@@ -1,0 +1,33 @@
+# TEMPLATE — RÉFÉRENTIEL PEUPLES (socle géographique, multi-pays)
+# =============================================================
+# À utiliser pour AJOUTER de nouveaux peuples (le "qui et où").
+# Ce format correspond au fichier Cameroon_PGs.xlsx et est PAYS-AGNOSTIQUE :
+# renseignez la colonne Country pour chaque ligne (Cameroon, Chad, Gabon, ...).
+#
+# IMPORT : depuis backend/, enregistrez vos données au format .xlsx (onglet "PGs")
+#   puis lancez :  node scripts/importPeoplesReference.js "data/VOTRE_FICHIER.xlsx"
+#   (ajoutez --dry-run pour prévisualiser sans écrire en base)
+# UPSERT par (People_Group + Village + Country) : réimporter ne crée pas de doublon.
+#
+# COLONNES :
+# - Region              : grande région / zone (ex. Francophone Central Africa)
+# - Country             : pays (REQUIS) — Cameroon, Chad, Central African Republic, Congo, Congo (DRC), Equatorial Guinea, Gabon
+# - People_Group        : nom du peuple (REQUIS)
+# - Village             : village/localité (sert de clé d'unicité avec People_Group + Country)
+# - District            : arrondissement -> stocké dans admin3
+# - Department          : département -> stocké dans admin2
+# - Province            : province/région -> stocké dans region
+# - Affinity_Group      : groupe d'affinité ethnolinguistique
+# - Language            : langue principale
+# - Religious_Background: religion dominante
+# - Urban_Rural         : Urbain / Rural / Mixte
+# - Start_Date          : (VOTRE donnée interne) année/date de début d'engagement
+# - Population_Size     : taille de population (texte libre autorisé ; le 1er nombre est extrait vers "population")
+# - E2M_Stage           : (VOTRE donnée interne) étape Engage-to-Movement
+# - Latitude            : latitude décimale (REQUIS pour apparaître sur la carte)
+# - Longitude           : longitude décimale (REQUIS pour apparaître sur la carte)
+# - Notes               : sources, niveau de confiance, remarques
+#
+Region,Country,People_Group,Village,District,Department,Province,Affinity_Group,Language,Religious_Background,Urban_Rural,Start_Date,Population_Size,E2M_Stage,Latitude,Longitude,Notes
+Francophone Central Africa,Cameroon,Akom,Akum,Furu-Awa,Menchum,Nord-Ouest,Sub-Saharan African Peoples,Akum,Christianisme,Rural,,≈2 800 (Cameroun),,5.887687,10.156404,Confirmé (Joshua Project). Géo approximative (chef-lieu de commune)
+Francophone Central Africa,Chad,Sara,Koumra,Koumra,Mandoul,Mandoul,Sub-Saharan African Peoples,Sara,Christianisme,Rural,,≈120 000,,8.9159,17.5540,Exemple — remplacez par vos données réelles

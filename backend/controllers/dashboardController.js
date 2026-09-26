@@ -34,6 +34,43 @@ const STATUS_DISPLAY_NAMES = {
   'pas-d-information': "Pas d'information"
 };
 
+const VILLAGE_REACHED_STATUSES = ['church-planted', 'multiplying', 'dmm', 'tipping-point', 'midway'];
+const VILLAGE_UNREACHED_STATUSES = ['unreached', 'pioneer', 'in-progress'];
+
+const buildVillageStatusCounts = async (match = {}) => {
+  const [statusAgg, totalCount] = await Promise.all([
+    Village.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: { $ifNull: ['$status', 'unreached'] },
+          count: { $sum: 1 }
+        }
+      }
+    ]),
+    Village.countDocuments(match)
+  ]);
+
+  const counts = {
+    unreached: 0,
+    pioneer: 0,
+    midway: 0,
+    'tipping-point': 0,
+    dmm: 0,
+    'in-progress': 0,
+    'church-planted': 0,
+    multiplying: 0,
+  };
+
+  statusAgg.forEach(item => {
+    if (Object.prototype.hasOwnProperty.call(counts, item._id)) {
+      counts[item._id] = item.count;
+    }
+  });
+
+  return { counts, totalCount };
+};
+
 /**
  * GET /api/dashboard/kpi-summary
  * Returns KPI cards data with counts by status
@@ -89,30 +126,7 @@ const getKPISummary = async (req, res) => {
     // Get total villages count
     const totalVillages = await Village.countDocuments();
 
-    // Aggregate villages by status (uses Village.status field, not PeopleGroup.engagementStatus)
-    const villageStatusAgg = await Village.aggregate([
-      {
-        $group: {
-          _id: { $ifNull: ['$status', 'unreached'] },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-    const villageStatusCounts = {
-      unreached: 0,
-      pioneer: 0,
-      midway: 0,
-      'tipping-point': 0,
-      dmm: 0,
-      'in-progress': 0,
-      'church-planted': 0,
-      multiplying: 0
-    };
-    villageStatusAgg.forEach(item => {
-      if (villageStatusCounts.hasOwnProperty(item._id)) {
-        villageStatusCounts[item._id] = item.count;
-      }
-    });
+    const { counts: villageStatusCounts } = await buildVillageStatusCounts();
 
     // Calculate coverage metrics
     const withDataCount = statusCounts.unreached + statusCounts.pioneer + 
@@ -339,30 +353,7 @@ const getCoverageGauge = async (req, res) => {
       : 0;
 
     // Aggregate village status counts
-    const villageStatusAggregation = await Village.aggregate([
-      {
-        $group: {
-          _id: { $ifNull: ['$status', 'unreached'] },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const villageStatusCounts = {
-      unreached: 0,
-      pioneer: 0,
-      midway: 0,
-      'tipping-point': 0,
-      dmm: 0,
-      'in-progress': 0,
-      'church-planted': 0,
-      multiplying: 0
-    };
-    villageStatusAggregation.forEach(item => {
-      if (Object.prototype.hasOwnProperty.call(villageStatusCounts, item._id)) {
-        villageStatusCounts[item._id] = item.count;
-      }
-    });
+    const { counts: villageStatusCounts, totalCount: villagesTotal } = await buildVillageStatusCounts();
 
     const villageCoverage = {
       withData: villagesWithPeopleGroups.length,
@@ -381,7 +372,9 @@ const getCoverageGauge = async (req, res) => {
         dmmCount: stats.dmm,
         saturationPercentage,
         villageStatusCounts,
-        villageCoverage
+        villageCoverage,
+        reachedVillages: VILLAGE_REACHED_STATUSES.reduce((sum, status) => sum + (villageStatusCounts[status] || 0), 0),
+        unreachedVillages: VILLAGE_UNREACHED_STATUSES.reduce((sum, status) => sum + (villageStatusCounts[status] || 0), 0)
       }
     });
   } catch (error) {

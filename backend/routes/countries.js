@@ -144,6 +144,24 @@ const COUNTRY_CONFIG = {
     languages: ['pt'],
     currency: 'STN',
   },
+  // ── AWA area (West Africa) ──────────────────────────────────────────────────
+  NG: { code: 'NG', code3: 'NGA', name: 'Nigéria', nameEn: 'Nigeria', capital: 'Abuja', region: 'West Africa', center: [9.0820, 8.6753], zoom: 6, bounds: [[4.2771, 2.6683], [13.8920, 14.6800]], languages: ['en'], currency: 'NGN' },
+  GH: { code: 'GH', code3: 'GHA', name: 'Ghana', nameEn: 'Ghana', capital: 'Accra', region: 'West Africa', center: [7.9465, -1.0232], zoom: 7, bounds: [[4.7388, -3.2607], [11.1733, 1.1993]], languages: ['en'], currency: 'GHS' },
+  SL: { code: 'SL', code3: 'SLE', name: 'Sierra Leone', nameEn: 'Sierra Leone', capital: 'Freetown', region: 'West Africa', center: [8.4606, -11.7799], zoom: 8, bounds: [[6.9285, -13.3079], [9.9992, -10.2640]], languages: ['en'], currency: 'SLL' },
+  LR: { code: 'LR', code3: 'LBR', name: 'Libéria', nameEn: 'Liberia', capital: 'Monrovia', region: 'West Africa', center: [6.4281, -9.4295], zoom: 7, bounds: [[4.3554, -11.4924], [8.5519, -7.3651]], languages: ['en'], currency: 'LRD' },
+  GM: { code: 'GM', code3: 'GMB', name: 'Gambie', nameEn: 'Gambia', capital: 'Banjul', region: 'West Africa', center: [13.4432, -15.3101], zoom: 8, bounds: [[13.0648, -16.8251], [13.8264, -13.7979]], languages: ['en'], currency: 'GMD' },
+  GW: { code: 'GW', code3: 'GNB', name: 'Guinée-Bissau', nameEn: 'Guinea-Bissau', capital: 'Bissau', region: 'West Africa', center: [11.8037, -15.1804], zoom: 8, bounds: [[10.9242, -16.7177], [12.6807, -13.6365]], languages: ['pt'], currency: 'XOF' },
+  GN: { code: 'GN', code3: 'GIN', name: 'Guinée', nameEn: 'Guinea', capital: 'Conakry', region: 'West Africa', center: [9.9456, -9.6966], zoom: 7, bounds: [[7.1906, -15.0779], [12.6764, -7.6411]], languages: ['fr'], currency: 'GNF' },
+  // ── FWA area (West Africa) ──────────────────────────────────────────────────
+  CI: { code: 'CI', code3: 'CIV', name: "Côte d'Ivoire", nameEn: "Côte d'Ivoire", capital: 'Yamoussoukro', region: 'West Africa', center: [7.5400, -5.5471], zoom: 7, bounds: [[4.3577, -8.6020], [10.7400, -2.4940]], languages: ['fr'], currency: 'XOF' },
+  BJ: { code: 'BJ', code3: 'BEN', name: 'Bénin', nameEn: 'Benin', capital: 'Porto-Novo', region: 'West Africa', center: [9.3077, 2.3158], zoom: 7, bounds: [[6.2359, 0.7766], [12.4183, 3.8517]], languages: ['fr'], currency: 'XOF' },
+  TG: { code: 'TG', code3: 'TGO', name: 'Togo', nameEn: 'Togo', capital: 'Lomé', region: 'West Africa', center: [8.6195, 0.8248], zoom: 7, bounds: [[6.1004, -0.1440], [11.1391, 1.8083]], languages: ['fr'], currency: 'XOF' },
+  NE: { code: 'NE', code3: 'NER', name: 'Niger', nameEn: 'Niger', capital: 'Niamey', region: 'West Africa', center: [17.6078, 8.0817], zoom: 5, bounds: [[11.6935, 0.1667], [23.5170, 15.9960]], languages: ['fr'], currency: 'XOF' },
+  ML: { code: 'ML', code3: 'MLI', name: 'Mali', nameEn: 'Mali', capital: 'Bamako', region: 'West Africa', center: [17.5707, -3.9962], zoom: 5, bounds: [[10.1596, -12.2402], [25.0000, 4.2455]], languages: ['fr'], currency: 'XOF' },
+  BF: { code: 'BF', code3: 'BFA', name: 'Burkina Faso', nameEn: 'Burkina Faso', capital: 'Ouagadougou', region: 'West Africa', center: [12.2383, -1.5616], zoom: 6, bounds: [[9.4011, -5.5188], [15.0850, 2.4054]], languages: ['fr'], currency: 'XOF' },
+  SN: { code: 'SN', code3: 'SEN', name: 'Sénégal', nameEn: 'Senegal', capital: 'Dakar', region: 'West Africa', center: [14.4974, -14.4524], zoom: 7, bounds: [[12.3072, -17.5353], [16.6919, -11.3558]], languages: ['fr'], currency: 'XOF' },
+  // ── FCA area (East Africa) ──────────────────────────────────────────────────
+  UG: { code: 'UG', code3: 'UGA', name: 'Ouganda', nameEn: 'Uganda', capital: 'Kampala', region: 'East Africa', center: [1.2533, 32.7433], zoom: 7, bounds: [[-1.4823, 29.5794], [4.2340, 35.0361]], languages: ['en'], currency: 'UGX' },
 };
 
 // Helper function to convert country code to database name

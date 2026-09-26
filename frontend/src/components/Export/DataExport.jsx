@@ -13,11 +13,23 @@ import {
 import toast from 'react-hot-toast'
 import { useLanguage } from '../../i18n'
 
+// Available people-group data sources. The new IMB (PeopleGroups.org) and
+// Finishing the Task (FTT) sources are included so exports can be filtered by source.
+const SOURCE_OPTIONS = [
+  { value: 'PeopleGroups.org', label: 'IMB / PeopleGroups.org' },
+  { value: 'Finishing the Task', label: 'Finishing the Task' },
+  { value: 'Joshua Project', label: 'Joshua Project' },
+  { value: 'DMM', label: 'DMM' },
+  { value: 'Survey', label: 'Survey' },
+  { value: 'manual', label: 'Manual' },
+]
+
 const DataExport = () => {
   const { t } = useLanguage()
   const [format, setFormat] = useState('json')
   const [selectedVillages, setSelectedVillages] = useState([])
   const [exportType, setExportType] = useState('all') // 'all' or 'selected'
+  const [selectedSources, setSelectedSources] = useState([]) // empty = all sources
 
   // Fetch villages for selection
   const { data: villagesData, isLoading: villagesLoading } = useQuery({
@@ -31,7 +43,10 @@ const DataExport = () => {
   // Export all mutation
   const exportAllMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.get(`/api/export/all?format=${format}`, {
+      const sourceParam = selectedSources.length > 0
+        ? `&source=${encodeURIComponent(selectedSources.join(','))}`
+        : ''
+      const response = await api.get(`/api/export/all?format=${format}${sourceParam}`, {
         responseType: 'blob'
       })
       return response
@@ -89,7 +104,10 @@ const DataExport = () => {
   // Export people groups mutation
   const exportPeopleGroupsMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.get(`/api/export/people-groups?format=${format}`, {
+      const sourceParam = selectedSources.length > 0
+        ? `&source=${encodeURIComponent(selectedSources.join(','))}`
+        : ''
+      const response = await api.get(`/api/export/people-groups?format=${format}${sourceParam}`, {
         responseType: 'blob'
       })
       return response
@@ -117,6 +135,14 @@ const DataExport = () => {
       prev.includes(villageId)
         ? prev.filter(id => id !== villageId)
         : [...prev, villageId]
+    )
+  }
+
+  const handleSourceToggle = (source) => {
+    setSelectedSources(prev =>
+      prev.includes(source)
+        ? prev.filter(s => s !== source)
+        : [...prev, source]
     )
   }
 
@@ -261,6 +287,34 @@ const DataExport = () => {
           )}
         </div>
       )}
+
+      {/* Source Filter (applies to "Export People Groups Only") */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Filter People Groups by Source <span className="text-gray-400 font-normal">(optional — empty = all sources)</span>
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {SOURCE_OPTIONS.map((src) => (
+            <button
+              key={src.value}
+              type="button"
+              onClick={() => handleSourceToggle(src.value)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-sm transition-colors ${
+                selectedSources.includes(src.value)
+                  ? 'border-primary-500 bg-primary-50 text-primary-700'
+                  : 'border-gray-200 hover:border-gray-300 text-gray-600'
+              }`}
+            >
+              {selectedSources.includes(src.value) ? (
+                <CheckSquare size={16} className="text-primary-600" />
+              ) : (
+                <Square size={16} />
+              )}
+              {src.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Export Buttons */}
       <div className="flex flex-wrap gap-3">

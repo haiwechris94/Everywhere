@@ -130,11 +130,21 @@ const PeopleGroupDetail = () => {
       population: peopleGroup.population || '',
       numberOfChurches: peopleGroup.numberOfChurches || 0,
       churchGeneration: peopleGroup.churchGeneration || 0,
+      dbs: peopleGroup.dbs || 0,
+      com: peopleGroup.com || 0,
+      cat: peopleGroup.cat || 0,
+      reportPeriod: peopleGroup.reportPeriod || '',
       villageName: peopleGroup.villageName || '',
       region: peopleGroup.region || '',
       country: peopleGroup.country || '',
       language: peopleGroup.language || '',
       religion: peopleGroup.religion || '',
+      donor: peopleGroup.donor || '',
+      nationalCoordinator: peopleGroup.nationalCoordinator || '',
+      churchPlanter: peopleGroup.churchPlanter || '',
+      affinityGroup: peopleGroup.affinityGroup || '',
+      urbanRural: peopleGroup.urbanRural || '',
+      startYear: peopleGroup.startYear || '',
       latitude: peopleGroup.location?.coordinates[1] || '',
       longitude: peopleGroup.location?.coordinates[0] || '',
     })
@@ -147,6 +157,11 @@ const PeopleGroupDetail = () => {
       population: parseInt(editData.population) || 0,
       numberOfChurches: parseInt(editData.numberOfChurches) || 0,
       churchGeneration: parseInt(editData.churchGeneration) || 0,
+      dbs: parseInt(editData.dbs) || 0,
+      com: parseInt(editData.com) || 0,
+      cat: parseInt(editData.cat) || 0,
+      reportPeriod: editData.reportPeriod || '',
+      startYear: editData.startYear ? parseInt(editData.startYear) : undefined,
     }
     if (editData.latitude && editData.longitude) {
       updateData.location = {
@@ -330,6 +345,50 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="form-label">DBS</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editData.dbs}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, dbs: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">COM</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editData.com}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, com: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">CAT</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editData.cat}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, cat: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">Trimestre (reportPeriod)</label>
+                    <input
+                      type="text"
+                      placeholder="ex. 2Q26"
+                      value={editData.reportPeriod}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, reportPeriod: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="form-label">{t('peopleMap.region')}</label>
@@ -368,6 +427,66 @@ const PeopleGroupDetail = () => {
                       step="any"
                       value={editData.longitude}
                       onChange={(e) => setEditData((prev) => ({ ...prev, longitude: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">Affinity Group</label>
+                    <input
+                      type="text"
+                      value={editData.affinityGroup}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, affinityGroup: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Urban / Rural</label>
+                    <input
+                      type="text"
+                      value={editData.urbanRural}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, urbanRural: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">Start Year</label>
+                    <input
+                      type="number"
+                      value={editData.startYear}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, startYear: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Donor</label>
+                    <input
+                      type="text"
+                      value={editData.donor}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, donor: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="form-label">National Coordinator</label>
+                    <input
+                      type="text"
+                      value={editData.nationalCoordinator}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, nationalCoordinator: e.target.value }))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Church Planter</label>
+                    <input
+                      type="text"
+                      value={editData.churchPlanter}
+                      onChange={(e) => setEditData((prev) => ({ ...prev, churchPlanter: e.target.value }))}
                       className="form-input"
                     />
                   </div>
@@ -417,6 +536,29 @@ const PeopleGroupDetail = () => {
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.churchGeneration')}</p>
                       <p className="text-lg font-semibold">{peopleGroup.churchGeneration || 0}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Activity size={24} className="text-primary-600" />
+                    <div>
+                      <p className="text-sm text-gray-500">DBS</p>
+                      <p className="text-lg font-semibold">{peopleGroup.dbs || 0}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Users size={24} className="text-primary-600" />
+                    <div>
+                      <p className="text-sm text-gray-500">COM</p>
+                      <p className="text-lg font-semibold">{peopleGroup.com || 0}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Church size={24} className="text-primary-600" />
+                    <div>
+                      <p className="text-sm text-gray-500">CAT</p>
+                      <p className="text-lg font-semibold">{peopleGroup.cat || 0}</p>
                     </div>
                   </div>
                 </div>
@@ -577,6 +719,46 @@ const PeopleGroupDetail = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">Religion</span>
                   <span className="font-semibold">{peopleGroup.religion}</span>
+                </div>
+              )}
+              {peopleGroup.affinityGroup && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Affinity Group</span>
+                  <span className="font-semibold text-right">{peopleGroup.affinityGroup}</span>
+                </div>
+              )}
+              {peopleGroup.urbanRural && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Urban / Rural</span>
+                  <span className="font-semibold text-right">{peopleGroup.urbanRural}</span>
+                </div>
+              )}
+              {peopleGroup.startYear && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Start Year</span>
+                  <span className="font-semibold">{peopleGroup.startYear}</span>
+                </div>
+              )}
+              {peopleGroup.donor && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Donor</span>
+                  <span className="font-semibold text-right">{peopleGroup.donor}</span>
+                </div>
+              )}
+              {peopleGroup.nationalCoordinator && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">National Coordinator</span>
+                  <span className="font-semibold text-right">{peopleGroup.nationalCoordinator}</span>
+                </div>
+              )}
+              {peopleGroup.churchPlanter && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">Church Planter</span>
+                  <span className="font-semibold text-right">
+                    <Link to={`/planters/${encodeURIComponent(peopleGroup.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
+                      {peopleGroup.churchPlanter}
+                    </Link>
+                  </span>
                 </div>
               )}
               {peopleGroup.createdAt && (

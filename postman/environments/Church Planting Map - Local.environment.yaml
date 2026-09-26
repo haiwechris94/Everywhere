@@ -4,5 +4,5 @@ values:
     value: 'http://localhost:5000'
     enabled: true
   - key: token
-    value: ''
+    value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWI3NDQ1ZThhMTQyNDFjZWMzOTVkMWIiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODI0NjgwODQsImV4cCI6MTc4MzA3Mjg4NH0.scKpZbHHj-fzvE5WJFMHAcQt25ueHW96mYREZ58mcNQ'
     enabled: true

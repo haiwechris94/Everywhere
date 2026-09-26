@@ -20,7 +20,8 @@
     "population:integrate": "node scripts/integratePopulationData.js",
     "population:update": "node scripts/integratePopulationData.js --update",
     "population:dry-run": "node scripts/integratePopulationData.js --dry-run --verbose",
-    "db:indexes": "node scripts/createIndexes.js"
+    "db:indexes": "node scripts/createIndexes.js",
+    "ingest:dmm": "node scripts/ingestDmmPeople.js"
   },
   "keywords": [
     "church",

@@ -47,11 +47,21 @@ const PendingValidations = () => {
 
   const approveMutation = useMutation({
     mutationFn: (id) => peopleGroupsApi.approve(id),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      // Backend returns 200 (with alreadyApproved:true) even if it was already
+      // approved, so we always refresh the pending list to drop the item.
       queryClient.invalidateQueries(['pendingValidations'])
-      toast.success(t('validation.approveSuccess'))
+      queryClient.invalidateQueries(['dmm-review-count'])
+      if (res?.data?.alreadyApproved) {
+        toast.success(t('validation.approveSuccess'))
+      } else {
+        toast.success(t('validation.approveSuccess'))
+      }
     },
     onError: (error) => {
+      // Even on error, refresh so the list reflects the true server state
+      // (prevents an item lingering after it was actually approved).
+      queryClient.invalidateQueries(['pendingValidations'])
       toast.error(error.response?.data?.message || t('validation.approveError'))
     },
   })

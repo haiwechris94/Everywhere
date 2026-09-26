@@ -1,0 +1,40 @@
+# TEMPLATE — SUIVI TRIMESTRIEL (métriques DMM par trimestre ET par pays)
+# =====================================================================
+# À utiliser pour les IMPORTS RÉCURRENTS de métriques (le "combien").
+# Chaque import correspond à UN trimestre (reportPeriod, ex. 3Q26) et peut
+# contenir PLUSIEURS pays à la fois.
+#
+# IMPORT : via l'écran "Données > Importer" de l'application (route POST /import/people-groups).
+# UPSERT par (name + villageName + country) : le peuple existant (issu du
+# référentiel) est mis à jour et un point d'HISTORIQUE daté du trimestre est
+# ajouté — pas de doublon, l'évolution est conservée trimestre après trimestre.
+#
+# BONNES PRATIQUES :
+# - Utilisez EXACTEMENT le même name + villageName + country que dans le référentiel
+#   pour que les métriques s'attachent au bon peuple (sinon un nouveau peuple est créé).
+# - Laissez latitude/longitude vides si le peuple existe déjà (ses coordonnées
+#   du référentiel sont conservées) ; renseignez-les seulement pour un nouveau peuple.
+# - reportPeriod : format trimestre, ex. 1Q26, 2Q26, 3Q26, 4Q26.
+#
+# COLONNES :
+# - name             : nom du peuple (REQUIS) — doit correspondre au référentiel
+# - villageName      : village (clé d'unicité avec name + country)
+# - country          : pays (REQUIS) — clé d'unicité
+# - reportPeriod     : trimestre du rapport (ex. 3Q26) (REQUIS)
+# - dbs              : nombre de Discovery Bible Studies
+# - com              : nombre de Communautés
+# - cat              : nombre d'églises catégorisées
+# - numberOfChurches : nombre total d'églises (détermine le statut si engagementStatus absent)
+# - churchGeneration : génération de multiplication (1-4+)
+# - engagementStatus : unreached / pioneer / midway / tipping-point / dmm (auto-calculé si vide)
+# - population        : population (optionnel)
+# - latitude          : latitude (optionnel — laisser vide pour un peuple déjà référencé)
+# - longitude         : longitude (optionnel — laisser vide pour un peuple déjà référencé)
+# - region            : région (optionnel)
+# - language          : langue (optionnel)
+# - religion          : religion (optionnel)
+# - description       : notes du trimestre (optionnel)
+#
+name,villageName,country,reportPeriod,dbs,com,cat,numberOfChurches,churchGeneration,engagementStatus,population,latitude,longitude,region,language,religion,description
+Bana,Mahaou,Cameroon,3Q26,27,5,15,20,4,,,,, ,,,Rapport trimestriel 3Q26 — exemple
+Sara,Koumra,Chad,3Q26,3,1,0,1,1,,,,, ,,,Rapport trimestriel 3Q26 — exemple

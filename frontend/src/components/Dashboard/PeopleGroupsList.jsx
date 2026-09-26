@@ -14,6 +14,7 @@ import {
   Database,
 } from 'lucide-react'
 import { useLanguage } from '../../i18n'
+import KPICards from './KPICards'
 
 // Status colors configuration
 const STATUS_COLORS = {
@@ -25,6 +26,22 @@ const STATUS_COLORS = {
 }
 
 const STATUS_ORDER = ['unreached', 'pioneer', 'midway', 'tipping-point', 'dmm']
+const HIERARCHY_ORDER = ['country', 'region', 'department', 'district', 'subDistrict']
+
+const HIERARCHY_CONFIG = {
+  country: { label: 'Pays', field: 'country' },
+  region: { label: 'Région', field: 'region' },
+  department: { label: 'District', field: 'departement' },
+  district: { label: 'Sous-district', field: 'arrondissement' },
+  subDistrict: { label: 'Village', field: 'villageName' },
+}
+
+const formatPeopleVillageName = (peopleName, villageName) => {
+  const name = (peopleName || '').trim()
+  const village = (villageName || '').trim()
+  if (name && village) return `${name}, ${village}`
+  return name || village || '-'
+}
 
 const PeopleGroupsList = ({ peopleGroups = [] }) => {
   const { t } = useLanguage()
@@ -36,6 +53,8 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
     { value: 'DMM', label: 'DMM', color: 'bg-blue-100 text-blue-700' },
     { value: 'Joshua Project', label: 'Joshua Project', color: 'bg-amber-100 text-amber-700' },
     { value: 'Manual', label: t('common.import') || 'Manual', color: 'bg-gray-100 text-gray-600' },
+    { value: 'PeopleGroups.org', label: 'IMB / PeopleGroups.org', color: 'bg-emerald-100 text-emerald-700' },
+    { value: 'Finishing the Task', label: 'Finishing the Task', color: 'bg-violet-100 text-violet-700' },
     // Add new organisations here in the future
   ], [t])
 
@@ -52,7 +71,8 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
   const [sourceFilter, setSourceFilter] = useState('all')
   const [activeStatuses, setActiveStatuses] = useState([])
   const [sortBy, setSortBy] = useState('name-asc')
-  const [viewMode, setViewMode] = useState('country')
+  const [viewMode, setViewMode] = useState('hierarchy')
+  const [hierarchyLevel, setHierarchyLevel] = useState('country')
   const [expandedGroups, setExpandedGroups] = useState(new Set())
   const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false)
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false)
@@ -114,6 +134,39 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
   }, [sortedGroups])
 
+  const getGroupStatusCounts = (items) => {
+    const counts = {}
+    items.forEach(pg => {
+      if (pg.engagementStatus) counts[pg.engagementStatus] = (counts[pg.engagementStatus] || 0) + 1
+    })
+    return counts
+  }
+
+  const groupedByHierarchy = useMemo(() => {
+    const config = HIERARCHY_CONFIG[hierarchyLevel]
+    const nextLevel = HIERARCHY_ORDER[HIERARCHY_ORDER.indexOf(hierarchyLevel) + 1] || null
+    const groups = {}
+
+    sortedGroups.forEach(pg => {
+      const key = pg?.[config.field] || 'Unknown'
+      if (!groups[key]) groups[key] = []
+      groups[key].push(pg)
+    })
+
+    return {
+      items: Object.entries(groups)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([name, items]) => ({
+          name,
+          items,
+          nextLevel,
+          statusCounts: getGroupStatusCounts(items),
+        })),
+      nextLevel,
+      config,
+    }
+  }, [sortedGroups, hierarchyLevel])
+
   const groupedByStatus = useMemo(() => {
     const groups = {}
     STATUS_ORDER.forEach(s => { groups[s] = [] })
@@ -153,9 +206,11 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
   }
 
   const expandAll = () => {
-    const keys = viewMode === 'country'
-      ? groupedByCountry.map(([c]) => c)
-      : groupedByStatus.map(([s]) => s)
+    const keys = viewMode === 'hierarchy'
+      ? groupedByHierarchy.items.map(({ name }) => name)
+      : viewMode === 'country'
+        ? groupedByCountry.map(([c]) => c)
+        : groupedByStatus.map(([s]) => s)
     setExpandedGroups(new Set(keys))
   }
 
@@ -197,14 +252,6 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
     URL.revokeObjectURL(url)
   }
 
-  const getGroupStatusCounts = (items) => {
-    const counts = {}
-    items.forEach(pg => {
-      if (pg.engagementStatus) counts[pg.engagementStatus] = (counts[pg.engagementStatus] || 0) + 1
-    })
-    return counts
-  }
-
   const StatusBadge = ({ status }) => {
     const colors = STATUS_COLORS[status] || { bg: 'bg-gray-100', text: 'text-gray-700', label: status || (t('common.unknown') || 'Unknown') }
     return (
@@ -242,7 +289,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
             const hasCoords = pg.location?.coordinates?.length >= 2
             return (
               <tr key={pg._id || idx} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{pg.name || '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{formatPeopleVillageName(pg.name, pg.villageName)}</td>
                 <td className="px-4 py-2 whitespace-nowrap"><StatusBadge status={pg.engagementStatus} /></td>
                 <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.population ? pg.population.toLocaleString() : '-'}</td>
                 <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.numberOfChurches || 0}</td>
@@ -267,7 +314,10 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
   )
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 relative z-10">
+    <div className="space-y-4">
+      <KPICards />
+
+      <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 relative z-10">
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -361,11 +411,11 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
           {/* View mode toggle */}
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             <button
-              onClick={() => setViewMode('country')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'country' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              onClick={() => setViewMode('hierarchy')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'hierarchy' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
             >
               <Globe className="h-4 w-4" />
-              {t('peopleMap.country') || 'Country'}
+              Hiérarchie
             </button>
             <button
               onClick={() => setViewMode('status')}
@@ -376,6 +426,18 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="px-6 py-3 border-b border-gray-200 bg-slate-50/60 flex items-center gap-2 flex-wrap">
+        {HIERARCHY_ORDER.map(level => (
+          <button
+            key={level}
+            onClick={() => setHierarchyLevel(level)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${hierarchyLevel === level ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+          >
+            {HIERARCHY_CONFIG[level].label}
+          </button>
+        ))}
       </div>
 
       {/* Status filter pills */}
@@ -436,7 +498,45 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
 
       {/* Accordion list */}
       <div className="divide-y divide-gray-100">
-        {viewMode === 'country' ? (
+        {viewMode === 'hierarchy' ? (
+          groupedByHierarchy.items.length === 0 ? (
+            <div className="p-12 text-center text-gray-400">
+              <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p className="font-medium">{t('peopleMap.noPeopleFound') || 'No people group found'}</p>
+            </div>
+          ) : (
+            groupedByHierarchy.items.map(({ name, items, statusCounts }) => {
+              const isExpanded = expandedGroups.has(name)
+              return (
+                <div key={name}>
+                  <button
+                    onClick={() => toggleGroup(name)}
+                    className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      {isExpanded ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
+                      <span className="font-semibold text-gray-800">{name}</span>
+                      <span className="text-sm text-gray-400">({items.length})</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {STATUS_ORDER.map(status => {
+                        const count = statusCounts[status]
+                        if (!count) return null
+                        const colors = STATUS_COLORS[status]
+                        return <span key={status} className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${colors.bg} ${colors.text}`}>{count}</span>
+                      })}
+                    </div>
+                  </button>
+                  {isExpanded && (
+                    <div className="px-6 pb-4">
+                      {renderTable(items)}
+                    </div>
+                  )}
+                </div>
+              )
+            })
+          )
+        ) : viewMode === 'country' ? (
           groupedByCountry.length === 0 ? (
             <div className="p-12 text-center text-gray-400">
               <Users className="h-12 w-12 mx-auto mb-3 opacity-30" />
@@ -526,6 +626,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
       {(sourceDropdownOpen || sortDropdownOpen) && (
         <div className="fixed inset-0 z-10" onClick={() => { setSourceDropdownOpen(false); setSortDropdownOpen(false) }} />
       )}
+      </div>
     </div>
   )
 }

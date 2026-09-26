@@ -14,6 +14,8 @@ const SOURCE_OPTIONS = [
   { key: 'dmm',            labelKey: 'map.sources.dmm',           fallback: 'DMM' },
   { key: 'survey',         labelKey: 'map.sources.survey',        fallback: 'Survey' },
   { key: 'joshua-project', labelKey: 'map.sources.joshuaProject', fallback: 'Joshua Project' },
+  { key: 'imb',            labelKey: 'map.sources.imb',           fallback: 'IMB / PeopleGroups.org', color: '#10b981' },
+  { key: 'ftt',            labelKey: 'map.sources.ftt',           fallback: 'Finishing the Task',     color: '#8b5cf6' },
 ]
 
 /**
@@ -26,7 +28,7 @@ const SOURCE_OPTIONS = [
  * Props:
  *  search, onSearchChange
  *  statusFilter (Set or Array of status keys), onStatusToggle(statusKey)
- *  sourceFilter ({dmm, survey, joshuaProject} booleans), onSourceToggle(sourceKey)
+ *  sourceFilter ({dmm, survey, joshuaProject, imb, ftt} booleans), onSourceToggle(sourceKey)
  *  country (string), onCountryChange(country)
  *  countries (array of strings)
  *  onClearAll
@@ -36,7 +38,7 @@ const FilterPanel = ({
   onSearchChange,
   statusFilter = new Set(),
   onStatusToggle,
-  sourceFilter = { dmm: true, survey: true, joshuaProject: true },
+  sourceFilter = { dmm: true, survey: true, joshuaProject: true, imb: true, ftt: true },
   onSourceToggle,
   country = '',
   onCountryChange,
@@ -162,6 +164,12 @@ const FilterPanel = ({
                       onChange={() => onSourceToggle?.(stateKey)}
                       className="w-3.5 h-3.5 rounded border-neutral-300 text-primary-600 focus:ring-primary-400 focus:ring-offset-0"
                     />
+                    {src.color && (
+                      <span
+                        className="w-2.5 h-2.5 rounded-full ring-1 ring-white shadow-sm"
+                        style={{ backgroundColor: src.color }}
+                      />
+                    )}
                     <span className="flex-1">{tx(src.labelKey, src.fallback)}</span>
                   </label>
                 )

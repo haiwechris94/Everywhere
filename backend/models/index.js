@@ -10,6 +10,10 @@ const Organization = require('./Organization');
 const Notification = require('./Notification');
 const ActivityLog = require('./ActivityLog');
 const Country = require('./Country');
+const PersonOfPeace = require('./PersonOfPeace');
+const DiscoveryGroup = require('./DiscoveryGroup');
+const DBSSession = require('./DBSSession');
+const CoachingSession = require('./CoachingSession');
 
 module.exports = {
   User,
@@ -21,4 +25,8 @@ module.exports = {
   Notification,
   ActivityLog,
   Country,
+  PersonOfPeace,
+  DiscoveryGroup,
+  DBSSession,
+  CoachingSession,
 };

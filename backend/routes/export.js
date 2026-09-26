@@ -311,14 +311,23 @@ router.get('/share-link', auth, async (req, res) => {
  */
 router.get('/all', auth, canExport, logExport('all'), async (req, res) => {
   try {
-    const { format = 'json' } = req.query;
+    const { format = 'json', source } = req.query;
 
     // Fetch all data
     const villages = await Village.find({})
       .select('-__v')
       .lean();
 
-    const peopleGroups = await PeopleGroup.find({ approved: true })
+    // Filter people groups by data source(s) — supports a single value or a
+    // comma-separated list (e.g. "IMB,PeopleGroups.org,Finishing the Task")
+    const pgQueryAll = { approved: true };
+    if (source) {
+      const sources = String(source).split(',').map(s => s.trim()).filter(Boolean);
+      if (sources.length === 1) pgQueryAll.source = sources[0];
+      else if (sources.length > 1) pgQueryAll.source = { $in: sources };
+    }
+
+    const peopleGroups = await PeopleGroup.find(pgQueryAll)
       .select('-__v -progressHistory')
       .lean();
 
@@ -364,12 +373,12 @@ router.get('/all', auth, canExport, logExport('all'), async (req, res) => {
       // People Groups CSV
       csvContent += '\n=== PEOPLE GROUPS ===\n';
       if (peopleGroups.length > 0) {
-        const pgHeaders = ['name', 'status', 'engagementStatus', 'population', 'numberOfChurches', 'churchGeneration', 'villageName', 'latitude', 'longitude'];
+        const pgHeaders = ['name', 'source', 'status', 'engagementStatus', 'population', 'numberOfChurches', 'churchGeneration', 'villageName', 'latitude', 'longitude'];
         csvContent += pgHeaders.join(',') + '\n';
         peopleGroups.forEach(pg => {
           const lat = pg.location?.coordinates?.[1] || '';
           const lng = pg.location?.coordinates?.[0] || '';
-          csvContent += `"${pg.name || ''}","${pg.status || ''}","${pg.engagementStatus || ''}",${pg.population || 0},${pg.numberOfChurches || 0},${pg.churchGeneration || 0},"${pg.villageName || ''}",${lat},${lng}\n`;
+          csvContent += `"${pg.name || ''}","${pg.source || ''}","${pg.status || ''}","${pg.engagementStatus || ''}",${pg.population || 0},${pg.numberOfChurches || 0},${pg.churchGeneration || 0},"${pg.villageName || ''}",${lat},${lng}\n`;
         });
       }
       
@@ -515,12 +524,19 @@ router.post('/villages', auth, canExport, logExport('villages'), async (req, res
  */
 router.get('/people-groups', auth, canExport, logExport('people-groups'), async (req, res) => {
   try {
-    const { format = 'csv', status, region, country } = req.query;
+    const { format = 'csv', status, region, country, source } = req.query;
 
     const query = { approved: true };
     if (status) query.status = status;
     if (region) query.region = region;
     if (country) query.country = country;
+    // Filter by data source(s) — supports a single value or a comma-separated
+    // list (e.g. "IMB,PeopleGroups.org,Finishing the Task")
+    if (source) {
+      const sources = String(source).split(',').map(s => s.trim()).filter(Boolean);
+      if (sources.length === 1) query.source = sources[0];
+      else if (sources.length > 1) query.source = { $in: sources };
+    }
 
     const peopleGroups = await PeopleGroup.find(query)
       .populate('village', 'name')
@@ -530,13 +546,13 @@ router.get('/people-groups', auth, canExport, logExport('people-groups'), async 
     const filename = `people-groups-${new Date().toISOString().split('T')[0]}`;
 
     if (format === 'csv') {
-      const headers = ['name', 'description', 'status', 'engagementStatus', 'engagementLevel', 'population', 'numberOfChurches', 'churchGeneration', 'villageName', 'region', 'country', 'language', 'religion', 'latitude', 'longitude'];
+      const headers = ['name', 'description', 'source', 'status', 'engagementStatus', 'engagementLevel', 'population', 'numberOfChurches', 'churchGeneration', 'villageName', 'region', 'country', 'language', 'religion', 'latitude', 'longitude'];
       let csvContent = headers.join(',') + '\n';
       
       peopleGroups.forEach(pg => {
         const lat = pg.location?.coordinates?.[1] || '';
         const lng = pg.location?.coordinates?.[0] || '';
-        csvContent += `"${pg.name || ''}","${(pg.description || '').replace(/"/g, '""')}","${pg.status || ''}","${pg.engagementStatus || ''}","${pg.engagementLevel || ''}",${pg.population || 0},${pg.numberOfChurches || 0},${pg.churchGeneration || 0},"${pg.villageName || ''}","${pg.region || ''}","${pg.country || ''}","${pg.language || ''}","${pg.religion || ''}",${lat},${lng}\n`;
+        csvContent += `"${pg.name || ''}","${(pg.description || '').replace(/"/g, '""')}","${pg.source || ''}","${pg.status || ''}","${pg.engagementStatus || ''}","${pg.engagementLevel || ''}",${pg.population || 0},${pg.numberOfChurches || 0},${pg.churchGeneration || 0},"${pg.villageName || ''}","${pg.region || ''}","${pg.country || ''}","${pg.language || ''}","${pg.religion || ''}",${lat},${lng}\n`;
       });
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');

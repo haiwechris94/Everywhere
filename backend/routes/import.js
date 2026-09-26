@@ -8,8 +8,10 @@ const csv = require('csv-parser');
 const { Readable } = require('stream');
 const PeopleGroup = require('../models/PeopleGroup');
 const Village = require('../models/Village');
+const MasterPeople = require('../models/MasterPeople');
 const { auth } = require('../middleware/auth');
 const { isMissionary } = require('../middleware/roles');
+const { COUNTRY_CONFIG } = require('./countries');
 
 const router = express.Router();
 
@@ -80,7 +82,17 @@ const sanitizeString = (value) => {
  */
 const parseNumber = (value, defaultValue = 0) => {
   if (value === null || value === undefined || value === '') return defaultValue;
-  const cleaned = String(value).replace(/[^\d.-]/g, '');
+  let str = String(value).trim();
+  // Remove spaces and non-breaking spaces used as thousands separators (e.g. "1 234,5")
+  str = str.replace(/[\s\u00A0]/g, '');
+  // French decimals: if there's a comma and no dot, treat comma as decimal separator.
+  if (str.indexOf(',') !== -1 && str.indexOf('.') === -1) {
+    str = str.replace(',', '.');
+  } else if (str.indexOf(',') !== -1 && str.indexOf('.') !== -1) {
+    // Both present: assume comma is a thousands separator (e.g. "1,234.5")
+    str = str.replace(/,/g, '');
+  }
+  const cleaned = str.replace(/[^\d.-]/g, '');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? defaultValue : parsed;
 };
@@ -91,6 +103,97 @@ const parseNumber = (value, defaultValue = 0) => {
 const parseInt = (value, defaultValue = 0) => {
   const num = parseNumber(value, defaultValue);
   return Math.floor(num);
+};
+
+/**
+ * Canonical header -> internal field map.
+ * Keys are the header label lowercased with all non-alphanumeric chars removed.
+ * Handles the new 20-column DMM template (incl. the source misspelling
+ * "NG_Engagment_Name") as well as the legacy coordinate-based template.
+ */
+const HEADER_MAP = {
+  // identity
+  name: 'name',
+  peoplegroupname: 'name',
+  peoplename: 'name',
+  groupname: 'name',
+  ngengagmentname: 'name',   // NG_Engagment_Name (source misspelling)
+  ngengagementname: 'name',
+  peoplegroup: 'peopleGroup',
+  villagename: 'villageName',
+  // churches
+  numberofchurches: 'numberOfChurches',
+  total: 'numberOfChurches',
+  churches: 'numberOfChurches',
+  churchgeneration: 'churchGeneration',
+  maxgen: 'churchGeneration',
+  generation: 'churchGeneration',
+  avgchurchsize: 'avgChurchSize',
+  // discovery / metrics
+  dbs: 'dbs',
+  com: 'com',
+  cat: 'cat',
+  newdisciples: 'newDisciples',
+  newbaptisms: 'newBaptisms',
+  newbaptized: 'newBaptisms',
+  leadersintraining: 'leadersInTraining',
+  activetrainerscoaches: 'activeCoaches',
+  activecoaches: 'activeCoaches',
+  oftrainingsheldinquarter: 'trainingsHeld',
+  trainingsheld: 'trainingsHeld',
+  lostchs: 'lostChurches',
+  mergedchs: 'mergedChurches',
+  notes: 'notes',
+  // status / period / geo
+  reportperiod: 'reportPeriod',
+  reportingperiod: 'reportPeriod',
+  engagementstatus: 'engagementStatus',
+  engagementlevel: 'engagementLevel',
+  region: 'region',
+  country: 'country',
+  population: 'population',
+  language: 'language',
+  religion: 'religion',
+  description: 'description',
+  // Cameroon / reporting aliases used by the import templates and reporting views
+  peoplegroupname: 'name',
+  peoplesgroup: 'peopleGroup',
+  peoplesgroupname: 'name',
+  ngengangementname: 'name',
+  ngengagementname: 'name',
+  ngengagmentname: 'name',
+  peoplegroupstatus: 'engagementStatus',
+  status: 'status',
+  reportingperiod: 'reportPeriod',
+  source: 'source',
+  village: 'villageName',
+  // country code + administrative levels (department / arrondissement)
+  countrycode: 'countryCode',
+  isocountrycode: 'countryCode',
+  admin2: 'admin2',
+  admin3: 'admin3',
+  departement: 'admin2',
+  department: 'admin2',
+  province: 'admin2',
+  arrondissement: 'admin3',
+  district: 'admin3',
+  subdivision: 'admin3',
+  commune: 'admin3',
+  // coordinates
+  lat: 'latitude',
+  latitude: 'latitude',
+  lng: 'longitude',
+  lon: 'longitude',
+  longitude: 'longitude',
+};
+
+/**
+ * Normalize a raw CSV header to an internal field name using HEADER_MAP.
+ * Falls back to the alphanumeric-only key when no mapping exists.
+ */
+const normalizeHeaderKey = (rawKey) => {
+  const k = removeBOM(String(rawKey || '')).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  return HEADER_MAP[k] || k;
 };
 
 /**
@@ -124,6 +227,91 @@ const calculateEngagementStatus = (numberOfChurches) => {
 };
 
 /**
+ * Determine whether an imported people group should be linked into the DMM
+ * reporting/query chain.
+ *
+ * We keep the existing import behavior intact, but for Cameroon DMM rows we
+ * need the backend to persist the linkage fields used by reporting and detail
+ * pages:
+ * - source: must be DMM (or Survey for legacy trusted imports)
+ * - approved: must be true so report queries do not filter it out
+ * - masterPeopleId: optional but required when the row is part of the NG chain
+ * - isNGEngaged: compatibility flag for downstream consumers that still inspect
+ *   the legacy boolean
+ */
+const isReportingVisibleDmmSource = (source) => ['DMM', 'Survey', 'manual'].includes(source);
+
+/**
+ * Build a lookup table that maps every known country identifier (alpha-2,
+ * alpha-3, French name, English name) to its canonical ISO 3166-1 alpha-2 code.
+ * Built once from COUNTRY_CONFIG (the same source of truth used by the
+ * reporting / countries / regions endpoints) so imported PeopleGroups end up
+ * with a countryCode the funnel can actually filter on.
+ */
+const COUNTRY_LOOKUP = (() => {
+  const map = {};
+  const norm = (s) => sanitizeString(s).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  Object.values(COUNTRY_CONFIG || {}).forEach((cfg) => {
+    if (!cfg || !cfg.code) return;
+    const code2 = cfg.code.toUpperCase();
+    [cfg.code, cfg.code3, cfg.name, cfg.nameEn].forEach((alias) => {
+      const key = norm(alias);
+      if (key) map[key] = code2;
+    });
+  });
+  return map;
+})();
+
+/**
+ * Resolve a raw CSV country value (e.g. "Cameroon", "Cameroun", "CMR", "CM")
+ * to its ISO 3166-1 alpha-2 code (e.g. "CM"). Returns '' when it can't be
+ * resolved so we never persist an invalid > 2-char value that would break the
+ * schema (countryCode maxlength: 2) and the reporting/country/region filters.
+ */
+const normalizeCountryCode = (country) => {
+  const raw = sanitizeString(country);
+  if (!raw) return '';
+  const key = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (COUNTRY_LOOKUP[key]) return COUNTRY_LOOKUP[key];
+  // If it is already a valid 2-letter code we know about, keep it.
+  const upper = raw.toUpperCase();
+  if (upper.length === 2 && COUNTRY_CONFIG[upper]) return upper;
+  return '';
+};
+
+const inferMasterPeopleLink = ({ source, name, country, villageName, peopleGroup }) => {
+  if (!isReportingVisibleDmmSource(source)) return null;
+
+  const rawName = sanitizeString(peopleGroup || name);
+  const rawCountry = normalizeCountryCode(country);
+  const rawVillage = sanitizeString(villageName);
+
+  return {
+    // Preserve the existing import behavior while exposing the minimal fields
+    // required by reporting/detail queries to treat Cameroon DMM rows as part
+    // of the DMM chain.
+    approved: true,
+    masterPeopleId: null,
+    isNGEngaged: source === 'DMM' || source === 'Survey',
+    countryCode: rawCountry || undefined,
+    peopleGroup: rawName || undefined,
+    villageName: rawVillage || undefined,
+  };
+};
+
+const applyReportingVisibilityPatch = (doc) => {
+  if (!doc) return;
+
+  const isVisibleSource = isReportingVisibleDmmSource(doc.source);
+  if (!isVisibleSource) return;
+
+  doc.approved = true;
+  if (doc.masterPeopleId === undefined) doc.masterPeopleId = null;
+  if (doc.isNGEngaged === undefined) doc.isNGEngaged = doc.source === 'DMM' || doc.source === 'Survey';
+  if (!doc.peopleGroup && doc.name) doc.peopleGroup = doc.name;
+};
+
+/**
  * Validate coordinates
  */
 const validateCoordinates = (lat, lng) => {
@@ -144,6 +332,76 @@ const validateCoordinates = (lat, lng) => {
   return errors;
 };
 
+const buildGeoPoint = (latitude, longitude) => {
+  if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+    return { type: 'Point', coordinates: [longitude, latitude] };
+  }
+  return undefined;
+};
+
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const normalizeMatchToken = (value) => sanitizeString(value).toLowerCase().replace(/\s+/g, ' ');
+
+const buildMasterPeopleMatchCandidates = ({ source, name, country, villageName, peopleGroup }) => {
+  if (!isReportingVisibleDmmSource(source)) return [];
+
+  const normalizedName = normalizeMatchToken(peopleGroup || name);
+  const normalizedCountry = sanitizeString(country).toUpperCase();
+  const normalizedVillage = normalizeMatchToken(villageName);
+  const nameRegex = new RegExp(`^${escapeRegExp(normalizedName)}$`, 'i');
+  const candidates = [];
+
+  if (!normalizedName) return candidates;
+
+  if (normalizedCountry && normalizedVillage) {
+    candidates.push({
+      type: 'country+name+village',
+      query: {
+        canonicalName: nameRegex,
+        primaryCountryCode: normalizedCountry.length === 2 ? normalizedCountry : undefined,
+      },
+    });
+  }
+
+  if (normalizedCountry) {
+    candidates.push({
+      type: 'country+name',
+      query: {
+        canonicalName: nameRegex,
+        primaryCountryCode: normalizedCountry.length === 2 ? normalizedCountry : undefined,
+      },
+    });
+  }
+
+  candidates.push({
+    type: 'name-only',
+    query: {
+      $or: [{ canonicalName: nameRegex }, { name: nameRegex }],
+    },
+  });
+
+  return candidates;
+};
+
+const findMatchingMasterPeople = async ({ source, name, country, villageName, peopleGroup }) => {
+  const candidates = buildMasterPeopleMatchCandidates({ source, name, country, villageName, peopleGroup });
+
+  for (const candidate of candidates) {
+    const query = { ...candidate.query };
+    if (query.primaryCountryCode === undefined) delete query.primaryCountryCode;
+    const matches = await MasterPeople.find(query)
+      .select('_id canonicalName primaryCountryCode name')
+      .lean();
+
+    if (matches.length === 1) {
+      return { master: matches[0], strategy: candidate.type };
+    }
+  }
+
+  return { master: null, strategy: null };
+};
+
 /**
  * GET /import/people-groups/template - Download CSV template
  * NOTE: No authentication required - templates are public resources
@@ -160,6 +418,9 @@ router.get('/people-groups/template', (req, res) => {
     'engagementStatus',
     'region',
     'country',
+    'countryCode',
+    'admin2',
+    'admin3',
     'language',
     'religion',
     'description'
@@ -175,8 +436,11 @@ router.get('/people-groups/template', (req, res) => {
       '120',
       '8',
       'dmm',
-      'Far North',
+      'Extrême-Nord',
       'Cameroon',
+      'CM',
+      'Mayo-Danay',
+      'Yagoua',
       'Massa',
       'Christianity',
       'Established DMM with strong multiplication'
@@ -190,8 +454,11 @@ router.get('/people-groups/template', (req, res) => {
       '0',
       '0',
       'unreached',
-      'North',
+      'Nord',
       'Cameroon',
+      'CM',
+      'Bénoué',
+      'Garoua',
       'Fulfulde',
       'Islam',
       'Nomadic group - no engagement yet'
@@ -286,34 +553,16 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
         }))
         .on('data', (row) => {
           rowNumber++;
-          // Normalize column names (handle different naming conventions)
+          // Normalize column names via the shared HEADER_MAP and keep a
+          // field -> original-header map so errors can name the exact column.
           const normalizedRow = {};
+          const headerByField = {};
           Object.keys(row).forEach(key => {
-            // Remove BOM and trim whitespace
-            const cleanKey = removeBOM(key).trim();
-            let normalizedKey = cleanKey.toLowerCase()
-              .replace(/\s+/g, '')
-              .replace('peoplegroupname', 'name')
-              .replace('peoplename', 'name')
-              .replace('groupname', 'name')
-              .replace('villagename', 'villageName')
-              .replace('village_name', 'villageName')
-              .replace('numberofchurches', 'numberOfChurches')
-              .replace('number_of_churches', 'numberOfChurches')
-              .replace('churches', 'numberOfChurches')
-              .replace('churchgeneration', 'churchGeneration')
-              .replace('church_generation', 'churchGeneration')
-              .replace('generation', 'churchGeneration')
-              .replace('engagementstatus', 'engagementStatus')
-              .replace('engagement_status', 'engagementStatus')
-              .replace('engagementlevel', 'engagementLevel')
-              .replace('engagement_level', 'engagementLevel')
-              .replace('lat', 'latitude')
-              .replace('lng', 'longitude')
-              .replace('lon', 'longitude');
+            const normalizedKey = normalizeHeaderKey(key);
             normalizedRow[normalizedKey] = sanitizeString(row[key]);
+            if (!headerByField[normalizedKey]) headerByField[normalizedKey] = removeBOM(key).trim();
           });
-          results.push({ rowNumber, data: { ...row, ...normalizedRow } });
+          results.push({ rowNumber, data: { ...row, ...normalizedRow }, headerByField });
         })
         .on('end', resolve)
         .on('error', (err) => {
@@ -333,7 +582,7 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
     const imported = [];
     const skipped = [];
 
-    for (const { rowNumber, data } of results) {
+    for (const { rowNumber, data, headerByField } of results) {
       try {
         // Skip empty rows
         const hasData = Object.values(data).some(v => v && v.trim());
@@ -341,40 +590,109 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
           continue; // Skip silently
         }
         
+        // Spreadsheet line the user sees (header = line 1, first data row = 2)
+        const line = rowNumber + 1;
+        const colOf = (field, fallback) => (headerByField && headerByField[field]) || fallback;
+
         // Validate required fields
         const name = sanitizeString(data.name);
         if (!name) {
-          errors.push({ 
-            row: rowNumber, 
+          errors.push({
+            row: line,
+            line,
+            column: colOf('name', 'NG_Engagment_Name'),
             field: 'name',
-            error: 'Name is required',
-            suggestion: 'Please provide a name for the people group'
+            value: '',
+            error: 'Le nom (NG_Engagment_Name) est obligatoire',
+            suggestion: 'Renseignez la colonne NG_Engagment_Name pour cette ligne'
           });
-          skipped.push({ row: rowNumber, reason: 'Name is required', field: 'name' });
+          skipped.push({ row: line, reason: 'Le nom (NG_Engagment_Name) est obligatoire', field: 'name' });
           continue;
         }
 
-        // Validate coordinates
+        // Coordinates are OPTIONAL. Only validate when at least one is provided.
+        const hasLat = data.latitude !== undefined && String(data.latitude).trim() !== '';
+        const hasLng = data.longitude !== undefined && String(data.longitude).trim() !== '';
         const latitude = parseNumber(data.latitude, NaN);
         const longitude = parseNumber(data.longitude, NaN);
-        
-        const coordErrors = validateCoordinates(latitude, longitude);
-        if (coordErrors.length > 0) {
-          errors.push({ 
-            row: rowNumber, 
-            field: 'coordinates',
-            error: coordErrors.join('; '),
-            value: `lat: ${data.latitude}, lng: ${data.longitude}`,
-            suggestion: 'Coordinates should be decimal numbers (e.g., latitude: 5.9631, longitude: 10.1591)'
-          });
-          skipped.push({ row: rowNumber, reason: coordErrors.join('; '), field: 'coordinates' });
-          continue;
+        let hasValidCoords = false;
+
+        if (hasLat || hasLng) {
+          const coordErrors = validateCoordinates(latitude, longitude);
+          if (coordErrors.length > 0) {
+            errors.push({
+              row: line,
+              line,
+              column: colOf('latitude', 'latitude') + '/' + colOf('longitude', 'longitude'),
+              field: 'coordinates',
+              value: `lat: ${data.latitude}, lng: ${data.longitude}`,
+              error: 'Coordonnées invalides : ' + coordErrors.join('; '),
+              suggestion: 'Les coordonnées doivent être des nombres décimaux (ex. latitude 5.9631, longitude 10.1591), ou laissez ces colonnes vides'
+            });
+            skipped.push({ row: line, reason: 'Coordonnées invalides', field: 'coordinates' });
+            continue;
+          }
+          hasValidCoords = true;
         }
 
+        // Validate numeric metric fields BEFORE parsing — reject non-numeric text
+        // (e.g. "xyz") with a per-cell error instead of silently coercing to 0.
+        const numericFields = [
+          ['numberOfChurches', 'TOTAL'],
+          ['churchGeneration', 'Max GEN'],
+          ['dbs', 'DBS'],
+          ['com', 'COM'],
+          ['cat', 'CAT'],
+          ['avgChurchSize', 'Avg church size'],
+          ['newDisciples', '# New Disciples'],
+          ['newBaptisms', '# New Baptisms'],
+          ['leadersInTraining', 'LEADERS IN TRAINING'],
+          ['activeCoaches', 'ACTIVE TRAINERS/COACHES'],
+          ['trainingsHeld', '# OF TRAININGS HELD IN QUARTER'],
+          ['lostChurches', 'LOST CHS'],
+          ['mergedChurches', 'MERGED CHS'],
+        ];
+        let numericError = null;
+        for (const [field, fallbackHeader] of numericFields) {
+          const raw = data[field];
+          if (raw === undefined || String(raw).trim() === '') continue; // blank allowed
+          if (Number.isNaN(parseNumber(raw, NaN))) {
+            const label = colOf(field, fallbackHeader);
+            errors.push({
+              row: line,
+              line,
+              column: label,
+              field,
+              value: raw,
+              error: `Valeur numérique invalide pour ${label}`,
+              suggestion: 'Saisissez un nombre (les décimales avec , ou . sont acceptées), ou laissez la case vide'
+            });
+            skipped.push({ row: line, reason: `Valeur numérique invalide pour ${label}`, field });
+            numericError = true;
+            break;
+          }
+        }
+        if (numericError) continue;
+
         // Parse numeric fields with defaults
-        const numberOfChurches = parseInt(data.numberOfChurches, 0);
-        const churchGeneration = parseInt(data.churchGeneration, 0);
-        const population = parseInt(data.population, 0);
+        const numberOfChurches = parseNumber(data.numberOfChurches, 0);
+        const churchGeneration = parseNumber(data.churchGeneration, 0);
+        const population = parseNumber(data.population, 0);
+        const dbs = parseNumber(data.dbs, 0) || 0;
+        const com = parseNumber(data.com, 0) || 0;
+        const cat = parseNumber(data.cat, 0) || 0;
+        const reportPeriod = sanitizeString(data.reportPeriod);
+        // New quarterly metric columns (blank => 0). avgChurchSize may be decimal.
+        const avgChurchSize = parseNumber(data.avgChurchSize, 0) || 0;
+        const newDisciples = parseInt(data.newDisciples, 0) || 0;
+        const newBaptisms = parseInt(data.newBaptisms, 0) || 0;
+        const leadersInTraining = parseInt(data.leadersInTraining, 0) || 0;
+        const activeCoaches = parseInt(data.activeCoaches, 0) || 0;
+        const trainingsHeld = parseInt(data.trainingsHeld, 0) || 0;
+        const lostChurches = parseInt(data.lostChurches, 0) || 0;
+        const mergedChurches = parseInt(data.mergedChurches, 0) || 0;
+        const peopleGroupLabel = sanitizeString(data.peopleGroup);
+        const notes = sanitizeString(data.notes);
 
         // Determine engagement status - auto-calculate if not provided or invalid
         const validEngagementStatuses = ['pioneer', 'midway', 'tipping-point', 'dmm', 'unreached'];
@@ -426,38 +744,224 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
           source = csvSource;
         }
 
-        // Create people group with sanitized data
-        const peopleGroup = new PeopleGroup({
-          name: name,
-          description: sanitizeString(data.description),
-          status: status,
-          engagementStatus: engagementStatus,
-          engagementLevel: sanitizeString(data.engagementLevel),
-          location: {
-            type: 'Point',
-            coordinates: [longitude, latitude]
-          },
-          population: population,
-          numberOfChurches: numberOfChurches,
-          churchGeneration: churchGeneration,
-          villageName: villageName,
-          village: villageRef,
-          region: sanitizeString(data.region),
-          country: sanitizeString(data.country),
-          language: sanitizeString(data.language),
-          religion: sanitizeString(data.religion),
-          source: source,
-          createdBy: req.user._id,
-          approved: ['admin', 'supervisor'].includes(req.user.role),
-          approvedBy: ['admin', 'supervisor'].includes(req.user.role) ? req.user._id : undefined,
-          approvedAt: ['admin', 'supervisor'].includes(req.user.role) ? new Date() : undefined,
-        });
+        const country = sanitizeString(data.country);
+        // Resolve the ISO 3166-1 alpha-2 code the reporting/country/region
+        // funnel filters on. Prefer an explicit countryCode column, else derive
+        // it from the country name/alpha-3 value.
+        const countryCode = normalizeCountryCode(data.countryCode) || normalizeCountryCode(country);
+        const admin2 = sanitizeString(data.admin2);
+        const admin3 = sanitizeString(data.admin3);
+        const description = sanitizeString(data.description);
+        const region = sanitizeString(data.region);
+        const language = sanitizeString(data.language);
+        const religion = sanitizeString(data.religion);
+        const engagementLevel = sanitizeString(data.engagementLevel);
+        const normalizedPeopleGroup = sanitizeString(data.peopleGroup || data.name);
 
-        await peopleGroup.save();
+        // QUARTERLY UPSERT: for DMM data, update an existing people group instead of
+        // creating a duplicate. Match key is (name + villageName + country), case-insensitive,
+        // restricted to DMM/Survey field data. This lets a people group evolve quarter over
+        // quarter AND supports the same people existing in several villages (e.g. "Bana" in
+        // Mahaou vs Gamboura), aligned with the geographic reference import.
+        const escapeRe = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const upsertQuery = {
+          name: { $regex: new RegExp(`^${escapeRe(name)}$`, 'i') },
+          country: { $regex: new RegExp(`^${escapeRe(country)}$`, 'i') },
+          source: { $in: ['DMM', 'Survey', 'manual'] },
+        };
+        // Include villageName in the match key when provided so metrics attach to the
+        // correct village-level people group.
+        let existing = null;
+        if (villageName) {
+          // CSV specifies a village -> match on (name + village + country).
+          existing = await PeopleGroup.findOne({
+            ...upsertQuery,
+            villageName: { $regex: new RegExp(`^${escapeRe(villageName)}$`, 'i') },
+          });
+          // Fallback: if no village-level match but exactly one same-name engagement
+          // exists in this country, update it (avoids creating a duplicate on a village
+          // spelling difference).
+          if (!existing) {
+            const sameName = await PeopleGroup.find(upsertQuery).select('_id').limit(2);
+            if (sameName.length === 1) existing = await PeopleGroup.findById(sameName[0]._id);
+          }
+        } else {
+          // CSV has NO village column (quarterly report case). The engagement name is
+          // the stable key. If exactly one engagement with this name exists in the
+          // country, update it in place and PRESERVE its existing village. Only when
+          // the name is ambiguous (0 or >1 matches) do we fall back to create/empty-village.
+          const sameName = await PeopleGroup.find(upsertQuery).select('_id').limit(2);
+          if (sameName.length === 1) {
+            existing = await PeopleGroup.findById(sameName[0]._id);
+          } else {
+            existing = await PeopleGroup.findOne({ ...upsertQuery, villageName: { $in: [null, ''] } });
+          }
+        }
+
+        let peopleGroup;
+        let action = 'created';
+
+        if (existing) {
+          // ---- UPDATE existing people group with this quarter's snapshot ----
+          action = 'updated';
+          const prevPeriod = existing.reportPeriod || 'previous';
+          existing.numberOfChurches = numberOfChurches;
+          existing.churchGeneration = churchGeneration;
+          existing.dbs = dbs;
+          existing.com = com;
+          existing.cat = cat;
+          existing.avgChurchSize = avgChurchSize;
+          existing.newDisciples = newDisciples;
+          existing.newBaptisms = newBaptisms;
+          existing.leadersInTraining = leadersInTraining;
+          existing.activeCoaches = activeCoaches;
+          existing.trainingsHeld = trainingsHeld;
+          existing.lostChurches = lostChurches;
+          existing.mergedChurches = mergedChurches;
+          if (normalizedPeopleGroup) existing.peopleGroup = normalizedPeopleGroup;
+          if (notes) existing.notes = notes;
+          existing.reportPeriod = reportPeriod || existing.reportPeriod;
+          existing.engagementStatus = engagementStatus;
+          existing.status = status;
+          if (engagementLevel) existing.engagementLevel = engagementLevel;
+          if (population) existing.population = population;
+          if (description) existing.description = description;
+          if (region) existing.region = region;
+          if (countryCode) existing.countryCode = countryCode;
+          if (admin2) existing.admin2 = admin2;
+          if (admin3) existing.admin3 = admin3;
+          if (language) existing.language = language;
+          if (religion) existing.religion = religion;
+          if (villageName) existing.villageName = villageName;
+          if (villageRef) existing.village = villageRef;
+          // Only move the marker if the incoming coordinates are meaningful (not a country-centroid placeholder)
+          const location = buildGeoPoint(latitude, longitude);
+          if (location) {
+            existing.location = location;
+          } else {
+            delete existing.location;
+          }
+          // Record a timeline point for this quarter (the pre-save hook also captures status changes).
+          existing.progressNotes = reportPeriod
+            ? `Import ${reportPeriod}: ${numberOfChurches} églises, gén ${churchGeneration}, DBS ${dbs}/COM ${com}/CAT ${cat}`
+            : existing.progressNotes;
+          existing.progressDate = new Date();
+          existing.progressHistory.push({
+            date: new Date(),
+            percentage: existing.progressPercentage,
+            status: status,
+            notes: reportPeriod
+              ? `Trimestre ${reportPeriod} (précédent: ${prevPeriod}) — ${numberOfChurches} églises, ${churchGeneration} gén, DBS ${dbs}, COM ${com}, CAT ${cat}`
+              : `Mise à jour import — ${numberOfChurches} églises, ${churchGeneration} gén`,
+            updatedBy: req.user._id,
+          });
+          existing.updatedBy = req.user._id;
+          applyReportingVisibilityPatch(existing);
+          peopleGroup = existing;
+          await peopleGroup.save();
+        } else {
+          // ---- CREATE new people group ----
+          const newDoc = {
+            name: name,
+            description: description,
+            status: status,
+            engagementStatus: engagementStatus,
+            engagementLevel: engagementLevel,
+            population: population,
+            numberOfChurches: numberOfChurches,
+            churchGeneration: churchGeneration,
+            dbs: dbs,
+            com: com,
+            cat: cat,
+            avgChurchSize: avgChurchSize,
+            newDisciples: newDisciples,
+            newBaptisms: newBaptisms,
+            leadersInTraining: leadersInTraining,
+            activeCoaches: activeCoaches,
+            trainingsHeld: trainingsHeld,
+            lostChurches: lostChurches,
+            mergedChurches: mergedChurches,
+            peopleGroup: normalizedPeopleGroup || undefined,
+            notes: notes || undefined,
+            reportPeriod: reportPeriod,
+            villageName: villageName,
+            village: villageRef,
+            region: region,
+            country: country,
+            language: language,
+            religion: religion,
+            source: source,
+            ...(source === 'DMM' || source === 'Survey'
+              ? inferMasterPeopleLink({ source, name, country, villageName, peopleGroup: normalizedPeopleGroup })
+              : {}),
+            // Explicit geographic keys (set AFTER the spread so they always win):
+            // countryCode drives the reporting/country/region funnel filters and
+            // admin2/admin3 drive the department/arrondissement detail pages.
+            countryCode: countryCode || undefined,
+            admin2: admin2 || undefined,
+            admin3: admin3 || undefined,
+            createdBy: req.user._id,
+            approved: ['admin', 'supervisor'].includes(req.user.role),
+            approvedBy: ['admin', 'supervisor'].includes(req.user.role) ? req.user._id : undefined,
+            approvedAt: ['admin', 'supervisor'].includes(req.user.role) ? new Date() : undefined,
+          };
+          applyReportingVisibilityPatch(newDoc);
+          // Location is optional: only set it when valid coordinates were provided.
+          const location = buildGeoPoint(latitude, longitude);
+          if (location) {
+            newDoc.location = location;
+          }
+          peopleGroup = new PeopleGroup(newDoc);
+          await peopleGroup.save();
+        }
+
+        if (source === 'DMM' || source === 'Survey') {
+          console.log(
+            `[IMPORT] DMM visibility check row ${rowNumber}: ` +
+            `source=${peopleGroup.source || 'n/a'}, ` +
+            `approved=${peopleGroup.approved === true}, ` +
+            `masterPeopleId=${peopleGroup.masterPeopleId ? 'set' : 'missing'}, ` +
+            `isNGEngaged=${peopleGroup.isNGEngaged === true ? 'true' : 'false'}`
+          );
+        }
+
+        // Ensure people-group imports that participate in the DMM chain are linked
+        // back to their master people using deterministic matching.
+        if ((source === 'DMM' || source === 'Survey') && !peopleGroup.masterPeopleId) {
+          const { master: matchingMaster, strategy } = await findMatchingMasterPeople({
+            source,
+            name,
+            country,
+            villageName,
+            peopleGroup: normalizedPeopleGroup,
+          });
+
+          if (matchingMaster) {
+            peopleGroup.masterPeopleId = matchingMaster._id;
+            peopleGroup.approved = true;
+            peopleGroup.isNGEngaged = true;
+            peopleGroup.peopleGroup = peopleGroup.peopleGroup || matchingMaster.canonicalName || name;
+            await peopleGroup.save();
+            console.log(
+              `[IMPORT] Linked DMM row ${rowNumber} to master people ${matchingMaster._id} via ${strategy}`
+            );
+          } else {
+            console.warn(
+              `[IMPORT] Unresolved DMM row ${rowNumber}: name="${name}", country="${country}", village="${villageName || ''}"`
+            );
+            skipped.push({
+              row: rowNumber,
+              reason: `Unresolved DMM masterPeople link for "${name}"`,
+              fields: ['name', 'country', 'villageName'],
+            });
+          }
+        }
+
         imported.push({
           row: rowNumber,
           id: peopleGroup._id,
           name: peopleGroup.name,
+          action,
           engagementStatus: peopleGroup.engagementStatus
         });
 
@@ -539,10 +1043,46 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
       }
     }
 
+    // Split imported into created vs updated for a clearer quarterly report
+    const createdCount = imported.filter(i => i.action === 'created').length;
+    const updatedCount = imported.filter(i => i.action === 'updated').length;
+
     // Build response message
-    let message = `Import completed: ${imported.length} imported`;
+    let message = `Import completed: ${imported.length} traités (${createdCount} créés, ${updatedCount} mis à jour)`;
     if (skipped.length > 0) {
       message += `, ${skipped.length} skipped`;
+    }
+
+    // Notify connected clients (map + dashboards) so they refresh live after a bulk import.
+    try {
+      const io = req.app.get('io');
+      if (io && imported.length > 0) {
+        io.to('map').emit('people-group-added', { bulk: true, count: imported.length });
+        io.emit('people-groups-imported', {
+          total: imported.length,
+          created: createdCount,
+          updated: updatedCount,
+          at: new Date().toISOString(),
+        });
+      }
+    } catch (emitErr) {
+      console.error('[IMPORT] Socket emit failed:', emitErr.message);
+    }
+
+    // Minimal verification hook: confirm imported DMM people are queryable by reporting views.
+    if (imported.length > 0) {
+      const verifyIds = imported.slice(0, 5).map(item => item.id);
+      const reportingVisible = await PeopleGroup.countDocuments({
+        _id: { $in: verifyIds },
+        $or: [
+          { source: 'DMM' },
+          { engagementStatus: 'dmm' },
+          { status: 'dmm' },
+        ],
+      });
+      console.log(
+        `[IMPORT] Reporting visibility check: ${reportingVisible}/${verifyIds.length} recently imported record(s) match DMM reporting filters`
+      );
     }
 
     res.json({
@@ -551,6 +1091,8 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
       summary: {
         total: results.length,
         imported: imported.length,
+        created: createdCount,
+        updated: updatedCount,
         skipped: skipped.length,
         errors: errors.length
       },
@@ -620,32 +1162,15 @@ router.post('/people-groups/validate', auth, isMissionary, upload.single('file')
         }))
         .on('data', (row) => {
           rowNumber++;
-          // Normalize column names
+          // Normalize column names via the shared HEADER_MAP + keep original headers.
           const normalizedRow = {};
+          const headerByField = {};
           Object.keys(row).forEach(key => {
-            const cleanKey = removeBOM(key).trim();
-            let normalizedKey = cleanKey.toLowerCase()
-              .replace(/\s+/g, '')
-              .replace('peoplegroupname', 'name')
-              .replace('peoplename', 'name')
-              .replace('groupname', 'name')
-              .replace('villagename', 'villageName')
-              .replace('village_name', 'villageName')
-              .replace('numberofchurches', 'numberOfChurches')
-              .replace('number_of_churches', 'numberOfChurches')
-              .replace('churches', 'numberOfChurches')
-              .replace('churchgeneration', 'churchGeneration')
-              .replace('church_generation', 'churchGeneration')
-              .replace('generation', 'churchGeneration')
-              .replace('engagementstatus', 'engagementStatus')
-              .replace('engagement_status', 'engagementStatus')
-              .replace('engagementlevel', 'engagementLevel')
-              .replace('lat', 'latitude')
-              .replace('lng', 'longitude')
-              .replace('lon', 'longitude');
+            const normalizedKey = normalizeHeaderKey(key);
             normalizedRow[normalizedKey] = sanitizeString(row[key]);
+            if (!headerByField[normalizedKey]) headerByField[normalizedKey] = removeBOM(key).trim();
           });
-          results.push({ rowNumber, data: { ...row, ...normalizedRow } });
+          results.push({ rowNumber, data: { ...row, ...normalizedRow }, headerByField });
         })
         .on('end', resolve)
         .on('error', reject);
@@ -663,10 +1188,13 @@ router.post('/people-groups/validate', auth, isMissionary, upload.single('file')
     const invalidRows = [];
     const warnings = [];
 
-    for (const { rowNumber, data } of results) {
+    for (const { rowNumber, data, headerByField } of results) {
       const rowErrors = [];
       const rowWarnings = [];
-      
+
+      // Map an internal field to its original CSV header label for the report.
+      const colOf = (field, fallback) => (headerByField && headerByField[field]) || fallback;
+
       // Skip empty rows
       const hasData = Object.values(data).some(v => v && v.trim());
       if (!hasData) {
@@ -678,29 +1206,68 @@ router.post('/people-groups/validate', auth, isMissionary, upload.single('file')
       if (!name) {
         rowErrors.push({
           field: 'name',
-          message: 'Name is required',
-          suggestion: 'Add a name for the people group'
+          column: colOf('name', 'NG_Engagment_Name'),
+          message: 'Le nom est requis',
+          suggestion: 'Renseignez la colonne NG_Engagment_Name pour cette ligne'
         });
       }
 
-      // Validate coordinates
-      const latitude = parseNumber(data.latitude, NaN);
-      const longitude = parseNumber(data.longitude, NaN);
-      
-      const coordErrors = validateCoordinates(latitude, longitude);
-      if (coordErrors.length > 0) {
-        rowErrors.push({
-          field: 'coordinates',
-          message: coordErrors.join('; '),
-          value: `lat: ${data.latitude}, lng: ${data.longitude}`,
-          suggestion: 'Use decimal format (e.g., 5.9631, 10.1591)'
-        });
+      // Validate coordinates — OPTIONAL. Only flag when a value was provided but
+      // is not a valid number. Rows without coordinates (DMM templates) are OK.
+      const latRaw = data.latitude;
+      const lngRaw = data.longitude;
+      const hasLat = latRaw !== undefined && String(latRaw).trim() !== '';
+      const hasLng = lngRaw !== undefined && String(lngRaw).trim() !== '';
+      if (hasLat || hasLng) {
+        const latitude = parseNumber(latRaw, NaN);
+        const longitude = parseNumber(lngRaw, NaN);
+        const coordErrors = validateCoordinates(latitude, longitude);
+        if (coordErrors.length > 0) {
+          rowErrors.push({
+            field: 'coordinates',
+            column: colOf('latitude', 'latitude') + '/' + colOf('longitude', 'longitude'),
+            message: coordErrors.join('; '),
+            value: `lat: ${latRaw}, lng: ${lngRaw}`,
+            suggestion: 'Les coordonnées doivent être des nombres décimaux (ex. 5.9631, 10.1591), ou laissez ces colonnes vides'
+          });
+        }
+      }
+
+      // Validate numeric metric fields — flag non-numeric text (e.g. "xyz").
+      const numericFields = [
+        ['numberOfChurches', 'TOTAL'],
+        ['churchGeneration', 'Max GEN'],
+        ['dbs', 'DBS'],
+        ['com', 'COM'],
+        ['cat', 'CAT'],
+        ['avgChurchSize', 'Avg church size'],
+        ['newDisciples', '# New Disciples'],
+        ['newBaptisms', '# New Baptisms'],
+        ['leadersInTraining', 'LEADERS IN TRAINING'],
+        ['activeCoaches', 'ACTIVE TRAINERS/COACHES'],
+        ['trainingsHeld', '# OF TRAININGS HELD IN QUARTER'],
+        ['lostChurches', 'LOST CHS'],
+        ['mergedChurches', 'MERGED CHS'],
+      ];
+      for (const [field, fallbackHeader] of numericFields) {
+        const raw = data[field];
+        if (raw === undefined || String(raw).trim() === '') continue; // blank is allowed
+        const parsed = parseNumber(raw, NaN);
+        if (Number.isNaN(parsed)) {
+          rowErrors.push({
+            field,
+            column: colOf(field, fallbackHeader),
+            message: `Valeur numérique invalide pour ${colOf(field, fallbackHeader)}`,
+            value: raw,
+            suggestion: 'Saisissez un nombre (les décimales avec , ou . sont acceptées), ou laissez la case vide'
+          });
+        }
       }
 
       // Check engagement status - add warning if will be auto-calculated
       const validEngagementStatuses = ['pioneer', 'midway', 'tipping-point', 'dmm', 'unreached'];
       const engagementStatus = sanitizeString(data.engagementStatus).toLowerCase();
-      const numberOfChurches = parseInt(data.numberOfChurches, 0);
+      const numberOfChurches = parseNumber(data.numberOfChurches, 0);
       
       if (!engagementStatus || !validEngagementStatuses.includes(engagementStatus)) {
         const calculatedStatus = calculateEngagementStatus(numberOfChurches);
@@ -961,7 +1528,7 @@ const COUNTRY_TEMPLATES = {
  * @param country - Country code (cameroun, congo-brazzaville, congo-rdc, centrafrique, tchad, gabon, guinee-equatoriale)
  * NOTE: No authentication required - templates are public resources
  */
-router.get('/people-groups/template/:country', (req, res) => {
+router.get('/people-groups/template/:country', async (req, res) => {
   const countryKey = req.params.country.toLowerCase();
   const countryConfig = COUNTRY_TEMPLATES[countryKey];
 
@@ -977,37 +1544,79 @@ router.get('/people-groups/template/:country', (req, res) => {
     });
   }
 
-  // Build headers with country-specific admin level names
+  // Canonical 20-column CMR Import Template model (English headers, exact order).
+  // Identity/structure columns are filled per country; quarterly metric columns
+  // are left blank in the template.
   const headers = [
-    'name',
-    'villageName',
-    'latitude',
-    'longitude',
-    'population',
-    'numberOfChurches',
-    'churchGeneration',
-    `region (${countryConfig.adminLevels.admin1})`,
-    `department (${countryConfig.adminLevels.admin2})`,
-    `arrondissement (${countryConfig.adminLevels.admin3})`,
-    'description'
+    'Date',
+    'Report period',
+    'Region',
+    'Country',
+    'NG_Engagment_Name',
+    'People_Group',
+    'DBS',
+    'COM',
+    'CAT',
+    'TOTAL',
+    'Max GEN',
+    'Avg church size',
+    '# New Disciples',
+    '# New Baptisms',
+    'LEADERS IN TRAINING',
+    'ACTIVE TRAINERS/COACHES',
+    '# OF TRAININGS HELD IN QUARTER',
+    'LOST CHS',
+    'MERGED CHS',
+    'NOTES'
   ];
 
-  // Build example rows
-  const exampleRows = countryConfig.examples.map(example => [
-    example.name,
-    example.villageName || '',
-    example.latitude,
-    example.longitude,
-    example.population,
-    example.numberOfChurches,
-    example.churchGeneration,
-    example.region,
-    example.department,
-    example.arrondissement,
-    example.description
-  ]);
+  // Quote a CSV cell for ';'-delimited output (Excel FR).
+  const q = (v) => {
+    const s = v === undefined || v === null ? '' : String(v);
+    return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  // Build one blank-metrics row from an identity tuple.
+  const buildRow = ({ region, ngName, peopleGroup }) => [
+    '',              // Date
+    '2Q26',          // Report period
+    region || '',    // Region
+    countryConfig.name, // Country
+    ngName || '',    // NG_Engagment_Name
+    peopleGroup || ngName || '', // People_Group
+    '', '', '', '', '', '', '', '', '', '', '', '', '', '' // 14 blank metric columns
+  ];
 
-  const csvContent = headers.join(';') + '\n' + exampleRows.map(row => row.join(';')).join('\n');
+  let rows = [];
+  try {
+    // Pre-fill with the country's EXISTING DMM engagements so the user only fills metrics.
+    // IMPORTANT: restrict to DMM-sourced engagements only. Joshua Project / IMB
+    // reference people groups must NOT be included in the country template.
+    const code = String(countryConfig.code || '').toUpperCase();
+    const existing = await PeopleGroup.find({
+      countryCode: code,
+      source: { $in: ['DMM', 'Survey', 'manual'] },
+    })
+      .select('name peopleGroup region')
+      .sort({ name: 1 })
+      .lean();
+    if (existing && existing.length > 0) {
+      rows = existing.map((pg) => buildRow({
+        region: pg.region,
+        ngName: pg.name,
+        peopleGroup: pg.peopleGroup || pg.name,
+      }));
+    }
+  } catch (dbErr) {
+    console.error('[TEMPLATE] Could not load existing engagements, using examples:', dbErr.message);
+    rows = [];
+  }
+
+  // Fallback: never return an empty template.
+  if (rows.length === 0) {
+    rows = countryConfig.examples.map((ex) => buildRow({ region: ex.region, ngName: ex.name, peopleGroup: ex.name }));
+  }
+
+  const csvContent = headers.map(q).join(';') + '\n' + rows.map(row => row.map(q).join(';')).join('\n');
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="template-${countryKey}-${countryConfig.code}.csv"`);
@@ -1092,6 +1701,31 @@ router.post('/people-groups/with-polygon-detection', auth, isMissionary, upload.
             const cleanKey = removeBOM(key).trim();
             let normalizedKey = cleanKey.toLowerCase()
               .replace(/\\s+/g, '')
+              // New 20-column CMR Import Template headers (aliases)
+              .replace('ng_engagment_name', 'name')
+              .replace('ng_engagement_name', 'name')
+              .replace('ngengagmentname', 'name')
+              .replace('ngengagementname', 'name')
+              .replace('people_group', 'peopleGroup')
+              .replace('peoplegroup', 'peopleGroup')
+              .replace('reportperiod', 'reportPeriod')
+              .replace('reportingperiod', 'reportPeriod')
+              .replace('total', 'numberOfChurches')
+              .replace('#newdisciples', 'newDisciples')
+              .replace('newdisciples', 'newDisciples')
+              .replace('#newbaptisms', 'newBaptisms')
+              .replace('newbaptisms', 'newBaptisms')
+              .replace('maxgen', 'maxGen')
+              .replace('avgchurchsize', 'avgChurchSize')
+              .replace('leadersintraining', 'leadersInTraining')
+              .replace('activetrainers/coaches', 'activeCoaches')
+              .replace('activecoaches', 'activeCoaches')
+              .replace('#oftrainingsheldinquarter', 'trainingsHeld')
+              .replace('trainingsheld', 'trainingsHeld')
+              .replace('lostchs', 'lostChurches')
+              .replace('mergedchs', 'mergedChurches')
+              .replace('notes', 'notes')
+              // Legacy / generic header aliases
               .replace('peoplegroupname', 'name')
               .replace('peoplename', 'name')
               .replace('groupname', 'name')
@@ -1244,6 +1878,9 @@ router.post('/people-groups/with-polygon-detection', auth, isMissionary, upload.
           population: population,
           numberOfChurches: numberOfChurches,
           churchGeneration: churchGeneration,
+          dbs: dbs,
+          com: com,
+          cat: cat,
           villageName: villageName,
           village: villageRef,
           region: sanitizeString(data.region),

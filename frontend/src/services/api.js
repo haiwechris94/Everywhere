@@ -66,9 +66,21 @@ export const fetchAllPages = async (fetchFn, baseParams = {}, options = {}) => {
         totalPages = responseData.totalPages || Math.ceil(totalCount / limit) || 1
       }
       
-      // Add data to collection
+      // Add data to collection, de-duplicating by _id.
+      // Pagination can return the same record on multiple pages when sort values
+      // are non-unique; without de-duplication totals get inflated (map vs dashboard).
       if (Array.isArray(pageData)) {
-        allData = [...allData, ...pageData]
+        const seen = new Set(allData.map((d) => d && d._id))
+        for (const item of pageData) {
+          if (item && item._id != null) {
+            if (!seen.has(item._id)) {
+              seen.add(item._id)
+              allData.push(item)
+            }
+          } else {
+            allData.push(item)
+          }
+        }
       }
       
       // Report progress
@@ -517,6 +529,16 @@ export const activitiesApi = {
   archive: (id, archived) => api.patch(`/api/activities/${id}/archive`, { archived }),
 }
 
+// Projects API
+export const projectsApi = {
+  getAll: (params) => api.get('/api/projects', { params }),
+  getStats: () => api.get('/api/projects/stats'),
+  getById: (id) => api.get(`/api/projects/${id}`),
+  create: (data) => api.post('/api/projects', data),
+  update: (id, data) => api.put(`/api/projects/${id}`, data),
+  delete: (id) => api.delete(`/api/projects/${id}`),
+}
+
 // Stats API
 export const statsApi = {
   getDashboard: () => api.get('/api/stats/dashboard'),
@@ -656,48 +678,6 @@ export const dashboardApi = {
   getJPCoverage: (params = {}) => api.get('/api/analytics/jp-coverage', { params }),
 }
 
-// ── Quarterly Report API ─────────────────────────────────────────────────────
-export const quarterlyApi = {
-  /**
-   * Prévisualise le fichier Excel SANS importer
-   * @param {File} file - Le fichier .xlsx
-   * @param {string} quarter - Optionnel: "Q1-2026"
-   */
-  preview: (file, quarter) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    const params = quarter ? `?quarter=${quarter}` : ''
-    return api.post(`/api/analytics/quarterly-upload/preview${params}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
-  },
-
-  /**
-   * Importe le fichier Excel dans MongoDB
-   * @param {File} file - Le fichier .xlsx
-   * @param {string} quarter - Optionnel: "Q1-2026"
-   */
-  import: (file, quarter) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    const params = quarter ? `?quarter=${quarter}` : ''
-    return api.post(`/api/analytics/quarterly-upload/import${params}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 120000, // 2 min pour les gros fichiers
-    })
-  },
-
-  /**
-   * Liste les trimestres disponibles
-   */
-  getQuarters: () => api.get('/api/analytics/quarterly-reports'),
-
-  /**
-   * Stats trimestre courant vs précédent pour le dashboard
-   */
-  getQuarterlyPulse: () => api.get('/api/analytics/quarterly-pulse'),
-}
-
 // Church Population Ratio API
 export const churchPopulationRatioApi = {
   /**
@@ -816,3 +796,164 @@ export const qualitativeAnalysisApi = {
    */
   delete: (id) => api.delete(`/api/qualitative-analysis/${id}`),
 }
+
+// IMB / PeopleGroups.org API
+export const imbApi = {
+  /**
+   * Get IMB/PeopleGroups.org import status
+   * @returns {Promise} Status object with count and lastSync
+   */
+  getStatus: () => api.get('/api/imb/status'),
+
+  /**
+   * Import a CSV file into IMB/PeopleGroups.org data
+   * @param {File} file - CSV file to import
+   * @param {Function} onUploadProgress - optional axios progress callback
+   * @returns {Promise} Import result with count imported
+   */
+  importCSV: (file, onUploadProgress) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/api/imb/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress,
+    })
+  },
+
+  /**
+   * Get all IMB/PeopleGroups.org people groups
+   * @param {Object} params - Query params (page, limit, country, status)
+   * @returns {Promise} List of people groups
+   */
+  getPeopleGroups: (params = {}) => api.get('/api/imb/people-groups', { params }),
+
+  /**
+   * Get unreached people groups from IMB/PeopleGroups.org
+   * @returns {Promise} List of unreached groups
+   */
+  getUnreached: () => api.get('/api/imb/people-groups/unreached'),
+
+  /**
+   * Clear all IMB/PeopleGroups.org data
+   * @returns {Promise} Confirmation
+   */
+  clearData: () => api.delete('/api/imb/clear'),
+}
+
+// Finishing the Task API
+export const fttApi = {
+  /**
+   * Get Finishing the Task import status
+   * @returns {Promise} Status object with count and lastSync
+   */
+  getStatus: () => api.get('/api/ftt/status'),
+
+  /**
+   * Import a CSV file into Finishing the Task data
+   * @param {File} file - CSV file to import
+   * @param {Function} onUploadProgress - optional axios progress callback
+   * @returns {Promise} Import result with count imported
+   */
+  importCSV: (file, onUploadProgress) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/api/ftt/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress,
+    })
+  },
+
+  /**
+   * Get all Finishing the Task people groups
+   * @param {Object} params - Query params (page, limit, country, status)
+   * @returns {Promise} List of people groups
+   */
+  getPeopleGroups: (params = {}) => api.get('/api/ftt/people-groups', { params }),
+
+  /**
+   * Get unreached UUPGs from Finishing the Task
+   * @returns {Promise} List of unreached groups
+   */
+  getUnreached: () => api.get('/api/ftt/people-groups/unreached'),
+
+  /**
+   * Clear all Finishing the Task data
+   * @returns {Promise} Confirmation
+   */
+  clearData: () => api.delete('/api/ftt/clear'),
+}
+// ============================================
+// Master People API (unified canonical people-graph)
+// ============================================
+export const masterPeopleApi = {
+  getMarkers: (params) => api.get('/api/master-people/map/markers', { params }),
+  getDmmVillages: (params) => api.get('/api/master-people/map/dmm-villages', { params }),
+  getDmmPeoples: (params) => api.get('/api/master-people/map/dmm-peoples', { params }),
+  // ONE marker per DMM engagement (village-level) — matches the Villages/DMM
+  // status layer population (e.g. 80 for Cameroon), labelled "nom, Village".
+  getDmmEngagements: (params) => api.get('/api/master-people/map/dmm-engagements', { params }),
+  getPlanterEngagements: (name) => api.get(`/api/master-people/planters/${encodeURIComponent(name)}/engagements`),
+  addVillage: (id, data) => api.post(`/api/master-people/${id}/villages`, data),
+  updateVillage: (id, villageId, data) => api.put(`/api/master-people/${id}/villages/${villageId}`, data),
+  deleteVillage: (id, villageId) => api.delete(`/api/master-people/${id}/villages/${villageId}`),
+  recomputeRollups: () => api.post('/api/master-people/recompute-rollups'),
+  getAll: (params) => api.get('/api/master-people', { params }),
+  getById: (id) => api.get(`/api/master-people/${id}`),
+  getSources: (id) => api.get(`/api/master-people/${id}/sources`),
+  getAliases: (id) => api.get(`/api/master-people/${id}/aliases`),
+  getCoordinates: (id) => api.get(`/api/master-people/${id}/coordinates`),
+  getMatches: (id) => api.get(`/api/master-people/${id}/matches`),
+  getProfile: (id) => api.get(`/api/master-people/${id}/profile`),
+  getCoverage: (id) => api.get(`/api/master-people/${id}/coverage`),
+  getActivities: (id) => api.get(`/api/master-people/${id}/activities`),
+}
+
+// ============================================
+// DMM Pillars API â€” Persons of Peace, Discovery Groups, DBS, iGROW Coaching, Reporting
+// ============================================
+
+// Pilier â‘  / carte â€” Personnes de paix
+export const personsOfPeaceApi = {
+  list: (params) => api.get('/api/persons-of-peace', { params }),
+  get: (id) => api.get(`/api/persons-of-peace/${id}`),
+  create: (data) => api.post('/api/persons-of-peace', data),
+  update: (id, data) => api.put(`/api/persons-of-peace/${id}`, data),
+  remove: (id) => api.delete(`/api/persons-of-peace/${id}`),
+}
+
+// Pilier â‘¢ â€” Groupes de dÃ©couverte (DBS)
+export const discoveryGroupsApi = {
+  list: (params) => api.get('/api/discovery-groups', { params }),
+  get: (id) => api.get(`/api/discovery-groups/${id}`),
+  getSessions: (id) => api.get(`/api/discovery-groups/${id}/sessions`),
+  create: (data) => api.post('/api/discovery-groups', data),
+  update: (id, data) => api.put(`/api/discovery-groups/${id}`, data),
+  remove: (id) => api.delete(`/api/discovery-groups/${id}`),
+}
+
+// Pilier â‘¢ â€” Sessions DBS (Ã©tude 3 colonnes)
+export const dbsSessionsApi = {
+  list: (params) => api.get('/api/dbs-sessions', { params }),
+  get: (id) => api.get(`/api/dbs-sessions/${id}`),
+  create: (data) => api.post('/api/dbs-sessions', data),
+  update: (id, data) => api.put(`/api/dbs-sessions/${id}`, data),
+  remove: (id) => api.delete(`/api/dbs-sessions/${id}`),
+}
+
+// Pilier â‘¡ â€” Coaching iGROW
+export const coachingSessionsApi = {
+  list: (params) => api.get('/api/coaching-sessions', { params }),
+  get: (id) => api.get(`/api/coaching-sessions/${id}`),
+  getDimensions: () => api.get('/api/coaching-sessions/dimensions'),
+  create: (data) => api.post('/api/coaching-sessions', data),
+  update: (id, data) => api.put(`/api/coaching-sessions/${id}`, data),
+  remove: (id) => api.delete(`/api/coaching-sessions/${id}`),
+}
+
+// Pilier â‘£ â€” Reporting (format numÃ©rique Cityteam)
+export const reportingApi = {
+  numerical: (params) => api.get('/api/reporting/numerical', { params }),
+  quarterly: (params) => api.get('/api/reporting/quarterly', { params }),
+  peoples: (params) => api.get('/api/reporting/peoples', { params }),
+}
+

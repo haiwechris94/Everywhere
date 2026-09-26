@@ -1,0 +1,39 @@
+$kind: http-request
+name: Import FTT CSV
+method: POST
+url: '{{baseUrl}}/api/ftt/import'
+order: 1000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+body:
+  type: formdata
+  content:
+    - key: file
+      type: file
+      src: ../../../data/ftt_uupg_real.csv
+      description: 'Fichier CSV Finishing the Task (colonnes: PeopleGroup/UPG/UUPG, Country, Population, Language, Religion, Latitude, Longitude…)'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200 - Import réussi", () => {
+          pm.response.to.have.status(200);
+      });
+
+      const res = pm.response.json();
+
+      pm.test("success = true", () => {
+          pm.expect(res.success).to.be.true;
+      });
+
+      pm.test("statistics présentes", () => {
+          pm.expect(res).to.have.property("statistics");
+          const s = res.statistics;
+          pm.expect(s).to.have.all.keys("totalFetched", "stored", "updated", "skipped");
+          console.log(`✅ FTT import: ${s.stored} insérés, ${s.updated} mis à jour, ${s.skipped} ignorés (total lu: ${s.totalFetched})`);
+      });
+
+      if (res.errors && res.errors.length > 0) {
+          console.warn(`⚠️ ${res.errors.length} erreur(s) lors de l'import:`, JSON.stringify(res.errors.slice(0, 5)));
+      }

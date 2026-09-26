@@ -58,6 +58,39 @@ const churchSchema = new mongoose.Schema(
       ref: 'Church',
       default: null,
     },
+    generation: {
+      type: Number,
+      min: [1, 'Generation must be at least 1'],
+      default: 1,
+    },
+    planterType: {
+      type: String,
+      enum: ['commissioned', 'catalytic'],
+      default: 'commissioned',
+    },
+    lifecycleStatus: {
+      type: String,
+      enum: ['active', 'merged', 'died'],
+      default: 'active',
+    },
+    mergedInto: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Church',
+      default: null,
+    },
+    baptizedCount: {
+      type: Number,
+      min: [0, 'Baptized count cannot be negative'],
+      default: 0,
+    },
+    peopleGroup: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PeopleGroup',
+    },
+    originGroup: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'DiscoveryGroup',
+    },
   },
   {
     timestamps: true,
@@ -95,6 +128,23 @@ churchSchema.pre('save', async function (next) {
     } catch (error) {
       console.error('Error updating village status:', error);
     }
+  }
+  next();
+});
+
+// Pre-save middleware to compute church generation based on its parent church.
+// Backward compatible: no parent -> generation defaults to 1.
+churchSchema.pre('save', async function (next) {
+  try {
+    if (this.parentChurch) {
+      const Church = mongoose.model('Church');
+      const parent = await Church.findById(this.parentChurch).select('generation');
+      this.generation = ((parent && parent.generation) || 1) + 1;
+    } else if (this.generation == null) {
+      this.generation = 1;
+    }
+  } catch (error) {
+    console.error('Error computing church generation:', error);
   }
   next();
 });

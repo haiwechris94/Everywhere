@@ -209,8 +209,9 @@ const createPeople = async (req, res) => {
     const peopleData = {
       name,
       createdBy: req.user._id,
-      // Auto-approve for admin/supervisor
-      approved: ['admin', 'supervisor'].includes(req.user.role),
+      // Nouveaux engagements : toujours en attente de validation par un admin
+      // avant d'être comptés dans le reporting région et affichés sur la carte.
+      approved: false,
     };
 
     // Add optional fields if provided

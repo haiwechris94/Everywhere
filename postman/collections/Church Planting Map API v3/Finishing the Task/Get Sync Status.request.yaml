@@ -1,0 +1,34 @@
+$kind: http-request
+name: Get Sync Status
+method: GET
+url: '{{baseUrl}}/api/ftt/status'
+order: 4000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => {
+          pm.response.to.have.status(200);
+      });
+
+      const res = pm.response.json();
+
+      pm.test("success = true", () => {
+          pm.expect(res.success).to.be.true;
+      });
+
+      pm.test("statistics présentes", () => {
+          pm.expect(res).to.have.property("statistics");
+          const s = res.statistics;
+          pm.expect(s).to.have.property("totalRecords");
+          pm.expect(s).to.have.property("totalPopulation");
+          pm.expect(s).to.have.property("byCountry");
+          pm.expect(s).to.have.property("byStatus");
+          console.log(`📈 FTT: ${s.totalRecords} groupes, population totale: ${s.totalPopulation?.toLocaleString()}`);
+          if (s.byCountry && s.byCountry.length > 0) {
+              console.log(`🌍 Top pays: ${s.byCountry.slice(0, 3).map(c => `${c.country}(${c.count})`).join(', ')}`);
+          }
+      });

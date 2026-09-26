@@ -13,10 +13,11 @@ import {
 import {
   Sparkles, TrendingUp, TrendingDown, MapPin, Users, Activity,
   RefreshCw, ChevronRight, Zap, Globe, BarChart2, Heart, Download,
-  Home, Target, BarChart3, Calendar, Church, Award, ArrowUp, ArrowDown,
+  Home, Target, BarChart3, Calendar, Church, Award, ArrowUp, ArrowDown, Flag, Search,
 } from 'lucide-react'
 import axios from 'axios'
-import { statsApi, villagesApi, activitiesApi, peopleGroupsApi, dashboardApi, quarterlyApi } from '../../services/api'
+import { statsApi, villagesApi, activitiesApi, peopleGroupsApi, dashboardApi } from '../../services/api'
+import SourceDonutChart from './SourceDonutChart'
 import { useLanguage } from '../../i18n'
 import { initSocket, getSocket, subscribeToPeopleGroupUpdates, subscribeToVillageStatusUpdates } from '../../services/socket'
 import { format } from 'date-fns'
@@ -89,7 +90,7 @@ const StatusPill = ({ status }) => {
 // ─── Card wrapper ─────────────────────────────────────────────────────────────
 const Card = ({ children, className = '', style = {} }) => (
   <div
-    className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md ${className}`}
+    className={`bg-white dark:bg-white/[0.06] dark:border-white/10 dark:shadow-black/40 rounded-2xl p-5 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md ${className}`}
     style={style}
   >
     {children}
@@ -98,7 +99,7 @@ const Card = ({ children, className = '', style = {} }) => (
 
 // ─── Section title ────────────────────────────────────────────────────────────
 const SectionTitle = ({ children }) => (
-  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">{children}</h3>
+  <h3 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-4">{children}</h3>
 )
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -205,6 +206,7 @@ const AIAssistantCard = () => {
 // WIDGET 2 — Monthly Activity Chart
 // ════════════════════════════════════════════════════════════════════════════
 const MonthlyActivityChart = () => {
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   const { data, isLoading } = useQuery({
     queryKey: ['analytics-monthly-activity'],
     queryFn: () => api('/api/analytics/monthly-activity').then(r => r.data),
@@ -225,10 +227,10 @@ const MonthlyActivityChart = () => {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800">Monthly Activity</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Villages, groups & trainings</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">Monthly Activity</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Villages, groups & trainings</p>
         </div>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-orange-50">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-orange-50 dark:bg-orange-500/10">
           <BarChart2 size={16} style={{ color: C.secondary }} />
         </div>
       </div>
@@ -242,16 +244,16 @@ const MonthlyActivityChart = () => {
       ) : (
         <ResponsiveContainer width="100%" height={120}>
           <BarChart data={chartData} barSize={16} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: C.muted }} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isDark ? '#94a3b8' : C.muted }} />
             <YAxis hide />
             <Tooltip
               cursor={false}
-              contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', fontSize: 12 }}
+              contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', fontSize: 12, backgroundColor: isDark ? '#0f172a' : '#fff', color: isDark ? '#e2e8f0' : undefined }}
               formatter={(v) => [v, 'Activités']}
             />
             <Bar dataKey="value" radius={[6, 6, 0, 0]}>
               {chartData.map((entry, index) => (
-                <Cell key={index} fill={entry.isCurrentMonth ? C.secondary : '#E5E7EB'} />
+                <Cell key={index} fill={entry.isCurrentMonth ? C.secondary : (isDark ? '#1e293b' : '#E5E7EB')} />
               ))}
             </Bar>
           </BarChart>
@@ -264,9 +266,9 @@ const MonthlyActivityChart = () => {
 // ════════════════════════════════════════════════════════════════════════════
 // WIDGET 3 — Progress Metrics (Reached / Unreached)
 // ════════════════════════════════════════════════════════════════════════════
-const MetricMiniCard = ({ title, endpoint, icon: Icon, color, positive = true }) => {
+const MetricMiniCard = ({ title, endpoint, icon: Icon, color, positive = true, queryKeySuffix }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ['analytics-metric', endpoint],
+    queryKey: ['analytics-metric', queryKeySuffix || endpoint],
     queryFn: () => api(endpoint).then(r => r.data),
     staleTime: 60000,
   })
@@ -300,10 +302,10 @@ const MetricMiniCard = ({ title, endpoint, icon: Icon, color, positive = true })
         </>
       ) : (
         <>
-          <p className="text-2xl font-extrabold text-gray-800">
+          <p className="text-2xl font-extrabold text-gray-800 dark:text-slate-100">
             {(data?.count ?? (positive ? 1620 : 3200)).toLocaleString()}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">{title}</p>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">{title}</p>
         </>
       )}
     </Card>
@@ -312,20 +314,6 @@ const MetricMiniCard = ({ title, endpoint, icon: Icon, color, positive = true })
 
 const ProgressMetrics = () => (
   <div className="flex flex-col gap-4">
-    <MetricMiniCard
-      title="Reached Villages"
-      endpoint="/api/analytics/reached-villages"
-      icon={MapPin}
-      color={C.success}
-      positive={true}
-    />
-    <MetricMiniCard
-      title="Unreached Villages"
-      endpoint="/api/analytics/unreached-villages"
-      icon={Globe}
-      color={C.danger}
-      positive={false}
-    />
   </div>
 )
 
@@ -344,10 +332,10 @@ const RecentActivity = () => {
     <Card className="col-span-1 md:col-span-2 lg:col-span-1">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800">Recent Activity</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Latest missionary actions</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">Recent Activity</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Latest missionary actions</p>
         </div>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-indigo-50">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10">
           <Activity size={16} style={{ color: C.primary }} />
         </div>
       </div>
@@ -367,8 +355,8 @@ const RecentActivity = () => {
               <div key={item.id || i} className="flex items-center gap-3 group">
                 <Avatar letter={item.avatar || item.name?.charAt(0) || '?'} index={i} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-400 truncate">{item.action} · {item.date}</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-slate-100 truncate">{item.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-400 truncate">{item.action} · {item.date}</p>
                 </div>
                 <StatusPill status={item.status || 'completed'} />
               </div>
@@ -376,7 +364,7 @@ const RecentActivity = () => {
         }
       </div>
 
-      <button className="mt-4 w-full flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl transition-colors hover:bg-gray-50"
+      <button className="mt-4 w-full flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-white/5"
         style={{ color: C.primary }}>
         View all activities <ChevronRight size={13} />
       </button>
@@ -388,6 +376,7 @@ const RecentActivity = () => {
 // WIDGET 5 — DMM Movement Growth (Radial / Donut)
 // ════════════════════════════════════════════════════════════════════════════
 const MovementGrowth = () => {
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   const { data, isLoading } = useQuery({
     queryKey: ['analytics-dmm-growth'],
     queryFn: () => api('/api/analytics/dmm-growth').then(r => r.data),
@@ -404,10 +393,10 @@ const MovementGrowth = () => {
     <Card className="flex flex-col items-center">
       <div className="w-full flex items-center justify-between mb-2">
         <div>
-          <h3 className="font-bold text-gray-800">DMM Growth</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Movement progress</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">DMM Growth</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Movement progress</p>
         </div>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-50">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-500/10">
           <TrendingUp size={16} style={{ color: '#8B5CF6' }} />
         </div>
       </div>
@@ -429,12 +418,12 @@ const MovementGrowth = () => {
               strokeWidth={0}
             >
               <Cell fill={C.secondary} />
-              <Cell fill="#F3F4F6" />
+              <Cell fill={isDark ? '#1e293b' : '#F3F4F6'} />
             </Pie>
           </PieChart>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-extrabold text-gray-800">+{growth}%</span>
-            <span className="text-xs text-gray-400">growth</span>
+            <span className="text-2xl font-extrabold text-gray-800 dark:text-slate-100">+{growth}%</span>
+            <span className="text-xs text-gray-400 dark:text-slate-400">growth</span>
           </div>
         </div>
       )}
@@ -466,10 +455,10 @@ const TopRegions = () => {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800">Top Active Regions</h3>
-          <p className="text-xs text-gray-400 mt-0.5">By village count</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">Top Active Regions</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">By village count</p>
         </div>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-blue-50">
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-500/10">
           <Users size={16} style={{ color: C.primary }} />
         </div>
       </div>
@@ -491,10 +480,10 @@ const TopRegions = () => {
               return (
                 <div key={r.region || i}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">{r.region}</span>
-                    <span className="text-xs font-bold text-gray-500">{r.count.toLocaleString()} villages</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-200">{r.region}</span>
+                    <span className="text-xs font-bold text-gray-500 dark:text-slate-400">{r.count.toLocaleString()} villages</span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{ width: `${pct}%`, background: barColors[i % barColors.length] }}
@@ -554,6 +543,7 @@ const APP_COUNTRIES = [
 ]
 
 const PeopleGroupsWidget = () => {
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   const navigate = useNavigate()
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedRegion, setSelectedRegion] = useState('')
@@ -646,6 +636,15 @@ const PeopleGroupsWidget = () => {
   const languages = data?.languageDistribution || []
   const maxReligion = religions.length ? Math.max(...religions.map(r => r.count)) : 1
   const maxLanguage = languages.length ? Math.max(...languages.map(l => l.count)) : 1
+  // Répartition par donateur (camembert) et par année de début (barres).
+  const donors = (data?.donorDistribution || []).map((d) => ({
+    name: d.donor || 'Inconnu',
+    value: d.count,
+  }))
+  const startYears = (data?.startYearDistribution || []).map((y) => ({
+    year: String(y.year),
+    count: y.count,
+  }))
 
   const dotColors = [C.primary, C.secondary, '#10B981', '#F59E0B', '#8B5CF6']
 
@@ -653,10 +652,10 @@ const PeopleGroupsWidget = () => {
     if (!active || !payload?.length) return null
     const d = payload[0]?.payload
     return (
-      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-3 text-xs">
-        <p className="font-bold text-gray-800 mb-1">{d?.name}</p>
-        <p className="text-gray-500">Groupes : <span className="font-semibold text-gray-800">{d?.count?.toLocaleString()}</span></p>
-        <p className="text-gray-500">Population : <span className="font-semibold text-gray-800">{d?.population?.toLocaleString()}</span></p>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-white/10 p-3 text-xs">
+        <p className="font-bold text-gray-800 dark:text-slate-100 mb-1">{d?.name}</p>
+        <p className="text-gray-500 dark:text-slate-400">Groupes : <span className="font-semibold text-gray-800 dark:text-slate-100">{d?.count?.toLocaleString()}</span></p>
+        <p className="text-gray-500 dark:text-slate-400">Population : <span className="font-semibold text-gray-800 dark:text-slate-100">{d?.population?.toLocaleString()}</span></p>
       </div>
     )
   }
@@ -670,7 +669,7 @@ const PeopleGroupsWidget = () => {
             <Users size={20} style={{ color: C.primary }} />
           </div>
           <div>
-            <h3 className="font-extrabold text-gray-800 text-base flex items-center gap-1 flex-wrap">
+            <h3 className="font-extrabold text-gray-800 dark:text-slate-100 text-base flex items-center gap-1 flex-wrap">
               People Groups
               {selectedCountry && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: C.primary + '18', color: C.primary }}>
@@ -683,7 +682,7 @@ const PeopleGroupsWidget = () => {
                 </span>
               )}
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">Population · Engagement · Évangélisation</p>
+            <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Population · Engagement · Évangélisation</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -691,7 +690,7 @@ const PeopleGroupsWidget = () => {
           <select
             value={selectedCountry}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 cursor-pointer shadow-sm"
+            className="text-xs border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 bg-white dark:bg-white/5 text-gray-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 cursor-pointer shadow-sm"
           >
             <option value="">Tous les pays</option>
             {APP_COUNTRIES.map(c => (
@@ -906,6 +905,60 @@ const PeopleGroupsWidget = () => {
         </div>
 
       </div>
+
+      {/* ── Répartition par donateur & par année de début ────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6 pt-6 border-t border-gray-100 dark:border-white/10">
+        {/* Par donateur (camembert) */}
+        <div>
+          <SectionTitle>Par donateur</SectionTitle>
+          {isLoading ? (
+            <Skeleton className="h-56 w-full rounded-xl" />
+          ) : donors.length === 0 ? (
+            <p className="text-xs text-gray-400">Aucune donnée</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={donors}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  innerRadius={45}
+                  paddingAngle={2}
+                >
+                  {donors.map((entry, i) => (
+                    <Cell key={entry.name} fill={dotColors[i % dotColors.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v, n) => [`${v} peuple(s)`, n]} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Par année de début (barres) */}
+        <div>
+          <SectionTitle>Par année de début</SectionTitle>
+          {isLoading ? (
+            <Skeleton className="h-56 w-full rounded-xl" />
+          ) : startYears.length === 0 ? (
+            <p className="text-xs text-gray-400">Aucune donnée</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={startYears} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v) => [`${v} peuple(s)`, 'Peuples']} />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]} fill={C.primary} barSize={22} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
     </Card>
   )
 }
@@ -1109,288 +1162,6 @@ const JPCoverageWidget = () => {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// WIDGET — Quarterly Pulse
-// Stats du trimestre courant vs trimestre précédent
-// ════════════════════════════════════════════════════════════════════════════
-const QuarterlyPulse = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['quarterly-pulse'],
-    queryFn: () => quarterlyApi.getQuarterlyPulse().then(r => r.data),
-    staleTime: 300000, // 5 min
-  })
-
-  // Couleurs statut DMM
-  const statusColors = {
-    unreached:      { bg: 'bg-red-100',     text: 'text-red-700',     label: 'Non-atteint' },
-    pioneer:        { bg: 'bg-orange-100',   text: 'text-orange-700',  label: 'Pionnier' },
-    midway:         { bg: 'bg-yellow-100',   text: 'text-yellow-700',  label: 'Mi-parcours' },
-    'tipping-point':{ bg: 'bg-green-100',    text: 'text-green-700',   label: 'Basculement' },
-    dmm:            { bg: 'bg-emerald-100',  text: 'text-emerald-800', label: 'Mouvement' },
-  }
-
-  // Composant d'une métrique avec delta
-  const Metric = ({ label, icon, metric, positive = true, highlight = false }) => {
-    if (!metric) return null
-    const hasDiff = metric.diff !== null && metric.diff !== undefined && metric.prev > 0
-    const isUp = metric.diff > 0
-    const isGood = positive ? isUp : !isUp
-
-    return (
-      <div className={`rounded-xl p-4 border transition-all ${
-        highlight
-          ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200'
-          : 'bg-white border-gray-100 hover:border-gray-200'
-      }`}>
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-gray-500">{label}</span>
-          <span className={`text-gray-400 ${highlight ? 'text-indigo-400' : ''}`}>{icon}</span>
-        </div>
-        <p className={`text-2xl font-bold mb-1 ${highlight ? 'text-indigo-700' : 'text-gray-800'}`}>
-          {(metric.value || 0).toLocaleString('fr-FR')}
-        </p>
-        {hasDiff && (
-          <div className={`flex items-center gap-1 text-xs font-semibold ${
-            isGood ? 'text-emerald-600' : 'text-red-500'
-          }`}>
-            {isUp
-              ? <ArrowUp size={12} />
-              : <ArrowDown size={12} />
-            }
-            <span>{Math.abs(metric.diff).toLocaleString('fr-FR')}</span>
-            {metric.pct !== null && (
-              <span className="text-gray-400 font-normal ml-0.5">({metric.pct > 0 ? '+' : ''}{metric.pct}%)</span>
-            )}
-            <span className="text-gray-400 font-normal ml-0.5">vs {data?.previousQ}</span>
-          </div>
-        )}
-        {!hasDiff && metric.prev === 0 && data?.previousQ && (
-          <p className="text-xs text-gray-400">Premier trimestre</p>
-        )}
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <Card className="col-span-3">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
-            <Calendar size={20} className="text-emerald-600" />
-          </div>
-          <div>
-            <Skeleton className="h-5 w-48 mb-1" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
-        </div>
-      </Card>
-    )
-  }
-
-  if (!data?.hasData) {
-    return (
-      <Card className="col-span-3">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
-            <Calendar size={20} className="text-emerald-600" />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800">Quarterly Pulse</h3>
-            <p className="text-xs text-gray-400">Rapport trimestriel DMM</p>
-          </div>
-        </div>
-        <div className="text-center py-10 text-gray-400">
-          <Calendar size={40} className="mx-auto mb-3 opacity-30" />
-          <p className="font-medium">Aucun rapport trimestriel importé</p>
-          <p className="text-sm mt-1">Allez dans <span className="font-semibold text-emerald-600">Data Management → Rapport Trimestriel</span> pour importer votre premier fichier Excel.</p>
-        </div>
-      </Card>
-    )
-  }
-
-  const m = data.metrics
-
-  return (
-    <Card className="col-span-3">
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm">
-            <Calendar size={20} className="text-white" />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800 text-base">Quarterly Pulse</h3>
-            <p className="text-xs text-gray-400">
-              <span className="font-semibold text-emerald-600">{data.currentQ}</span>
-              {data.previousQ && <span className="text-gray-400"> · vs {data.previousQ}</span>}
-              <span className="ml-2">· {m.peoples?.value} peuples</span>
-            </p>
-          </div>
-        </div>
-        {/* Badges alertes */}
-        <div className="flex gap-2">
-          {m.statusChanges?.value > 0 && (
-            <span className="flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200">
-              <Zap size={11} /> {m.statusChanges.value} percée{m.statusChanges.value > 1 ? 's' : ''}
-            </span>
-          )}
-          {m.newPGs?.value > 0 && (
-            <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-200">
-              <Users size={11} /> +{m.newPGs.value} nouveaux
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* ── Métriques principales ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <Metric label="Nouvelles Églises"   icon={<Church size={16}/>}   metric={m.churches}   positive={true} highlight />
-        <Metric label="Nouveaux Disciples"  icon={<Users size={16}/>}    metric={m.disciples}  positive={true} />
-        <Metric label="Nouveaux Baptêmes"   icon={<Heart size={16}/>}    metric={m.baptisms}   positive={true} />
-        <Metric label="Croyants MBB"        icon={<Globe size={16}/>}    metric={m.mbb}        positive={true} />
-        <Metric label="Leaders en formation"icon={<Award size={16}/>}    metric={m.leaders}    positive={true} />
-        <Metric label="Coaches actifs"      icon={<Users size={16}/>}    metric={m.coaches}    positive={true} />
-        <Metric label="Églises perdues"     icon={<TrendingDown size={16}/>} metric={m.lostChurches} positive={false} />
-        <Metric label="Nouveaux peuples"    icon={<MapPin size={16}/>}   metric={m.newPGs}     positive={true} />
-      </div>
-
-      {/* ── Bas : Percées + Top Pays + MBB ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-        {/* Percées */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-100">
-          <h4 className="font-bold text-amber-800 text-sm mb-3 flex items-center gap-1.5">
-            <Zap size={14} className="text-amber-500" />
-            Percées — {data.currentQ}
-          </h4>
-          {data.breakthroughs?.length > 0 ? (
-            <div className="space-y-2">
-              {data.breakthroughs.map((b, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-amber-500 text-xs">🏆</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 truncate">{b.peopleGroupName}</p>
-                    <p className="text-[10px] text-gray-500">{b.country}</p>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                      statusColors[b['delta.previousStatus'] || b.delta?.previousStatus]?.bg || 'bg-gray-100'
-                    } ${statusColors[b['delta.previousStatus'] || b.delta?.previousStatus]?.text || 'text-gray-600'}`}>
-                      {statusColors[b['delta.previousStatus'] || b.delta?.previousStatus]?.label || b.delta?.previousStatus}
-                    </span>
-                    <ArrowUp size={10} className="text-emerald-500" />
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
-                      statusColors[b.calculatedStatus]?.bg || 'bg-gray-100'
-                    } ${statusColors[b.calculatedStatus]?.text || 'text-gray-600'}`}>
-                      {statusColors[b.calculatedStatus]?.label || b.calculatedStatus}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-amber-600 italic">Aucune percée détectée ce trimestre</p>
-          )}
-        </div>
-
-        {/* Top pays */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <h4 className="font-bold text-gray-700 text-sm mb-3 flex items-center gap-1.5">
-            <Globe size={14} className="text-indigo-400" />
-            Top pays — nouveaux disciples
-          </h4>
-          <div className="space-y-2">
-            {data.topCountries?.slice(0, 5).map((c, i) => {
-              const max = data.topCountries[0]?.disciples || 1
-              const pct = Math.round((c.disciples / max) * 100)
-              return (
-                <div key={i} className="space-y-0.5">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-medium text-gray-700 truncate">{c._id}</span>
-                    <span className="text-gray-500 ml-2 flex-shrink-0">{c.disciples?.toLocaleString('fr-FR')}</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-purple-500 transition-all duration-500"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* MBB Radar */}
-        <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border border-red-100">
-          <h4 className="font-bold text-red-800 text-sm mb-3 flex items-center gap-1.5">
-            <Globe size={14} className="text-red-400" />
-            MBB — Croyants d'origine musulmane
-          </h4>
-          {data.topMBB?.length > 0 ? (
-            <div className="space-y-2">
-              {data.topMBB.map((m, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                    i === 0 ? 'bg-red-500 text-white' : 'bg-red-100 text-red-700'
-                  }`}>{i + 1}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 truncate">{m.peopleGroupName}</p>
-                    <p className="text-[10px] text-gray-500">{m.country}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-bold text-red-700">{m.mbbCount}</p>
-                    {m.mbPercent > 0 && (
-                      <p className="text-[10px] text-red-500">{m.mbPercent}%</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-red-600 italic">Aucune donnée MBB ce trimestre</p>
-          )}
-        </div>
-      </div>
-
-      {/* ── Mini graphe tendance ── */}
-      {data.trend?.length > 1 && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <p className="text-xs font-semibold text-gray-500 mb-2">Tendance — {data.trend.length} derniers trimestres</p>
-          <ResponsiveContainer width="100%" height={60}>
-            <AreaChart data={data.trend} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="pulseGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor={C.success} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={C.success} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="_id" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: C.muted }} />
-              <Tooltip
-                contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 2px 12px rgba(0,0,0,.1)', fontSize: 11 }}
-                formatter={(v, n) => [v?.toLocaleString('fr-FR'), n === 'disciples' ? 'Disciples' : n === 'baptisms' ? 'Baptêmes' : 'Églises']}
-              />
-              <Area type="monotone" dataKey="disciples" stroke={C.success} strokeWidth={2} fill="url(#pulseGrad)" dot={false} />
-              <Area type="monotone" dataKey="baptisms"  stroke={C.primary} strokeWidth={1.5} fill="none" dot={false} strokeDasharray="4 2" />
-            </AreaChart>
-          </ResponsiveContainer>
-          <div className="flex gap-4 mt-1">
-            <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
-              <div className="w-3 h-0.5 bg-emerald-500 rounded" />Disciples
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
-              <div className="w-3 h-0.5 bg-indigo-500 rounded" style={{backgroundImage:'repeating-linear-gradient(90deg,#5B5FEF 0,#5B5FEF 4px,transparent 4px,transparent 6px)'}} />Baptêmes
-            </div>
-          </div>
-        </div>
-      )}
-    </Card>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
 const EvolutionChart = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['analytics-pg-timeline'],
@@ -1508,6 +1279,11 @@ const EvolutionChart = () => {
 const AnalyticsDashboard = () => {
   const [lastRefresh, setLastRefresh] = useState(new Date())
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [sourceFilter, setSourceFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('name')
+  const [sortOrder, setSortOrder] = useState('asc')
   const { t, isFrench } = useLanguage()
   const dateLocale = isFrench ? fr : enUS
   const queryClient = useQueryClient()
@@ -1626,10 +1402,16 @@ const AnalyticsDashboard = () => {
   })
 
   const { data: peopleGroupsData } = useQuery({
-    queryKey: ['peopleGroups', 'dashboard', 'all'],
+    queryKey: ['peopleGroups', 'dashboard', 'all', search, statusFilter, sourceFilter, sortBy, sortOrder],
     queryFn: async () => {
       try {
-        const allData = await peopleGroupsApi.getAllPaginated({}, {
+        const allData = await peopleGroupsApi.getAllPaginated({
+          search,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          source: sourceFilter !== 'all' ? sourceFilter : undefined,
+          sortBy,
+          sortOrder,
+        }, {
           onProgress: (progress) => { setPaginationProgress(progress) },
         })
         setPaginationProgress(null)
@@ -1643,10 +1425,15 @@ const AnalyticsDashboard = () => {
   })
 
   const { data: villagesData } = useQuery({
-    queryKey: ['villages'],
+    queryKey: ['villages', search, statusFilter, sortBy, sortOrder],
     queryFn: async () => {
       try {
-        const response = await villagesApi.getAll()
+        const response = await villagesApi.getAll({
+          search,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          sortBy,
+          sortOrder,
+        })
         return response.data.villages || response.data || []
       } catch { return [] }
     },
@@ -1675,6 +1462,8 @@ const AnalyticsDashboard = () => {
     dmm: peopleGroups.filter(p => p.engagementStatus === 'dmm').length,
     totalChurches: peopleGroups.reduce((sum, p) => sum + (p.numberOfChurches || 0), 0),
     withCoordinates: peopleGroups.filter(p => p?.location?.coordinates?.length >= 2).length,
+    imbSource: peopleGroups.filter(p => p.source === 'PeopleGroups.org').length,
+    fttSource: peopleGroups.filter(p => p.source === 'Finishing the Task').length,
   }), [peopleGroups])
 
   const { peopleGroupsByCountry, countryDataList, peopleGroupsByCountryList } = useMemo(() => {
@@ -1733,11 +1522,21 @@ const AnalyticsDashboard = () => {
     { name: 'DMM (Reached)', peopleGroups: peopleStats.dmm, villages: villageStats.byStatus.dmm },
   ], [peopleStats, villageStats])
 
+  const [isDark, setIsDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setIsDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    setIsDark(el.classList.contains('dark'))
+    return () => obs.disconnect()
+  }, [])
+  const T = isDark ? { primary: '#818cf8', secondary: '#fb7185', bg: '#0b1020', card: 'rgba(17,24,39,0.75)', text: '#e5e7eb', muted: '#94a3b8', success: '#34d399', danger: '#f87171' } : C
+
   return (
-    <div className="min-h-screen -m-6 p-6 relative" style={{ background: C.bg }}>
+    <div className="min-h-screen -m-6 p-6 relative" style={{ background: T.bg }}>
       {/* Background Logo Watermark */}
       <div
-        className="fixed inset-0 z-0 pointer-events-none opacity-5"
+        className="fixed inset-0 z-0 pointer-events-none opacity-5 dark:opacity-[0.03] dark:invert"
         style={{
           backgroundImage: 'url(/data/Everywhere Logo_Mark & Title_Black.png)',
           backgroundPosition: 'center',
@@ -1752,10 +1551,10 @@ const AnalyticsDashboard = () => {
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 relative z-10">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: C.text }}>
-              Your Analytics Dashboard
+            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: T.text }}>
+              Global Dashboard
             </h1>
-            <p className="text-sm mt-1" style={{ color: C.muted }}>
+            <p className="text-sm mt-1" style={{ color: T.muted }}>
               Mission progress · Church planting movements · Regional insights
             </p>
           </div>
@@ -1765,13 +1564,13 @@ const AnalyticsDashboard = () => {
                 Loading: {paginationProgress.recordsFetched}/{paginationProgress.totalCount}
               </span>
             )}
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-slate-400 text-sm">
               {format(new Date(), "EEEE d MMMM yyyy", { locale: dateLocale })}
             </p>
             <button
               onClick={handleRefresh}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
-              style={{ color: C.primary }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 dark:bg-white/5 dark:border-white/10 dark:text-indigo-300"
+              style={{ color: T.primary }}
             >
               <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
               Refresh · {timeAgo()}
@@ -1779,107 +1578,168 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
 
-        {/* ── Grid Layout — AI Assistant, Monthly, Metrics, Activity, Growth, Regions ── */}
-        {/*
-          Row 1: [AI Assistant (wide)] [Monthly Chart] [Progress Metrics (stacked)]
-          Row 2: [Recent Activity (wide)] [DMM Growth] [Top Regions]
-        */}
+        {/* ── Grid Layout — Progress Metrics ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8 relative z-10">
 
-          {/* Row 1 */}
-          <AIAssistantCard />
-          <MonthlyActivityChart />
           <ProgressMetrics />
 
-          {/* Row 2 */}
-          <RecentActivity />
-          <MovementGrowth />
-          <TopRegions />
-
         </div>
 
-        {/* ── Quarterly Pulse — pleine largeur ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 mb-8 relative z-10">
-          <QuarterlyPulse />
-        </div>
+        {/* ── DMM Engagement Status (People Groups) ── */}
+        <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md border border-white/60 dark:bg-slate-900/60 dark:border-white/10 p-5 mb-6 relative z-10">
+          <div className="flex items-center gap-3 mb-5">
+            <Target size={22} className="text-sky-600" />
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Global Peoples Groups</h2>
+          </div>
 
-        {/* ── DMM Engagement Status Cards ── */}
-        <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 mb-8 relative z-10">
-          <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2 drop-shadow">
-            <Target size={20} className="text-primary-600" />
-            {t('dashboard.engagementStatus') || 'DMM Engagement Status'}
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="bg-red-50 rounded-xl p-5 text-center border border-red-100 hover:border-red-200 transition-colors">
-              <p className="text-4xl font-bold text-red-600 mb-1">{peopleStats.unreached}</p>
-              <p className="text-sm text-red-700 font-semibold">Unreached</p>
-              <p className="text-xs text-red-500 mt-2">0 {t('dashboard.churchesUnit') || 'churches'}, 0 {t('dashboard.generationAbbr') || 'gen'}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="bg-red-50/80 rounded-2xl p-4 text-center border border-red-100 hover:border-red-200 transition-colors dark:bg-red-500/10 dark:border-red-500/20">
+              <p className="text-4xl font-bold text-red-600 dark:text-red-400 mb-1">{peopleStats.unreached}</p>
+              <p className="text-base text-red-700 dark:text-red-300 font-semibold">Unreached</p>
+              <p className="text-xs text-red-500 dark:text-red-400 mt-2">0 churches, 0 gen.</p>
             </div>
-            <div className="bg-orange-50 rounded-xl p-5 text-center border border-orange-100 hover:border-orange-200 transition-colors">
-              <p className="text-4xl font-bold text-orange-600 mb-1">{peopleStats.pioneer}</p>
-              <p className="text-sm text-orange-700 font-semibold">Pioneer</p>
-              <p className="text-xs text-orange-500 mt-2">1-33 {t('dashboard.churchesUnit') || 'churches'}</p>
+            <div className="bg-orange-50/80 rounded-2xl p-4 text-center border border-orange-100 hover:border-orange-200 transition-colors dark:bg-orange-500/10 dark:border-orange-500/20">
+              <p className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-1">{peopleStats.pioneer}</p>
+              <p className="text-base text-orange-700 dark:text-orange-300 font-semibold">Pioneer</p>
+              <p className="text-xs text-orange-500 dark:text-orange-400 mt-2">1-33 churches</p>
             </div>
-            <div className="bg-yellow-50 rounded-xl p-5 text-center border border-yellow-100 hover:border-yellow-200 transition-colors">
-              <p className="text-4xl font-bold text-yellow-600 mb-1">{peopleStats.midway}</p>
-              <p className="text-sm text-yellow-700 font-semibold">Midway</p>
-              <p className="text-xs text-yellow-500 mt-2">34-66 {t('dashboard.churchesUnit') || 'churches'}</p>
+            <div className="bg-yellow-50/80 rounded-2xl p-4 text-center border border-yellow-100 hover:border-yellow-200 transition-colors dark:bg-yellow-500/10 dark:border-yellow-500/20">
+              <p className="text-4xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{peopleStats.midway}</p>
+              <p className="text-base text-yellow-700 dark:text-yellow-300 font-semibold">Midway</p>
+              <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-2">34-66 churches</p>
             </div>
-            <div className="bg-emerald-50 rounded-xl p-5 text-center border border-emerald-100 hover:border-emerald-200 transition-colors">
-              <p className="text-4xl font-bold text-emerald-600 mb-1">{peopleStats.tippingPoint}</p>
-              <p className="text-sm text-emerald-700 font-semibold">Tipping Point</p>
-              <p className="text-xs text-emerald-500 mt-2">67-99 {t('dashboard.churchesUnit') || 'churches'}</p>
+            <div className="bg-emerald-50/80 rounded-2xl p-4 text-center border border-emerald-100 hover:border-emerald-200 transition-colors dark:bg-emerald-500/10 dark:border-emerald-500/20">
+              <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{peopleStats.tippingPoint}</p>
+              <p className="text-base text-emerald-700 dark:text-emerald-300 font-semibold">Tipping Point</p>
+              <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-2">67-99 churches</p>
             </div>
-            <div className="bg-green-50 rounded-xl p-5 text-center border border-green-100 hover:border-green-200 transition-colors">
-              <p className="text-4xl font-bold text-green-700 mb-1">{peopleStats.dmm}</p>
-              <p className="text-sm text-green-800 font-semibold">DMM (Reached)</p>
-              <p className="text-xs text-green-600 mt-2">100+ {t('dashboard.churchesUnit') || 'churches'} & 4+ {t('dashboard.generationAbbr') || 'gen'}</p>
+            <div className="bg-green-50/80 rounded-2xl p-4 text-center border border-green-100 hover:border-green-200 transition-colors dark:bg-green-500/10 dark:border-green-500/20">
+              <p className="text-4xl font-bold text-green-700 dark:text-green-400 mb-1">{peopleStats.dmm}</p>
+              <p className="text-base text-green-800 dark:text-green-300 font-semibold">DMM (Reached)</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-2">100+ churches & 4+ gen.</p>
             </div>
           </div>
         </div>
 
+        {/* ── Répartition People Groups : Source · Statut · JP non-engagés ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6 relative z-10 items-stretch">
+
+          {/* People Groups by Source (Donut) — apporte sa propre carte */}
+          <div className="[&>div]:h-full [&>div]:mb-0 flex flex-col">
+            <SourceDonutChart peopleGroups={peopleGroups} />
+          </div>
+
+          {/* People Groups by Status (Pie) */}
+          <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-white/60 flex flex-col relative z-10 overflow-hidden dark:bg-slate-900/60 dark:border-white/10 dark:shadow-[0_0_25px_-5px_rgba(99,102,241,0.45)] dark:ring-1 dark:ring-indigo-500/20">
+            {/* halo futuriste subtil */}
+            <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-20 dark:opacity-40 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)' }} />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2 mb-5 relative">
+              <Target size={18} className="text-primary-600" />
+              {t('dashboard.peopleGroupStatus') || 'People Group Status'}
+            </h3>
+            {engagementStatusData.length > 0 ? (
+              <>
+                <ResponsiveContainer width="100%" height={160}>
+                  <PieChart>
+                    <Pie
+                      data={engagementStatusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={34}
+                      outerRadius={62}
+                      paddingAngle={5}
+                      dataKey="count"
+                    >
+                      {engagementStatusData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={engagementStatusColors[entry.status]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDark ? '#0f172a' : '#fff',
+                        border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        color: isDark ? '#e2e8f0' : undefined,
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-3 space-y-1.5">
+                  {engagementStatusData.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm p-1.5 rounded-lg hover:bg-gray-50/80 dark:hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-3.5 h-3.5 rounded-full shadow-sm"
+                          style={{ backgroundColor: engagementStatusColors[item.status] }}
+                        />
+                        <span className="text-gray-700 dark:text-slate-200 font-medium">{item.label}</span>
+                      </div>
+                      <span className="font-bold text-gray-800 dark:text-slate-100">{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-48 text-gray-400 dark:text-slate-500">
+                <p>No people groups data available</p>
+              </div>
+            )}
+          </div>
+
+          {/* Peuples JP non-engagés */}
+          <div className="md:col-span-2 xl:col-span-1 flex flex-col [&>div]:h-full [&>div]:rounded-xl">
+            <JPCoverageWidget />
+          </div>
+
+        </div>
+
         {/* ── Village Coverage — 3 widgets ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 relative z-10">
 
           {/* WIDGET 1 — Statut des villages */}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
-            <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Home size={18} className="text-primary-600" />
+          <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-5 border border-white/60 dark:bg-slate-900/60 dark:border-white/10">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Home size={16} className="text-primary-600" />
               Statut des villages
             </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl p-4 text-center border border-red-100 bg-red-50">
-                <p className="text-xs font-semibold text-red-600 mb-1">Non-atteint</p>
-                <p className="text-3xl font-bold text-red-600">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="rounded-xl p-3.5 text-center border border-red-100 bg-red-50/80 dark:bg-red-500/10 dark:border-red-500/20">
+                <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">Non-atteint</p>
+                <p className="text-3xl font-bold text-red-600 dark:text-red-400">
                   {kpiSummary?.villageStatusCounts?.unreached
                     ?? coverageGauge?.statusCounts?.unreached
                     ?? statusDistribution?.villages?.find(v => v.status === 'unreached')?.count
                     ?? '—'}
                 </p>
               </div>
-              <div className="rounded-xl p-4 text-center border border-green-100 bg-green-50">
-                <p className="text-xs font-semibold text-green-700 mb-1">Mouvement</p>
-                <p className="text-3xl font-bold text-green-700">
+              <div className="rounded-xl p-3.5 text-center border border-green-100 bg-green-50/80 dark:bg-green-500/10 dark:border-green-500/20">
+                <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">Mouvement</p>
+                <p className="text-3xl font-bold text-green-700 dark:text-green-400">
                   {kpiSummary?.villageStatusCounts?.dmm
                     ?? coverageGauge?.statusCounts?.dmm
                     ?? statusDistribution?.villages?.find(v => v.status === 'dmm')?.count
                     ?? '—'}
                 </p>
               </div>
-              <div className="rounded-xl p-4 text-center border border-yellow-100 bg-yellow-50">
-                <p className="text-xs font-semibold text-yellow-600 mb-1">En cours</p>
-                <p className="text-3xl font-bold text-yellow-600">
+              <div className="rounded-xl p-3.5 text-center border border-yellow-100 bg-yellow-50/80 dark:bg-yellow-500/10 dark:border-yellow-500/20">
+                <p className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mb-1">En cours</p>
+                <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                   {kpiSummary?.villageStatusCounts
                     ? (kpiSummary.villageStatusCounts.pioneer || 0)
                       + (kpiSummary.villageStatusCounts.midway || 0)
                       + (kpiSummary.villageStatusCounts['tipping-point'] || 0)
                     : coverageGauge?.villageCoverage?.withData ?? '—'}
                 </p>
-                <p className="text-xs text-yellow-500 mt-1">avec données</p>
+                <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-1">avec données</p>
               </div>
-              <div className="rounded-xl p-4 text-center border border-gray-100 bg-gray-50">
-                <p className="text-xs font-semibold text-gray-500 mb-1">Sans données</p>
-                <p className="text-3xl font-bold text-gray-500">
+              <div className="rounded-xl p-3.5 text-center border border-gray-100 bg-gray-50/80 dark:bg-white/5 dark:border-white/10">
+                <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">Sans données</p>
+                <p className="text-3xl font-bold text-gray-500 dark:text-slate-400">
                   {coverageGauge?.villageCoverage?.withoutData
                     ?? kpiSummary?.villageStatusCounts?.noData
                     ?? '—'}
@@ -1889,9 +1749,9 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* WIDGET 2 — Donut villages avec données DMM */}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
-            <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <Target size={18} className="text-primary-600" />
+          <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-5 border border-white/60 dark:bg-slate-900/60 dark:border-white/10">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <Target size={16} className="text-primary-600" />
               Villages avec données DMM
             </h3>
             {(() => {
@@ -1918,7 +1778,7 @@ const AnalyticsDashboard = () => {
               const total = raw?.reduce((s, d) => s + (d.count || 0), 0) || 0
               if (!raw || raw.length === 0) {
                 return (
-                  <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
+                  <div className="flex items-center justify-center h-36 text-gray-400 dark:text-slate-500 text-sm">
                     Aucune donnée disponible
                   </div>
                 )
@@ -1926,14 +1786,14 @@ const AnalyticsDashboard = () => {
               return (
                 <>
                   <div className="relative">
-                    <ResponsiveContainer width="100%" height={180}>
+                    <ResponsiveContainer width="100%" height={160}>
                       <PieChart>
                         <Pie
                           data={raw}
                           cx="50%"
                           cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
+                          innerRadius={44}
+                          outerRadius={68}
                           paddingAngle={3}
                           dataKey="count"
                         >
@@ -1943,25 +1803,25 @@ const AnalyticsDashboard = () => {
                         </Pie>
                         <Tooltip
                           formatter={(value, name, props) => [value, donutLabels[props.payload?.status] || props.payload?.status]}
-                          contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                          contentStyle={{ backgroundColor: isDark ? '#0f172a' : '#fff', border: isDark ? '1px solid #334155' : '1px solid #e5e7eb', borderRadius: '8px', color: isDark ? '#e2e8f0' : undefined }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center">
-                        <p className="text-2xl font-bold text-gray-800">{total}</p>
-                        <p className="text-xs text-gray-400">villages</p>
+                        <p className="text-2xl font-bold text-gray-800 dark:text-slate-100">{total}</p>
+                        <p className="text-xs text-gray-400 dark:text-slate-400">villages</p>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-1.5 mt-2">
+                  <div className="space-y-1 mt-2">
                     {raw.filter(d => d.count > 0).map((item, i) => (
                       <div key={i} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
                           <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: donutColors[item.status] || '#9ca3af' }} />
-                          <span className="text-gray-600">{donutLabels[item.status] || item.status}</span>
+                          <span className="text-gray-600 dark:text-slate-300">{donutLabels[item.status] || item.status}</span>
                         </div>
-                        <span className="font-semibold text-gray-800">{item.count}</span>
+                        <span className="font-semibold text-gray-800 dark:text-slate-100">{item.count}</span>
                       </div>
                     ))}
                   </div>
@@ -1971,9 +1831,9 @@ const AnalyticsDashboard = () => {
           </div>
 
           {/* WIDGET 3 — Gauge couverture villages */}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
-            <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <BarChart3 size={18} className="text-primary-600" />
+          <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-5 border border-white/60 dark:bg-slate-900/60 dark:border-white/10">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-3 flex items-center gap-2">
+              <BarChart3 size={16} className="text-primary-600" />
               Couverture des villages
             </h3>
             {(() => {
@@ -1984,13 +1844,13 @@ const AnalyticsDashboard = () => {
               const filled   = (gaugeVal / 100) * 180
               const gaugeData = [
                 { value: filled,       fill: '#0ea5e9' },
-                { value: 180 - filled, fill: '#e5e7eb' },
+                { value: 180 - filled, fill: isDark ? '#1e293b' : '#e5e7eb' },
                 { value: 180,          fill: 'transparent' },
               ]
               return (
                 <>
-                  <div className="relative" style={{ height: 150 }}>
-                    <ResponsiveContainer width="100%" height={150}>
+                  <div className="relative" style={{ height: 132 }}>
+                    <ResponsiveContainer width="100%" height={132}>
                       <PieChart>
                         <Pie
                           data={gaugeData}
@@ -1998,8 +1858,8 @@ const AnalyticsDashboard = () => {
                           cy="85%"
                           startAngle={180}
                           endAngle={0}
-                          innerRadius={55}
-                          outerRadius={80}
+                          innerRadius={48}
+                          outerRadius={68}
                           paddingAngle={0}
                           dataKey="value"
                           isAnimationActive={true}
@@ -2012,33 +1872,33 @@ const AnalyticsDashboard = () => {
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex items-end justify-center pb-4 pointer-events-none">
                       <div className="text-center">
-                        <p className="text-3xl font-bold text-sky-600">{pct}%</p>
-                        <p className="text-xs text-gray-400 mt-0.5">villages engagés</p>
+                        <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{pct}%</p>
+                        <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">villages engagés</p>
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <div className="flex justify-between text-xs text-gray-400 dark:text-slate-400 mt-1">
                     <span>0</span>
                     <span>{total.toLocaleString('fr-FR')}</span>
                   </div>
                   <div className="mt-3">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400 mb-1">
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-sky-500 inline-block" />
                         {withData.toLocaleString('fr-FR')} avec données
                       </span>
-                      <span className="text-gray-400">sur {total.toLocaleString('fr-FR')}</span>
+                      <span className="text-gray-400 dark:text-slate-400">sur {total.toLocaleString('fr-FR')}</span>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-sky-500 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(gaugeVal, 100)}%` }}
                       />
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                    <span className="text-gray-400">Objectif 100%</span>
-                    <span className="font-semibold text-gray-600">{(total - withData).toLocaleString('fr-FR')} restants</span>
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between text-xs">
+                    <span className="text-gray-400 dark:text-slate-400">Objectif 100%</span>
+                    <span className="font-semibold text-gray-600 dark:text-slate-300">{(total - withData).toLocaleString('fr-FR')} restants</span>
                   </div>
                 </>
               )
@@ -2048,24 +1908,25 @@ const AnalyticsDashboard = () => {
         </div>
 
         {/* ── Charts Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 relative z-10">
+        <div className="grid grid-cols-1 gap-8 mb-8 relative z-10">
           {/* Comparison Bar Chart */}
-          <div className="lg:col-span-2 bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2 drop-shadow">
-              <BarChart3 size={20} className="text-primary-600" />
+          <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 p-5 border border-white/60 dark:bg-slate-900/60 dark:border-white/10">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-slate-100 mb-4 flex items-center gap-2 drop-shadow">
+              <BarChart3 size={18} className="text-primary-600" />
               {t('dashboard.statusComparison') || 'Status Comparison'}
             </h3>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={260}>
               <BarChart data={comparisonData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fill: '#6b7280' }} />
-                <YAxis tick={{ fill: '#6b7280' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e5e7eb'} />
+                <XAxis dataKey="name" tick={{ fill: isDark ? '#94a3b8' : '#6b7280' }} />
+                <YAxis tick={{ fill: isDark ? '#94a3b8' : '#6b7280' }} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #e5e7eb',
+                    backgroundColor: isDark ? '#0f172a' : '#fff',
+                    border: isDark ? '1px solid #334155' : '1px solid #e5e7eb',
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    color: isDark ? '#e2e8f0' : undefined,
                   }}
                 />
                 <Legend />
@@ -2074,72 +1935,10 @@ const AnalyticsDashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          {/* People Groups Status Pie Chart */}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-6 drop-shadow">
-              {t('dashboard.peopleGroupStatus') || 'People Group Status'}
-            </h3>
-            {engagementStatusData.length > 0 ? (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={engagementStatusData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="count"
-                    >
-                      {engagementStatusData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={engagementStatusColors[entry.status]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#fff',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="mt-6 space-y-3">
-                  {engagementStatusData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-4 h-4 rounded-full shadow-sm"
-                          style={{ backgroundColor: engagementStatusColors[item.status] }}
-                        />
-                        <span className="text-gray-700 font-medium">{item.label}</span>
-                      </div>
-                      <span className="font-bold text-gray-800">{item.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-48 text-gray-400">
-                <p>No people groups data available</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Evolution Chart + JP Coverage + People Groups ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10">
-          <JPCoverageWidget />
         </div>
 
         {/* ── Footer note ── */}
-        <p className="text-center text-xs mt-8 pb-4" style={{ color: C.muted }}>
+        <p className="text-center text-xs mt-8 pb-4" style={{ color: T.muted }}>
           Data refreshes automatically every 60 seconds · Church Planting Map Analytics
         </p>
       </div>

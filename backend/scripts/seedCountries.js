@@ -246,6 +246,84 @@ const centralAfricanCountries = [
       dmmPeoples: false,
     },
   },
+  // ── AWA area (West Africa) ──────────────────────────────────────────────────
+  {
+    code: 'NG', code3: 'NGA', name: 'Nigeria', nameFr: 'Nigéria', region: 'West Africa',
+    defaultCenter: { lat: 9.0820, lng: 8.6753 }, defaultZoom: 6, capital: 'Abuja',
+    languages: ['English'], currency: 'NGN', isActive: true, isDefault: false,
+  },
+  {
+    code: 'GH', code3: 'GHA', name: 'Ghana', nameFr: 'Ghana', region: 'West Africa',
+    defaultCenter: { lat: 7.9465, lng: -1.0232 }, defaultZoom: 7, capital: 'Accra',
+    languages: ['English'], currency: 'GHS', isActive: true, isDefault: false,
+  },
+  {
+    code: 'SL', code3: 'SLE', name: 'Sierra Leone', nameFr: 'Sierra Leone', region: 'West Africa',
+    defaultCenter: { lat: 8.4606, lng: -11.7799 }, defaultZoom: 8, capital: 'Freetown',
+    languages: ['English'], currency: 'SLL', isActive: true, isDefault: false,
+  },
+  {
+    code: 'LR', code3: 'LBR', name: 'Liberia', nameFr: 'Libéria', region: 'West Africa',
+    defaultCenter: { lat: 6.4281, lng: -9.4295 }, defaultZoom: 7, capital: 'Monrovia',
+    languages: ['English'], currency: 'LRD', isActive: true, isDefault: false,
+  },
+  {
+    code: 'GM', code3: 'GMB', name: 'Gambia', nameFr: 'Gambie', region: 'West Africa',
+    defaultCenter: { lat: 13.4432, lng: -15.3101 }, defaultZoom: 8, capital: 'Banjul',
+    languages: ['English'], currency: 'GMD', isActive: true, isDefault: false,
+  },
+  {
+    code: 'GW', code3: 'GNB', name: 'Guinea-Bissau', nameFr: 'Guinée-Bissau', region: 'West Africa',
+    defaultCenter: { lat: 11.8037, lng: -15.1804 }, defaultZoom: 8, capital: 'Bissau',
+    languages: ['Portuguese'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'GN', code3: 'GIN', name: 'Guinea', nameFr: 'Guinée', region: 'West Africa',
+    defaultCenter: { lat: 9.9456, lng: -9.6966 }, defaultZoom: 7, capital: 'Conakry',
+    languages: ['French'], currency: 'GNF', isActive: true, isDefault: false,
+  },
+  // ── FWA area (West Africa) ──────────────────────────────────────────────────
+  {
+    code: 'CI', code3: 'CIV', name: "Côte d'Ivoire", nameFr: "Côte d'Ivoire", region: 'West Africa',
+    defaultCenter: { lat: 7.5400, lng: -5.5471 }, defaultZoom: 7, capital: 'Yamoussoukro',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'BJ', code3: 'BEN', name: 'Benin', nameFr: 'Bénin', region: 'West Africa',
+    defaultCenter: { lat: 9.3077, lng: 2.3158 }, defaultZoom: 7, capital: 'Porto-Novo',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'TG', code3: 'TGO', name: 'Togo', nameFr: 'Togo', region: 'West Africa',
+    defaultCenter: { lat: 8.6195, lng: 0.8248 }, defaultZoom: 7, capital: 'Lomé',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'NE', code3: 'NER', name: 'Niger', nameFr: 'Niger', region: 'West Africa',
+    defaultCenter: { lat: 17.6078, lng: 8.0817 }, defaultZoom: 5, capital: 'Niamey',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'ML', code3: 'MLI', name: 'Mali', nameFr: 'Mali', region: 'West Africa',
+    defaultCenter: { lat: 17.5707, lng: -3.9962 }, defaultZoom: 5, capital: 'Bamako',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'BF', code3: 'BFA', name: 'Burkina Faso', nameFr: 'Burkina Faso', region: 'West Africa',
+    defaultCenter: { lat: 12.2383, lng: -1.5616 }, defaultZoom: 6, capital: 'Ouagadougou',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  {
+    code: 'SN', code3: 'SEN', name: 'Senegal', nameFr: 'Sénégal', region: 'West Africa',
+    defaultCenter: { lat: 14.4974, lng: -14.4524 }, defaultZoom: 7, capital: 'Dakar',
+    languages: ['French'], currency: 'XOF', isActive: true, isDefault: false,
+  },
+  // ── FCA area (East Africa) ──────────────────────────────────────────────────
+  {
+    code: 'UG', code3: 'UGA', name: 'Uganda', nameFr: 'Ouganda', region: 'East Africa',
+    defaultCenter: { lat: 1.2533, lng: 32.7433 }, defaultZoom: 7, capital: 'Kampala',
+    languages: ['English', 'Swahili'], currency: 'UGX', isActive: true, isDefault: false,
+  },
 ];
 
 async function seedCountries() {

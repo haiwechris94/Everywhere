@@ -17,11 +17,21 @@
 # - numberOfChurches: Number of churches (determines engagement status)
 # - churchGeneration: Generation of church multiplication (1-4+)
 # - engagementStatus: pioneer, midway, tipping-point, dmm, unreached (auto-calculated if not provided)
-# - region: Geographic region
-# - country: Country name
+# - region: Geographic region (admin1 / région)
+# - country: Country name (e.g. Cameroon / Cameroun)
+# - countryCode: ISO 3166-1 alpha-2 code (e.g. CM). Optional: derived from `country` if left blank.
+# - admin2: Department / province (used by the Région & Pays detail pages)
+# - admin3: Arrondissement / district / commune (used by the detail pages)
 # - language: Primary language spoken
 # - religion: Primary religion
 # - description: Additional notes or description
+#
+# IMPORTANT — REPORTING / PAGES PAYS & RÉGIONS:
+# Reporting, the Pays and Régions pages, and the people sheets filter by the ISO
+# alpha-2 country code. Provide either a recognised `country` name (Cameroon,
+# Cameroun, Tchad, ...) OR an explicit 2-letter `countryCode` (CM, TD, ...), so
+# imported data shows up in the funnel. Fill admin2/admin3 for department- and
+# arrondissement-level detail.
 #
 # ENGAGEMENT STATUS AUTO-CALCULATION:
 # - 0 churches = unreached
@@ -30,9 +40,9 @@
 # - 67-99 churches = tipping-point
 # - 100+ churches = dmm (Disciple Making Movement)
 #
-name,latitude,longitude,villageName,population,numberOfChurches,churchGeneration,engagementStatus,region,country,language,religion,description
-Massa,10.3417,15.2372,Yagoua,15000,120,8,dmm,Far North,Cameroon,Massa,Christianity,Established DMM with strong multiplication
-Fulani,9.3011,13.3964,Garoua,25000,0,0,unreached,North,Cameroon,Fulfulde,Islam,Nomadic group - no engagement yet
-Tupuri,10.0833,14.9500,Maroua,8000,25,2,pioneer,Far North,Cameroon,Tupuri,Traditional,Initial church planting phase
-Moundang,9.6167,15.0833,Kaele,12000,50,3,midway,Far North,Cameroon,Moundang,Christianity,Active discipleship ongoing
-Guiziga,10.5000,14.3333,Mokolo,6000,85,4,tipping-point,Far North,Cameroon,Guiziga,Traditional,Approaching movement status
+name,latitude,longitude,villageName,population,numberOfChurches,churchGeneration,engagementStatus,region,country,countryCode,admin2,admin3,language,religion,description
+Massa,10.3417,15.2372,Yagoua,15000,120,8,dmm,Extrême-Nord,Cameroon,CM,Mayo-Danay,Yagoua,Massa,Christianity,Established DMM with strong multiplication
+Fulani,9.3011,13.3964,Garoua,25000,0,0,unreached,Nord,Cameroon,CM,Bénoué,Garoua,Fulfulde,Islam,Nomadic group - no engagement yet
+Tupuri,10.0833,14.9500,Maroua,8000,25,2,pioneer,Extrême-Nord,Cameroon,CM,Diamaré,Maroua,Tupuri,Traditional,Initial church planting phase
+Moundang,9.6167,15.0833,Kaele,12000,50,3,midway,Extrême-Nord,Cameroon,CM,Mayo-Kani,Kaélé,Moundang,Christianity,Active discipleship ongoing
+Guiziga,10.5000,14.3333,Mokolo,6000,85,4,tipping-point,Extrême-Nord,Cameroon,CM,Mayo-Tsanaga,Mokolo,Guiziga,Traditional,Approaching movement status

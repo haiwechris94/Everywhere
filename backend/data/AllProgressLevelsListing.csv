@@ -1,0 +1,23 @@
+﻿Joshua Project People Group Data;;;;;;;;
+;;;;;;;;
+JPScale;JPStage;JPScaleDescription;TotalPopulation;PctGlobalPopulation;CountofPGIC;PctGlobalPGIC;JPScaleEvangelicals;JPScaleAdherents
+0.1;Unreached (Frontier);Less than 1 in 1,000 (0.1%) identify as Christians in any way.;2047439000;24.853938026596;4824;29.368075003044;Evangelicals <=0.1%;Professing Christians <=0.1%
+0.5;Unreached (non-Frontier);Few evangelicals and little, if any, history of Christianity.;1574463000;19.112470817707;2338;14.233532205041;Evangelicals >0.1% and <=2%;Professing Christians >0.1% and <=5%
+1;Unreached (All);Few evangelicals and few who identify as Christians.  Little, if any, history of Christianity.;3621902000;43.966408844303;7162;43.601607208085;Evangelicals <= 2%;Professing Christians <= 5%
+2;Minimally reached;Few evangelicals, but significant number who identify as Christians.;248059000;3.0112017573947;996;6.0635577742603;Evangelicals <= 2%;Professing Christians > 5% and <= 50%
+3;Superficially reached;Few evangelicals, but many who identify as Christians. In great need of spiritual renewal and commitment to biblical faith.;535870000;6.5049481201369;1416;8.6204797272617;Evangelicals <= 2%;Professing Christians > 50%
+4;Partially reached;Evangelicals have a modest to moderate presence.;1924294000;23.359079468197;3630;22.099111165226;Evangelicals > 2% and <= 10%;
+5;Significantly reached;Evangelicals have a significant presence.;1907759000;23.158361809969;3222;19.615244125167;Evangelicals > 10%;
+;;;;;;;;
+Bible Translation status:;;;;;;;;
+0;Unspecified;;;;;;;
+1;Translation Needed;;;;;;;
+2;Translation Started;;;;;;;
+3;Portions;;;;;;;
+4;New Testament;;;;;;;
+5;Complete Bible;;;;;;;
+;;;;;;;;
+Joshua Project welcomes corrections / updates to this data.  Please send feedback to:;;;;;;;;
+;;;;;;;;
+Email:;info@joshuaproject.net;;;;;;;
+Web:;www.joshuaproject.net;;;;;;;

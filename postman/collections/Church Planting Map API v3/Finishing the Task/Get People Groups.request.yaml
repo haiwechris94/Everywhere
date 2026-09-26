@@ -1,0 +1,53 @@
+$kind: http-request
+name: Get People Groups
+method: GET
+url: '{{baseUrl}}/api/ftt/people-groups'
+order: 2000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+queryParams:
+  - key: page
+    value: '1'
+  - key: limit
+    value: '50'
+  - key: sortBy
+    value: name
+    disabled: true
+  - key: sortOrder
+    value: asc
+    disabled: true
+  - key: country
+    value: ''
+    disabled: true
+  - key: status
+    value: unreached
+    disabled: true
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => {
+          pm.response.to.have.status(200);
+      });
+
+      const res = pm.response.json();
+
+      pm.test("success = true", () => {
+          pm.expect(res.success).to.be.true;
+      });
+
+      pm.test("pagination présente", () => {
+          pm.expect(res).to.have.property("pagination");
+          const p = res.pagination;
+          pm.expect(p).to.have.all.keys("page", "limit", "total", "totalPages", "hasNext", "hasPrev");
+          console.log(`📊 FTT People Groups: ${p.total} enregistrements, page ${p.page}/${p.totalPages}`);
+      });
+
+      pm.test("data est un tableau", () => {
+          pm.expect(res.data).to.be.an("array");
+          if (res.data.length > 0) {
+              pm.collectionVariables.set("fttPeopleGroupId", res.data[0]._id);
+              console.log(`Premier groupe: ${res.data[0].name} (${res.data[0].country})`);
+          }
+      });

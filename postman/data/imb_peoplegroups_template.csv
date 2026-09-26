@@ -1,0 +1,22 @@
+# Template CSV pour l'import IMB / PeopleGroups.org
+# Délimiteur détecté automatiquement (virgule ou point-virgule)
+# Colonnes obligatoires : PeopNameInCountry (ou Name)
+# Colonnes optionnelles : Ctry, ISO2 (code pays 2 lettres), Population, Latitude, Longitude,
+#                         PrimaryLanguageName, PrimaryReligion, Region, PercentChristianity, JPScale
+#
+# PercentChristianity → statut calculé automatiquement :
+#   0%          = unreached   | 0 < x ≤ 33%  = pioneer
+#   33 < x ≤ 66% = mid-journey | 66 < x ≤ 99% = tipping-point
+#   100%        = movement
+#
+PeopNameInCountry,Ctry,ISO2,Population,Latitude,Longitude,PrimaryLanguageName,PrimaryReligion,Region,PercentChristianity,JPScale
+Fulani (Fula),Cameroon,CM,1250000,7.3697,12.3547,Fulfulde,Islam,Sub-Saharan Africa,0.5,1
+Hausa,Nigeria,NG,43000000,12.0022,8.5919,Hausa,Islam,Sub-Saharan Africa,0.2,1
+Wolof,Senegal,SN,5900000,14.4974,-14.4524,Wolof,Islam,Sub-Saharan Africa,1.2,2
+Sindhi,Pakistan,PK,30000000,25.8943,68.5247,Sindhi,Islam,South Asia,0.1,1
+Uyghur,China,CN,12000000,41.1129,85.2401,Uyghur,Islam,East Asia,0.3,1
+Dinka,South Sudan,SS,4500000,7.8699,29.6949,Dinka,Ethnic Religion,Sub-Saharan Africa,12.5,3
+Malay,Malaysia,MY,17000000,3.1390,101.6869,Malay,Islam,Southeast Asia,0.3,1
+Zarma (Djerma),Niger,NE,3200000,13.5137,2.1098,Zarma,Islam,Sub-Saharan Africa,0.4,1
+Moroccan Arab,Morocco,MA,28000000,31.7917,-7.0926,Arabic (Moroccan),Islam,North Africa,0.1,1
+Tibetan,China,CN,7200000,31.1048,97.1700,Tibetan,Buddhism,East Asia,1.8,2

@@ -3,111 +3,14 @@
  */
 const express = require('express');
 const mongoose = require('mongoose');
-const multer = require('multer');
-const XLSX = require('xlsx');
-const os = require('os');
-const path = require('path');
-const fs = require('fs');
 const turf = require('@turf/turf');
 const Village = require('../models/Village');
 const PeopleGroup = require('../models/PeopleGroup');
 const Church = require('../models/Church');
 const ActivityLog = require('../models/ActivityLog');
-const QuarterlyReport = require('../models/QuarterlyReport');
 const { auth, optionalAuth } = require('../middleware/auth');
-const { isSupervisorOrAdmin, hasPermission } = require('../middleware/roles');
+const { isSupervisorOrAdmin } = require('../middleware/roles');
 const { generateAnalysisInsights } = require('../services/deepseekService');
-
-// ── Multer — stockage temporaire en mémoire pour les fichiers Excel ──────────
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB max
-  fileFilter: (req, file, cb) => {
-    const allowed = [
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
-      'application/octet-stream',
-    ]
-    const ext = path.extname(file.originalname).toLowerCase()
-    if (ext === '.xlsx' || ext === '.xls' || allowed.includes(file.mimetype)) {
-      cb(null, true)
-    } else {
-      cb(new Error('Seuls les fichiers Excel (.xlsx, .xls) sont acceptés'))
-    }
-  },
-})
-
-// ── Helpers partagés avec importQuarterlyReport.js ───────────────────────────
-const COUNTRY_CODE_MAP = {
-  'Cameroon': 'CM', 'Central African Republic': 'CF', 'Chad': 'TD',
-  'Congo, Dem. Rep.': 'CD', 'Congo, Rep.': 'CG', 'Equatorial Guinea': 'GQ',
-  'Gabon': 'GA', 'Rwanda': 'RW',
-}
-const COUNTRY_NORMALIZE = {
-  'cameroun': 'Cameroon', 'cameroon': 'Cameroon',
-  'car': 'Central African Republic', 'central african republic': 'Central African Republic',
-  'rca': 'Central African Republic', 'centrafrique': 'Central African Republic',
-  'chad': 'Chad', 'tchad': 'Chad',
-  'congo, dem. rep.': 'Congo, Dem. Rep.', 'rd congo': 'Congo, Dem. Rep.',
-  'rdc': 'Congo, Dem. Rep.', 'congo drc': 'Congo, Dem. Rep.',
-  'congo, rep.': 'Congo, Rep.', 'congo rep': 'Congo, Rep.',
-  'congo brazzaville': 'Congo, Rep.',
-  'equatorial guinea': 'Equatorial Guinea',
-  'guinée équatoriale': 'Equatorial Guinea', 'guinee equatoriale': 'Equatorial Guinea',
-  'gabon': 'Gabon', 'rwanda': 'Rwanda',
-}
-const normalizeCountry = (raw) => {
-  if (!raw) return ''
-  const key = String(raw).trim().toLowerCase()
-  return COUNTRY_NORMALIZE[key] || String(raw).trim()
-}
-const toNum = (val) => {
-  if (val === null || val === undefined) return 0
-  if (typeof val === 'string' && (val.startsWith('#') || !val.trim())) return 0
-  const n = parseFloat(val)
-  return isNaN(n) ? 0 : n
-}
-const toStr = (val) => {
-  if (val === null || val === undefined) return ''
-  const s = String(val).trim()
-  return s.startsWith('#') ? '' : s
-}
-const excelDateToDate = (serial) => {
-  if (!serial || typeof serial !== 'number') return null
-  const d = new Date((serial - 25569) * 86400 * 1000)
-  return isNaN(d.getTime()) ? null : d
-}
-const detectQuarterFromFilename = (filename) => {
-  const base = path.basename(filename, path.extname(filename))
-  const match = base.match(/(\d)[Qq](\d{2,4})/)
-  if (!match) return null
-  const qNum = match[1]
-  let year = parseInt(match[2])
-  if (year < 100) year += 2000
-  return `Q${qNum}-${year}`
-}
-const calculateDMMStatus = (totalChurches, churchGeneration) => {
-  const chs = totalChurches || 0
-  const gen = churchGeneration || 0
-  if (chs === 0 && gen === 0) return { status: 'unreached', level: '' }
-  if (gen >= 7) return { status: 'dmm', level: 'IV' }
-  if (gen >= 5) {
-    if (chs >= 67) return { status: 'dmm', level: 'IV' }
-    if (chs >= 34) return { status: 'tipping-point', level: 'III' }
-    return { status: 'midway', level: 'II' }
-  }
-  if (gen >= 3) {
-    if (chs >= 100) return { status: 'dmm', level: 'IV' }
-    if (chs >= 67)  return { status: 'tipping-point', level: 'III' }
-    if (chs >= 34)  return { status: 'midway', level: 'II' }
-    return { status: 'pioneer', level: 'I' }
-  }
-  if (chs >= 100) return { status: 'midway', level: 'III' }
-  if (chs >= 67)  return { status: 'midway', level: 'II' }
-  if (chs >= 34)  return { status: 'pioneer', level: 'II' }
-  if (chs >= 1)   return { status: 'pioneer', level: 'I' }
-  return { status: 'unreached', level: '' }
-}
 
 const router = express.Router();
 
@@ -876,7 +779,7 @@ router.get('/people-groups-stats', optionalAuth, async (req, res) => {
     if (region) baseMatch.region = region;
 
     // Run all aggregations in parallel (including distinct regions list)
-    const [totalsResult, statusDist, top5, religionDist, languageDist, rawRegions] = await Promise.all([
+    const [totalsResult, statusDist, top5, religionDist, languageDist, rawRegions, donorDist, startYearDist] = await Promise.all([
       // Totals: count, population, believers, churches
       PeopleGroup.aggregate([
         { $match: baseMatch },
@@ -929,6 +832,21 @@ router.get('/people-groups-stats', optionalAuth, async (req, res) => {
 
       // Distinct regions (always unfiltered — full list for the selector)
       PeopleGroup.distinct('region', { approved: true }),
+
+      // Donor distribution (répartition des peuples par donateur, top 10)
+      PeopleGroup.aggregate([
+        { $match: { ...baseMatch, donor: { $exists: true, $ne: null, $ne: '' } } },
+        { $group: { _id: '$donor', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+      ]),
+
+      // Start-year distribution (répartition par année de début, ascendant)
+      PeopleGroup.aggregate([
+        { $match: { ...baseMatch, startYear: { $exists: true, $ne: null, $gte: 1900, $lte: 2100 } } },
+        { $group: { _id: '$startYear', count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+      ]),
     ]);
 
     const totals = totalsResult[0] || {
@@ -984,6 +902,8 @@ router.get('/people-groups-stats', optionalAuth, async (req, res) => {
       })),
       religionDistribution: religionDist.map(r => ({ religion: r._id, count: r.count })),
       languageDistribution: languageDist.map(l => ({ language: l._id, count: l.count })),
+      donorDistribution: donorDist.map(d => ({ donor: d._id, count: d.count })),
+      startYearDistribution: startYearDist.map(y => ({ year: y._id, count: y.count })),
     });
   } catch (error) {
     console.error('[Analytics] /people-groups-stats error:', error.message);
@@ -1058,484 +978,6 @@ router.get('/jp-coverage', optionalAuth, async (req, res) => {
 })
 
 /**
- * POST /analytics/quarterly-upload/preview
- * Lit le fichier Excel et retourne un aperçu SANS sauvegarder.
- * Utilisé pour montrer à l'utilisateur ce qui va être importé.
- */
-router.post('/quarterly-upload/preview', auth, upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu' })
-
-    const filename = req.file.originalname
-    const quarter = req.query.quarter || detectQuarterFromFilename(filename)
-    if (!quarter) {
-      return res.status(400).json({
-        error: 'Trimestre non détecté',
-        message: 'Nommez le fichier avec le format XXXXXXX_1Q26.xlsx ou passez ?quarter=Q1-2026',
-      })
-    }
-
-    // Lire le fichier Excel depuis le buffer en mémoire
-    const workbook = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: false })
-    const ws1 = workbook.Sheets['Sheet1']
-    if (!ws1) return res.status(400).json({ error: 'Feuille "Sheet1" introuvable dans ce fichier' })
-
-    const sheet1Data = XLSX.utils.sheet_to_json(ws1, { header: 1, range: 1, defval: null })
-    const dataRows = sheet1Data.slice(1).filter(row => row && row[7] && String(row[7]).trim())
-
-    // Compter les nouveaux peuples (onglet NEW PGs)
-    let newPGCount = 0
-    const wsNewPGs = workbook.Sheets['NEW PGs']
-    if (wsNewPGs) {
-      const newPGData = XLSX.utils.sheet_to_json(wsNewPGs, { header: 1, range: 0, defval: null })
-      newPGCount = newPGData.slice(1).filter(r => r && r[3] && String(r[3]).trim()).length
-    }
-
-    // Stats par pays
-    const byCountry = {}
-    let totalChurches = 0, totalDisciples = 0, totalBaptisms = 0, totalMBB = 0
-
-    for (const row of dataRows) {
-      const country = normalizeCountry(row[7] || row[6])
-      byCountry[country] = (byCountry[country] || 0) + 1
-      totalChurches  += toNum(row[15])
-      totalDisciples += toNum(row[18])
-      totalBaptisms  += toNum(row[19])
-      totalMBB       += toNum(row[22])
-    }
-
-    // Aperçu des 5 premières lignes
-    const preview = dataRows.slice(0, 5).map(row => ({
-      country:       normalizeCountry(row[7] || row[6]),
-      name:          toStr(row[11]),
-      totalChurches: toNum(row[15]),
-      generation:    toNum(row[16]),
-      newDisciples:  toNum(row[18]),
-      newBaptisms:   toNum(row[19]),
-      mbbCount:      toNum(row[22]),
-      status:        calculateDMMStatus(toNum(row[15]), toNum(row[16])).status,
-    }))
-
-    // Vérifier si ce trimestre existe déjà
-    const existingCount = await QuarterlyReport.countDocuments({ quarter })
-
-    res.json({
-      quarter,
-      filename,
-      totals: {
-        peoples:    dataRows.length,
-        newPGs:     newPGCount,
-        churches:   totalChurches,
-        disciples:  totalDisciples,
-        baptisms:   totalBaptisms,
-        mbb:        totalMBB,
-      },
-      byCountry,
-      preview,
-      alreadyExists: existingCount > 0,
-      existingCount,
-    })
-  } catch (error) {
-    console.error('[quarterly-upload/preview]', error.message)
-    res.status(500).json({ error: 'Erreur de lecture du fichier', message: error.message })
-  }
-})
-
-/**
- * POST /analytics/quarterly-upload/import
- * Importe réellement le rapport trimestriel dans MongoDB.
- */
-router.post('/quarterly-upload/import', auth, upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu' })
-
-    const filename = req.file.originalname
-    const quarter = req.query.quarter || detectQuarterFromFilename(filename)
-    if (!quarter) return res.status(400).json({ error: 'Trimestre non détecté' })
-
-    const qMatch = quarter.match(/^Q(\d)-(\d{4})$/)
-    if (!qMatch) return res.status(400).json({ error: 'Format de trimestre invalide (attendu: Q1-2026)' })
-
-    const quarterNumber = parseInt(qMatch[1])
-    const year          = parseInt(qMatch[2])
-
-    const workbook = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: false })
-    const ws1 = workbook.Sheets['Sheet1']
-    if (!ws1) return res.status(400).json({ error: 'Feuille "Sheet1" introuvable' })
-
-    const sheet1Data = XLSX.utils.sheet_to_json(ws1, { header: 1, range: 1, defval: null })
-    const dataRows = sheet1Data.slice(1).filter(row => row && row[7] && String(row[7]).trim())
-
-    const stats = { created: 0, updated: 0, pgUpdated: 0, errors: 0, statusChanges: [] }
-
-    const processRow = async (rowData, isNewPG = false) => {
-      const { status, level } = calculateDMMStatus(rowData.totalChurches, rowData.generation)
-
-      // Chercher PeopleGroup existant
-      let existingPG = null
-      if (rowData.jpId && rowData.jpId !== '#N/A' && !isNaN(rowData.jpId)) {
-        existingPG = await PeopleGroup.findOne({ 'jpData.peopleId': String(rowData.jpId), approved: true })
-      }
-      if (!existingPG) {
-        existingPG = await PeopleGroup.findOne({
-          name: { $regex: new RegExp(`^${rowData.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
-          country: { $regex: new RegExp(`^${rowData.country.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
-          approved: true,
-        }).catch(() => null)
-      }
-
-      // Delta vs trimestre précédent
-      let delta = { totalChurches: null, newDisciples: null, newBaptisms: null, mbbCount: null, statusChanged: false, previousStatus: '' }
-      if (existingPG) {
-        const prevQNum = quarterNumber === 1 ? 4 : quarterNumber - 1
-        const prevYear = quarterNumber === 1 ? year - 1 : year
-        const prevReport = await QuarterlyReport.findOne({ quarter: `Q${prevQNum}-${prevYear}`, peopleGroup: existingPG._id })
-        if (prevReport) {
-          delta.totalChurches  = rowData.totalChurches - (prevReport.totalChurches || 0)
-          delta.newDisciples   = rowData.newDisciples  - (prevReport.newDisciples  || 0)
-          delta.newBaptisms    = rowData.newBaptisms   - (prevReport.newBaptisms   || 0)
-          delta.mbbCount       = rowData.mbbCount      - (prevReport.mbbCount      || 0)
-          delta.previousStatus = prevReport.calculatedStatus || ''
-          delta.statusChanged  = status !== prevReport.calculatedStatus && !!prevReport.calculatedStatus
-        }
-      }
-
-      // Upsert QuarterlyReport
-      const reportData = {
-        quarter, year, quarterNumber,
-        country: rowData.country, countryCode: COUNTRY_CODE_MAP[rowData.country] || '',
-        region: rowData.region, peopleGroup: existingPG?._id || null,
-        peopleGroupName: rowData.name, engagementName: rowData.engagementName || `${rowData.country}-${rowData.name}`,
-        jpPeopleGroupId: rowData.jpId || '', ngKey: rowData.ngKey || undefined,
-        dbs: rowData.dbs, com: rowData.com, cat: rowData.cat,
-        totalChurches: rowData.totalChurches, churchGeneration: rowData.generation,
-        avgChurchSize: rowData.avgChurchSize, newDisciples: rowData.newDisciples,
-        newBaptisms: rowData.newBaptisms, mbPercent: rowData.mbPct,
-        mbbCount: rowData.mbbCount, leadersInTraining: rowData.leadersTraining,
-        activeTrainers: rowData.activeTrainers, lostChurches: rowData.lostChs,
-        mergedChurches: rowData.mergedChs, notes: rowData.notes,
-        calculatedStatus: status, calculatedLevel: level, delta,
-        isNewPG, importedBy: req.user._id, sourceFile: filename,
-      }
-
-      const existing = await QuarterlyReport.findOne({ quarter, peopleGroupName: rowData.name, country: rowData.country })
-      if (existing) {
-        await QuarterlyReport.findByIdAndUpdate(existing._id, reportData)
-        stats.updated++
-      } else {
-        await new QuarterlyReport(reportData).save()
-        stats.created++
-      }
-
-      // Mise à jour PeopleGroup
-      if (existingPG) {
-        await PeopleGroup.findByIdAndUpdate(existingPG._id, {
-          $set: { numberOfChurches: rowData.totalChurches, churchGeneration: rowData.generation, engagementStatus: status, engagementLevel: level, status },
-        })
-        stats.pgUpdated++
-      }
-
-      if (delta.statusChanged) stats.statusChanges.push({ name: rowData.name, country: rowData.country, from: delta.previousStatus, to: status })
-    }
-
-    // Traiter Sheet1
-    for (const row of dataRows) {
-      try {
-        await processRow({
-          ngKey: row[0], region: toStr(row[3] || row[4]),
-          country: normalizeCountry(row[7] || row[6]),
-          engagementName: toStr(row[9]), jpId: toStr(row[10]),
-          name: toStr(row[11]), dbs: toNum(row[12]), com: toNum(row[13]),
-          cat: toNum(row[14]), totalChurches: toNum(row[15]), generation: toNum(row[16]),
-          avgChurchSize: toNum(row[17]), newDisciples: toNum(row[18]),
-          newBaptisms: toNum(row[19]), mbPct: toNum(row[20]), mbbCount: toNum(row[22]),
-          notes: toStr(row[23]), leadersTraining: toNum(row[24]),
-          activeTrainers: toNum(row[25]), lostChs: toNum(row[33]), mergedChs: toNum(row[34]),
-        })
-      } catch (e) { stats.errors++ }
-    }
-
-    // Traiter NEW PGs
-    const wsNewPGs = workbook.Sheets['NEW PGs']
-    if (wsNewPGs) {
-      const newPGData = XLSX.utils.sheet_to_json(wsNewPGs, { header: 1, range: 0, defval: null })
-      for (const row of newPGData.slice(1).filter(r => r && r[3] && String(r[3]).trim())) {
-        try {
-          await processRow({
-            region: toStr(row[1]), country: normalizeCountry(row[2]),
-            name: toStr(row[3]), dbs: toNum(row[4]), com: toNum(row[5]),
-            cat: toNum(row[6]), totalChurches: toNum(row[7]), generation: toNum(row[8]),
-            avgChurchSize: toNum(row[9]), newDisciples: toNum(row[10]),
-            newBaptisms: toNum(row[11]), mbPct: toNum(row[12]), mbbCount: toNum(row[13]),
-            notes: toStr(row[14]), leadersTraining: toNum(row[15]),
-            activeTrainers: toNum(row[16]), lostChs: toNum(row[17]), mergedChs: toNum(row[18]),
-          }, true)
-        } catch (e) { stats.errors++ }
-      }
-    }
-
-    res.json({
-      success: true,
-      quarter,
-      stats,
-      message: `Import ${quarter} terminé — ${stats.created} créés, ${stats.updated} mis à jour, ${stats.statusChanges.length} percées détectées`,
-    })
-  } catch (error) {
-    console.error('[quarterly-upload/import]', error.message)
-    res.status(500).json({ error: 'Erreur lors de l\'import', message: error.message })
-  }
-})
-
-/**
- * GET /analytics/quarterly-reports
- * Liste les trimestres disponibles avec leurs stats globales
- */
-router.get('/quarterly-reports', optionalAuth, async (req, res) => {
-  try {
-    const quarters = await QuarterlyReport.aggregate([
-      {
-        $group: {
-          _id: '$quarter',
-          peoples:    { $sum: 1 },
-          churches:   { $sum: '$totalChurches' },
-          disciples:  { $sum: '$newDisciples' },
-          baptisms:   { $sum: '$newBaptisms' },
-          mbb:        { $sum: '$mbbCount' },
-          coaches:    { $sum: '$activeTrainers' },
-          leaders:    { $sum: '$leadersInTraining' },
-          statusChanges: { $sum: { $cond: ['$delta.statusChanged', 1, 0] } },
-        },
-      },
-      { $sort: { _id: -1 } },
-    ])
-    res.json(quarters.map(q => ({ ...q, quarter: q._id })))
-  } catch (error) {
-    res.status(500).json({ error: 'Server error', message: error.message })
-  }
-})
-
-/**
- * GET /analytics/quarterly-pulse
- * Stats du trimestre courant vs trimestre précédent.
- * Retourne les deltas, les percées, et les tendances par pays.
- * Utilisé par le widget QuarterlyPulse du dashboard.
- */
-router.get('/quarterly-pulse', optionalAuth, async (req, res) => {
-  try {
-    // 1. Trouver les 2 derniers trimestres importés
-    const quarters = await QuarterlyReport.distinct('quarter')
-    if (!quarters.length) {
-      return res.json({ hasData: false, message: 'Aucun rapport trimestriel importé' })
-    }
-
-    // Trier : Q4-2026 > Q3-2026 > ... > Q1-2026
-    const sorted = quarters.sort((a, b) => {
-      const [qa, ya] = a.replace('Q','').split('-').map(Number)
-      const [qb, yb] = b.replace('Q','').split('-').map(Number)
-      return (yb * 4 + qb) - (ya * 4 + qa)
-    })
-
-    const currentQ  = sorted[0]
-    const previousQ = sorted[1] || null
-
-    // 2. Stats trimestre courant
-    const currentAgg = await QuarterlyReport.aggregate([
-      { $match: { quarter: currentQ } },
-      {
-        $group: {
-          _id: null,
-          peoples:       { $sum: 1 },
-          churches:      { $sum: '$totalChurches' },
-          disciples:     { $sum: '$newDisciples' },
-          baptisms:      { $sum: '$newBaptisms' },
-          mbb:           { $sum: '$mbbCount' },
-          leaders:       { $sum: '$leadersInTraining' },
-          coaches:       { $sum: '$activeTrainers' },
-          lostChurches:  { $sum: '$lostChurches' },
-          statusChanges: { $sum: { $cond: ['$delta.statusChanged', 1, 0] } },
-          newPGs:        { $sum: { $cond: ['$isNewPG', 1, 0] } },
-        },
-      },
-    ])
-
-    // 3. Stats trimestre précédent
-    let previousAgg = []
-    if (previousQ) {
-      previousAgg = await QuarterlyReport.aggregate([
-        { $match: { quarter: previousQ } },
-        {
-          $group: {
-            _id: null,
-            peoples:   { $sum: 1 },
-            churches:  { $sum: '$totalChurches' },
-            disciples: { $sum: '$newDisciples' },
-            baptisms:  { $sum: '$newBaptisms' },
-            mbb:       { $sum: '$mbbCount' },
-            leaders:   { $sum: '$leadersInTraining' },
-            coaches:   { $sum: '$activeTrainers' },
-          },
-        },
-      ])
-    }
-
-    const cur  = currentAgg[0]  || {}
-    const prev = previousAgg[0] || {}
-
-    // 4. Calcul des deltas
-    const delta = (field) => {
-      const c = cur[field]  || 0
-      const p = prev[field] || 0
-      return {
-        value:   c,
-        prev:    p,
-        diff:    c - p,
-        pct:     p > 0 ? Math.round(((c - p) / p) * 100) : null,
-        up:      c >= p,
-      }
-    }
-
-    // 5. Percées du trimestre courant
-    const breakthroughs = await QuarterlyReport.find({
-      quarter: currentQ,
-      'delta.statusChanged': true,
-    })
-      .sort({ calculatedStatus: 1 })
-      .limit(10)
-      .select('peopleGroupName country delta.previousStatus calculatedStatus mbbCount')
-      .lean()
-
-    // 6. Top 5 pays par croissance (nouveaux disciples ce trimestre)
-    const topCountries = await QuarterlyReport.aggregate([
-      { $match: { quarter: currentQ } },
-      {
-        $group: {
-          _id:       '$country',
-          disciples: { $sum: '$newDisciples' },
-          baptisms:  { $sum: '$newBaptisms' },
-          churches:  { $sum: '$totalChurches' },
-          peoples:   { $sum: 1 },
-        },
-      },
-      { $sort: { disciples: -1 } },
-      { $limit: 6 },
-    ])
-
-    // 7. Tendance sur les 4 derniers trimestres (pour mini graphe)
-    const trendQuarters = sorted.slice(0, 4).reverse()
-    const trend = await QuarterlyReport.aggregate([
-      { $match: { quarter: { $in: trendQuarters } } },
-      {
-        $group: {
-          _id:       '$quarter',
-          disciples: { $sum: '$newDisciples' },
-          baptisms:  { $sum: '$newBaptisms' },
-          churches:  { $sum: '$totalChurches' },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ])
-
-    // 8. Top peuples MBB (croyants d'origine musulmane)
-    const topMBB = await QuarterlyReport.find({
-      quarter: currentQ,
-      mbbCount: { $gt: 0 },
-    })
-      .sort({ mbbCount: -1 })
-      .limit(5)
-      .select('peopleGroupName country mbbCount mbPercent')
-      .lean()
-
-    res.json({
-      hasData:      true,
-      currentQ,
-      previousQ,
-      metrics: {
-        peoples:      delta('peoples'),
-        churches:     delta('churches'),
-        disciples:    delta('disciples'),
-        baptisms:     delta('baptisms'),
-        mbb:          delta('mbb'),
-        leaders:      delta('leaders'),
-        coaches:      delta('coaches'),
-        lostChurches: { value: cur.lostChurches || 0 },
-        statusChanges:{ value: cur.statusChanges || 0 },
-        newPGs:       { value: cur.newPGs || 0 },
-      },
-      breakthroughs,
-      topCountries,
-      trend,
-      topMBB,
-    })
-  } catch (error) {
-    console.error('[quarterly-pulse]', error.message)
-    res.status(500).json({ error: 'Server error', message: error.message })
-  }
-})
-
-/**
- * GET /analytics/mbb-radar
- * Données MBB (Muslim Background Believers) par peuple pour la couche carte.
- * Retourne les peuples avec mbbCount > 0 du dernier trimestre importé,
- * avec leurs coordonnées pour affichage sur la carte.
- */
-router.get('/mbb-radar', optionalAuth, async (req, res) => {
-  try {
-    const { quarter, country } = req.query
-
-    // Si pas de trimestre spécifié, prendre le plus récent
-    let targetQuarter = quarter
-    if (!targetQuarter) {
-      const quarters = await QuarterlyReport.distinct('quarter')
-      if (!quarters.length) return res.json({ quarter: null, peoples: [] })
-      targetQuarter = quarters.sort((a, b) => {
-        const [qa, ya] = a.replace('Q','').split('-').map(Number)
-        const [qb, yb] = b.replace('Q','').split('-').map(Number)
-        return (yb * 4 + qb) - (ya * 4 + qa)
-      })[0]
-    }
-
-    const matchFilter = { quarter: targetQuarter, mbbCount: { $gt: 0 } }
-    if (country) matchFilter.country = country
-
-    // Récupérer les peuples avec MBB, enrichis des coordonnées JP ou DMM
-    const mbbReports = await QuarterlyReport.find(matchFilter)
-      .sort({ mbbCount: -1 })
-      .limit(200)
-      .populate({
-        path: 'peopleGroup',
-        select: 'name location country jpData engagementStatus',
-      })
-      .lean()
-
-    // Construire la réponse — ne garder que ceux avec des coordonnées
-    const peoples = mbbReports
-      .filter(r => r.peopleGroup?.location?.coordinates)
-      .map(r => ({
-        _id:             r._id,
-        name:            r.peopleGroupName,
-        country:         r.country,
-        mbbCount:        r.mbbCount,
-        mbPercent:       r.mbPercent || 0,
-        totalChurches:   r.totalChurches,
-        newDisciples:    r.newDisciples,
-        calculatedStatus:r.calculatedStatus,
-        coordinates:     r.peopleGroup.location.coordinates, // [lng, lat]
-        jpScale:         r.peopleGroup.jpData?.jpScale || null,
-        frontier:        r.peopleGroup.jpData?.frontier || false,
-      }))
-
-    res.json({
-      quarter: targetQuarter,
-      total:   peoples.length,
-      peoples,
-    })
-  } catch (error) {
-    console.error('[mbb-radar]', error.message)
-    res.status(500).json({ error: 'Server error', message: error.message })
-  }
-})
-
-/**
  * GET /analytics/coverage-voronoi
  * Retourne le statut DMM de chaque village pour colorier les polygones Voronoï.
  *
@@ -1574,6 +1016,8 @@ router.get('/coverage-voronoi', optionalAuth, async (req, res) => {
           peopleCount:{ $sum: 1 },
           population: { $sum: '$population' },
           churches:   { $sum: '$numberOfChurches' },
+          // Génération maximale atteinte parmi les engagements du village.
+          maxGeneration: { $max: '$churchGeneration' },
         },
       },
     ])
@@ -1594,6 +1038,11 @@ router.get('/coverage-voronoi', optionalAuth, async (req, res) => {
         peopleCount:  v.peopleCount,
         population:   v.population,
         churches:     v.churches,
+        // Génération max du village (utilisée par le popup du mode couverture).
+        maxGeneration: v.maxGeneration || 0,
+        // Population par source : ce jeu de données est DMM-only, donc la
+        // population appartient à la source DMM (jamais cumulée entre sources).
+        populationBySource: { DMM: v.population || 0 },
       }
 
       // Aussi indexer par nom en minuscules pour le matching côté frontend

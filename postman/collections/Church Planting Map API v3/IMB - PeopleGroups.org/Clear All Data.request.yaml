@@ -1,0 +1,26 @@
+$kind: http-request
+name: Clear All Data
+method: DELETE
+url: '{{baseUrl}}/api/imb/clear'
+order: 5000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => {
+          pm.response.to.have.status(200);
+      });
+
+      const res = pm.response.json();
+
+      pm.test("success = true", () => {
+          pm.expect(res.success).to.be.true;
+      });
+
+      pm.test("deletedCount présent", () => {
+          pm.expect(res).to.have.property("deletedCount");
+          console.log(`🗑️ IMB: ${res.deletedCount} enregistrements supprimés`);
+      });

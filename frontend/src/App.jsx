@@ -30,23 +30,35 @@ import ResetPassword from './pages/ResetPassword'
 // ============================================================================
 
 // Dashboard components - loaded after authentication
-const Dashboard = lazy(() => import('./pages/Dashboard'))
 const DashboardEnhanced = lazy(() => import('./pages/DashboardEnhanced'))
+const AnalyticsTablePage = lazy(() => import('./pages/AnalyticsTablePage'))
 
 // Map components - HEAVY (~1600 lines each) - loaded only when navigating to map
-const MapView = lazy(() => import('./pages/MapView'))
 const GeoJSONMapView = lazy(() => import('./pages/GeoJSONMapView'))
 const VoronoiMapPage = lazy(() => import('./pages/VoronoiMapPage'))
+const UnifiedMapView = lazy(() => import('./pages/UnifiedMapView'))
 
 // Secondary pages - loaded on demand
-const Activities = lazy(() => import('./pages/Activities'))
 const Profile = lazy(() => import('./pages/Profile'))
 const PeopleGroupDetail = lazy(() => import('./pages/PeopleGroupDetail'))
 const VillageDetail = lazy(() => import('./pages/VillageDetail'))
+const Projects = lazy(() => import('./pages/Projects'))
 const DataManagement = lazy(() => import('./pages/DataManagement'))
 const PendingValidations = lazy(() => import('./pages/PendingValidations'))
 const RejectedPeopleGroups = lazy(() => import('./pages/RejectedPeopleGroups'))
 const AnalyseQualitative = lazy(() => import('./pages/AnalyseQualitative'))
+
+// DMM pillars — nouvelles pages
+const DmmReporting = lazy(() => import('./pages/DmmReporting'))
+const DmmReviewQueue = lazy(() => import('./pages/DmmReviewQueue'));
+const Regions = lazy(() => import('./pages/Regions'))
+const RegionCountries = lazy(() => import('./pages/RegionCountries'))
+const CountryPeoples = lazy(() => import('./pages/CountryPeoples'))
+const PeopleDetailLite = lazy(() => import('./pages/PeopleDetailLite'))
+const PlanterEngagements = lazy(() => import('./pages/PlanterEngagements'))
+const Activities = lazy(() => import('./pages/Activities'))
+
+const NOTION_ACTIVITE_URL = 'https://reminiscent-acapella-740.notion.site/EVERYWHERE-2a3ec55e01df8007bfc3fc19d481d3fc'
 
 // Admin pages - lazy loaded, admin-only access
 const AdminUsers = lazy(() => import('./pages/AdminUsers'))
@@ -127,7 +139,8 @@ const PublicRoute = ({ children }) => {
   }
 
   if (user) {
-    return <Navigate to="/dashboard" replace />
+    // Après connexion, la première page affichée est « Regions ».
+    return <Navigate to="/regions" replace />
   }
 
   return children
@@ -173,7 +186,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/regions" replace />} />
           
           {/* Dashboard - lazy loaded */}
           <Route path="dashboard" element={
@@ -181,21 +194,23 @@ function App() {
               <DashboardEnhanced />
             </Suspense>
           } />
-          <Route path="dashboard-old" element={
+          <Route path="analytics-table" element={
             <Suspense fallback={<CompactLoader />}>
-              <Dashboard />
+              <AnalyticsTablePage />
             </Suspense>
           } />
           
           {/* Map Views - HEAVY components, lazy loaded with error boundaries */}
-          <Route path="map" element={
-            <ErrorBoundary fallbackMessage="Erreur lors du chargement de la carte. Vérifiez votre connexion.">
+          <Route path="unified-map" element={
+            <ErrorBoundary fallbackMessage="Erreur lors du chargement de la carte unifiee.">
               <Suspense fallback={<CompactLoader />}>
-                <MapView />
+                <UnifiedMapView />
               </Suspense>
             </ErrorBoundary>
           } />
-          <Route path="geojson-map" element={<Navigate to="/map" replace />} />
+          {/* Legacy Map route removed - redirect to the unified map */}
+          <Route path="map" element={<Navigate to="/unified-map" replace />} />
+          <Route path="geojson-map" element={<Navigate to="/unified-map" replace />} />
           <Route path="voronoi-map" element={
             <ErrorBoundary fallbackMessage="Erreur lors du chargement de la carte Voronoi.">
               <Suspense fallback={<CompactLoader />}>
@@ -210,11 +225,17 @@ function App() {
               <Activities />
             </Suspense>
           } />
+          <Route path="projects" element={
+            <Suspense fallback={<CompactLoader />}>
+              <Projects />
+            </Suspense>
+          } />
           <Route path="pending-validations" element={
             <Suspense fallback={<CompactLoader />}>
               <PendingValidations />
             </Suspense>
           } />
+          <Route path="dmm-review" element={<Suspense fallback={<CompactLoader />}><DmmReviewQueue /></Suspense>} />
           <Route path="rejected-people-groups" element={
             <Suspense fallback={<CompactLoader />}>
               <RejectedPeopleGroups />
@@ -223,6 +244,32 @@ function App() {
           <Route path="analyse-qualitative" element={
             <Suspense fallback={<CompactLoader />}>
               <AnalyseQualitative />
+            </Suspense>
+          } />
+          {/* DMM pillars — groupes DBS, reporting */}
+          <Route path="dmm-reporting" element={
+            <Suspense fallback={<CompactLoader />}>
+              <DmmReporting />
+            </Suspense>
+          } />
+          <Route path="regions" element={
+            <Suspense fallback={<CompactLoader />}>
+              <Regions />
+            </Suspense>
+          } />
+          <Route path="regions/:regionId" element={
+            <Suspense fallback={<CompactLoader />}>
+              <RegionCountries />
+            </Suspense>
+          } />
+          <Route path="regions/:regionId/countries/:countryCode" element={
+            <Suspense fallback={<CompactLoader />}>
+              <CountryPeoples />
+            </Suspense>
+          } />
+          <Route path="regions/:regionId/countries/:countryCode/peoples/:peopleId" element={
+            <Suspense fallback={<CompactLoader />}>
+              <PeopleDetailLite />
             </Suspense>
           } />
           <Route path="data-management" element={
@@ -239,6 +286,13 @@ function App() {
             <ErrorBoundary fallbackMessage="Error loading people group details.">
               <Suspense fallback={<CompactLoader />}>
                 <PeopleGroupDetail />
+              </Suspense>
+            </ErrorBoundary>
+          } />
+          <Route path="planters/:name/engagements" element={
+            <ErrorBoundary fallbackMessage="Error loading planter engagements.">
+              <Suspense fallback={<CompactLoader />}>
+                <PlanterEngagements />
               </Suspense>
             </ErrorBoundary>
           } />

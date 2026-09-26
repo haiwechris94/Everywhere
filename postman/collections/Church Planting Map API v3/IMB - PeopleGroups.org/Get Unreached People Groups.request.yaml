@@ -1,0 +1,40 @@
+$kind: http-request
+name: Get Unreached People Groups
+method: GET
+url: '{{baseUrl}}/api/imb/people-groups/unreached'
+order: 3000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+queryParams:
+  - key: page
+    value: '1'
+  - key: limit
+    value: '50'
+  - key: sortBy
+    value: population
+    disabled: true
+  - key: sortOrder
+    value: desc
+    disabled: true
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status 200", () => {
+          pm.response.to.have.status(200);
+      });
+
+      const res = pm.response.json();
+
+      pm.test("success = true", () => {
+          pm.expect(res.success).to.be.true;
+      });
+
+      pm.test("Tous les groupes sont 'unreached'", () => {
+          pm.expect(res.data).to.be.an("array");
+          res.data.forEach(g => {
+              pm.expect(g.status).to.equal("unreached");
+          });
+          console.log(`🔴 ${res.pagination?.total ?? res.data.length} groupes non-atteints (IMB)`);
+      });

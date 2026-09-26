@@ -1,0 +1,22 @@
+# Template CSV pour l'import Finishing the Task (FTT / UUPG)
+# Délimiteur détecté automatiquement (virgule ou point-virgule)
+# Colonnes obligatoires : UPG (ou PeopNameInCountry, GroupName, Name)
+# Colonnes optionnelles : Country, CC, PopulationTotal, Latitude, Longitude,
+#                         PrimaryLanguage, Religion, Continent, PChrn
+#
+# PChrn (PercentChristian) → statut calculé automatiquement :
+#   0%          = unreached   | 0 < x ≤ 33%  = pioneer
+#   33 < x ≤ 66% = mid-journey | 66 < x ≤ 99% = tipping-point
+#   100%        = movement
+#
+UPG,Country,CC,PopulationTotal,Latitude,Longitude,PrimaryLanguage,Religion,Continent,PChrn
+Rohingya,Bangladesh,BD,1800000,21.4272,92.0058,Rohingya,Islam,Asia,0.1
+Pashtun (Afghan),Afghanistan,AF,15000000,33.9391,67.7100,Pashto,Islam,Asia,0.2
+Kazakh,Kazakhstan,KZ,13500000,48.0196,66.9237,Kazakh,Islam,Asia,1.5
+Somali,Somalia,SO,16400000,5.1521,46.1996,Somali,Islam,Africa,0.1
+Hui,China,CN,10500000,35.8617,104.1954,Mandarin Chinese,Islam,Asia,0.3
+Baloch,Pakistan,PK,9000000,29.3544,66.8755,Balochi,Islam,Asia,0.2
+Brahui,Pakistan,PK,2800000,28.4935,65.8718,Brahui,Islam,Asia,0.1
+Shaikh (Bengali Muslim),Bangladesh,BD,90000000,23.6850,90.3563,Bengali,Islam,Asia,0.2
+Azerbaijani,Azerbaijan,AZ,9200000,40.1431,47.5769,Azerbaijani,Islam,Asia,0.5
+Kabyle,Algeria,DZ,5200000,36.7538,4.4761,Kabyle (Tamazight),Islam,Africa,0.6

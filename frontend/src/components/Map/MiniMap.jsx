@@ -225,8 +225,8 @@ const MiniMap = ({
           keyboard={false}
         >
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-            attribution=""
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
           />
           
           {/* Sync mini-map to country bounds */}

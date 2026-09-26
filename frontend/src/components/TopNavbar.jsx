@@ -1,5 +1,5 @@
 /**
- * TopNavbar - Horizontal Navigation Bar Component
+ * TopNavbar - Collapsible vertical left sidebar navigation
  */
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
@@ -11,34 +11,52 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronDown,
   Shield,
+  LayoutDashboard,
+  Map,
+  Globe,
+  FolderKanban,
+  Activity,
+  GraduationCap,
+  BarChart3,
+  ClipboardList,
+  Database,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react'
+
+const COLLAPSE_KEY = 'sidebar.collapsed'
 
 const TopNavbar = () => {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
-  
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem(COLLAPSE_KEY) === 'true' } catch { return false }
+  })
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
-  
+
   // Base navigation items for all users
   const baseNavItems = [
-    { path: '/dashboard', label: t('nav.dashboard') || 'Dashboard', exact: true },
-    { path: '/map', label: t('nav.map') || 'Carte' },
-    { path: '/activities', label: t('nav.activities') || 'Activités' },
-    { path: '/analyse-qualitative', label: t('nav.analyseQualitative') || 'Analyse' },
-    { path: '/data-management', label: t('nav.dataManagement') || 'Données' },
+    { path: '/regions', label: 'Regions', icon: Globe },
+    { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: Globe },
+    { path: '/projects', label: 'Projects', icon: FolderKanban },
+    { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
+    { path: '/activities', label: t('nav.activities') || 'Activités', icon: Activity },
+    { path: '/analyse-qualitative', label: t('nav.analyseQualitative') || 'Analyse', icon: ClipboardList },
+    { path: '/data-management', label: t('nav.dataManagement') || 'Données', icon: Database },
+    { path: '/dashboard', label: 'Global Dashboard', icon: LayoutDashboard, exact: true },
   ]
-  
+
   // Add Administration link for admin users only
-  const navItems = user?.role === 'admin' 
-    ? [...baseNavItems, { path: '/admin/users', label: 'Administration', icon: Shield }]
+  const navItems = user?.role === 'admin'
+    ? [...baseNavItems, { path: '/admin/users', label: 'Administration', icon: Shield, admin: true }]
     : baseNavItems
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -48,16 +66,20 @@ const TopNavbar = () => {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-  
+
   useEffect(() => {
-    setMobileMenuOpen(false)
+    setMobileOpen(false)
   }, [location.pathname])
-  
+
+  useEffect(() => {
+    try { localStorage.setItem(COLLAPSE_KEY, String(collapsed)) } catch { /* noop */ }
+  }, [collapsed])
+
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
-  
+
   const isActive = (path) => {
     if (path === '/dashboard') {
       return location.pathname === '/dashboard' || location.pathname === '/'
@@ -67,137 +89,164 @@ const TopNavbar = () => {
     }
     return location.pathname.startsWith(path)
   }
-  
+
+  const width = collapsed ? 'lg:w-16' : 'lg:w-64'
+
   return (
-    <header className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-600"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-            <NavLink to="/dashboard" className="flex items-center gap-2.5">
-              <img
-                src="/data/Everywhere_Logo_Mark_Black.png"
-                alt="EVERYWHERE"
-                className="h-8 w-8"
-              />
-              <span className="hidden sm:block text-base font-bold text-neutral-800 uppercase tracking-widest">
-                EVERYWHERE
-              </span>
-            </NavLink>
-          </div>
-
-          {/* Center Nav — Desktop */}
-          <nav className="hidden lg:flex items-center justify-center flex-1 mx-6">
-            <div className="flex items-center gap-0.5">
-              {navItems.map((item) => {
-                const active = isActive(item.path)
-                const Icon = item.icon
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={() =>
-                      `px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex items-center gap-1.5 ${
-                        active
-                          ? 'bg-neutral-900 text-white'
-                          : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-                      }${item.path === '/admin/users' ? ' bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800' : ''}`
-                    }
-                  >
-                    {Icon && <Icon size={14} />}
-                    {item.label}
-                  </NavLink>
-                )
-              })}
-            </div>
-          </nav>
-
-          {/* Right: Language + User */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <LanguageSwitcher variant="compact" />
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-neutral-50 transition-all duration-150 border border-transparent hover:border-neutral-200"
-                aria-label="User menu"
-              >
-                <div className="w-7 h-7 bg-gradient-to-br from-neutral-700 to-neutral-900 rounded-full flex items-center justify-center">
-                  <User size={14} className="text-white" />
-                </div>
-                <ChevronDown
-                  size={14}
-                  className={`hidden md:block text-neutral-400 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 overflow-hidden z-50">
-                  <div className="px-4 py-2.5 border-b border-neutral-100">
-                    <p className="text-sm font-semibold text-neutral-800">{user?.name}</p>
-                    <p className="text-xs text-neutral-400 truncate">{user?.email}</p>
-                  </div>
-                  <div className="py-1">
-                    <NavLink
-                      to="/profile"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
-                    >
-                      <User size={15} />
-                      <span>{t('nav.profile') || 'Profil'}</span>
-                    </NavLink>
-                  </div>
-                  <div className="border-t border-neutral-100 pt-1">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full transition-colors"
-                    >
-                      <LogOut size={15} />
-                      <span>{t('auth.logout') || 'Déconnexion'}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+    <>
+      {/* Mobile top bar (hamburger + logo) */}
+      <header className="lg:hidden bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
+        <div className="flex items-center justify-between h-14 px-4">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-600"
+            aria-label="Open menu"
+          >
+            <Menu size={22} />
+          </button>
+          <NavLink to="/dashboard" className="flex items-center gap-2">
+            <img src="/data/Everywhere_Logo_Mark_Black.png" alt="EVERYWHERE" className="h-7 w-7" />
+            <span className="text-sm font-bold text-neutral-800 uppercase tracking-widest">EVERYWHERE</span>
+          </NavLink>
+          <LanguageSwitcher variant="compact" />
         </div>
-      </div>
+      </header>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-neutral-200 bg-white">
-          <nav className="px-4 py-2 space-y-0.5">
-            {navItems.map((item) => {
-              const active = isActive(item.path)
-              const Icon = item.icon
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={() =>
-                    `flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                      active
-                        ? 'bg-neutral-900 text-white'
-                        : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
-                    }${item.path === '/admin/users' ? ' bg-red-50 text-red-700 hover:bg-red-100' : ''}`
-                  }
-                >
-                  {Icon && <Icon size={16} />}
-                  {item.label}
-                </NavLink>
-              )
-            })}
-          </nav>
-        </div>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-50"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
       )}
-    </header>
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          bg-white border-r border-neutral-200 flex flex-col z-50
+          fixed inset-y-0 left-0 w-64 transform transition-transform duration-200
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:static lg:translate-x-0 lg:h-screen lg:sticky lg:top-0 ${width} lg:transition-[width] lg:duration-200
+        `}
+      >
+        {/* Header: logo + collapse toggle */}
+        <div className={`flex items-center h-14 flex-shrink-0 border-b border-neutral-200 ${collapsed ? 'lg:justify-center px-2' : 'justify-between px-4'}`}>
+          <NavLink to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
+            <img src="/data/Everywhere_Logo_Mark_Black.png" alt="EVERYWHERE" className="h-8 w-8 flex-shrink-0" />
+            <span className={`text-base font-bold text-neutral-800 uppercase tracking-widest whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>
+              EVERYWHERE
+            </span>
+          </NavLink>
+          {/* Close on mobile */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-600"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
+          {/* Collapse toggle on desktop */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className={`hidden lg:inline-flex p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-800 ${collapsed ? 'lg:hidden' : ''}`}
+            aria-label="Collapse sidebar"
+            title="Réduire"
+          >
+            <PanelLeftClose size={18} />
+          </button>
+        </div>
+
+        {/* Expand button visible when collapsed (desktop) */}
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="hidden lg:flex items-center justify-center h-9 mx-2 mt-2 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-800"
+            aria-label="Expand sidebar"
+            title="Développer"
+          >
+            <PanelLeftOpen size={18} />
+          </button>
+        )}
+
+        {/* Nav items */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+          {navItems.map((item) => {
+            const active = isActive(item.path)
+            const Icon = item.icon
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileOpen(false)}
+                title={collapsed ? item.label : undefined}
+                className={
+                  `flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150 ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
+                    active
+                      ? 'bg-neutral-900 text-white'
+                      : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
+                  }${item.admin ? (active ? '' : ' bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800') : ''}`
+                }
+              >
+                {Icon && <Icon size={18} className="flex-shrink-0" />}
+                <span className={`whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
+              </NavLink>
+            )
+          })}
+        </nav>
+
+        {/* Footer: language (desktop) + user */}
+        <div className="flex-shrink-0 border-t border-neutral-200 p-2 space-y-1">
+          <div className={`hidden lg:block ${collapsed ? 'lg:hidden' : ''} px-1 py-1`}>
+            <LanguageSwitcher variant="compact" />
+          </div>
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className={`flex items-center gap-2.5 w-full rounded-xl hover:bg-neutral-50 transition-all duration-150 border border-transparent hover:border-neutral-200 ${collapsed ? 'lg:justify-center px-2' : 'px-2.5'} py-2`}
+              aria-label="User menu"
+              title={collapsed ? user?.name : undefined}
+            >
+              <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-neutral-700 to-neutral-900 rounded-full flex items-center justify-center">
+                <User size={15} className="text-white" />
+              </div>
+              <div className={`flex-1 min-w-0 text-left ${collapsed ? 'lg:hidden' : ''}`}>
+                <p className="text-sm font-semibold text-neutral-800 truncate">{user?.name}</p>
+                <p className="text-xs text-neutral-400 truncate">{user?.email}</p>
+              </div>
+            </button>
+
+            {userMenuOpen && (
+              <div className="absolute bottom-full left-0 mb-2 w-52 bg-white rounded-xl shadow-xl border border-neutral-200 py-2 overflow-hidden z-50">
+                <div className="px-4 py-2.5 border-b border-neutral-100">
+                  <p className="text-sm font-semibold text-neutral-800">{user?.name}</p>
+                  <p className="text-xs text-neutral-400 truncate">{user?.email}</p>
+                </div>
+                <div className="py-1">
+                  <NavLink
+                    to="/profile"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                  >
+                    <User size={15} />
+                    <span>{t('nav.profile') || 'Profil'}</span>
+                  </NavLink>
+                </div>
+                <div className="border-t border-neutral-100 pt-1">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full transition-colors"
+                  >
+                    <LogOut size={15} />
+                    <span>{t('auth.logout') || 'Déconnexion'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
   )
 }
 

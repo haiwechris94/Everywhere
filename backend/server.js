@@ -58,7 +58,16 @@ const activityFeedRoutes = require('./routes/activityFeed');
 const adminRoutes = require('./routes/admin');
 const jpSyncApiRoutes = require('./routes/jpSyncApi');
 const imbPeopleGroupsRoutes = require('./routes/imbPeopleGroups');
+const masterPeopleRoutes = require('./routes/masterPeople');
 const finishingTheTaskRoutes = require('./routes/finishingTheTask');
+// DMM pillars: persons of peace, discovery groups, DBS sessions, iGROW coaching, reporting
+const personsOfPeaceRoutes = require('./routes/personsOfPeace');
+const discoveryGroupsRoutes = require('./routes/discoveryGroups');
+const dbsSessionsRoutes = require('./routes/dbsSessions');
+const coachingSessionsRoutes = require('./routes/coachingSessions');
+const reportingRoutes = require('./routes/reporting');
+const dmmReviewRoutes = require('./routes/dmmReview');
+const projectRoutes = require('./routes/projects');
 const { setupWeeklyCron: setupJPWeeklyCron } = require('./routes/joshuaProjectSync');
 
 // Import database seeding script
@@ -365,6 +374,7 @@ app.use('/api/church-population-ratio', churchPopulationRatioRoutes);
 app.use('/api/joshua-project', joshuaProjectRoutes);
 app.use('/api/jp', joshuaProjectRoutes); // Short alias for Joshua Project routes
 app.use('/api/imb', imbPeopleGroupsRoutes);
+app.use('/api/master-people', masterPeopleRoutes);
 app.use('/api/ftt', finishingTheTaskRoutes);
 app.use('/api/osm', osmRoutes);
 app.use('/api/countries', countriesRoutes);
@@ -374,6 +384,14 @@ app.use('/api/activity-feed', activityFeedRoutes);
 app.use('/api/activity', activityFeedRoutes); // alias for frontend compatibility
 app.use('/api/admin', adminRoutes);
 app.use('/api/jp-sync', jpSyncApiRoutes);
+// DMM pillars
+app.use('/api/persons-of-peace', personsOfPeaceRoutes);
+app.use('/api/discovery-groups', discoveryGroupsRoutes);
+app.use('/api/dbs-sessions', dbsSessionsRoutes);
+app.use('/api/coaching-sessions', coachingSessionsRoutes);
+app.use('/api/reporting', reportingRoutes);
+app.use('/api/dmm-review', dmmReviewRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Configure le CRON hebdomadaire JP (chaque lundi 3h)
 try { setupJPWeeklyCron(); } catch (e) { console.warn('⚠️  JP CRON setup failed:', e.message); }

@@ -6,7 +6,7 @@ import { dashboardApi } from '../../services/api'
 import { useDataSourceVisibility } from '../../pages/DashboardEnhanced'
 import { peopleGroupsApi } from '../../services/api'
 import { useMemo } from 'react'
-import { TrendingUp, Target, Layers } from 'lucide-react'
+import { TrendingUp, Target, Layers, Users, Flag } from 'lucide-react'
 import { useLanguage } from '../../i18n'
 
 // NEW COLOR SYSTEM
@@ -65,7 +65,14 @@ const KPICards = () => {
     Object.keys(counts).forEach(k => {
       pct[k] = total > 0 ? Math.round((counts[k] / total) * 100) : 0
     })
-    return { counts, pct, total }
+    // Source breakdown (IMB / PeopleGroups.org & Finishing the Task) — independent of DMM/JP toggles
+    const bySource = { imb: 0, ftt: 0 }
+    allPeoples.forEach(pg => {
+      const src = pg.source || pg.dataSource || ''
+      if (src === 'PeopleGroups.org') bySource.imb++
+      else if (src === 'Finishing the Task') bySource.ftt++
+    })
+    return { counts, pct, total, bySource }
   }, [allPeoples, showDMM, showJoshuaProject])
 
   const isLoading = loadingPeoples || loadingKpi
@@ -87,12 +94,14 @@ const KPICards = () => {
     )
   }
 
-  const { counts, pct, total } = computed || { counts: {}, pct: {}, total: 0 }
+  const { counts, pct, total, bySource } = computed || { counts: {}, pct: {}, total: 0, bySource: { imb: 0, ftt: 0 } }
   const villages = kpiData?.villagesWithData ?? 0
   const totalVillages = kpiData?.totalVillages ?? 0
   const coveragePct = totalVillages > 0 ? Math.round((villages / totalVillages) * 100) : 0
   const dmmCount = counts['dmm'] || 0
   const satPct = total > 0 ? Math.round((dmmCount / total) * 100) : 0
+  const imbPct = total > 0 ? Math.round(((bySource?.imb ?? 0) / total) * 100) : 0
+  const fttPct = total > 0 ? Math.round(((bySource?.ftt ?? 0) / total) * 100) : 0
 
   return (
     <div className="space-y-4">
@@ -166,6 +175,35 @@ const KPICards = () => {
             <p className="text-xs font-medium text-emerald-200 uppercase tracking-wide">{t('dashboard.dmmSaturation') || 'DMM Saturation'}</p>
             <p className="text-3xl font-bold">{satPct}%</p>
             <p className="text-xs text-emerald-200 mt-0.5">{dmmCount} DMM / {total} total</p>
+          </div>
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full" />
+        </div>
+      </div>
+
+      {/* Source breakdown row — IMB / PeopleGroups.org & Finishing the Task */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* IMB / PeopleGroups.org */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md p-5 flex items-center gap-4">
+          <div className="bg-white/20 rounded-xl p-2.5">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wide">IMB / PeopleGroups.org</p>
+            <p className="text-3xl font-bold">{(bySource?.imb ?? 0).toLocaleString()}</p>
+            <p className="text-xs text-emerald-100 mt-0.5">{imbPct}% du total · groupes de personnes</p>
+          </div>
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full" />
+        </div>
+
+        {/* Finishing the Task */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md p-5 flex items-center gap-4">
+          <div className="bg-white/20 rounded-xl p-2.5">
+            <Flag className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-violet-100 uppercase tracking-wide">Finishing the Task</p>
+            <p className="text-3xl font-bold">{(bySource?.ftt ?? 0).toLocaleString()}</p>
+            <p className="text-xs text-violet-100 mt-0.5">{fttPct}% du total · UUPGs</p>
           </div>
           <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full" />
         </div>

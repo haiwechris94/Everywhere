@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import api, { peopleGroupsApi, quarterlyApi } from '../services/api'
+import api, { peopleGroupsApi } from '../services/api'
 import { useLanguage } from '../i18n'
 import {
   Upload,
@@ -44,6 +44,30 @@ const COUNTRY_TEMPLATES = [
   { key: 'guinee-equatoriale', name: 'Guinée Équatoriale', code: 'GQ', flag: '🇬🇶' },
 ]
 
+// Selectable export columns (field -> French label). Used by the export tab so
+// the user can pick a country and exactly which metrics to export.
+const EXPORT_METRIC_FIELDS = [
+  { key: 'name', label: 'Peuple / Nom' },
+  { key: 'villageName', label: 'Village' },
+  { key: 'country', label: 'Pays' },
+  { key: 'region', label: 'Région' },
+  { key: 'reportPeriod', label: 'Période' },
+  { key: 'engagementStatus', label: 'Statut' },
+  { key: 'numberOfChurches', label: 'Églises (TOTAL)' },
+  { key: 'churchGeneration', label: 'Génération (Max GEN)' },
+  { key: 'avgChurchSize', label: 'Taille moyenne église' },
+  { key: 'dbs', label: 'DBS' },
+  { key: 'com', label: 'COM' },
+  { key: 'cat', label: 'CAT' },
+  { key: 'newDisciples', label: 'Nouveaux disciples' },
+  { key: 'newBaptisms', label: 'Nouveaux baptisés' },
+  { key: 'leadersInTraining', label: 'Leaders en formation' },
+  { key: 'activeCoaches', label: 'Coachs actifs' },
+  { key: 'trainingsHeld', label: 'Formations tenues' },
+  { key: 'lostChurches', label: 'Églises perdues' },
+  { key: 'mergedChurches', label: 'Églises fusionnées' },
+]
+
 // Export format configurations
 const EXPORT_FORMATS = [
   {
@@ -82,29 +106,16 @@ const DataManagement = () => {
   const { t } = useLanguage()
   const queryClient = useQueryClient()
   const fileInputRef = useRef(null)
-  const quarterlyFileInputRef = useRef(null)
   const [activeTab, setActiveTab] = useState('import')
   const [importFile, setImportFile] = useState(null)
   const [importPreview, setImportPreview] = useState(null)
   const [importError, setImportError] = useState(null)
+  const [importReport, setImportReport] = useState(null) // backend { summary, errors, skipped }
+  // Export filters
+  const [exportCountry, setExportCountry] = useState('all')
+  const [exportMetrics, setExportMetrics] = useState(() => new Set(['name', 'country', 'numberOfChurches', 'churchGeneration']))
   const [isProcessing, setIsProcessing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-
-  // ── État Rapport Trimestriel ─────────────────────────────────────────────
-  const [quarterlyFile, setQuarterlyFile] = useState(null)
-  const [quarterlyPreview, setQuarterlyPreview] = useState(null)
-  const [quarterlyError, setQuarterlyError] = useState(null)
-  const [quarterlyResult, setQuarterlyResult] = useState(null)
-  const [isQuarterlyDragging, setIsQuarterlyDragging] = useState(false)
-  const [isQuarterlyLoading, setIsQuarterlyLoading] = useState(false)
-  const [isQuarterlyImporting, setIsQuarterlyImporting] = useState(false)
-
-  // Fetch trimestres disponibles
-  const { data: quartersData } = useQuery({
-    queryKey: ['quarterly-reports'],
-    queryFn: () => quarterlyApi.getQuarters().then(r => r.data),
-    enabled: activeTab === 'quarterly',
-  })
 
   // ── JP Live Sync state ───────────────────────────────────────────────────
   const [jpSelectedCountry, setJpSelectedCountry] = useState('')
@@ -185,6 +196,18 @@ const DataManagement = () => {
     },
   })
 
+  // Authoritative total from the backend (the fetched array may be paginated/capped).
+  const { data: peoplesTotal } = useQuery({
+    queryKey: ['peopleGroups', 'dataManagement', 'count'],
+    queryFn: async () => {
+      const res = await api.get('/api/people-groups', { params: { limit: 1, page: 1 } })
+      const meta = res.data?.meta || res.data?.pagination || {}
+      return meta.totalCount ?? meta.total ?? res.data?.total ?? null
+    },
+  })
+  // Real number of peoples to display everywhere on this page.
+  const peoplesCount = (peoplesTotal ?? (Array.isArray(peoplesData) ? peoplesData.length : 0))
+
   // Handle drag events
   const handleDragEnter = useCallback((e) => {
     e.preventDefault()
@@ -260,195 +283,84 @@ const DataManagement = () => {
 
   // Import mutation
   const importMutation = useMutation({
-    mutationFn: async (data) => {
-      const results = { success: 0, failed: 0, errors: [] }
-      
-      for (const [index, row] of data.entries()) {
-        const rowNum = index + 2 // +2 because row 1 is the header
-
-        // ── Resolve name (support multiple column aliases) ──
-        const name = (
-          row.name || row.Name || row.nom || row.Nom || ''
-        ).trim()
-
-        if (!name || name.length < 2) {
-          results.failed++
-          results.errors.push(
-            `Row ${rowNum}: Missing or too-short "name" column (got: "${name || ''}")`
-          )
-          continue
-        }
-
-        // ── Resolve coordinates ──
-        const lat = parseFloat(row.latitude || row.Latitude || row.lat || row.Lat)
-        const lng = parseFloat(row.longitude || row.Longitude || row.lng || row.Lng)
-
-        if (isNaN(lat) || isNaN(lng)) {
-          results.failed++
-          results.errors.push(
-            `Row ${rowNum} ("${name}"): Missing or invalid latitude/longitude columns`
-          )
-          continue
-        }
-
-        if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
-          results.failed++
-          results.errors.push(
-            `Row ${rowNum} ("${name}"): Coordinates out of range — lng=${lng}, lat=${lat}`
-          )
-          continue
-        }
-
-        try {
-          await peopleGroupsApi.create({
-            name,
-            villageName: row.villageName || row.VillageName || row.village || row.Village || '',
-            engagementStatus: (
-              row.engagementStatus || row.status || row.Status || 'pioneer'
-            ).toLowerCase(),
-            engagementLevel: row.engagementLevel || row.level || row.Level || '',
-            numberOfChurches: parseInt(row.numberOfChurches || row.NumberOfChurches || row.churches || row.Churches || 0),
-            churchGeneration: parseInt(row.churchGeneration || row.ChurchGeneration || row.churchGenerations || row.generation || row.Generation || 0),
-            description: row.description || row.Description || '',
-            region: row.region || row.Region || '',
-            country: row.country || row.Country || '',
-            location: {
-              type: 'Point',
-              coordinates: [lng, lat],
-            },
-          })
-          results.success++
-        } catch (err) {
-          results.failed++
-          // Extract the most useful part of the error message
-          const msg = err?.response?.data?.message || err?.response?.data?.error || err.message
-          results.errors.push(`Row ${rowNum} ("${name}"): ${msg}`)
-        }
-      }
-      
-      return results
+    // Send the raw file to the backend bulk-import route. The backend handles
+    // delimiter detection, French decimals, optional coordinates, full metric
+    // mapping and returns a detailed per-row/per-column error report.
+    mutationFn: async (file) => {
+      const fd = new FormData()
+      fd.append('file', file)
+      const { data } = await api.post('/api/import/people-groups', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return data // { success, message, summary, imported, skipped, errors }
     },
     onSuccess: (results) => {
+      // Rafraîchir la liste des peuples ET tous les widgets du tableau de bord
+      // (les imports trimestriels modifient KPI, statuts DMM, couverture et analytics).
       queryClient.invalidateQueries(['peopleGroups'])
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboardKPI'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboardStatusDistribution'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboardCoverage'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-ai-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-monthly-activity'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-weekly-activity'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-metric'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-dmm-growth'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-top-regions'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-people-groups'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics-pg-timeline'] })
+
+      // Lightweight verification: ensure reporting-focused people queries refresh after import.
+      queryClient.invalidateQueries({ queryKey: ['peopleGroups', 'reporting'] })
+      queryClient.invalidateQueries({ queryKey: ['peopleGroups', 'detail'] })
+
+      const summary = results?.summary || {}
+      const imported = summary.imported ?? results?.imported?.length ?? 0
+      const skipped = summary.skipped ?? results?.skipped?.length ?? 0
+      const errors = results?.errors || []
+
+      // Keep the detailed report on screen so the user can fix the flagged cells.
+      setImportReport(results)
+
       toast.success(
-        `${t('dataManagement.import.success') || 'Import completed'}: ${results.success} ${t('dataManagement.import.successCount') || 'records imported'}`
+        `${t('dataManagement.import.success') || 'Import terminé'}: ${imported} ${t('dataManagement.import.successCount') || 'lignes importées'}`
       )
-      if (results.failed > 0) {
-        toast.error(`${results.failed} ${t('dataManagement.import.failedCount') || 'records failed'}`)
-        console.warn('[DataManagement] Import errors:', results.errors)
+      if (errors.length > 0 || skipped > 0) {
+        toast.error(`${errors.length || skipped} ${t('dataManagement.import.failedCount') || 'ligne(s) en erreur'}`)
+        console.warn('[DataManagement] Import errors:', errors)
       }
-      resetImport()
+      console.log('[DataManagement] Reporting visibility refresh triggered after import', {
+        imported,
+        skipped,
+        errors: errors.length,
+      })
+      // Clear the file/preview but KEEP importReport visible.
+      setImportFile(null)
+      setImportPreview(null)
+      setImportError(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     },
     onError: (error) => {
-      toast.error(error.message || t('dataManagement.import.error') || 'Import failed')
+      const msg = error?.response?.data?.message || error?.message || t('dataManagement.import.error') || "Échec de l'import"
+      toast.error(msg)
     },
   })
 
-  // Process import
+  // Process import — send the raw file to the backend bulk-import route.
   const handleImport = async () => {
-    if (!importFile || !importPreview) return
-
+    if (!importFile) return
     setIsProcessing(true)
-    
+    setImportReport(null)
     try {
-      const reader = new FileReader()
-      reader.onload = async (event) => {
-        const text = event.target.result
-        const lines = text.split('\n').filter(line => line.trim())
-        // Auto-detect separator (semicolon vs comma) based on header line
-        const separator = (lines[0].match(/;/g) || []).length >= (lines[0].match(/,/g) || []).length ? ';' : ','
-        const headers = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''))
-        
-        const data = lines.slice(1).map(line => {
-          const values = line.split(separator).map(v => v.trim().replace(/"/g, ''))
-          const row = {}
-          headers.forEach((header, i) => {
-            row[header] = values[i] || ''
-          })
-          return row
-        }).filter(row => Object.values(row).some(v => v))
-
-        await importMutation.mutateAsync(data)
-        setIsProcessing(false)
-      }
-      reader.readAsText(importFile)
+      await importMutation.mutateAsync(importFile)
     } catch (err) {
+      // onError already toasts; nothing else to do here
+    } finally {
       setIsProcessing(false)
-      toast.error(err.message)
     }
   }
 
-
-  // ── Handlers Rapport Trimestriel ──────────────────────────────────────────
-  const handleQuarterlyDragEnter = useCallback((e) => { e.preventDefault(); setIsQuarterlyDragging(true) }, [])
-  const handleQuarterlyDragLeave = useCallback((e) => { e.preventDefault(); setIsQuarterlyDragging(false) }, [])
-  const handleQuarterlyDragOver  = useCallback((e) => { e.preventDefault() }, [])
-  const handleQuarterlyDrop = useCallback((e) => {
-    e.preventDefault(); setIsQuarterlyDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleQuarterlyFileProcess(file)
-  }, [])
-
-  const handleQuarterlyFileSelect = (e) => {
-    const file = e.target.files[0]
-    if (file) handleQuarterlyFileProcess(file)
-  }
-
-  const handleQuarterlyFileProcess = async (file) => {
-    const ext = file.name.split('.').pop().toLowerCase()
-    if (!['xlsx', 'xls'].includes(ext)) {
-      setQuarterlyError('Seuls les fichiers Excel (.xlsx, .xls) sont acceptés')
-      return
-    }
-    setQuarterlyError(null)
-    setQuarterlyFile(file)
-    setQuarterlyPreview(null)
-    setQuarterlyResult(null)
-    setIsQuarterlyLoading(true)
-    try {
-      const res = await quarterlyApi.preview(file)
-      setQuarterlyPreview(res.data)
-    } catch (err) {
-      setQuarterlyError(err?.response?.data?.message || err.message || 'Erreur de lecture du fichier')
-      setQuarterlyFile(null)
-    } finally {
-      setIsQuarterlyLoading(false)
-    }
-  }
-
-  const handleQuarterlyImport = async () => {
-    if (!quarterlyFile || !quarterlyPreview) return
-    setIsQuarterlyImporting(true)
-    try {
-      const res = await quarterlyApi.import(quarterlyFile)
-      setQuarterlyResult(res.data)
-      queryClient.invalidateQueries(['quarterly-reports'])
-      queryClient.invalidateQueries(['analytics-people-groups'])
-      toast.success(`✅ ${res.data.message}`)
-    } catch (err) {
-      const msg = err?.response?.data?.message || err.message
-      setQuarterlyError(msg)
-      toast.error(`❌ Import échoué: ${msg}`)
-    } finally {
-      setIsQuarterlyImporting(false)
-    }
-  }
-
-  const resetQuarterly = () => {
-    setQuarterlyFile(null)
-    setQuarterlyPreview(null)
-    setQuarterlyError(null)
-    setQuarterlyResult(null)
-    if (quarterlyFileInputRef.current) quarterlyFileInputRef.current.value = ''
-  }
-
-  const STATUS_COLORS = {
-    unreached: 'bg-red-100 text-red-700',
-    pioneer: 'bg-orange-100 text-orange-700',
-    midway: 'bg-yellow-100 text-yellow-700',
-    'tipping-point': 'bg-green-100 text-green-700',
-    dmm: 'bg-emerald-100 text-emerald-800',
-  }
 
   // Reset import state
   const resetImport = () => {
@@ -460,73 +372,65 @@ const DataManagement = () => {
     }
   }
 
-  // Export to CSV
-  const exportToCSV = () => {
-    if (!peoplesData || peoplesData.length === 0) {
-      toast.error(t('dataManagement.export.noData') || 'No data to export')
-      return
-    }
-
-    const headers = [
-      'name', 'villageName', 'engagementStatus', 'engagementLevel',
-      'numberOfChurches', 'churchGeneration', 'description', 'region', 'country',
-      'latitude', 'longitude'
-    ]
-
-    const csvContent = [
-      headers.join(','),
-      ...peoplesData.map(p => [
-        `"${p.name || ''}"`,
-        `"${p.villageName || ''}"`,
-        `"${p.engagementStatus || ''}"`,
-        `"${p.engagementLevel || ''}"`,
-        p.numberOfChurches || 0,
-        p.churchGeneration || 0,
-        `"${(p.description || '').replace(/"/g, '""')}"`,
-        `"${p.region || ''}"`,
-        `"${p.country || ''}"`,
-        p.location?.coordinates?.[1] || '',
-        p.location?.coordinates?.[0] || '',
-      ].join(','))
-    ].join('\n')
-
-    downloadFile(csvContent, 'peoples_data.csv', 'text/csv')
-    toast.success(t('dataManagement.export.success') || 'Export completed')
+  // ── Export helpers: filter by country + only the selected metric columns ──
+  const getExportRows = () => {
+    const all = Array.isArray(peoplesData) ? peoplesData : []
+    if (exportCountry === 'all') return all
+    const want = exportCountry.toLowerCase()
+    return all.filter(p => {
+      const c = (p.country || '').toLowerCase()
+      // Accept FR/EN variants (Cameroun/Cameroon, etc.)
+      return c === want || (want === 'cameroun' && c === 'cameroon') || (want === 'cameroon' && c === 'cameroun')
+    })
+  }
+  // Selected fields in their canonical order; always keep at least the name.
+  const getSelectedFields = () => {
+    const chosen = EXPORT_METRIC_FIELDS.filter(f => exportMetrics.has(f.key))
+    return chosen.length ? chosen : EXPORT_METRIC_FIELDS.filter(f => f.key === 'name')
+  }
+  const cellValue = (p, key) => {
+    if (key === 'country') return p.country || ''
+    if (key === 'name') return p.name || ''
+    if (key === 'villageName') return p.villageName || ''
+    if (key === 'region') return p.region || ''
+    if (key === 'reportPeriod') return p.reportPeriod || ''
+    if (key === 'engagementStatus') return p.engagementStatus || ''
+    const v = p[key]
+    return v === undefined || v === null ? '' : v
   }
 
-  // Export to Excel
-  const exportToExcel = () => {
-    if (!peoplesData || peoplesData.length === 0) {
-      toast.error(t('dataManagement.export.noData') || 'No data to export')
+  // Export to CSV (respects the country filter + selected metric columns)
+  const exportToCSV = () => {
+    const rows = getExportRows()
+    if (rows.length === 0) {
+      toast.error(t('dataManagement.export.noData') || 'Aucune donnée à exporter')
       return
     }
-
-    const BOM = '\uFEFF'
-    const headers = [
-      'Name', 'Village', 'Status', 'Level',
-      'Churches', 'Generation', 'Description', 'Region', 'Country',
-      'Latitude', 'Longitude'
-    ]
-
-    const csvContent = BOM + [
-      headers.join(';'),
-      ...peoplesData.map(p => [
-        `"${p.name || ''}"`,
-        `"${p.villageName || ''}"`,
-        `"${p.engagementStatus || ''}"`,
-        `"${p.engagementLevel || ''}"`,
-        p.numberOfChurches || 0,
-        p.churchGeneration || 0,
-        `"${(p.description || '').replace(/"/g, '""')}"`,
-        `"${p.region || ''}"`,
-        `"${p.country || ''}"`,
-        p.location?.coordinates?.[1] || '',
-        p.location?.coordinates?.[0] || '',
-      ].join(';'))
+    const fields = getSelectedFields()
+    const esc = (v) => `"${String(v).replace(/"/g, '""')}"`
+    const csvContent = [
+      fields.map(f => esc(f.label)).join(','),
+      ...rows.map(p => fields.map(f => esc(cellValue(p, f.key))).join(',')),
     ].join('\n')
+    downloadFile('\uFEFF' + csvContent, 'peoples_export.csv', 'text/csv')
+    toast.success(t('dataManagement.export.success') || 'Export terminé')
+  }
 
-    downloadFile(csvContent, 'peoples_data.xlsx', 'application/vnd.ms-excel')
-    toast.success(t('dataManagement.export.success') || 'Export completed')
+  // Export to Excel (';'-delimited, respects country filter + selected metrics)
+  const exportToExcel = () => {
+    const rows = getExportRows()
+    if (rows.length === 0) {
+      toast.error(t('dataManagement.export.noData') || 'Aucune donnée à exporter')
+      return
+    }
+    const fields = getSelectedFields()
+    const esc = (v) => `"${String(v).replace(/"/g, '""')}"`
+    const csvContent = '\uFEFF' + [
+      fields.map(f => esc(f.label)).join(';'),
+      ...rows.map(p => fields.map(f => esc(cellValue(p, f.key))).join(';')),
+    ].join('\n')
+    downloadFile(csvContent, 'peoples_export.xls', 'application/vnd.ms-excel')
+    toast.success(t('dataManagement.export.success') || 'Export terminé')
   }
 
   // Export to PDF
@@ -617,6 +521,9 @@ const DataManagement = () => {
     URL.revokeObjectURL(url)
   }
 
+  // Télécharge un CSV PRÉ-REMPLI avec les engagements DMM déjà présents dans
+  // l'appli, au format exact du modèle d'import people-groups, afin de pouvoir
+  // ajuster puis ré-importer facilement via le même flux d'import.
   const handleExport = (formatId) => {
     switch (formatId) {
       case 'csv':
@@ -650,7 +557,7 @@ const DataManagement = () => {
             <Users size={24} />
             <div>
               <p className="text-sm text-indigo-100">Total des peuples</p>
-              <p className="text-2xl font-bold">{peoplesData?.length || 0}</p>
+              <p className="text-2xl font-bold">{peoplesCount}</p>
             </div>
           </div>
         </div>
@@ -681,17 +588,6 @@ const DataManagement = () => {
             >
               <Download size={20} />
               {t('dataManagement.tabs.export') || 'Exporter des données'}
-            </button>
-            <button
-              onClick={() => setActiveTab('quarterly')}
-              className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
-                activeTab === 'quarterly'
-                  ? 'text-emerald-600 border-b-3 border-emerald-600 bg-emerald-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <Calendar size={20} />
-              Rapport Trimestriel
             </button>
             <button
               onClick={() => setActiveTab('jp-sync')}
@@ -750,6 +646,7 @@ const DataManagement = () => {
                     </a>
                   ))}
                 </div>
+
               </div>
 
               {/* Drag & Drop Upload Zone */}
@@ -898,12 +795,111 @@ const DataManagement = () => {
                   </div>
                 </div>
               )}
+
+              {/* Rapport d'import : lignes/colonnes en erreur */}
+              {importReport && (
+                <div className="mt-6 space-y-4">
+                  {(importReport.summary?.imported ?? 0) > 0 && (
+                    <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-800">
+                      <CheckCircle size={18} />
+                      <span className="font-medium">
+                        {importReport.summary.imported} ligne(s) importée(s)
+                        {(importReport.summary?.skipped ?? 0) > 0 ? ` · ${importReport.summary.skipped} ignorée(s)` : ''}
+                      </span>
+                    </div>
+                  )}
+                  {Array.isArray(importReport.errors) && importReport.errors.length > 0 && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                      <div className="mb-3 flex items-center gap-2 text-red-800">
+                        <AlertCircle size={18} />
+                        <span className="font-semibold">
+                          Lignes en erreur — corrigez ces cases puis ré-importez ({importReport.errors.length})
+                        </span>
+                      </div>
+                      <div className="max-h-80 overflow-auto rounded-lg border border-red-100 bg-white">
+                        <table className="min-w-full text-sm">
+                          <thead className="bg-red-100/60 text-red-900">
+                            <tr>
+                              <th className="px-3 py-2 text-left font-semibold">Ligne</th>
+                              <th className="px-3 py-2 text-left font-semibold">Colonne</th>
+                              <th className="px-3 py-2 text-left font-semibold">Valeur</th>
+                              <th className="px-3 py-2 text-left font-semibold">Problème</th>
+                              <th className="px-3 py-2 text-left font-semibold">Correction</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-red-100">
+                            {importReport.errors.map((er, i) => (
+                              <tr key={i} className="align-top">
+                                <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800">{er.row ?? er.line ?? '-'}</td>
+                                <td className="px-3 py-2 whitespace-nowrap text-gray-700">{er.column || er.field || '-'}</td>
+                                <td className="px-3 py-2 text-gray-600">{er.value === '' || er.value === undefined ? '—' : String(er.value)}</td>
+                                <td className="px-3 py-2 text-red-700">{er.error || er.reason || '-'}</td>
+                                <td className="px-3 py-2 text-gray-600">{er.suggestion || ''}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setImportReport(null)}
+                        className="mt-3 text-sm font-medium text-red-700 hover:underline"
+                      >
+                        Masquer le rapport
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
           {/* Export Tab */}
           {activeTab === 'export' && (
             <div className="space-y-6">
+              {/* Filtres d'export : pays + métriques à exporter */}
+              <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Globe size={20} className="text-indigo-600" />
+                  Filtres d'export
+                </h3>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Pays</label>
+                  <select
+                    value={exportCountry}
+                    onChange={(e) => setExportCountry(e.target.value)}
+                    className="w-full sm:w-72 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    <option value="all">Tous les pays</option>
+                    {[...new Set((peoplesData || []).map(p => p.country).filter(Boolean))].sort().map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Métriques à exporter</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {EXPORT_METRIC_FIELDS.map(f => (
+                      <label key={f.key} className="flex items-center gap-2 text-sm text-gray-700 bg-white rounded-lg border border-gray-200 px-3 py-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={exportMetrics.has(f.key)}
+                          onChange={() => setExportMetrics(prev => {
+                            const next = new Set(prev)
+                            if (next.has(f.key)) next.delete(f.key); else next.add(f.key)
+                            return next
+                          })}
+                        />
+                        {f.label}
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {exportCountry === 'all' ? 'Tous les pays' : exportCountry} · {getExportRows().length} ligne(s) · {getSelectedFields().length} colonne(s)
+                  </p>
+                </div>
+              </div>
+
               {/* Export Format Cards */}
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -976,265 +972,6 @@ const DataManagement = () => {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune donnée à exporter</h3>
                   <p className="text-gray-500">Commencez par importer des données ou créer des peuples</p>
-                </div>
-              )}
-            </div>
-          )}
-          {/* ── Quarterly Report Tab ── */}
-          {activeTab === 'quarterly' && (
-            <div className="space-y-6">
-
-              {/* Header info */}
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                    <Calendar className="text-white" size={28} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">Import Rapport Trimestriel DMM</h3>
-                    <p className="text-gray-600">
-                      Déposez le fichier Excel trimestriel (ex: FRANCOPHONE_CENTRAL_AFRICA_1Q26.xlsx).
-                      Le système met à jour automatiquement les peuples, calcule les statuts DMM et détecte les percées.
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3 text-sm">
-                  {[
-                    { icon: <BarChart2 size={15}/>, text: 'Statuts DMM auto-calculés' },
-                    { icon: <Zap size={15}/>, text: 'Détection des percées' },
-                    { icon: <TrendingUp size={15}/>, text: 'Historique trimestriel' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-emerald-100">
-                      <span className="text-emerald-600">{item.icon}</span>
-                      <span className="text-gray-700 font-medium">{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Trimestres existants */}
-              {quartersData && quartersData.length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <BookOpen size={16} className="text-gray-400" />
-                    Trimestres déjà importés
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {quartersData.map(q => (
-                      <div key={q._id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
-                        <span className="font-bold text-emerald-700 text-sm">{q._id}</span>
-                        <span className="text-emerald-600 text-xs">{q.peoples} peuples</span>
-                        <span className="text-emerald-500 text-xs">·</span>
-                        <span className="text-emerald-600 text-xs">{q.churches?.toLocaleString()} églises</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Zone de dépôt */}
-              {!quarterlyPreview && !quarterlyResult && (
-                <div
-                  onDragEnter={handleQuarterlyDragEnter}
-                  onDragLeave={handleQuarterlyDragLeave}
-                  onDragOver={handleQuarterlyDragOver}
-                  onDrop={handleQuarterlyDrop}
-                  className={`relative border-3 border-dashed rounded-2xl p-12 text-center transition-all ${
-                    isQuarterlyDragging
-                      ? 'border-emerald-500 bg-emerald-50 scale-[1.02]'
-                      : 'border-gray-300 hover:border-emerald-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <input
-                    ref={quarterlyFileInputRef}
-                    type="file"
-                    accept=".xlsx,.xls"
-                    onChange={handleQuarterlyFileSelect}
-                    className="hidden"
-                    id="quarterly-upload"
-                  />
-                  <label htmlFor="quarterly-upload" className="cursor-pointer">
-                    <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center transition-all ${
-                      isQuarterlyLoading ? 'bg-emerald-100' : isQuarterlyDragging ? 'bg-emerald-500 scale-110' : 'bg-gray-100'
-                    }`}>
-                      {isQuarterlyLoading
-                        ? <Loader2 size={40} className="text-emerald-600 animate-spin" />
-                        : <FileSpreadsheet size={40} className={isQuarterlyDragging ? 'text-white' : 'text-gray-400'} />
-                      }
-                    </div>
-                    <p className="text-xl font-semibold text-gray-700 mb-2">
-                      {isQuarterlyLoading
-                        ? 'Analyse du fichier en cours...'
-                        : isQuarterlyDragging
-                          ? 'Déposez le fichier ici...'
-                          : 'Cliquez ou glissez-déposez le rapport Excel'}
-                    </p>
-                    <p className="text-gray-500">Fichier Excel trimestriel — <span className="font-medium">.xlsx ou .xls</span> (max 20MB)</p>
-                    <p className="text-gray-400 text-sm mt-2">
-                      Ex: <span className="font-mono bg-gray-100 px-2 py-0.5 rounded">FRANCOPHONE_CENTRAL_AFRICA_1Q26.xlsx</span>
-                    </p>
-                  </label>
-                </div>
-              )}
-
-              {/* Erreur */}
-              {quarterlyError && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-4">
-                  <AlertCircle className="text-red-500 flex-shrink-0" size={24} />
-                  <span className="flex-1 text-red-700 font-medium">{quarterlyError}</span>
-                  <button onClick={resetQuarterly} className="p-2 hover:bg-red-100 rounded-lg">
-                    <X size={18} className="text-red-500" />
-                  </button>
-                </div>
-              )}
-
-              {/* Aperçu avant import */}
-              {quarterlyPreview && !quarterlyResult && (
-                <div className="space-y-4 animate-fade-in">
-                  {/* Résumé */}
-                  <div className={`p-4 rounded-xl border-2 ${quarterlyPreview.alreadyExists ? 'bg-amber-50 border-amber-300' : 'bg-green-50 border-green-200'}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className={quarterlyPreview.alreadyExists ? 'text-amber-500' : 'text-green-600'} size={24} />
-                        <div>
-                          <p className="font-bold text-gray-800">{quarterlyFile?.name}</p>
-                          <p className="text-sm text-gray-600">
-                            Trimestre <span className="font-semibold text-emerald-700">{quarterlyPreview.quarter}</span>
-                            {quarterlyPreview.alreadyExists && (
-                              <span className="ml-2 text-amber-600">⚠️ {quarterlyPreview.existingCount} entrées existantes — seront mises à jour</span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-                      <button onClick={resetQuarterly} className="p-2 hover:bg-gray-100 rounded-lg">
-                        <X size={18} className="text-gray-500" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Stats globales */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { label: 'Peuples', value: quarterlyPreview.totals.peoples, icon: <Users size={18}/>, color: 'text-blue-600 bg-blue-50' },
-                      { label: 'Églises totales', value: quarterlyPreview.totals.churches?.toLocaleString(), icon: <Church size={18}/>, color: 'text-emerald-600 bg-emerald-50' },
-                      { label: 'Nouveaux disciples', value: quarterlyPreview.totals.disciples?.toLocaleString(), icon: <TrendingUp size={18}/>, color: 'text-purple-600 bg-purple-50' },
-                      { label: 'Nouveaux baptêmes', value: quarterlyPreview.totals.baptisms?.toLocaleString(), icon: <BarChart2 size={18}/>, color: 'text-orange-600 bg-orange-50' },
-                    ].map((s, i) => (
-                      <div key={i} className={`rounded-xl p-4 border ${s.color.split(' ')[1]} border-gray-100`}>
-                        <div className={`flex items-center gap-2 mb-1 ${s.color.split(' ')[0]}`}>{s.icon}<span className="text-xs font-medium">{s.label}</span></div>
-                        <p className="text-2xl font-bold text-gray-800">{s.value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Répartition par pays */}
-                  <div className="bg-white rounded-xl border border-gray-200 p-4">
-                    <h4 className="font-semibold text-gray-700 mb-3">Répartition par pays</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(quarterlyPreview.byCountry || {}).sort((a,b) => b[1]-a[1]).map(([country, count]) => (
-                        <span key={country} className="flex items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1 text-sm">
-                          <span className="font-medium text-gray-800">{country}</span>
-                          <span className="text-gray-500">{count}</span>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Aperçu des 5 premières lignes */}
-                  <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                    <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-                      <Table size={16} className="text-gray-500" />
-                      <span className="font-semibold text-gray-700 text-sm">Aperçu — 5 premières lignes</span>
-                    </div>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-sm">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            {['Pays', 'Peuple', 'Église', 'Gén.', 'Disciples', 'Baptêmes', 'MBB', 'Statut calculé'].map(h => (
-                              <th key={h} className="px-3 py-2 text-left text-xs font-bold text-gray-500 uppercase">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {quarterlyPreview.preview?.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50">
-                              <td className="px-3 py-2 text-gray-600 whitespace-nowrap">{row.country}</td>
-                              <td className="px-3 py-2 font-medium text-gray-800 whitespace-nowrap">{row.name}</td>
-                              <td className="px-3 py-2 text-center">{row.totalChurches}</td>
-                              <td className="px-3 py-2 text-center">{row.generation}</td>
-                              <td className="px-3 py-2 text-center text-purple-700">{row.newDisciples}</td>
-                              <td className="px-3 py-2 text-center text-blue-700">{row.newBaptisms}</td>
-                              <td className="px-3 py-2 text-center text-orange-700">{row.mbbCount || '-'}</td>
-                              <td className="px-3 py-2">
-                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[row.status] || 'bg-gray-100 text-gray-700'}`}>
-                                  {row.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {/* Boutons */}
-                  <div className="flex justify-end gap-3">
-                    <button onClick={resetQuarterly} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
-                      Annuler
-                    </button>
-                    <button
-                      onClick={handleQuarterlyImport}
-                      disabled={isQuarterlyImporting}
-                      className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all font-semibold shadow-lg disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {isQuarterlyImporting ? (
-                        <><Loader2 size={20} className="animate-spin" /> Import en cours...</>
-                      ) : (
-                        <><Upload size={20} /> Importer {quarterlyPreview.totals.peoples} peuples</>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Résultat après import */}
-              {quarterlyResult && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 text-center">
-                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <CheckCircle size={36} className="text-emerald-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-1">Import terminé !</h3>
-                    <p className="text-gray-600">{quarterlyResult.message}</p>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { label: 'Créés', value: quarterlyResult.stats?.created, color: 'text-green-700 bg-green-50' },
-                      { label: 'Mis à jour', value: quarterlyResult.stats?.updated, color: 'text-blue-700 bg-blue-50' },
-                      { label: 'PeopleGroups MAJ', value: quarterlyResult.stats?.pgUpdated, color: 'text-purple-700 bg-purple-50' },
-                      { label: 'Percées 🎉', value: quarterlyResult.stats?.statusChanges?.length, color: 'text-orange-700 bg-orange-50' },
-                    ].map((s, i) => (
-                      <div key={i} className={`rounded-xl p-4 ${s.color} border border-gray-100 text-center`}>
-                        <p className="text-3xl font-bold">{s.value ?? 0}</p>
-                        <p className="text-sm font-medium mt-1">{s.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                  {quarterlyResult.stats?.statusChanges?.length > 0 && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                      <h4 className="font-bold text-amber-800 mb-2">🎉 Percées ce trimestre</h4>
-                      {quarterlyResult.stats.statusChanges.map((sc, i) => (
-                        <p key={i} className="text-sm text-amber-700">
-                          🏆 <strong>{sc.country} / {sc.name}</strong> : {sc.from} → <strong>{sc.to}</strong>
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex justify-center">
-                    <button onClick={resetQuarterly} className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors font-semibold">
-                      Importer un autre rapport
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

@@ -72,6 +72,41 @@ const peopleGroupSchema = new mongoose.Schema({
     min: [0, 'Church generation cannot be negative'],
     default: 0,
   },
+  // NG field-report metrics (Discovery Bible Studies / Communities / Categorized churches)
+  dbs: {
+    type: Number,
+    min: [0, 'DBS cannot be negative'],
+    default: 0,
+  },
+  com: {
+    type: Number,
+    min: [0, 'COM cannot be negative'],
+    default: 0,
+  },
+  cat: {
+    type: Number,
+    min: [0, 'CAT cannot be negative'],
+    default: 0,
+  },
+  // Additional DMM quarterly metrics (from the 20-column report template)
+  avgChurchSize: { type: Number, min: 0, default: 0 },
+  newDisciples: { type: Number, min: 0, default: 0 },
+  newBaptisms: { type: Number, min: 0, default: 0 },
+  leadersInTraining: { type: Number, min: 0, default: 0 },
+  activeCoaches: { type: Number, min: 0, default: 0 },
+  trainingsHeld: { type: Number, min: 0, default: 0 },
+  lostChurches: { type: Number, min: 0, default: 0 },
+  mergedChurches: { type: Number, min: 0, default: 0 },
+  // Master people group label (People_Group column) the engagement rolls up to
+  peopleGroup: { type: String, trim: true, maxlength: [200, 'People group label too long'] },
+  // Free-text notes column
+  notes: { type: String, trim: true, maxlength: [2000, 'Notes cannot exceed 2000 characters'] },
+  // Reporting period this data snapshot belongs to (e.g. "2Q26"). Updated on each quarterly import.
+  reportPeriod: {
+    type: String,
+    trim: true,
+    maxlength: [20, 'Report period cannot exceed 20 characters'],
+  },
   // Engagement status: unreached, pioneer, midway, tipping-point, dmm
   engagementStatus: {
     type: String,
@@ -112,13 +147,21 @@ const peopleGroupSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: ['Point'],
-      default: 'Point',
+      // Do NOT default to 'Point'. Defaulting materializes an empty
+      // { type: 'Point' } subdocument for coordinate-less rows (DMM metric
+      // imports), which the 2dsphere index then rejects with
+      // "Can't extract geo keys ... Point must be an array or object".
+      // Only set when real coordinates are provided.
+      required: false,
     },
     coordinates: {
       type: [Number], // [longitude, latitude]
-      required: [true, 'Location coordinates are required'],
+      required: false, // Optional: DMM metric imports may have no coordinates
       validate: {
         validator: function (coords) {
+          // Allow empty/undefined (people group without a map location)
+          if (coords === undefined || coords === null) return true;
+          if (Array.isArray(coords) && coords.length === 0) return true;
           if (!Array.isArray(coords) || coords.length !== 2) return false;
           const [lng, lat] = coords;
           return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
@@ -167,6 +210,43 @@ const peopleGroupSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [100, 'Religion cannot exceed 100 characters'],
+  },
+  // ── Engagement/reference metadata (from Cameroon_PGs.xlsx) ──────────────────
+  // Funding partner / sponsor of the engagement (e.g. Volunteer, DOULOS, GRACE)
+  donor: {
+    type: String,
+    trim: true,
+    maxlength: [150, 'Donor cannot exceed 150 characters'],
+  },
+  // National coordinator responsible for this people group
+  nationalCoordinator: {
+    type: String,
+    trim: true,
+    maxlength: [150, 'National coordinator cannot exceed 150 characters'],
+  },
+  // Field church planter assigned to this people group
+  churchPlanter: {
+    type: String,
+    trim: true,
+    maxlength: [150, 'Church planter cannot exceed 150 characters'],
+  },
+  // Affinity group classification (e.g. Sub-Saharan African Peoples)
+  affinityGroup: {
+    type: String,
+    trim: true,
+    maxlength: [150, 'Affinity group cannot exceed 150 characters'],
+  },
+  // Urban / rural context (free text, e.g. "Rural", "Urbain (petite ville)")
+  urbanRural: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Urban/Rural cannot exceed 100 characters'],
+  },
+  // Year the engagement started
+  startYear: {
+    type: Number,
+    min: [1900, 'Start year is invalid'],
+    max: [2100, 'Start year is invalid'],
   },
   believersCount: {
     type: Number,
@@ -251,6 +331,14 @@ const peopleGroupSchema = new mongoose.Schema({
   sourceData: {
     type: mongoose.Schema.Types.Mixed,
   },
+  // Link to the canonical MasterPeople this group has been reconciled into (set by
+  // the DMM ingestion loader). Sparse: only DMM-linked groups carry this reference.
+  masterPeopleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MasterPeople',
+    index: true,
+    sparse: true,
+  },
 }, {
   timestamps: true,
 });
@@ -260,7 +348,7 @@ const peopleGroupSchema = new mongoose.Schema({
 // ============================================
 
 // Geospatial index for location-based queries (required for $near, $geoWithin)
-peopleGroupSchema.index({ location: '2dsphere' });
+peopleGroupSchema.index({ location: '2dsphere' }, { sparse: true });
 
 // Single-field indexes for common filters
 peopleGroupSchema.index({ status: 1 });                    // Filter by DMM status
@@ -301,7 +389,29 @@ peopleGroupSchema.index({ villageName: 1 }, { sparse: true });
 peopleGroupSchema.index({ village: 1 }, { sparse: true });
 
 // Auto-update statusColor based on status
+// Strip an incomplete GeoJSON location before validation/save. Rows imported
+// without coordinates (DMM metric templates) must NOT carry an empty
+// { type: 'Point' } subdocument, otherwise the 2dsphere index throws
+// "Can't extract geo keys ... Point must be an array or object".
+function stripEmptyLocation(doc) {
+  const loc = doc.location;
+  if (!loc) return;
+  const coords = loc.coordinates;
+  const hasValidCoords = Array.isArray(coords) && coords.length === 2 &&
+    Number.isFinite(coords[0]) && Number.isFinite(coords[1]);
+  if (!hasValidCoords) {
+    doc.location = undefined;
+    if (typeof doc.markModified === 'function') doc.markModified('location');
+  }
+}
+
+peopleGroupSchema.pre('validate', function (next) {
+  stripEmptyLocation(this);
+  next();
+});
+
 peopleGroupSchema.pre('save', function (next) {
+  stripEmptyLocation(this);
   const statusColorMap = {
     'unreached': 'red',
     'pioneer': 'yellow',

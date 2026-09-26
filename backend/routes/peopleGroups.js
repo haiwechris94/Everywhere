@@ -86,6 +86,43 @@ function countGeoJSONPoints(geometry) {
 }
 
 /**
+ * Normalize a GeoJSON Point-like value into a valid { type: 'Point', coordinates: [lng, lat] } object.
+ * Accepts JSON strings, raw coordinate arrays, and already-shaped objects.
+ * Returns null when the value cannot be safely normalized.
+ */
+function normalizePointLocation(location) {
+  if (!location) return null;
+
+  let value = location;
+  if (typeof value === 'string') {
+    try {
+      value = JSON.parse(value);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length !== 2) return null;
+    const lng = Number(value[0]);
+    const lat = Number(value[1]);
+    if (Number.isNaN(lng) || Number.isNaN(lat)) return null;
+    return { type: 'Point', coordinates: [lng, lat] };
+  }
+
+  if (value && typeof value === 'object') {
+    const coords = value.coordinates;
+    if (!Array.isArray(coords) || coords.length !== 2) return null;
+    const lng = Number(coords[0]);
+    const lat = Number(coords[1]);
+    if (Number.isNaN(lng) || Number.isNaN(lat)) return null;
+    return { type: 'Point', coordinates: [lng, lat] };
+  }
+
+  return null;
+}
+
+/**
  * Simplify a GeoJSON polygon using Douglas-Peucker algorithm
  * @param {Object} polygon - GeoJSON Polygon or MultiPolygon
  * @param {number} tolerance - Simplification tolerance (higher = more simplification)
@@ -696,6 +733,7 @@ router.get('/', optionalAuth, async (req, res) => {
       village,
       search, 
       approved,
+      source,
       region,
       country,
       countryCode,
@@ -865,6 +903,16 @@ router.get('/', optionalAuth, async (req, res) => {
     }
     // NOTE: If no approved param is passed, we do NOT filter by approved status
     // This ensures all people groups are returned regardless of approval status
+
+    // ============================================
+    // 5b. SOURCE FILTER (Query-param based)
+    // ============================================
+    // Allow filtering by data source (e.g. 'Joshua Project', 'PeopleGroups.org',
+    // 'Finishing the Task', 'Survey', 'DMM'). Values are case-sensitive and must
+    // match the stored `source` field exactly. 'all' (or empty) means no filter.
+    if (source && typeof source === 'string' && source.trim() && source !== 'all') {
+      query.source = source.trim();
+    }
     
     // ============================================
     // 6. GEOGRAPHIC FILTERS (with validation)
@@ -970,6 +1018,9 @@ router.get('/', optionalAuth, async (req, res) => {
       language: 1,
       approved: 1,
       source: 1,
+      // masterPeopleId : nécessaire pour compter les peuples DMM au niveau
+      // « master people » (≈54) plutôt que les engagements (≈80) côté dashboard.
+      masterPeopleId: 1,
       organizationTags: 1,
       createdAt: 1,
       updatedAt: 1,
@@ -1009,7 +1060,11 @@ router.get('/', optionalAuth, async (req, res) => {
     const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
     const safeSortOrder = sortOrder === 'asc' ? 1 : -1;
     
-    const sort = { [safeSortBy]: safeSortOrder };
+    // Include a unique tiebreaker (_id) so skip/limit pagination is deterministic.
+    // Records sharing the same sort value (e.g. identical createdAt from a bulk
+    // import) could otherwise be duplicated or skipped across page boundaries,
+    // causing inconsistent totals between consumers (e.g. map vs dashboard).
+    const sort = { [safeSortBy]: safeSortOrder, _id: safeSortOrder };
     
     // ============================================
     // 9. EXECUTE QUERY WITH OPTIMIZATIONS
@@ -1560,7 +1615,14 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
       churchGeneration,
       engagementStatus,
       engagementLevel,
-      source
+      source,
+      // Reference/engagement metadata
+      donor,
+      nationalCoordinator,
+      churchPlanter,
+      affinityGroup,
+      urbanRural,
+      startYear
     } = req.body;
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -1574,20 +1636,9 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
       });
     }
 
-    let parsedLocationEarly;
-    try {
-      parsedLocationEarly = typeof location === 'string' ? JSON.parse(location) : location;
-    } catch (e) {
-      parsedLocationEarly = null;
-    }
+    const parsedLocationEarly = normalizePointLocation(location);
 
-    if (
-      !parsedLocationEarly ||
-      !Array.isArray(parsedLocationEarly.coordinates) ||
-      parsedLocationEarly.coordinates.length !== 2 ||
-      isNaN(parsedLocationEarly.coordinates[0]) ||
-      isNaN(parsedLocationEarly.coordinates[1])
-    ) {
+    if (!parsedLocationEarly) {
       return res.status(400).json({
         error: 'Validation failed',
         message: 'Location coordinates are required. Provide { type: "Point", coordinates: [longitude, latitude] }.',
@@ -1666,6 +1717,15 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
       region,
       country,
       photos,
+      // Reference/engagement metadata
+      donor,
+      nationalCoordinator,
+      churchPlanter,
+      affinityGroup,
+      urbanRural,
+      startYear: (startYear !== undefined && startYear !== null && startYear !== '')
+        ? parseInt(startYear, 10)
+        : undefined,
       // New fields for peoples page
       villageName,
       numberOfChurches: churches,
@@ -1678,7 +1738,10 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
       createdBy: req.user._id,
       // Auto-approve DMM people groups for all authenticated users
       // Survey data requires manual review; DMM data is trusted from field workers
-      approved: determinedSource === 'DMM' ? true : ['admin', 'supervisor'].includes(req.user.role),
+      // Nouveaux engagements : toujours "en attente de validation" (approved:false),
+      // quel que soit le rôle ou la source, afin qu'un administrateur les valide
+      // avant qu'ils ne comptent dans le reporting région et n'apparaissent sur la carte.
+      approved: false,
       approvedBy: (determinedSource === 'DMM' || ['admin', 'supervisor'].includes(req.user.role)) ? req.user._id : undefined,
       approvedAt: (determinedSource === 'DMM' || ['admin', 'supervisor'].includes(req.user.role)) ? new Date() : undefined,
     });
@@ -1745,7 +1808,6 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
     // Emit people-group-added event for real-time updates
     const io = req.app.get('io');
     if (io) {
-      console.log('📤 Emitting people-group-added event');
       io.to('map').emit('people-group-added', {
         id: peopleGroup._id,
         name: peopleGroup.name,
@@ -1756,14 +1818,9 @@ router.post('/', auth, isMissionary, uploadPhotos, processUploadedFiles,
     }
 
     // Recalculate and emit village status update
-    console.log('🏘️ People group created with villageName:', villageName);
-    console.log('🔐 People group approved status:', peopleGroup.approved);
     if (villageName) {
-      console.log('📡 Triggering village status update for:', villageName);
       // Await the emit to ensure it completes before response
       await emitVillageStatusUpdate(req, villageName);
-    } else {
-      console.log('⚠️ No villageName provided, skipping village status update');
     }
 
     // Get village status for response
@@ -1894,14 +1951,26 @@ router.put('/:id', auth, isMissionary,
       'village', 'organizationTags', 'progressPercentage', 'progressNotes',
       'region', 'country', 'isPublic',
       // New fields for peoples page (excluding engagementStatus and engagementLevel - auto-calculated)
-      'villageName', 'numberOfChurches', 'churchGeneration'
+      'villageName', 'numberOfChurches', 'churchGeneration',
+      // NG field-report metrics
+      'dbs', 'com', 'cat',
+      // Reference/engagement metadata (from Cameroon_PGs.xlsx)
+      'donor', 'nationalCoordinator', 'churchPlanter', 'affinityGroup', 'urbanRural', 'startYear'
     ];
     
     allowedUpdates.forEach(field => {
       if (req.body[field] !== undefined) {
-        peopleGroup[field] = req.body[field];
+        peopleGroup[field] = field === 'location' ? normalizePointLocation(req.body[field]) : req.body[field];
       }
     });
+
+    if (req.body.location !== undefined && !peopleGroup.location) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Location coordinates are required. Provide { type: "Point", coordinates: [longitude, latitude] }.',
+        code: 'LOCATION_REQUIRED',
+      });
+    }
 
     // ═══════════════════════════════════════════════════════════════════════
     // DMM STATUS CALCULATION: Auto-recalculate status and level if churches or generations changed
@@ -1931,7 +2000,6 @@ router.put('/:id', auth, isMissionary,
     // Emit people-group-updated event for real-time updates
     const io = req.app.get('io');
     if (io) {
-      console.log('📤 Emitting people-group-updated event');
       io.to('map').emit('people-group-updated', {
         id: peopleGroup._id,
         name: peopleGroup.name,
@@ -2106,10 +2174,24 @@ router.post('/:id/approve', auth, canApprove,
       });
     }
 
+    // Idempotent: if it's already approved, return success (200) so the client
+    // can simply drop it from the pending list instead of surfacing an error.
     if (peopleGroup.approved) {
+      return res.json({
+        message: 'People group is already approved',
+        alreadyApproved: true,
+        ...peopleGroup.toJSON()
+      });
+    }
+
+    // Only block approval when a location value is present but malformed.
+    // Reference/location-less records (e.g. country-level people groups) can
+    // still be approved; they simply won't render as a point on the map.
+    if (peopleGroup.location && !normalizePointLocation(peopleGroup.location)) {
       return res.status(400).json({
-        error: 'Already approved',
-        message: 'This people group is already approved'
+        error: 'Approval failed',
+        message: 'This people group has invalid location data and must be corrected before approval.',
+        code: 'INVALID_LOCATION',
       });
     }
 
@@ -2118,23 +2200,34 @@ router.post('/:id/approve', auth, canApprove,
     peopleGroup.approvedAt = new Date();
     await peopleGroup.save();
 
-    // Notify the creator
-    await Notification.create({
-      user: peopleGroup.createdBy,
-      type: 'approval-granted',
-      title: 'Content Approved',
-      message: `Your people group "${peopleGroup.name}" has been approved`,
-      relatedEntity: {
-        entityType: 'PeopleGroup',
-        entityId: peopleGroup._id,
-      },
-      sender: req.user._id,
-    });
+    // Effets de bord NON bloquants : une notification ou une émission de statut
+    // qui échoue ne doit JAMAIS faire échouer l'approbation (sinon le client
+    // reçoit une erreur alors que l'enregistrement est bel et bien approuvé —
+    // c'était la cause du bug "erreur puis déjà approuvé").
+    try {
+      if (peopleGroup.createdBy) {
+        await Notification.create({
+          user: peopleGroup.createdBy,
+          type: 'approval-granted',
+          title: 'Content Approved',
+          message: `Your people group "${peopleGroup.name}" has been approved`,
+          relatedEntity: {
+            entityType: 'PeopleGroup',
+            entityId: peopleGroup._id,
+          },
+          sender: req.user._id,
+        });
+      }
+    } catch (notifyErr) {
+      console.warn('[approve] notification non critique ignorée:', notifyErr.message);
+    }
 
-    // Emit village status update since approval changes which people groups are counted
-    console.log('✅ People group approved, triggering village status update for:', peopleGroup.villageName);
-    if (peopleGroup.villageName) {
-      await emitVillageStatusUpdate(req, peopleGroup.villageName);
+    try {
+      if (peopleGroup.villageName) {
+        await emitVillageStatusUpdate(req, peopleGroup.villageName);
+      }
+    } catch (emitErr) {
+      console.warn('[approve] emitVillageStatusUpdate non critique ignoré:', emitErr.message);
     }
 
     res.json({
@@ -2544,7 +2637,8 @@ router.post('/engage-from-jp', auth, isMissionary, async (req, res) => {
       engagementLevel:  'I',
       status:           'pioneer',
       source:           'DMM',
-      approved:         ['admin', 'supervisor'].includes(req.user.role),
+      // Toujours en attente de validation à la création (voir note ci-dessus).
+      approved:         false,
       createdBy:        req.user._id,
       approvedBy:       ['admin', 'supervisor'].includes(req.user.role) ? req.user._id : undefined,
       approvedAt:       ['admin', 'supervisor'].includes(req.user.role) ? new Date() : undefined,
