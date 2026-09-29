@@ -57,19 +57,78 @@ export const StateEmpty = ({ label }) => (
 )
 
 export const StatCard = ({ label, value, accent = 'neutral' }) => {
-  const accents = {
-    neutral: 'text-neutral-900',
-    green: 'text-green-600',
+  // Reinforced + colored top border and colored label for the blue/green
+  // grouped metric cards. `neutral` keeps the original plain card look.
+  const topBorder = {
+    neutral: 'border-t border-neutral-200',
+    blue: 'border-t-4 border-t-blue-500',
+    green: 'border-t-4 border-t-green-500',
+    amber: 'border-t-4 border-t-amber-500',
+  }
+  const labelColor = {
+    neutral: 'text-neutral-400',
     blue: 'text-blue-600',
+    green: 'text-green-600',
     amber: 'text-amber-600',
   }
+  // Fixed, equal width so cards keep the same size even when they wrap to the
+  // next line. Reduced padding + font sizes for a more compact card. Numbers
+  // are always black regardless of the accent colour.
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 px-4 py-3 flex-1 min-w-[140px]">
-      <p className="text-xs font-medium text-neutral-400 uppercase tracking-wide">{label}</p>
-      <p className={`text-2xl font-bold mt-1 ${accents[accent] || accents.neutral}`}>
+    <div
+      className={`bg-white rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3 py-2 w-36`}
+    >
+      <p className={`text-[10.5px] font-bold leading-tight ${labelColor[accent] || labelColor.neutral}`}>
+        {label}
+      </p>
+      <p className="text-xl font-bold mt-0.5 text-neutral-900">
         {value ?? '—'}
       </p>
     </div>
+  )
+}
+
+/**
+ * Colored status pill shared across the country/people tables.
+ * Handles both the DMM engagement statuses (Pioneer, Midway, Tipping Point,
+ * Movement) and the reference/source statuses (UNREACHED, ENGAGED, DMM, …).
+ * The match is case- and separator-insensitive ("tipping-point", "Tipping Point",
+ * "TIPPING_POINT" all map to the same colour). Unknown values fall back to a
+ * neutral grey pill. Any trailing source annotation like " (JP)" is preserved
+ * as a muted suffix so nothing is lost from the original text.
+ */
+export const StatusBadge = ({ status }) => {
+  if (status == null || status === '' || status === '—') return <span className="text-neutral-400">—</span>
+
+  const raw = String(status).trim()
+  // Split an optional "(SOURCE)" suffix, e.g. "MOVEMENT (JP)".
+  const match = raw.match(/^(.*?)\s*\(([^)]+)\)\s*$/)
+  const main = (match ? match[1] : raw).trim()
+  const source = match ? match[2].trim() : null
+
+  const norm = main.toLowerCase().replace(/[\s_-]+/g, '')
+
+  // Ordered so more specific keys win (e.g. "tippingpoint" before "point").
+  const palette = {
+    pioneer: 'bg-amber-100 text-amber-700',
+    midway: 'bg-blue-100 text-blue-700',
+    tippingpoint: 'bg-purple-100 text-purple-700',
+    movement: 'bg-green-100 text-green-700',
+    dmm: 'bg-green-100 text-green-700',
+    engaged: 'bg-blue-100 text-blue-700',
+    unreached: 'bg-red-100 text-red-700',
+    reached: 'bg-green-100 text-green-700',
+    unknown: 'bg-slate-100 text-slate-600',
+  }
+  const cls = palette[norm] || 'bg-slate-100 text-slate-600'
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
+        {main}
+      </span>
+      {source && <span className="text-xs text-slate-400">({source})</span>}
+    </span>
   )
 }
 
@@ -108,7 +167,7 @@ export const ChildrenGrid = ({ title, items, toPath, emptyLabel }) => {
   return (
     <div className="mb-8">
       {title && (
-        <h2 className="text-sm font-semibold text-neutral-700 uppercase tracking-wide mb-3">
+        <h2 className="text-sm font-bold text-neutral-700 uppercase tracking-wide mb-3">
           {title} <span className="text-neutral-400">({list.length})</span>
         </h2>
       )}
@@ -121,7 +180,7 @@ export const ChildrenGrid = ({ title, items, toPath, emptyLabel }) => {
             const to = toPath(name)
             const card = (
               <div className="flex items-center justify-between bg-white border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-400 hover:bg-neutral-50 transition-colors">
-                <span className="text-sm font-medium text-neutral-800 truncate">
+                <span className="text-sm font-bold text-neutral-800 truncate">
                   {name || '—'}
                 </span>
                 {to && <ChevronRight size={16} className="text-neutral-400 flex-shrink-0" />}

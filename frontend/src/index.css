@@ -22,6 +22,33 @@ body {
 }
 
 /* ============================================================================
+ * FONT WEIGHT
+ * Tailwind's font-* weight utilities (font-medium/semibold/bold/…) and native
+ * bold tags are left to behave normally so that intentional emphasis (bold nav
+ * labels, section titles, numbers, statuses, etc.) renders as expected.
+ * Body text keeps the regular 400 weight by default (Tailwind's base).
+ * ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+ * BOLD NUMBERS EVERYWHERE
+ * Any element tagged with the `num` class (or the data-number attribute) renders
+ * its digits in bold. Wrap numeric values with <span className="num"> to opt in.
+ * ------------------------------------------------------------------------- */
+.num,
+[data-number] {
+  font-weight: 700;
+}
+
+/* Numeric-data conventions used across the app render bold:
+ *  - right-aligned table cells (the numeric columns: counts, populations, %…)
+ *  - elements using tabular figures (tabular-nums) which are always numbers. */
+td.text-right,
+th.text-right,
+.tabular-nums {
+  font-weight: 700;
+}
+
+/* ============================================================================
  * MOBILE ZOOM PREVENTION
  * Prevents iOS Safari from auto-zooming on input focus
  * Font-size must be >= 16px to prevent zoom

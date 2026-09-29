@@ -469,7 +469,7 @@ router.get('/peoples', async (req, res) => {
           approved: true,
           masterPeopleId: { $in: masterIds },
         })
-          .select('masterPeopleId name villageName region admin2 admin3 engagementStatus engagementLevel numberOfChurches churchGeneration')
+          .select('masterPeopleId name villageName region admin2 admin3 engagementStatus engagementLevel numberOfChurches churchGeneration newDisciples')
           .lean()
       : [];
     const engByMaster = new Map();
@@ -519,15 +519,18 @@ router.get('/peoples', async (req, res) => {
         const villagesTouched = rollup?.villagesTouched != null ? rollup.villagesTouched : new Set(mine.map((e) => (e.villageName || '').trim()).filter(Boolean)).size;
         const totalChurches = rollup?.totalChurches != null ? rollup.totalChurches : mine.reduce((s, e) => s + (e.numberOfChurches || 0), 0);
         const maxGeneration = rollup?.maxGeneration != null ? rollup.maxGeneration : mine.reduce((mx, e) => Math.max(mx, e.churchGeneration || 0), 0);
+        // Total des nouveaux disciples/croyants cumulé sur tous les engagements du peuple.
+        const totalNewDisciples = mine.reduce((s, e) => s + (e.newDisciples || 0), 0);
         const w = window ? { from: window.from, to: window.to, ...(dbsByMaster.get(String(m._id)) || { newDisciples: 0, baptisms: 0 }) } : null;
         dmm = {
-          engagementCount, villagesTouched, totalChurches, maxGeneration,
+          engagementCount, villagesTouched, totalChurches, maxGeneration, totalNewDisciples,
           window: w,
           engagements: mine.map((e) => ({
             peopleGroupId: e._id, name: e.name, villageName: e.villageName,
             region: e.region, admin2: e.admin2, admin3: e.admin3,
             engagementStatus: e.engagementStatus, engagementLevel: e.engagementLevel,
             numberOfChurches: e.numberOfChurches, churchGeneration: e.churchGeneration,
+            newDisciples: e.newDisciples || 0,
           })),
         };
       }
@@ -655,12 +658,44 @@ router.get('/regions/:regionId', optionalAuth, async (req, res) => {
       period,
     });
 
+    // Per-country metrics for the Countries table on the region fiche.
+    // Reuse buildNumericalReport scoped to a single country so the numbers stay
+    // dynamically derived from the same source as the region-wide totals.
+    const countriesWithMetrics = await Promise.all(
+      countries.map(async (country) => {
+        const cm = await buildNumericalReport({
+          from,
+          to,
+          organization: req.query.organization,
+          countries: [country.code],
+          peoples,
+          period,
+        });
+        const engagements = cm.churches?.engagements ?? cm.dmmFieldMetrics?.engagements ?? 0;
+        const churchesTotal = cm.churches?.total ?? 0;
+        const maxGen = cm.churches?.maxGeneration || 0;
+        // Total Believers = new believers only. The baptized are already counted
+        // among the new believers, so they must NOT be added again.
+        const totalBelievers = cm.disciples?.newDisciples || 0;
+        return {
+          ...country,
+          metrics: cm,
+          summary: {
+            engagements,
+            churches: churchesTotal,
+            maxGeneration: maxGen,
+            totalBelievers,
+          },
+        };
+      })
+    );
+
     res.json({
       data: {
         id: regionId,
         name: regionId,
         fullName: ngAreaFullName(regionId),
-        countries,
+        countries: countriesWithMetrics,
         metrics,
       },
     });

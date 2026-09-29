@@ -23,7 +23,7 @@ import toast from 'react-hot-toast'
 import api from '../services/api'
 
 const Profile = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const { user, updateProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [showPasswordSection, setShowPasswordSection] = useState(false)

@@ -29,7 +29,7 @@ const statusColors = {
 }
 
 const PendingValidations = () => {
-  const { t, language } = useLanguage()
+  const { t, language, isFrench } = useLanguage()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const dateLocale = language === 'fr' ? fr : enUS

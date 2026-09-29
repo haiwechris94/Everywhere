@@ -14,6 +14,7 @@ import {
   Shield,
   LayoutDashboard,
   Map,
+  MapPin,
   Globe,
   FolderKanban,
   Activity,
@@ -43,7 +44,7 @@ const TopNavbar = () => {
   // Base navigation items for all users
   const baseNavItems = [
     { path: '/regions', label: 'Regions', icon: Globe },
-    { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: Globe },
+    { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
     { path: '/projects', label: 'Projects', icon: FolderKanban },
     { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
     { path: '/activities', label: t('nav.activities') || 'Activités', icon: Activity },
@@ -189,7 +190,7 @@ const TopNavbar = () => {
                 }
               >
                 {Icon && <Icon size={18} className="flex-shrink-0" />}
-                <span className={`whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
+                <span className={`whitespace-nowrap font-bold ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
               </NavLink>
             )
           })}

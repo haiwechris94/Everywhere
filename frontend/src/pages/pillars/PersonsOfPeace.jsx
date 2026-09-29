@@ -10,15 +10,18 @@ const villageName = (r) => r.village?.name || r.village || '—'
 
 const PersonsOfPeace = () => (
   <PillarListPage
-    title="Personnes de paix"
-    subtitle="Pilier DMM transverse — personnes de paix identifiées, tous peuples confondus."
+    title={(isFrench) => (isFrench ? 'Personnes de paix' : 'Persons of peace')}
+    subtitle={(isFrench) =>
+      isFrench
+        ? 'Pilier DMM transverse — personnes de paix identifiées, tous peuples confondus.'
+        : 'Cross-cutting DMM pillar — identified persons of peace, across all people groups.'}
     queryKey="pillar-persons-of-peace"
     fetcher={() => personsOfPeaceApi.list({ limit: 500 })}
     columns={[
-      { key: 'name', label: 'Nom', render: (r) => r.name || '—' },
-      { key: 'status', label: 'Statut', render: (r) => r.status || '—' },
+      { key: 'name', label: (isFrench) => (isFrench ? 'Nom' : 'Name'), render: (r) => r.name || '—' },
+      { key: 'status', label: (isFrench) => (isFrench ? 'Statut' : 'Status'), render: (r) => r.status || '—' },
       { key: 'village', label: 'Village', render: villageName },
-      { key: 'createdAt', label: 'Créé le', render: (r) => fmtDate(r.createdAt) },
+      { key: 'createdAt', label: (isFrench) => (isFrench ? 'Créé le' : 'Created on'), render: (r) => fmtDate(r.createdAt) },
     ]}
   />
 )

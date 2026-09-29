@@ -168,7 +168,7 @@ function GrowthCard({ label, first, last, isFrench }) {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
       <div className={`mt-1 flex items-center gap-1 text-2xl font-bold ${color}`}>
         <Icon size={20} />
         {first === 0 && last > 0 ? '—' : `${pct > 0 ? '+' : ''}${pct.toFixed(0)}%`}
@@ -385,7 +385,7 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
 function Stat({ label, value, accent = 'text-gray-900' }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${accent}`}>{value ?? 0}</p>
     </div>
   )
@@ -1191,7 +1191,7 @@ export default function DmmReporting() {
                   <div className="h-4 flex-1 rounded bg-gray-100">
                     <div className="h-4 rounded bg-indigo-500" style={{ width: `${((gen[k] || 0) / maxGen) * 100}%` }} />
                   </div>
-                  <span className="w-8 text-right text-sm font-semibold">{gen[k] || 0}</span>
+                  <span className="w-8 text-right text-sm font-bold">{gen[k] || 0}</span>
                 </div>
               ))}
               <p className="mt-1 text-xs text-gray-400">Un mouvement (DMM) = 100+ églises sur 4 générations.</p>
@@ -1248,10 +1248,10 @@ export default function DmmReporting() {
                           {p.primaryCountryCode && <span className="text-xs text-gray-400">{p.primaryCountryCode}</span>}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-600 shrink-0">
-                          {p.dmm && <span>{p.dmm.engagementCount} eng.</span>}
-                          {p.dmm && <span>{p.dmm.totalChurches} égl.</span>}
-                          {p.dmm && <span>G{p.dmm.maxGeneration}</span>}
-                          {w && <span>{w.newDisciples || 0} disc. / {w.baptisms || 0} bapt.</span>}
+                          {p.dmm && <span><span className="font-bold">{p.dmm.engagementCount}</span> eng.</span>}
+                          {p.dmm && <span><span className="font-bold">{p.dmm.totalChurches}</span> égl.</span>}
+                          {p.dmm && <span className="font-bold">G{p.dmm.maxGeneration}</span>}
+                          {w && <span><span className="font-bold">{w.newDisciples || 0}</span> disc. / <span className="font-bold">{w.baptisms || 0}</span> bapt.</span>}
                         </div>
                       </button>
                       {isOpen && engagements.length > 0 && (
@@ -1271,8 +1271,8 @@ export default function DmmReporting() {
                                 <tr key={e.peopleGroupId} className="border-t border-gray-50">
                                   <td className="py-1 pr-2 text-gray-900">{peopleVillageName(p.canonicalName || e.name, e.villageName)}</td>
                                   <td className="py-1 pr-2 text-gray-600">{[e.region, e.admin2, e.admin3].filter(Boolean).join(' · ')}</td>
-                                  <td className="py-1 pr-2">{e.numberOfChurches ?? 0}</td>
-                                  <td className="py-1 pr-2">{e.churchGeneration ?? 0}</td>
+                                  <td className="py-1 pr-2 font-bold">{e.numberOfChurches ?? 0}</td>
+                                  <td className="py-1 pr-2 font-bold">{e.churchGeneration ?? 0}</td>
                                   <td className="py-1">{e.engagementStatus || '—'}</td>
                                 </tr>
                               ))}

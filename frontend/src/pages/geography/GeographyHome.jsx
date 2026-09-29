@@ -13,7 +13,7 @@ import {
 } from './geoComponents'
 
 const GeographyHome = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['geo-regions'],
@@ -38,7 +38,7 @@ const GeographyHome = () => {
       />
 
       {isLoading ? (
-        <StateLoading label="Chargement des régions…" />
+        <StateLoading label={isFrench ? 'Chargement des régions…' : 'Loading regions…'} />
       ) : isError ? (
         <StateError />
       ) : (
@@ -46,7 +46,7 @@ const GeographyHome = () => {
           title={t('geo.regions') || 'Régions'}
           items={regions}
           toPath={(name) => `/geography/regions/${encodeURIComponent(name)}`}
-          emptyLabel="Aucune région disponible."
+          emptyLabel={isFrench ? 'Aucune région disponible.' : 'No region available.'}
         />
       )}
     </div>

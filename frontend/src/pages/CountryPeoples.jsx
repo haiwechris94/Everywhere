@@ -1,24 +1,26 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRight, Users, MapPin } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { reportingApi } from '../services/reportingApi'
-import { StateLoading, StateError, StateEmpty, StatCard } from './geography/geoComponents'
+import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
+import { useLanguage } from '../i18n'
 
-const StatusBadge = ({ status }) => {
-  if (!status) return null
-  const map = {
-    dmm: 'bg-green-100 text-green-700',
-    engaged: 'bg-blue-100 text-blue-700',
-    unreached: 'bg-amber-100 text-amber-700',
-    UNKNOWN: 'bg-slate-100 text-slate-600',
-  }
-  const cls = map[status] || 'bg-slate-100 text-slate-600'
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cls}`}>{status}</span>
+const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
+
+// Pick the reference (non-DMM) source of a people's status, e.g. JP / IMB / FTT.
+// Falls back to the first available source type.
+const referenceSource = (sourceTypes = []) => {
+  const preferred = sourceTypes.find((s) => s && s.toUpperCase() !== 'DMM')
+  return (preferred || sourceTypes[0] || '').toUpperCase() || null
 }
 
 const CountryPeoples = () => {
+  const { isFrench } = useLanguage()
   const { regionId, countryCode } = useParams()
+  const [peoplesOpen, setPeoplesOpen] = useState(true)
+  const [engagementsOpen, setEngagementsOpen] = useState(true)
 
   const countryQuery = useQuery({
     queryKey: ['ng-region-country', regionId, countryCode],
@@ -40,22 +42,27 @@ const CountryPeoples = () => {
     retry: false,
   })
 
-  if (countryQuery.isLoading) return <div className="p-6"><StateLoading label="Chargement du pays…" /></div>
+  if (countryQuery.isLoading) return <div className="p-6"><StateLoading label={isFrench ? 'Chargement du pays…' : 'Loading country…'} /></div>
   if (countryQuery.isError) {
     const notFound = countryQuery.error?.response?.status === 404
-    return <div className="p-6"><StateError label={notFound ? 'Pays introuvable.' : 'Erreur de chargement.'} /></div>
+    return <div className="p-6"><StateError label={notFound ? (isFrench ? 'Pays introuvable.' : 'Country not found.') : (isFrench ? 'Erreur de chargement.' : 'Loading error.')} /></div>
   }
 
   const detail = countryQuery.data
   const region = detail?.region
   const country = detail?.country
-  if (!country) return <div className="p-6">Pays introuvable.</div>
+  if (!country) return <div className="p-6">{isFrench ? 'Pays introuvable.' : 'Country not found.'}</div>
 
   const cards = metricCards(detail.metrics)
   const peoples = peoplesQuery.data || []
   const dmmPeoples = peoples.filter((p) => p.isNGEngaged)
   const engagements = dmmPeoples.flatMap((p) =>
-    (p.dmm?.engagements || []).map((e) => ({ ...e, masterPeopleId: p.masterPeopleId }))
+    (p.dmm?.engagements || []).map((e) => ({
+      ...e,
+      masterPeopleId: p.masterPeopleId,
+      // Parent people name (e.g. engagement "Bana Guili" belongs to people "Bana").
+      peopleName: p.canonicalName,
+    }))
   )
   const reportingCount = dmmPeoples.reduce((sum, p) => sum + (p.dmm?.engagementCount || 0), 0)
 
@@ -67,117 +74,150 @@ const CountryPeoples = () => {
       </p>
       <div>
         <h1 className="text-4xl font-bold text-slate-900">{country.name || country.nameEn}</h1>
-        <p className="text-slate-500 mt-1">{country.capital ? `Capitale : ${country.capital}` : ''} · {country.code}</p>
-        <p className="text-xs text-slate-500 mt-2">Vérification DMM: {reportingCount} engagement(s) chargé(s) depuis le reporting.</p>
+        <p className="text-slate-500 mt-1">{country.capital ? (isFrench ? `Capitale : ${country.capital}` : `Capital: ${country.capital}`) : ''} · {country.code}</p>
+        <p className="text-xs text-slate-500 mt-2">{isFrench ? `Vérification DMM: ${reportingCount} engagement(s) chargé(s) depuis le reporting.` : `DMM check: ${reportingCount} engagement(s) loaded from reporting.`}</p>
       </div>
 
+      {/* Cartes de métriques : une seule grille fluide. Les groupes bleu (ligne 1)
+          et vert (ligne 2) partagent désormais le même conteneur, donc quand une
+          carte de la 1re ligne passe à la ligne suivante, les cartes de la 2e ligne
+          remontent pour combler l'espace au lieu de rester sur une ligne séparée.
+          Chaque carte conserve sa couleur d'accent d'origine. */}
       <div className="flex flex-wrap gap-3">
         {cards.map((c) => (
-          <StatCard key={c.label} label={c.label} value={c.value} />
+          <StatCard key={c.label} label={c.label} value={c.value} accent={c.accent} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col">
-          <div className="flex items-center justify-between gap-3 px-6 py-4 border-b border-slate-100">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                <Users size={18} />
-              </span>
-              Peuples
-            </h2>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-medium text-slate-600">
-              {peoplesQuery.isLoading ? '…' : dmmPeoples.length}
-            </span>
-          </div>
-
-          <div className="p-4 lg:max-h-[70vh] lg:overflow-y-auto">
-            {peoplesQuery.isLoading ? (
-              <StateLoading label="Chargement des peuples…" />
-            ) : peoplesQuery.isError ? (
-              <StateError label="Impossible de charger les peuples." />
-            ) : dmmPeoples.length === 0 ? (
-              <StateEmpty label="Aucun peuple DMM pour ce pays." />
+      {/* Peuple en haut, Engagements en bas — deux sections repliables, même
+          structure visuelle que le tableau Countries de la page Regions. */}
+      <div className="space-y-6">
+        {/* ── Peuple ─────────────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <button
+            type="button"
+            onClick={() => setPeoplesOpen((v) => !v)}
+            aria-expanded={peoplesOpen}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            {peoplesOpen ? (
+              <ChevronDown size={20} className="text-blue-600" />
             ) : (
-              <div className="space-y-2.5">
-                {dmmPeoples.map((p) => (
-                  <Link
-                    key={p.masterPeopleId}
-                    to={`/regions/${regionId}/countries/${countryCode}/peoples/${p.masterPeopleId}`}
-                    className="group flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4 transition-colors hover:border-indigo-200 hover:bg-indigo-50/40"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-slate-900 truncate">{p.canonicalName}</p>
-                        <StatusBadge status={p.status?.global} />
-                        {p.isNGEngaged && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium">NG</span>
-                        )}
-                      </div>
-                      {p.dmm && (
-                        <p className="text-sm text-slate-500 mt-1">
-                          {p.dmm.engagementCount ?? 0} engagements · {p.dmm.totalChurches ?? 0} churches · gen {p.dmm.maxGeneration ?? 0}
-                        </p>
-                      )}
-                    </div>
-                    <ChevronRight size={18} className="text-slate-300 shrink-0 transition-colors group-hover:text-indigo-500" />
-                  </Link>
-                ))}
-              </div>
+              <ChevronRight size={20} className="text-blue-600" />
             )}
-          </div>
+            <span className="text-base font-semibold text-blue-600">{isFrench ? 'peuple' : 'people group'}</span>
+            <span className="text-slate-400 text-sm">
+              ({peoplesQuery.isLoading ? '…' : dmmPeoples.length})
+            </span>
+          </button>
+
+          {peoplesOpen && (
+            peoplesQuery.isLoading ? (
+              <div className="mt-4"><StateLoading label={isFrench ? 'Chargement des peuples…' : 'Loading people groups…'} /></div>
+            ) : peoplesQuery.isError ? (
+              <div className="mt-4"><StateError label={isFrench ? 'Impossible de charger les peuples.' : 'Unable to load people groups.'} /></div>
+            ) : dmmPeoples.length === 0 ? (
+              <div className="mt-4"><StateEmpty label={isFrench ? 'Aucun peuple DMM pour ce pays.' : 'No DMM people group for this country.'} /></div>
+            ) : (
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'engagements" : '# engagements'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
+                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dmmPeoples.map((p) => {
+                      const src = referenceSource(p.sourceTypes)
+                      const status = p.status?.global || 'UNKNOWN'
+                      return (
+                        <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                          <td className="py-3 pr-4">
+                            <Link
+                              to={`/regions/${regionId}/countries/${countryCode}/peoples/${p.masterPeopleId}`}
+                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                            >
+                              {p.canonicalName}
+                            </Link>
+                          </td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.engagementCount ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.totalChurches ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.maxGeneration ?? 0)}</td>
+                          <td className="py-3 pl-4 text-left text-slate-700">
+                            <StatusBadge status={`${status}${src ? ` (${src})` : ''}`} />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )
+          )}
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col">
-          <div className="flex items-center justify-between gap-3 px-6 py-4 border-b border-slate-100">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <MapPin size={18} />
-              </span>
-              Engagements
-            </h2>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-medium text-slate-600">
-              {peoplesQuery.isLoading ? '…' : engagements.length}
-            </span>
-          </div>
-
-          <div className="p-4 lg:max-h-[70vh] lg:overflow-y-auto">
-            {peoplesQuery.isLoading ? (
-              <StateLoading label="Chargement des engagements…" />
-            ) : peoplesQuery.isError ? (
-              <StateError label="Impossible de charger les engagements." />
-            ) : engagements.length === 0 ? (
-              <StateEmpty label="Aucun engagement pour ce pays." />
+        {/* ── Engagements ────────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <button
+            type="button"
+            onClick={() => setEngagementsOpen((v) => !v)}
+            aria-expanded={engagementsOpen}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            {engagementsOpen ? (
+              <ChevronDown size={20} className="text-blue-600" />
             ) : (
-              <div className="space-y-2.5">
-                {engagements.map((e) => (
-                  <Link
-                    key={e.peopleGroupId}
-                    to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}`}
-                    className="group flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-4 transition-colors hover:border-emerald-200 hover:bg-emerald-50/40"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-slate-900 truncate">{e.name}</p>
-                        <StatusBadge status={e.engagementStatus} />
-                      </div>
-                      <p className="text-sm text-slate-500 mt-1">
-                        {[
-                          e.villageName || '—',
-                          e.region || e.admin2 || '',
-                          `${e.numberOfChurches ?? 0} églises`,
-                          `gen ${e.churchGeneration ?? 0}`,
-                        ]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </p>
-                    </div>
-                    <ChevronRight size={18} className="text-slate-300 shrink-0 transition-colors group-hover:text-emerald-500" />
-                  </Link>
-                ))}
-              </div>
+              <ChevronRight size={20} className="text-blue-600" />
             )}
-          </div>
+            <span className="text-base font-semibold text-blue-600">engagements</span>
+            <span className="text-slate-400 text-sm">
+              ({peoplesQuery.isLoading ? '…' : engagements.length})
+            </span>
+          </button>
+
+          {engagementsOpen && (
+            peoplesQuery.isLoading ? (
+              <div className="mt-4"><StateLoading label={isFrench ? 'Chargement des engagements…' : 'Loading engagements…'} /></div>
+            ) : peoplesQuery.isError ? (
+              <div className="mt-4"><StateError label={isFrench ? 'Impossible de charger les engagements.' : 'Unable to load engagements.'} /></div>
+            ) : engagements.length === 0 ? (
+              <div className="mt-4"><StateEmpty label={isFrench ? 'Aucun engagement pour ce pays.' : 'No engagement for this country.'} /></div>
+            ) : (
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Nom du peuple' : 'People group name'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
+                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {engagements.map((e) => (
+                      <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                        <td className="py-3 pr-4">
+                          <Link
+                            to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}`}
+                            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                          >
+                            {e.peopleName || e.name}
+                          </Link>
+                        </td>
+                        <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.numberOfChurches ?? 0)}</td>
+                        <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.churchGeneration ?? 0)}</td>
+                        <td className="py-3 pl-4 text-left text-slate-700"><StatusBadge status={e.engagementStatus} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          )}
         </section>
       </div>
     </div>

@@ -30,19 +30,21 @@ export const maxGeneration = (metrics) => {
 export const metricCards = (metrics) => {
   const m = metrics || {}
   return [
+    // ── Row 1 (blue) ──────────────────────────────────────────────────────────
     // Total engagements = count of DMM engagements (churches.engagements /
     // dmmFieldMetrics.engagements). It was wrongly reading discoveryGroups.total.
-    { label: 'Engagements', value: m.churches?.engagements ?? m.dmmFieldMetrics?.engagements ?? 0 },
-    { label: 'Churches', value: m.churches?.total ?? 0 },
-    { label: 'Max Generation', value: maxGeneration(m) },
-    { label: 'Commissioned', value: m.churches?.commissioned ?? 0 },
-    { label: 'Catalytic', value: m.churches?.catalytic ?? 0 },
-    { label: 'New Believers', value: m.disciples?.newDisciples ?? 0 },
-    { label: 'Baptized', value: m.disciples?.baptized ?? 0 },
-    { label: 'Discovery Groups', value: m.discoveryGroups?.total ?? 0 },
-    { label: 'Active Groups', value: m.discoveryGroups?.active ?? 0 },
-    { label: 'Persons of Peace', value: m.personsOfPeace?.total ?? 0 },
-    { label: 'Leaders in Training', value: m.leaders?.inTraining ?? 0 },
-    { label: 'Active Coaches', value: m.leaders?.activeCoaches ?? 0 },
+    { label: '# of engagements', row: 1, accent: 'blue', value: m.churches?.engagements ?? m.dmmFieldMetrics?.engagements ?? 0 },
+    { label: '# of churches', row: 1, accent: 'blue', value: m.churches?.total ?? 0 },
+    { label: '# of max generation', row: 1, accent: 'blue', value: maxGeneration(m) },
+    { label: '# of commissioned', row: 1, accent: 'blue', value: m.churches?.commissioned ?? 0 },
+    { label: '# of catalytic', row: 1, accent: 'blue', value: m.churches?.catalytic ?? 0 },
+    { label: '# of discovery groups', row: 1, accent: 'blue', value: m.discoveryGroups?.total ?? 0 },
+    { label: '# of active groups', row: 1, accent: 'blue', value: m.discoveryGroups?.active ?? 0 },
+    // ── Row 2 (green) ─────────────────────────────────────────────────────────
+    { label: '# of persons of peace', row: 2, accent: 'green', value: m.personsOfPeace?.total ?? 0 },
+    { label: '# of new believers', row: 2, accent: 'green', value: m.disciples?.newDisciples ?? 0 },
+    { label: '# of baptized', row: 2, accent: 'green', value: m.disciples?.baptized ?? 0 },
+    { label: '# of leaders in training', row: 2, accent: 'green', value: m.leaders?.inTraining ?? 0 },
+    { label: '# of active coaches', row: 2, accent: 'green', value: m.leaders?.activeCoaches ?? 0 },
   ]
 }

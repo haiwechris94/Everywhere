@@ -4,14 +4,22 @@ import PillarListPage from './PillarListPage'
 const villageName = (r) => r.village?.name || r.village || '—'
 const peopleGroupName = (r) => r.peopleGroup?.name || '—'
 
-const statusLabel = (s) => {
-  const map = {
-    planning: 'Planification',
-    planted: 'Plantée',
-    growing: 'En croissance',
-    multiplying: 'En multiplication',
-    inactive: 'Inactive',
-  }
+const statusLabel = (s, isFrench) => {
+  const map = isFrench
+    ? {
+        planning: 'Planification',
+        planted: 'Plantée',
+        growing: 'En croissance',
+        multiplying: 'En multiplication',
+        inactive: 'Inactive',
+      }
+    : {
+        planning: 'Planning',
+        planted: 'Planted',
+        growing: 'Growing',
+        multiplying: 'Multiplying',
+        inactive: 'Inactive',
+      }
   return map[s] || s || '—'
 }
 
@@ -21,19 +29,22 @@ const statusLabel = (s) => {
  */
 const ChurchesList = () => (
   <PillarListPage
-    title="Églises"
-    subtitle="Métrique de multiplication — églises plantées (généalogie, générations 1→4+), rattachées à un peuple."
+    title={(isFrench) => (isFrench ? 'Églises' : 'Churches')}
+    subtitle={(isFrench) =>
+      isFrench
+        ? 'Métrique de multiplication — églises plantées (généalogie, générations 1→4+), rattachées à un peuple.'
+        : 'Multiplication metric — planted churches (genealogy, generations 1→4+), tied to a people group.'}
     queryKey="pillar-churches"
     fetcher={() => churchesApi.getAll({ limit: 500 })}
     searchText={(r) => `${r.name || ''} ${r.status || ''} ${r.leader || ''}`}
     columns={[
-      { key: 'name', label: 'Nom', render: (r) => r.name || '—' },
-      { key: 'status', label: 'Statut', render: (r) => statusLabel(r.status) },
-      { key: 'generation', label: 'Génération', render: (r) => r.generation ?? '—' },
-      { key: 'peopleGroup', label: 'Peuple', render: peopleGroupName },
+      { key: 'name', label: (isFrench) => (isFrench ? 'Nom' : 'Name'), render: (r) => r.name || '—' },
+      { key: 'status', label: (isFrench) => (isFrench ? 'Statut' : 'Status'), render: (r, isFrench) => statusLabel(r.status, isFrench) },
+      { key: 'generation', label: (isFrench) => (isFrench ? 'Génération' : 'Generation'), render: (r) => r.generation ?? '—' },
+      { key: 'peopleGroup', label: (isFrench) => (isFrench ? 'Peuple' : 'People group'), render: peopleGroupName },
       { key: 'village', label: 'Village', render: villageName },
-      { key: 'memberCount', label: 'Membres', render: (r) => r.memberCount ?? '—' },
-      { key: 'baptizedCount', label: 'Baptisés', render: (r) => r.baptizedCount ?? '—' },
+      { key: 'memberCount', label: (isFrench) => (isFrench ? 'Membres' : 'Members'), render: (r) => r.memberCount ?? '—' },
+      { key: 'baptizedCount', label: (isFrench) => (isFrench ? 'Baptisés' : 'Baptized'), render: (r) => r.baptizedCount ?? '—' },
     ]}
   />
 )

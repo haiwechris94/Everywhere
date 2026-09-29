@@ -1,0 +1,150 @@
+[{
+  "_id": {
+    "$oid": "69b7445e8a14241cec395d1b"
+  },
+  "name": "Christian Haiwe Djamo",
+  "email": "chrishaiwe@gmail.com",
+  "password": "$2b$10$BLFXXca.fFkJ9ApFAYgzou2J5L8tEZqHT3Q1F1rvlV5kEu73zGZJ.",
+  "role": "admin",
+  "avatar": null,
+  "lastKnownLocation": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "notificationPreferences": {
+    "email": true,
+    "push": true,
+    "proximity": true,
+    "proximityRadius": 10000
+  },
+  "isActive": true,
+  "isVerified": false,
+  "loginCount": 312,
+  "createdAt": {
+    "$date": "2026-03-15T23:44:30.086Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-26T08:51:46.085Z"
+  },
+  "__v": 0,
+  "lastLogin": {
+    "$date": "2026-09-26T08:51:46.079Z"
+  },
+  "resetPasswordExpires": {
+    "$date": "2026-03-16T17:34:33.567Z"
+  },
+  "resetPasswordToken": "218c52be128505c310965ead100a67644e800094b3479be26e27f04bf77c660a"
+},
+{
+  "_id": {
+    "$oid": "69b8f10d7abd7451bb91d3bc"
+  },
+  "name": "Chris Haiwe",
+  "email": "haiwechris94@gmail.com",
+  "password": "$2b$10$U3Zwcj2HiemGxqwRmE9NJug5BKkjEJK/7xwguT6lIM3xrh6Bccp12",
+  "role": "admin",
+  "organizationName": "New Generation",
+  "avatar": null,
+  "lastKnownLocation": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "notificationPreferences": {
+    "email": true,
+    "push": true,
+    "proximity": true,
+    "proximityRadius": 10000
+  },
+  "isActive": true,
+  "isVerified": true,
+  "loginCount": 27,
+  "createdAt": {
+    "$date": "2026-03-17T06:13:33.029Z"
+  },
+  "updatedAt": {
+    "$date": "2026-09-26T18:39:03.006Z"
+  },
+  "__v": 0,
+  "lastLogin": {
+    "$date": "2026-09-26T18:39:02.999Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a16b78e4de5223a901ff7b9"
+  },
+  "name": "Allou Guy Yannick",
+  "email": "guypro82@gmail.com",
+  "password": "$2b$10$ZM9KEQ6c30zhNK1YKeBVFeuTkPH42fy0AkVVONX9oHryDlEPFHfUy",
+  "role": "admin",
+  "organizationName": "",
+  "avatar": null,
+  "lastKnownLocation": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "notificationPreferences": {
+    "email": true,
+    "push": true,
+    "proximity": true,
+    "proximityRadius": 10000
+  },
+  "isActive": true,
+  "isVerified": true,
+  "loginCount": 2,
+  "createdAt": {
+    "$date": "2026-05-27T09:21:18.473Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-30T05:16:51.291Z"
+  },
+  "__v": 0,
+  "lastLogin": {
+    "$date": "2026-05-30T05:16:51.258Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a3e8bc7613c351181874fc7"
+  },
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "$2b$10$aFsWXO5iBPg0gIlGhIl97OECPUSHMnUlhl3Y5YroD3rqR29zdtE3q",
+  "role": "missionary",
+  "avatar": null,
+  "lastKnownLocation": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "notificationPreferences": {
+    "email": true,
+    "push": true,
+    "proximity": true,
+    "proximityRadius": 10000
+  },
+  "isActive": true,
+  "isVerified": false,
+  "loginCount": 2,
+  "createdAt": {
+    "$date": "2026-06-26T14:25:11.207Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-26T14:26:28.788Z"
+  },
+  "__v": 0,
+  "lastLogin": {
+    "$date": "2026-06-26T14:26:28.786Z"
+  }
+}]

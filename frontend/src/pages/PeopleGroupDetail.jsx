@@ -196,7 +196,7 @@ const PeopleGroupDetail = () => {
         <div className="text-red-500 mb-4">
           <X size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">{t('peopleMap.loadError') || 'People group not found'}</h3>
+        <h3 className="text-lg font-bold text-gray-900">{t('peopleMap.loadError') || 'People group not found'}</h3>
         <p className="text-gray-500 mt-2">{t('peopleMap.loadErrorDesc') || "This people group doesn't exist or has been deleted"}</p>
         <Link to="/map" className="btn-primary mt-4 inline-block">
           {t('common.back')}
@@ -274,7 +274,7 @@ const PeopleGroupDetail = () => {
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('peopleMap.peopleName') || 'General Information'}</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('peopleMap.peopleName') || 'General Information'}</h3>
             
             {isEditing ? (
               <div className="space-y-4">
@@ -586,7 +586,7 @@ const PeopleGroupDetail = () => {
           {/* Photos */}
           {peopleGroup.photos && peopleGroup.photos.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Image size={20} />
                 Photos ({peopleGroup.photos.length})
               </h3>
@@ -616,7 +616,7 @@ const PeopleGroupDetail = () => {
           {/* Progress History */}
           {peopleGroup.progressHistory && peopleGroup.progressHistory.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Clock size={20} />
                 Progress History
               </h3>
@@ -653,7 +653,7 @@ const PeopleGroupDetail = () => {
           {/* Activities */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Activities</h3>
+              <h3 className="text-lg font-bold text-gray-800">Activities</h3>
               <Link to={`/activities?peopleGroup=${id}`} className="text-primary-600 text-sm hover:underline">
                 View all
               </Link>
@@ -689,7 +689,7 @@ const PeopleGroupDetail = () => {
         <div className="space-y-6">
           {/* Quick Stats */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Details</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Details</h3>
             <div className="space-y-3">
               {peopleGroup.villageName && (
                 <div className="flex items-center justify-between">
@@ -780,7 +780,7 @@ const PeopleGroupDetail = () => {
 
           {/* Approval Status */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Status</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Status</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-gray-500">Approved</span>

@@ -52,28 +52,29 @@ const listCount = (res) => {
 
 /* --------------------------------- Profil --------------------------------- */
 function ProfilTab({ pg }) {
-  if (!pg) return <StateEmpty label="Profil indisponible." />
+  const { isFrench } = useLanguage()
+  if (!pg) return <StateEmpty label={isFrench ? 'Profil indisponible.' : 'Profile unavailable.'} />
   const rows = [
-    ['Nom', pg.name],
-    ['Région', pg.region],
-    ['Département', pg.admin2 || pg.department],
-    ['Arrondissement', pg.admin3 || pg.subdivision],
-    ['Statut DMM', pg.status || pg.dmmStatus],
-    ["Niveau d'engagement", pg.engagementLevel],
+    [isFrench ? 'Nom' : 'Name', pg.name],
+    [isFrench ? 'Région' : 'Region', pg.region],
+    [isFrench ? 'Département' : 'Department', pg.admin2 || pg.department],
+    [isFrench ? 'Arrondissement' : 'Subdivision', pg.admin3 || pg.subdivision],
+    [isFrench ? 'Statut DMM' : 'DMM status', pg.status || pg.dmmStatus],
+    [isFrench ? "Niveau d'engagement" : 'Engagement level', pg.engagementLevel],
     [
       'Population',
       typeof pg.population === 'number'
         ? pg.population.toLocaleString('fr-FR')
         : pg.population,
     ],
-    ['Langue', pg.language],
+    [isFrench ? 'Langue' : 'Language', pg.language],
     ['Religion', pg.religion],
-    ["Groupe d'affinité", pg.affinityGroup],
-    ['Urbain / Rural', pg.urbanRural],
-    ['Année de début', pg.startYear],
-    ['Donateur', pg.donor],
-    ['Coordinateur national', pg.nationalCoordinator],
-    ['Implanteur d\'église', pg.churchPlanter ? (
+    [isFrench ? "Groupe d'affinité" : 'Affinity group', pg.affinityGroup],
+    [isFrench ? 'Urbain / Rural' : 'Urban / Rural', pg.urbanRural],
+    [isFrench ? 'Année de début' : 'Start year', pg.startYear],
+    [isFrench ? 'Donateur' : 'Donor', pg.donor],
+    [isFrench ? 'Coordinateur national' : 'National coordinator', pg.nationalCoordinator],
+    [isFrench ? "Implanteur d'église" : 'Church planter', pg.churchPlanter ? (
       <Link to={`/planters/${encodeURIComponent(pg.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
         {pg.churchPlanter}
       </Link>
@@ -99,18 +100,19 @@ function ProfilTab({ pg }) {
 
 /* --------------------------------- Sources -------------------------------- */
 function SourcesTab({ pg }) {
-  if (!pg) return <StateEmpty label="Aucune source." />
+  const { isFrench } = useLanguage()
+  if (!pg) return <StateEmpty label={isFrench ? 'Aucune source.' : 'No source.'} />
   const sources = [
     { key: 'JP', label: 'Joshua Project', present: !!(pg.joshuaProjectId || pg.jpId || pg.peopleId || pg.sources?.joshuaProject) },
     { key: 'IMB', label: 'IMB (People Groups)', present: !!(pg.imbId || pg.sources?.imb) },
     { key: 'FTT', label: 'Finishing The Task', present: !!(pg.fttId || pg.sources?.ftt) },
-    { key: 'DMM', label: 'DMM (terrain)', present: !!(pg.status || pg.dmmStatus || pg.sources?.dmm) },
+    { key: 'DMM', label: isFrench ? 'DMM (terrain)' : 'DMM (field)', present: !!(pg.status || pg.dmmStatus || pg.sources?.dmm) },
   ]
   const any = sources.some((s) => s.present)
   return (
     <div>
       <p className="text-sm text-neutral-500 mb-4">
-        Provenance des données consolidées pour ce peuple (modèle Master People).
+        {isFrench ? 'Provenance des données consolidées pour ce peuple (modèle Master People).' : 'Provenance of the consolidated data for this people group (Master People model).'}
       </p>
       <div className="flex flex-wrap gap-3">
         {sources.map((s) => (
@@ -127,18 +129,19 @@ function SourcesTab({ pg }) {
             </p>
             <p className="text-sm font-medium text-neutral-800 mt-0.5">{s.label}</p>
             <p className={`text-xs mt-1 ${s.present ? 'text-green-700' : 'text-neutral-400'}`}>
-              {s.present ? 'Présent' : 'Absent'}
+              {s.present ? (isFrench ? 'Présent' : 'Present') : (isFrench ? 'Absent' : 'Absent')}
             </p>
           </div>
         ))}
       </div>
-      {!any && <StateEmpty label="Aucune source identifiée sur cet enregistrement." />}
+      {!any && <StateEmpty label={isFrench ? 'Aucune source identifiée sur cet enregistrement.' : 'No source identified on this record.'} />}
     </div>
   )
 }
 
 /* ------------------------------ Multiplication ---------------------------- */
 function MultiplicationTab({ id }) {
+  const { isFrench } = useLanguage()
   const q = (key, fn) =>
     useQuery({ queryKey: [key, id], queryFn: fn, enabled: !!id })
 
@@ -149,20 +152,20 @@ function MultiplicationTab({ id }) {
   const coaching = q('mult-coaching', () => coachingSessionsApi.list({ peopleGroup: id, limit: 500 }))
 
   const loading = [pop, dg, dbs, churches, coaching].some((x) => x.isLoading)
-  if (loading) return <StateLoading label="Agrégation des métriques de multiplication…" />
+  if (loading) return <StateLoading label={isFrench ? 'Agrégation des métriques de multiplication…' : 'Aggregating multiplication metrics…'} />
 
   const cards = [
-    { label: 'Personnes de paix', value: listCount(pop.data), icon: Users, accent: 'blue' },
-    { label: 'Groupes de découverte', value: listCount(dg.data), icon: BookOpen, accent: 'blue' },
-    { label: 'Sessions DBS', value: listCount(dbs.data), icon: HeartHandshake, accent: 'amber' },
-    { label: 'Églises', value: listCount(churches.data), icon: ChurchIcon, accent: 'green' },
+    { label: isFrench ? 'Personnes de paix' : 'Persons of peace', value: listCount(pop.data), icon: Users, accent: 'blue' },
+    { label: isFrench ? 'Groupes de découverte' : 'Discovery groups', value: listCount(dg.data), icon: BookOpen, accent: 'blue' },
+    { label: isFrench ? 'Sessions DBS' : 'DBS sessions', value: listCount(dbs.data), icon: HeartHandshake, accent: 'amber' },
+    { label: isFrench ? 'Églises' : 'Churches', value: listCount(churches.data), icon: ChurchIcon, accent: 'green' },
     { label: 'Coaching iGROW', value: listCount(coaching.data), icon: GraduationCap, accent: 'neutral' },
   ]
 
   return (
     <div>
       <div className="rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-600 text-xs px-3 py-2 mb-4">
-        Indicateurs de multiplication filtrés sur ce peuple (paramètre <code>peopleGroup</code>).
+        {isFrench ? <>Indicateurs de multiplication filtrés sur ce peuple (paramètre <code>peopleGroup</code>).</> : <>Multiplication indicators filtered on this people group (<code>peopleGroup</code> parameter).</>}
       </div>
       <div className="flex flex-wrap gap-3">
         {cards.map((c) => (
@@ -175,7 +178,7 @@ function MultiplicationTab({ id }) {
 
 /* -------------------------------- Reporting ------------------------------- */
 /** Flatten the nested numerical report into labelled stat cards (FR). */
-function reportToStats(r) {
+function reportToStats(r, isFrench = true) {
   if (!r || typeof r !== 'object') return []
   const d = r.disciples || {}
   const dg = r.discoveryGroups || {}
@@ -183,19 +186,20 @@ function reportToStats(r) {
   const l = r.leaders || {}
   const pop = r.personsOfPeace || {}
   return [
-    { label: 'Nouveaux disciples', value: d.newDisciples, accent: 'green' },
-    { label: 'Baptisés', value: d.baptized, accent: 'green' },
-    { label: 'Groupes de découverte', value: dg.total, accent: 'blue' },
-    { label: 'GD actifs', value: dg.active, accent: 'blue' },
-    { label: 'GD devenus église', value: dg.becameChurch, accent: 'blue' },
-    { label: 'Églises', value: c.total, accent: 'amber' },
-    { label: 'Personnes de paix', value: pop.total, accent: 'neutral' },
-    { label: 'Leaders en formation', value: l.inTraining, accent: 'neutral' },
-    { label: 'Coachs actifs', value: l.activeCoaches, accent: 'neutral' },
+    { label: isFrench ? 'Nouveaux disciples' : 'New disciples', value: d.newDisciples, accent: 'green' },
+    { label: isFrench ? 'Baptisés' : 'Baptized', value: d.baptized, accent: 'green' },
+    { label: isFrench ? 'Groupes de découverte' : 'Discovery groups', value: dg.total, accent: 'blue' },
+    { label: isFrench ? 'GD actifs' : 'Active DGs', value: dg.active, accent: 'blue' },
+    { label: isFrench ? 'GD devenus église' : 'DGs became church', value: dg.becameChurch, accent: 'blue' },
+    { label: isFrench ? 'Églises' : 'Churches', value: c.total, accent: 'amber' },
+    { label: isFrench ? 'Personnes de paix' : 'Persons of peace', value: pop.total, accent: 'neutral' },
+    { label: isFrench ? 'Leaders en formation' : 'Leaders in training', value: l.inTraining, accent: 'neutral' },
+    { label: isFrench ? 'Coachs actifs' : 'Active coaches', value: l.activeCoaches, accent: 'neutral' },
   ].filter((s) => typeof s.value === 'number')
 }
 
 function ReportingTab({ id }) {
+  const { isFrench } = useLanguage()
   const quarterly = useQuery({
     queryKey: ['people-reporting', id],
     // Scope the whole DMM report to THIS people group.
@@ -208,17 +212,17 @@ function ReportingTab({ id }) {
     enabled: !!id,
   })
 
-  if (quarterly.isLoading) return <StateLoading label="Chargement du reporting…" />
-  if (quarterly.isError) return <StateError label="Reporting indisponible." />
+  if (quarterly.isLoading) return <StateLoading label={isFrench ? 'Chargement du reporting…' : 'Loading reporting…'} />
+  if (quarterly.isError) return <StateError label={isFrench ? 'Reporting indisponible.' : 'Reporting unavailable.'} />
 
   const payload = quarterly.data?.data?.data || quarterly.data?.data || {}
-  const stats = reportToStats(payload)
+  const stats = reportToStats(payload, isFrench)
   const qualData = qual.data?.data?.data || qual.data?.data
 
   return (
     <div>
       <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs px-3 py-2 mb-4">
-        Reporting trimestriel filtré sur ce peuple (paramètre <code>peopleGroup</code>) + analyse qualitative DMM.
+        {isFrench ? <>Reporting trimestriel filtré sur ce peuple (paramètre <code>peopleGroup</code>) + analyse qualitative DMM.</> : <>Quarterly reporting filtered on this people group (<code>peopleGroup</code> parameter) + DMM qualitative analysis.</>}
       </div>
       {stats.length > 0 ? (
         <div className="flex flex-wrap gap-3 mb-4">
@@ -227,11 +231,11 @@ function ReportingTab({ id }) {
           ))}
         </div>
       ) : (
-        <StateEmpty label="Aucune donnée de reporting pour ce peuple." />
+        <StateEmpty label={isFrench ? 'Aucune donnée de reporting pour ce peuple.' : 'No reporting data for this people group.'} />
       )}
       {qualData && (
         <div className="mt-4 bg-white border border-neutral-200 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-neutral-700 mb-2">Analyse qualitative</h3>
+          <h3 className="text-sm font-bold text-neutral-700 mb-2">{isFrench ? 'Analyse qualitative' : 'Qualitative analysis'}</h3>
           <pre className="text-xs text-neutral-600 whitespace-pre-wrap break-words max-h-64 overflow-auto">
             {JSON.stringify(qualData, null, 2)}
           </pre>
@@ -244,7 +248,7 @@ function ReportingTab({ id }) {
 /* --------------------------------- Page ----------------------------------- */
 const PeopleDetail = () => {
   const { id } = useParams()
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const [tab, setTab] = useState('profil')
 
   const { data, isLoading, isError } = useQuery({
@@ -259,7 +263,7 @@ const PeopleDetail = () => {
   const pg = data || null
 
   const tabs = [
-    { key: 'profil', label: t('people.tabProfile') || 'Profil', icon: User },
+    { key: 'profil', label: t('people.tabProfile') || (isFrench ? 'Profil' : 'Profile'), icon: User },
     { key: 'sources', label: t('people.tabSources') || 'Sources', icon: Database },
     { key: 'multiplication', label: t('people.tabMultiplication') || 'Multiplication', icon: Sprout },
     { key: 'reporting', label: t('people.tabReporting') || 'Reporting', icon: BarChart3 },
@@ -269,10 +273,10 @@ const PeopleDetail = () => {
     <div>
       <PageHeader
         breadcrumb={[
-          { label: t('nav.peoples') || 'Peuples', to: '/peoples' },
+          { label: t('nav.peoples') || (isFrench ? 'Peuples' : 'People groups'), to: '/peoples' },
           { label: pg?.name || '…' },
         ]}
-        title={pg?.name || (isLoading ? 'Chargement…' : 'Peuple')}
+        title={pg?.name || (isLoading ? (isFrench ? 'Chargement…' : 'Loading…') : (isFrench ? 'Peuple' : 'People group'))}
         subtitle={[pg?.region, pg?.status].filter(Boolean).join(' · ') || undefined}
       />
 
@@ -282,14 +286,14 @@ const PeopleDetail = () => {
           className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900"
         >
           <ExternalLink size={15} />
-          {t('people.fullEditor') || 'Vue complète / éditer'}
+          {t('people.fullEditor') || (isFrench ? 'Vue complète / éditer' : 'Full view / edit')}
         </Link>
       </div>
 
       {isLoading ? (
         <StateLoading />
       ) : isError ? (
-        <StateError label="Impossible de charger ce peuple." />
+        <StateError label={isFrench ? 'Impossible de charger ce peuple.' : 'Unable to load this people group.'} />
       ) : (
         <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
           <div className="flex border-b border-neutral-200 overflow-x-auto">

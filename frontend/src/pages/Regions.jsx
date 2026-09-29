@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { reportingApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty } from './geography/geoComponents'
+import { useLanguage } from '../i18n'
 
 const Regions = () => {
+  const { isFrench } = useLanguage()
   const { data, isLoading, isError } = useQuery({
     queryKey: ['ng-regions'],
     queryFn: async () => {
@@ -17,16 +19,16 @@ const Regions = () => {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <p className="text-sm text-gray-500">Regions</p>
+        <p className="text-sm font-bold text-gray-500">Regions</p>
         <h1 className="text-4xl font-bold text-slate-900">Regions</h1>
       </div>
 
       {isLoading ? (
-        <StateLoading label="Chargement des régions…" />
+        <StateLoading label={isFrench ? 'Chargement des régions…' : 'Loading regions…'} />
       ) : isError ? (
-        <StateError label="Impossible de charger les régions." />
+        <StateError label={isFrench ? 'Impossible de charger les régions.' : 'Unable to load regions.'} />
       ) : regions.length === 0 ? (
-        <StateEmpty label="Aucune région disponible." />
+        <StateEmpty label={isFrench ? 'Aucune région disponible.' : 'No region available.'} />
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
           {regions.map((region) => (

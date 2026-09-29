@@ -2,10 +2,13 @@
  * PillarListPage — generic, defensive list scaffold for the DMM pillars
  * (persons of peace, discovery groups, DBS sessions, churches).
  * Grouped under the transverse "Piliers DMM" navigation section.
+ * i18n: user-visible chrome (search, states, breadcrumb) is localized via isFrench;
+ * callers may pass title/subtitle/column labels as a string or an (isFrench)=>string function.
  */
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Search } from 'lucide-react'
+import { useLanguage } from '../../i18n'
 import {
   PageHeader,
   StateLoading,
@@ -20,13 +23,13 @@ const extractArray = (res) => {
 }
 
 /**
- * @param {string} title
- * @param {string} subtitle
+ * @param {string|((isFrench:boolean)=>string)} title
+ * @param {string|((isFrench:boolean)=>string)} subtitle
  * @param {string} queryKey
  * @param {Function} fetcher - returns an axios promise
- * @param {Array<{key:string,label:string,render?:Function}>} columns
+ * @param {Array<{key:string,label:string|((isFrench:boolean)=>string),render?:Function}>} columns - render receives (row, isFrench)
  * @param {Function} [searchText] - (row) => string used for filtering
- * @param {ReactNode} [icon]
+ * @param {string} [emptyLabel] - optional override for the empty-state label (falls back to i18n)
  */
 const PillarListPage = ({
   title,
@@ -35,7 +38,9 @@ const PillarListPage = ({
   fetcher,
   columns,
   searchText,
+  emptyLabel,
 }) => {
+  const { isFrench } = useLanguage()
   const [search, setSearch] = useState('')
 
   const { data, isLoading, isError } = useQuery({
@@ -48,17 +53,16 @@ const PillarListPage = ({
     const q = search.trim().toLowerCase()
     if (!q) return rows
     const toText =
-      searchText ||
-      ((r) => `${r.name || r.title || ''} ${r.status || ''}`)
+      searchText || ((r) => `${r.name || r.title || ''} ${r.status || ''}`)
     return rows.filter((r) => String(toText(r)).toLowerCase().includes(q))
   }, [rows, search, searchText])
 
   return (
     <div>
       <PageHeader
-        breadcrumb={[{ label: 'Piliers DMM' }, { label: title }]}
-        title={title}
-        subtitle={subtitle}
+        breadcrumb={[{ label: isFrench ? 'Piliers DMM' : 'DMM Pillars' }, { label: typeof title === 'function' ? title(isFrench) : title }]}
+        title={typeof title === 'function' ? title(isFrench) : title}
+        subtitle={typeof subtitle === 'function' ? subtitle(isFrench) : subtitle}
         stats={[{ label: 'Total', value: rows.length }]}
       />
 
@@ -68,17 +72,17 @@ const PillarListPage = ({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher…"
+          placeholder={isFrench ? 'Rechercher…' : 'Search…'}
           className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-300"
         />
       </div>
 
       {isLoading ? (
-        <StateLoading />
+        <StateLoading label={isFrench ? 'Chargement…' : 'Loading…'} />
       ) : isError ? (
-        <StateError />
+        <StateError label={isFrench ? 'Erreur' : 'Error'} />
       ) : filtered.length === 0 ? (
-        <StateEmpty label="Aucun enregistrement." />
+        <StateEmpty label={emptyLabel || (isFrench ? 'Aucun enregistrement.' : 'No records.')} />
       ) : (
         <div className="bg-white rounded-xl border border-neutral-200 overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -86,7 +90,7 @@ const PillarListPage = ({
               <tr className="text-left text-neutral-400 border-b border-neutral-200 bg-neutral-50">
                 {columns.map((c) => (
                   <th key={c.key} className="py-2.5 px-4 font-medium whitespace-nowrap">
-                    {c.label}
+                    {typeof c.label === 'function' ? c.label(isFrench) : c.label}
                   </th>
                 ))}
               </tr>
@@ -96,7 +100,7 @@ const PillarListPage = ({
                 <tr key={row._id || i} className="border-b border-neutral-100 hover:bg-neutral-50">
                   {columns.map((c) => (
                     <td key={c.key} className="py-2.5 px-4 text-neutral-700">
-                      {c.render ? c.render(row) : row[c.key] ?? '—'}
+                      {c.render ? c.render(row, isFrench) : row[c.key] ?? '—'}
                     </td>
                   ))}
                 </tr>

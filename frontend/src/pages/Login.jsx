@@ -26,7 +26,7 @@ const Login = () => {
     const result = await login(data.email, data.password)
     setIsLoading(false)
     if (result.success) {
-      navigate('/dashboard')
+      navigate('/regions')
     }
   }
 

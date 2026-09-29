@@ -28,7 +28,7 @@ const statusBadge = (status) => {
 }
 
 const PeoplesList = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const [search, setSearch] = useState('')
 
   const { data, isLoading, isError } = useQuery({
@@ -73,19 +73,19 @@ const PeoplesList = () => {
       </div>
 
       {isLoading ? (
-        <StateLoading label="Chargement des peuples…" />
+        <StateLoading label={isFrench ? 'Chargement des peuples…' : 'Loading people groups…'} />
       ) : isError ? (
         <StateError />
       ) : filtered.length === 0 ? (
-        <StateEmpty label="Aucun peuple trouvé." />
+        <StateEmpty label={isFrench ? 'Aucun peuple trouvé.' : 'No people group found.'} />
       ) : (
         <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
           <table className="min-w-full text-sm">
             <thead>
               <tr className="text-left text-neutral-400 border-b border-neutral-200 bg-neutral-50">
-                <th className="py-2.5 px-4 font-medium">Peuple</th>
-                <th className="py-2.5 px-4 font-medium">Région</th>
-                <th className="py-2.5 px-4 font-medium">Statut</th>
+                <th className="py-2.5 px-4 font-medium">{isFrench ? 'Peuple' : 'People group'}</th>
+                <th className="py-2.5 px-4 font-medium">{isFrench ? 'Région' : 'Region'}</th>
+                <th className="py-2.5 px-4 font-medium">{isFrench ? 'Statut' : 'Status'}</th>
                 <th className="py-2.5 px-4 font-medium">Population</th>
                 <th className="py-2.5 px-4 font-medium"></th>
               </tr>

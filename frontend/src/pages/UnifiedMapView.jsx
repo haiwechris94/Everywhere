@@ -1608,11 +1608,6 @@ export default function UnifiedMapView() {
             <ChevronLeft size={18} />
           </button>
         </div>
-        <p className={`mb-3 text-xs ${subtleText(theme)}`}>
-          Un peuple = un marqueur. Désactiver une source masque ses attributs sans supprimer le
-          marqueur tant qu'une autre source existe.
-        </p>
-
         <div className="mb-3">
           <p className="mb-1 text-xs font-semibold text-gray-600">Sources</p>
           {ALL_SOURCES.map((s) => (

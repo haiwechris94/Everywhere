@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast'
 import { projectsApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../i18n'
 
 const STATUS_STYLES = {
   Active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -40,6 +41,7 @@ const emptyForm = {
 }
 
 const Projects = () => {
+  const { isFrench } = useLanguage()
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const canManage = user?.role === 'admin' || user?.role === 'supervisor'
@@ -77,11 +79,11 @@ const Projects = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       queryClient.invalidateQueries({ queryKey: ['projects-stats'] })
-      toast.success('Projet créé')
+      toast.success(isFrench ? 'Projet créé' : 'Project created')
       setShowModal(false)
       setForm(emptyForm)
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Erreur lors de la création'),
+    onError: (err) => toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la création' : 'Error while creating')),
   })
 
   const updateMutation = useMutation({
@@ -89,12 +91,12 @@ const Projects = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       queryClient.invalidateQueries({ queryKey: ['projects-stats'] })
-      toast.success('Projet mis à jour')
+      toast.success(isFrench ? 'Projet mis à jour' : 'Project updated')
       setShowModal(false)
       setForm(emptyForm)
       setEditingId(null)
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Erreur lors de la mise à jour'),
+    onError: (err) => toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la mise à jour' : 'Error while updating')),
   })
 
   const deleteMutation = useMutation({
@@ -102,9 +104,9 @@ const Projects = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       queryClient.invalidateQueries({ queryKey: ['projects-stats'] })
-      toast.success('Projet supprimé')
+      toast.success(isFrench ? 'Projet supprimé' : 'Project deleted')
     },
-    onError: (err) => toast.error(err.response?.data?.message || 'Erreur lors de la suppression'),
+    onError: (err) => toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la suppression' : 'Error while deleting')),
   })
 
   const openCreate = () => {
@@ -137,7 +139,7 @@ const Projects = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!form.name.trim()) {
-      toast.error('Le nom du projet est requis')
+      toast.error(isFrench ? 'Le nom du projet est requis' : 'Project name is required')
       return
     }
     const payload = {
@@ -153,16 +155,16 @@ const Projects = () => {
   }
 
   const handleDelete = (id, name) => {
-    if (window.confirm(`Supprimer le projet "${name}" ?`)) {
+    if (window.confirm(isFrench ? `Supprimer le projet "${name}" ?` : `Delete the project "${name}"?`)) {
       deleteMutation.mutate(id)
     }
   }
 
   const headerStats = [
-    { label: 'Projects', value: stats.projects, icon: FolderKanban },
-    { label: 'Countries', value: stats.countries, icon: Globe2 },
-    { label: 'Teams', value: stats.teams, icon: Users2 },
-    { label: 'Churches', value: stats.churches, icon: FileText },
+    { label: isFrench ? 'Projets' : 'Projects', value: stats.projects, icon: FolderKanban },
+    { label: isFrench ? 'Pays' : 'Countries', value: stats.countries, icon: Globe2 },
+    { label: isFrench ? 'Équipes' : 'Teams', value: stats.teams, icon: Users2 },
+    { label: isFrench ? 'Églises' : 'Churches', value: stats.churches, icon: FileText },
   ]
 
   return (
@@ -172,12 +174,12 @@ const Projects = () => {
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
               <FolderKanban size={14} />
-              Projects
+              {isFrench ? 'Projets' : 'Projects'}
             </div>
             <div className="space-y-3">
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Projects dashboard</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{isFrench ? 'Tableau de bord des projets' : 'Projects dashboard'}</h1>
               <p className="text-sm sm:text-base text-slate-200 max-w-xl">
-                Track church planting initiatives, ownership, progress, and regional coverage from one central view.
+                {isFrench ? 'Suivez les initiatives d\'implantation d\'églises, la responsabilité, la progression et la couverture régionale depuis une vue centrale.' : 'Track church planting initiatives, ownership, progress, and regional coverage from one central view.'}
               </p>
             </div>
           </div>
@@ -202,8 +204,8 @@ const Projects = () => {
       <section className="rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
           <div>
-            <h2 className="text-lg font-semibold text-neutral-900">Projects list</h2>
-            <p className="text-sm text-neutral-500">Current initiatives and their execution status.</p>
+            <h2 className="text-lg font-semibold text-neutral-900">{isFrench ? 'Liste des projets' : 'Projects list'}</h2>
+            <p className="text-sm text-neutral-500">{isFrench ? 'Initiatives actuelles et leur statut d\'exécution.' : 'Current initiatives and their execution status.'}</p>
           </div>
           {canManage && (
             <button
@@ -211,7 +213,7 @@ const Projects = () => {
               className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors"
             >
               <Plus size={16} />
-              New project
+              {isFrench ? 'Nouveau projet' : 'New project'}
             </button>
           )}
         </div>
@@ -224,7 +226,7 @@ const Projects = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Rechercher un projet par nom..."
+              placeholder={isFrench ? 'Rechercher un projet par nom...' : 'Search a project by name...'}
               className="w-full rounded-lg border border-neutral-300 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
             />
           </div>
@@ -233,7 +235,7 @@ const Projects = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 sm:w-48"
           >
-            <option value="all">Tous les statuts</option>
+            <option value="all">{isFrench ? 'Tous les statuts' : 'All statuses'}</option>
             {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
@@ -245,9 +247,9 @@ const Projects = () => {
         ) : projects.length === 0 ? (
           <div className="px-6 py-16 text-center">
             <FolderKanban className="mx-auto text-neutral-300" size={48} />
-            <h3 className="mt-4 text-base font-semibold text-neutral-900">Aucun projet pour le moment</h3>
+            <h3 className="mt-4 text-base font-semibold text-neutral-900">{isFrench ? 'Aucun projet pour le moment' : 'No projects yet'}</h3>
             <p className="mt-1 text-sm text-neutral-500">
-              Commencez par créer votre premier projet réel.
+              {isFrench ? 'Commencez par créer votre premier projet réel.' : 'Start by creating your first real project.'}
             </p>
             {canManage && (
               <button
@@ -255,7 +257,7 @@ const Projects = () => {
                 className="mt-5 inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-colors"
               >
                 <Plus size={16} />
-                Créer un projet
+                {isFrench ? 'Créer un projet' : 'Create a project'}
               </button>
             )}
           </div>
@@ -275,14 +277,14 @@ const Projects = () => {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-500">
                       {project.owner && <span className="inline-flex items-center gap-1.5"><Building2 size={14} /> {project.owner}</span>}
                       {(project.country || project.region) && <span className="inline-flex items-center gap-1.5"><Globe2 size={14} /> {project.country || project.region}</span>}
-                      <span className="inline-flex items-center gap-1.5"><CalendarDays size={14} /> {project.churches || 0} churches</span>
+                      <span className="inline-flex items-center gap-1.5"><CalendarDays size={14} /> {project.churches || 0} {isFrench ? 'églises' : 'churches'}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div className="w-full sm:w-48">
                       <div className="mb-2 flex items-center justify-between text-xs font-medium text-neutral-500">
-                        <span>Progress</span>
+                        <span>{isFrench ? 'Progression' : 'Progress'}</span>
                         <span>{project.progress || 0}%</span>
                       </div>
                       <div className="h-2 rounded-full bg-neutral-100 overflow-hidden">
@@ -293,7 +295,7 @@ const Projects = () => {
                       <button
                         onClick={() => openEdit(project)}
                         className="p-2 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
-                        title="Modifier"
+                        title={isFrench ? 'Modifier' : 'Edit'}
                       >
                         <Pencil size={16} />
                       </button>
@@ -302,7 +304,7 @@ const Projects = () => {
                       <button
                         onClick={() => handleDelete(project._id, project.name)}
                         className="p-2 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        title="Supprimer"
+                        title={isFrench ? 'Supprimer' : 'Delete'}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -319,26 +321,26 @@ const Projects = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-              <h3 className="text-lg font-semibold text-neutral-900">{editingId ? 'Modifier le projet' : 'Nouveau projet'}</h3>
+              <h3 className="text-lg font-semibold text-neutral-900">{editingId ? (isFrench ? 'Modifier le projet' : 'Edit project') : (isFrench ? 'Nouveau projet' : 'New project')}</h3>
               <button onClick={closeModal} className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-500">
                 <X size={18} />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">Nom du projet *</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Nom du projet *' : 'Project name *'}</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                  placeholder="Ex: Nigeria Church Planting Initiative"
+                  placeholder={isFrench ? 'Ex: Nigeria Church Planting Initiative' : 'e.g. Nigeria Church Planting Initiative'}
                   autoFocus
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Statut</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Statut' : 'Status'}</label>
                   <select
                     value={form.status}
                     onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -348,17 +350,17 @@ const Projects = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Responsable</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Responsable' : 'Owner'}</label>
                   <input
                     type="text"
                     value={form.owner}
                     onChange={(e) => setForm({ ...form, owner: e.target.value })}
                     className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
-                    placeholder="Ex: Regional Team"
+                    placeholder={isFrench ? 'Ex: Regional Team' : 'e.g. Regional Team'}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Pays</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Pays' : 'Country'}</label>
                   <input
                     type="text"
                     value={form.country}
@@ -367,7 +369,7 @@ const Projects = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Région</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Région' : 'Region'}</label>
                   <input
                     type="text"
                     value={form.region}
@@ -376,7 +378,7 @@ const Projects = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Progression (%)</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Progression (%)' : 'Progress (%)'}</label>
                   <input
                     type="number"
                     min="0"
@@ -387,7 +389,7 @@ const Projects = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Nombre d'églises</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? "Nombre d'églises" : 'Number of churches'}</label>
                   <input
                     type="number"
                     min="0"
@@ -398,7 +400,7 @@ const Projects = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">{isFrench ? 'Description' : 'Description'}</label>
                 <textarea
                   rows={3}
                   value={form.description}
@@ -412,7 +414,7 @@ const Projects = () => {
                   onClick={closeModal}
                   className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                 >
-                  Annuler
+                  {isFrench ? 'Annuler' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
@@ -420,7 +422,7 @@ const Projects = () => {
                   className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-60"
                 >
                   {(createMutation.isPending || updateMutation.isPending) && <Loader2 size={15} className="animate-spin" />}
-                  {editingId ? 'Enregistrer' : 'Créer'}
+                  {editingId ? (isFrench ? 'Enregistrer' : 'Save') : (isFrench ? 'Créer' : 'Create')}
                 </button>
               </div>
             </form>
