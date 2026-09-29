@@ -25,6 +25,8 @@ const MasterStatusSummarySchema = new Schema(
     },
     jpScale: { type: Number, default: null },     // Joshua Project Progress Scale 1–5
     leastReached: { type: Boolean, default: null },
+    percentEvangelical: { type: Number, default: null }, // JP PercentEvangelical (denormalized)
+    bibleStatus: { type: String, default: null },        // JP BibleStatus code (0–5, denormalized)
   },
   { _id: false }
 );
@@ -64,6 +66,7 @@ const ReferenceDataSchema = new Schema(
     reachedStatus: { type: String, default: null },   // UNREACHED|FRONTIER|... (JP reached-status)
     percentChristian: { type: Number, default: null },
     percentEvangelical: { type: Number, default: null },
+    bibleStatus: { type: String, default: null },      // JP BibleStatus code (0–5)
     latitude: { type: Number, default: null },
     longitude: { type: Number, default: null },
     updatedAt: { type: Date, default: null },

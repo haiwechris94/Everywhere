@@ -127,7 +127,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {} }) => {
   }
 
   const linkBase =
-    'flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150'
+    'flex items-center gap-3 rounded-lg text-[15px] font-medium transition-all duration-150 font-[Arial] lowercase'
 
   const renderSimpleLink = (item, { isAdmin } = {}) => {
     const Icon = item.icon
@@ -228,9 +228,9 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {} }) => {
         }`}
       >
         {!collapsed && (
-          <span className="text-sm font-bold text-neutral-800 uppercase tracking-widest">
+        <span className="text-sm font-bold text-neutral-800 uppercase tracking-widest font-[Arial]">
             Navigation
-          </span>
+        </span>
         )}
         <button
           type="button"

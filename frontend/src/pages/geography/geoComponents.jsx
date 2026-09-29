@@ -76,9 +76,9 @@ export const StatCard = ({ label, value, accent = 'neutral' }) => {
   // are always black regardless of the accent colour.
   return (
     <div
-      className={`bg-white rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3 py-2 w-36`}
+      className={`bg-white rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3.5 py-2.5 w-[9.75rem]`}
     >
-      <p className={`text-[10.5px] font-bold leading-tight ${labelColor[accent] || labelColor.neutral}`}>
+      <p className={`text-[15px] font-normal leading-tight font-[Arial] ${labelColor[accent] || labelColor.neutral}`}>
         {label}
       </p>
       <p className="text-xl font-bold mt-0.5 text-neutral-900">

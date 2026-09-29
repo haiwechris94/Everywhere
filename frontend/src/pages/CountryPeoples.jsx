@@ -74,8 +74,6 @@ const CountryPeoples = () => {
       </p>
       <div>
         <h1 className="text-4xl font-bold text-slate-900">{country.name || country.nameEn}</h1>
-        <p className="text-slate-500 mt-1">{country.capital ? (isFrench ? `Capitale : ${country.capital}` : `Capital: ${country.capital}`) : ''} · {country.code}</p>
-        <p className="text-xs text-slate-500 mt-2">{isFrench ? `Vérification DMM: ${reportingCount} engagement(s) chargé(s) depuis le reporting.` : `DMM check: ${reportingCount} engagement(s) loaded from reporting.`}</p>
       </div>
 
       {/* Cartes de métriques : une seule grille fluide. Les groupes bleu (ligne 1)

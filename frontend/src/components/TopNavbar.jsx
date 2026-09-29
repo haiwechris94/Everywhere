@@ -182,7 +182,7 @@ const TopNavbar = () => {
                 onClick={() => setMobileOpen(false)}
                 title={collapsed ? item.label : undefined}
                 className={
-                  `flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150 ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
+                  `flex items-center gap-3 rounded-lg text-[15px] font-medium transition-all duration-150 font-[Arial] ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
                     active
                       ? 'bg-neutral-900 text-white'
                       : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
@@ -190,7 +190,7 @@ const TopNavbar = () => {
                 }
               >
                 {Icon && <Icon size={18} className="flex-shrink-0" />}
-                <span className={`whitespace-nowrap font-bold ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
+                <span className={`whitespace-nowrap font-normal font-[Arial] ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
               </NavLink>
             )
           })}
