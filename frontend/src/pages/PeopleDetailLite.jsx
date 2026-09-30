@@ -5,6 +5,7 @@ import { reportingApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import { jpStageFor, evangelicalRangeFor, bibleStatusLabel } from '../utils/joshuaProjectScales'
+import { DmmStatusDot } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
 
 // Libellés lisibles pour les codes de source de population.
@@ -415,6 +416,9 @@ const PeopleDetailLite = () => {
       : (Array.isArray(dmm?.engagements) ? dmm.engagements : [])
   ).map((v) => ({
     id: v.id || v.peopleGroupId || `${v.villageName}-${v.numberOfChurches}`,
+    // Vrai identifiant de l'engagement (document « village ») pour le lien vers
+    // la fiche Engagement. Peut être absent pour un engagement non persisté.
+    engagementId: v._id || v.id || v.peopleGroupId || null,
     villageName: v.villageName || null,
     engagementStatus: v.engagementStatus || null,
     numberOfChurches: v.numberOfChurches ?? 0,
@@ -631,15 +635,30 @@ const PeopleDetailLite = () => {
               <div key={v.id} className="rounded-xl border border-slate-200 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-slate-900">{peopleVillageLabel(name, v.villageName)}</p>
+                    {/* Nom de l'engagement cliquable → fiche Engagement (funnel
+                        Regions ▸ Pays ▸ Peuple ▸ Engagement). */}
+                    {v.engagementId ? (
+                      <Link
+                        to={`/regions/${regionId}/countries/${countryCode}/peoples/${peopleId}/engagements/${v.engagementId}`}
+                        className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                      >
+                        {peopleVillageLabel(name, v.villageName)}
+                      </Link>
+                    ) : (
+                      <p className="font-semibold text-slate-900">{peopleVillageLabel(name, v.villageName)}</p>
+                    )}
                     <p className="text-sm text-slate-500 mt-1">
                       {[v.region, v.admin2, v.admin3].filter(Boolean).join(' · ') || '—'}
                     </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      {isFrench
-                        ? `${v.numberOfChurches ?? 0} église(s) · gén ${v.churchGeneration ?? 0} · ${v.engagementStatus || 'n/a'}`
-                        : `${v.numberOfChurches ?? 0} church(es) · gen ${v.churchGeneration ?? 0} · ${v.engagementStatus || 'n/a'}`}
-                    </p>
+                    <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
+                      <span>
+                        {isFrench
+                          ? `${v.numberOfChurches ?? 0} église(s) · gén ${v.churchGeneration ?? 0}`
+                          : `${v.numberOfChurches ?? 0} church(es) · gen ${v.churchGeneration ?? 0}`}
+                      </span>
+                      {/* Statut DMM coloré selon le tableau (nombre d'églises). */}
+                      <DmmStatusDot engagement={v} />
+                    </div>
                   </div>
                   {v.id && (
                     <div className="flex shrink-0 gap-2">

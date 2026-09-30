@@ -55,6 +55,7 @@ const Regions = lazy(() => import('./pages/Regions'))
 const RegionCountries = lazy(() => import('./pages/RegionCountries'))
 const CountryPeoples = lazy(() => import('./pages/CountryPeoples'))
 const PeopleDetailLite = lazy(() => import('./pages/PeopleDetailLite'))
+const EngagementDetail = lazy(() => import('./pages/EngagementDetail'))
 const PlanterEngagements = lazy(() => import('./pages/PlanterEngagements'))
 const Activities = lazy(() => import('./pages/Activities'))
 
@@ -271,6 +272,20 @@ function App() {
             <Suspense fallback={<CompactLoader />}>
               <PeopleDetailLite />
             </Suspense>
+          } />
+          <Route path="regions/:regionId/countries/:countryCode/peoples/:peopleId/engagements/:engagementId" element={
+            <ErrorBoundary fallbackMessage="Error loading engagement details.">
+              <Suspense fallback={<CompactLoader />}>
+                <EngagementDetail />
+              </Suspense>
+            </ErrorBoundary>
+          } />
+          <Route path="engagements/:engagementId" element={
+            <ErrorBoundary fallbackMessage="Error loading engagement details.">
+              <Suspense fallback={<CompactLoader />}>
+                <EngagementDetail />
+              </Suspense>
+            </ErrorBoundary>
           } />
           <Route path="data-management" element={
             <Suspense fallback={<CompactLoader />}>

@@ -1,0 +1,150 @@
+/**
+ * DMM engagement status — règles & couleurs.
+ *
+ * Source des règles : « TABLEAU DMM.docx ». L'étape (statut) d'un engagement est
+ * déterminée par son NOMBRE D'ÉGLISES :
+ *   - Mouvement           : 100 églises ou plus
+ *   - Point de Basculement : 67 à 99 églises
+ *   - Mi-parcours          : 34 à 66 églises
+ *   - Pionnier             : 1 à 33 églises
+ * (Le tableau croise aussi le nombre de générations pour affiner les NIVEAUX
+ *  I–IV, mais l'ÉTAPE colorée dépend du nombre d'églises.)
+ *
+ * Couleurs imposées (indépendantes des couleurs du tableau) :
+ *   - Mouvement            = Vert foncé
+ *   - Point de Basculement = Vert clair
+ *   - Mi-parcours          = Jaune
+ *   - Pionnier             = Orange
+ */
+
+// Clés canoniques des étapes DMM.
+export const DMM_STAGE = {
+  MOVEMENT: 'movement',
+  TIPPING_POINT: 'tippingpoint',
+  MIDWAY: 'midway',
+  PIONEER: 'pioneer',
+}
+
+// Libellés d'affichage (français) par étape.
+export const DMM_STAGE_LABEL_FR = {
+  [DMM_STAGE.MOVEMENT]: 'Mouvement',
+  [DMM_STAGE.TIPPING_POINT]: 'Point de Basculement',
+  [DMM_STAGE.MIDWAY]: 'Mi-parcours',
+  [DMM_STAGE.PIONEER]: 'Pionnier',
+}
+
+export const DMM_STAGE_LABEL_EN = {
+  [DMM_STAGE.MOVEMENT]: 'Movement',
+  [DMM_STAGE.TIPPING_POINT]: 'Tipping Point',
+  [DMM_STAGE.MIDWAY]: 'Midway',
+  [DMM_STAGE.PIONEER]: 'Pioneer',
+}
+
+/**
+ * Palette imposée par étape. On expose à la fois :
+ *  - hex        : couleur brute (points colorés, SVG…)
+ *  - dot        : classe Tailwind pour un point coloré
+ *  - text       : classe Tailwind pour le texte coloré
+ *  - badge      : classes Tailwind fond+texte pour une pastille
+ */
+export const DMM_STAGE_COLORS = {
+  // Vert foncé
+  [DMM_STAGE.MOVEMENT]: {
+    hex: '#166534',
+    dot: 'bg-green-700',
+    text: 'text-green-800',
+    badge: 'bg-green-700 text-white',
+  },
+  // Vert clair
+  [DMM_STAGE.TIPPING_POINT]: {
+    hex: '#86efac',
+    dot: 'bg-green-300',
+    text: 'text-green-600',
+    badge: 'bg-green-100 text-green-700',
+  },
+  // Jaune
+  [DMM_STAGE.MIDWAY]: {
+    hex: '#facc15',
+    dot: 'bg-yellow-400',
+    text: 'text-yellow-600',
+    badge: 'bg-yellow-100 text-yellow-700',
+  },
+  // Orange
+  [DMM_STAGE.PIONEER]: {
+    hex: '#f97316',
+    dot: 'bg-orange-500',
+    text: 'text-orange-600',
+    badge: 'bg-orange-100 text-orange-700',
+  },
+}
+
+const NEUTRAL_COLORS = {
+  hex: '#94a3b8',
+  dot: 'bg-slate-400',
+  text: 'text-slate-600',
+  badge: 'bg-slate-100 text-slate-600',
+}
+
+/**
+ * Étape DMM d'un engagement d'après le NOMBRE D'ÉGLISES (règle du tableau DMM).
+ * @param {number} numberOfChurches
+ * @returns {string|null} une clé DMM_STAGE, ou null si 0 / invalide.
+ */
+export function dmmStageFromChurches(numberOfChurches) {
+  const n = Number(numberOfChurches)
+  if (!Number.isFinite(n) || n < 1) return null
+  if (n >= 100) return DMM_STAGE.MOVEMENT
+  if (n >= 67) return DMM_STAGE.TIPPING_POINT
+  if (n >= 34) return DMM_STAGE.MIDWAY
+  return DMM_STAGE.PIONEER // 1 à 33
+}
+
+/**
+ * Normalise un statut d'engagement textuel (pioneer / midway / tipping-point /
+ * movement, dans n'importe quelle casse/séparateur) vers une clé DMM_STAGE.
+ */
+export function normalizeDmmStage(status) {
+  const norm = String(status || '').toLowerCase().replace(/[\s_-]+/g, '')
+  if (!norm) return null
+  if (norm === 'movement' || norm === 'dmm' || norm === 'mouvement') return DMM_STAGE.MOVEMENT
+  if (norm === 'tippingpoint' || norm === 'pointdebasculement') return DMM_STAGE.TIPPING_POINT
+  if (norm === 'midway' || norm === 'miparcours') return DMM_STAGE.MIDWAY
+  if (norm === 'pioneer' || norm === 'pionnier') return DMM_STAGE.PIONEER
+  return null
+}
+
+/**
+ * Étape DMM d'un engagement. On applique EN PRIORITÉ la règle du tableau
+ * (nombre d'églises). En repli, on utilise le statut textuel stocké.
+ * @param {{ numberOfChurches?: number, engagementStatus?: string }} engagement
+ */
+export function dmmStageForEngagement(engagement = {}) {
+  return (
+    dmmStageFromChurches(engagement.numberOfChurches) ||
+    normalizeDmmStage(engagement.engagementStatus) ||
+    null
+  )
+}
+
+/** Libellé d'affichage d'une étape DMM (fr/en). */
+export function dmmStageLabel(stage, isFrench = true) {
+  if (!stage) return isFrench ? 'Non engagé' : 'Not engaged'
+  return (isFrench ? DMM_STAGE_LABEL_FR : DMM_STAGE_LABEL_EN)[stage] || stage
+}
+
+/** Couleurs (hex + classes Tailwind) d'une étape DMM. */
+export function dmmStageColors(stage) {
+  return (stage && DMM_STAGE_COLORS[stage]) || NEUTRAL_COLORS
+}
+
+/**
+ * Raccourci pratique : à partir d'un engagement, renvoie { stage, label, colors }.
+ */
+export function dmmEngagementDisplay(engagement = {}, isFrench = true) {
+  const stage = dmmStageForEngagement(engagement)
+  return {
+    stage,
+    label: dmmStageLabel(stage, isFrench),
+    colors: dmmStageColors(stage),
+  }
+}

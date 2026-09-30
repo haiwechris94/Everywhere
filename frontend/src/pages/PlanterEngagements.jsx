@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, MapPin, Church, Loader2 } from 'lucide-react'
 import { masterPeopleApi } from '../services/api'
+import { DmmStatusDot } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
 
 /**
@@ -76,8 +77,9 @@ export default function PlanterEngagements() {
               {engagements.map((e) => (
                 <tr key={e.id} className="hover:bg-gray-50">
                   <td className="px-3 py-2 font-medium">
-                    <Link to={`/people-groups/${e.id}`} className="text-blue-600 hover:underline">
-                      {e.name}
+                    {/* Le nom de l'engagement mène à SA fiche (fiche Engagement). */}
+                    <Link to={`/engagements/${e.id}`} className="text-blue-600 hover:underline">
+                      {e.villageName || e.name}
                     </Link>
                   </td>
                   <td className="px-3 py-2 text-gray-600">
@@ -88,7 +90,7 @@ export default function PlanterEngagements() {
                     ) : '—'}
                   </td>
                   <td className="px-3 py-2 text-gray-600">{e.region || '—'}</td>
-                  <td className="px-3 py-2 text-gray-600">{e.engagementStatus || '—'}</td>
+                  <td className="px-3 py-2"><DmmStatusDot engagement={e} /></td>
                   <td className="px-3 py-2 text-right">
                     <span className="inline-flex items-center gap-1">
                       <Church className="h-3 w-3 text-gray-400" /> {e.numberOfChurches ?? 0}

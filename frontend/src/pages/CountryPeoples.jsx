@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { reportingApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
+import { DmmStatusBadge } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
@@ -103,7 +104,7 @@ const CountryPeoples = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-blue-600">{isFrench ? 'peuple' : 'people group'}</span>
+            <span className="text-base font-semibold text-blue-600">{isFrench ? 'Peuples' : 'People groups'}</span>
             <span className="text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : dmmPeoples.length})
             </span>
@@ -171,7 +172,7 @@ const CountryPeoples = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-blue-600">engagements</span>
+            <span className="text-base font-semibold text-blue-600">Engagements</span>
             <span className="text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : engagements.length})
             </span>
@@ -199,16 +200,22 @@ const CountryPeoples = () => {
                     {engagements.map((e) => (
                       <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                         <td className="py-3 pr-4">
-                          <Link
-                            to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}`}
-                            className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                          >
-                            {e.peopleName || e.name}
-                          </Link>
+                          {/* Le nom d'un engagement mène désormais vers la FICHE
+                              DE L'ENGAGEMENT (et non plus vers celle du peuple). */}
+                          {e.peopleGroupId ? (
+                            <Link
+                              to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}/engagements/${e.peopleGroupId}`}
+                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                            >
+                              {e.villageName || e.peopleName || e.name}
+                            </Link>
+                          ) : (
+                            <span className="font-medium text-slate-700">{e.villageName || e.peopleName || e.name}</span>
+                          )}
                         </td>
                         <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.numberOfChurches ?? 0)}</td>
                         <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.churchGeneration ?? 0)}</td>
-                        <td className="py-3 pl-4 text-left text-slate-700"><StatusBadge status={e.engagementStatus} /></td>
+                        <td className="py-3 pl-4 text-left text-slate-700"><DmmStatusBadge engagement={e} /></td>
                       </tr>
                     ))}
                   </tbody>
