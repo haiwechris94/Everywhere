@@ -393,60 +393,6 @@ const Activities = () => {
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────
-          New Generation — contenu inspiré de goeverywhere.org
-          (Calendrier annuel + Engagements S.E.R.V.E. + liens externes)
-          ───────────────────────────────────────────────────────────── */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Calendrier annuel New Generation */}
-        <section className="rounded-2xl border border-gray-100 bg-white/90 backdrop-blur-lg shadow-lg p-6 lg:col-span-2">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar size={20} className="text-emerald-600" />
-            <h2 className="text-lg font-bold text-gray-800">Calendrier annuel New Generation</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { q: 'Q1', label: 'Vision & Lancement' },
-              { q: 'Q2', label: 'Mobilisation & Formation' },
-              { q: 'Q3', label: 'Expansion & Partenariats' },
-              { q: 'Q4', label: 'Moisson & Bilan' },
-            ].map((item) => (
-              <div key={item.q} className="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <div className="text-xs font-bold uppercase tracking-wider text-emerald-600">{item.q}</div>
-                <div className="mt-1 text-sm font-medium text-gray-700">{item.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Engagements S.E.R.V.E. */}
-        <section className="rounded-2xl border border-gray-100 bg-white/90 backdrop-blur-lg shadow-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Heart size={20} className="text-rose-500" />
-            <h2 className="text-lg font-bold text-gray-800">Nos engagements communs S.E.R.V.E.</h2>
-          </div>
-          <ul className="space-y-2.5">
-            {[
-              { l: 'S', en: 'Spiritual Vitality', fr: 'Vitalité spirituelle' },
-              { l: 'E', en: 'Empowering Leadership', fr: 'Développer le leadership' },
-              { l: 'R', en: 'Relational Unity', fr: 'Unité relationnelle' },
-              { l: 'V', en: 'Visionary Execution', fr: 'Exécution visionnaire' },
-              { l: 'E', en: 'Engagement with the Margins', fr: 'Aller vers les moins atteints' },
-            ].map((item, i) => (
-              <li key={`${item.l}-${i}`} className="flex items-start gap-3">
-                <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-bold">
-                  {item.l}
-                </span>
-                <div className="text-sm">
-                  <div className="font-medium text-gray-800">{item.fr}</div>
-                  <div className="text-xs text-gray-400">{item.en}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-
       {/* Liens externes : site officiel + calendrier détaillé */}
       <div className="flex flex-wrap gap-3">
         <a

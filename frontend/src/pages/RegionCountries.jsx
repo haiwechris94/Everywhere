@@ -73,7 +73,7 @@ const RegionCountries = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-blue-600">
+            <span className="text-base font-semibold text-black uppercase">
               countries
             </span>
             <span className="text-slate-400 text-sm">({countries.length})</span>

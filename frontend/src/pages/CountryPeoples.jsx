@@ -105,7 +105,7 @@ const CountryPeoples = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-blue-600">{isFrench ? 'Peuples' : 'People groups'}</span>
+            <span className="text-base font-semibold text-black uppercase">{isFrench ? 'Peuples' : 'People groups'}</span>
             <span className="text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : dmmPeoples.length})
             </span>
@@ -176,7 +176,7 @@ const CountryPeoples = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-blue-600">Engagements</span>
+            <span className="text-base font-semibold text-black uppercase">Engagements</span>
             <span className="text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : engagements.length})
             </span>
