@@ -5,9 +5,9 @@ import { useQuery } from '@tanstack/react-query'
 import L from 'leaflet'
 import { createPortal } from 'react-dom'
 import {
-  Loader2, Compass, Eye, Search, Moon, Sun, ChevronLeft, ChevronRight,
+  Loader2, Compass, Eye, Search, Moon, Sun, ChevronLeft, ChevronRight, ChevronDown,
   BarChart3, Users, MapPin, Church, X, Minimize2, Map as MapIcon, Download,
-  Target, RotateCcw, Layers, Info,
+  RotateCcw, Layers, Info,
 } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip } from 'recharts'
 import 'leaflet/dist/leaflet.css'
@@ -15,6 +15,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { masterPeopleApi } from '../services/api'
 import { reportingApi } from '../services/reportingApi'
+import { dmmStageForEngagement } from '../utils/dmmEngagement'
 import MasterPeopleLayer from '../components/Map/MasterPeopleLayer'
 import DmmPeopleLayer from '../components/Map/DmmPeopleLayer'
 import { getCountryConfig, SUPPORTED_COUNTRIES } from '../config/supportedCountries'
@@ -215,14 +216,14 @@ const LEVEL_BADGE_COLORS = {
   region:         'bg-amber-100 text-amber-700 border-amber-300',
 }
 
-const CoverageLevelIndicator = ({ level, zoom }) => {
+const CoverageLevelIndicator = ({ level, zoom, visible }) => {
   if (!level) return null
   const cfg = VORONOI_ZOOM_CONFIG[level]
   if (!cfg) return null
   const colors = LEVEL_BADGE_COLORS[level] || 'bg-gray-100 text-gray-700 border-gray-300'
   return createPortal(
     <div
-      className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold shadow-md pointer-events-none select-none ${colors}`}
+      className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold shadow-md pointer-events-none select-none backdrop-blur-sm bg-opacity-75 transition-opacity duration-300 ${colors} ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
       <span>{cfg.label}</span>
       <span className="opacity-60 font-normal">zoom {zoom}</span>
@@ -248,6 +249,8 @@ const CoverageLayer = ({ visible, countryCode, peoples, levelOverride, onPeopleC
 
   // ── state ───────────────────────────────────────────────────────────────
   const [zoom, setZoom]               = React.useState(() => map.getZoom())
+  const [zooming, setZooming]         = React.useState(false)
+  const zoomHideTimer                 = React.useRef(null)
   const [adminData, setAdminData]     = React.useState(null)
   const [villageData, setVillageData] = React.useState(null)
   const [voronoiData, setVoronoiData] = React.useState(null)
@@ -257,9 +260,18 @@ const CoverageLayer = ({ visible, countryCode, peoples, levelOverride, onPeopleC
 
   const layerRef = React.useRef(null)
 
-  // Track zoom changes
+  // Track zoom changes. The level badge is only shown WHILE zooming, then
+  // auto-hides ~900ms after the last zoomend.
   useMapEvents({
-    zoomend() { setZoom(map.getZoom()) },
+    zoomstart() {
+      if (zoomHideTimer.current) { clearTimeout(zoomHideTimer.current); zoomHideTimer.current = null }
+      setZooming(true)
+    },
+    zoomend() {
+      setZoom(map.getZoom())
+      if (zoomHideTimer.current) clearTimeout(zoomHideTimer.current)
+      zoomHideTimer.current = setTimeout(() => { setZooming(false); zoomHideTimer.current = null }, 900)
+    },
   })
 
   const level = levelOverride || getVoronoiLevelForZoom(zoom)
@@ -522,7 +534,7 @@ const CoverageLayer = ({ visible, countryCode, peoples, levelOverride, onPeopleC
         document.body,
       )}
       {!loading && !error && (
-        <CoverageLevelIndicator level={level} zoom={zoom} />
+        <CoverageLevelIndicator level={level} zoom={zoom} visible={zooming} />
       )}
     </>
   )
@@ -543,12 +555,34 @@ const FitToFeature = ({ feature }) => {
   return null
 }
 
+// Trace ORANGE de l'entité administrative sélectionnée (pays / admin 1-2-3).
+// Piloté par `selectedAdminFeature` : le tracé suit donc toujours le filtre.
+// Couche Leaflet impérative (react-leaflet n'importe pas <GeoJSON> ici).
+const SelectionOutline = ({ feature }) => {
+  const map = useMap()
+  React.useEffect(() => {
+    if (!map || !feature?.geometry) return
+    let layer
+    try {
+      layer = L.geoJSON(feature, {
+        interactive: false,
+        style: { color: '#f97316', weight: 2.5, opacity: 0.95, fill: true, fillColor: '#f97316', fillOpacity: 0.06 },
+      })
+      layer.addTo(map)
+    } catch { /* géométrie invalide : on ignore */ }
+    return () => { if (layer) { try { layer.remove() } catch { /* noop */ } } }
+  }, [map, feature])
+  return null
+}
+
 // ── Légende Mode Couverture ───────────────────────────────────────────────────
 const CoverageLegend = ({ visible, theme }) => {
   if (!visible) return null
   return (
-    <div className={`absolute bottom-20 right-4 z-[1001] rounded-xl shadow-lg p-3 ${panelCls(theme)}`}>
-      <p className={`text-[10px] font-bold uppercase tracking-wide mb-2 ${subtleText(theme)}`}>Couverture DMM</p>
+    <details className={`absolute bottom-20 right-4 z-[1001] rounded-xl shadow-lg p-3 ${panelCls(theme)}`} open>
+      <summary className={`cursor-pointer list-none text-[10px] font-bold uppercase tracking-wide mb-2 ${subtleText(theme)}`}>
+        Couverture DMM
+      </summary>
       {Object.entries(STATUS_COLORS_FILL)
         .filter(([k]) => k !== 'unknown')
         .map(([status, cfg]) => (
@@ -561,7 +595,7 @@ const CoverageLegend = ({ visible, theme }) => {
         <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-gray-300" />
         <span className={`text-xs ${subtleText(theme)}`}>Non renseigné</span>
       </div>
-    </div>
+    </details>
   )
 }
 
@@ -573,12 +607,11 @@ const LEVEL_LABELS = {
   village: 'Village',
 }
 
-// ── Map Mode Toggle (Terrain / Stratégique / Couverture) ─────────────────────
+// ── Map Mode Toggle (Terrain / Couverture) ───────────────────────────────────
 const MapModeToggle = ({ mode, onChange, theme }) => (
   <div className={`absolute top-3 left-1/2 -translate-x-1/2 z-[1001] flex rounded-full shadow-md p-0.5 gap-0.5 ${panelCls(theme)}`}>
     {[
       { key: 'terrain',   icon: Compass, label: 'Terrain',     active: 'text-teal-700 bg-teal-50' },
-      { key: 'strategic', icon: Target,  label: 'Stratégique', active: 'text-indigo-700 bg-indigo-50' },
       { key: 'coverage',  icon: Eye,     label: 'Couverture',  active: 'text-emerald-700 bg-emerald-50' },
     ].map(({ key, icon: Icon, label, active }) => (
       <button key={key} onClick={() => onChange(key)}
@@ -621,21 +654,6 @@ const inputCls = (theme) =>
   theme === 'dark'
     ? 'bg-neutral-800 border-neutral-700 text-neutral-100'
     : 'bg-white border-gray-300 text-gray-800'
-
-// ── Theme toggle ─────────────────────────────────────────────────────────────
-const ThemeToggle = ({ theme, onToggle }) => (
-  <button
-    onClick={onToggle}
-    title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'}
-    className={`flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-colors ${
-      theme === 'dark'
-        ? 'bg-neutral-800 text-amber-300 hover:bg-neutral-700'
-        : 'bg-white text-neutral-600 hover:bg-neutral-100'
-    }`}
-  >
-    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-  </button>
-)
 
 // ── Search box (peuples) ─────────────────────────────────────────────────────
 const SearchBox = ({ markers, onPick, onClear, theme }) => {
@@ -705,11 +723,42 @@ const KpiCard = ({ icon: Icon, label, value, color, theme }) => (
 )
 
 const KpiBar = ({ stats, theme }) => (
-  <div className="absolute top-16 right-4 z-[1000] hidden w-40 flex-col gap-1.5 sm:flex">
+  <div className="absolute top-16 right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1.5 sm:flex">
     <KpiCard icon={Users} label="Peuples" value={stats.total.toLocaleString('fr-FR')} color="#6366f1" theme={theme} />
     <KpiCard icon={MapPin} label="Non atteints" value={stats.unreached.toLocaleString('fr-FR')} color="#ef4444" theme={theme} />
     <KpiCard icon={Church} label="Atteints" value={stats.reached.toLocaleString('fr-FR')} color="#15803d" theme={theme} />
     <KpiCard icon={BarChart3} label="Population" value={formatCompact(stats.population)} color="#0ea5e9" theme={theme} />
+  </div>
+)
+
+// ── DMM engagement indicators (counts by stage, filter-aware) ────────────────
+// The four DMM stages with their legend colour. 'movement' has no entry in
+// STATUS_COLORS_FILL, so its colour is defined here.
+const DMM_STAGE_META = [
+  { key: 'pioneer',        label: 'Pionnier',    color: '#f97316' },
+  { key: 'midway',         label: 'Mi-parcours', color: '#eab308' },
+  { key: 'tipping-point',  label: 'Basculement', color: '#22c55e' },
+  { key: 'movement',       label: 'Movement',    color: '#2563eb' },
+]
+
+// Panel listing the number of engagements per DMM stage, with a coloured dot.
+// `counts` is keyed by the four stage keys above and is computed from the
+// already-filtered engagement list, so it obeys the active filters.
+const DmmIndicatorsPanel = ({ counts, theme, style }) => (
+  <div
+    style={style}
+    className={`absolute right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1 rounded-lg px-2.5 py-2 shadow-sm sm:flex ${panelCls(theme)}`}
+  >
+    <div className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>
+      Engagements DMM
+    </div>
+    {DMM_STAGE_META.map(({ key, label, color }) => (
+      <div key={key} className="flex items-center gap-1.5 leading-tight">
+        <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
+        <span className="min-w-0 flex-1 truncate text-[10px]">{label}</span>
+        <span className="text-xs font-bold">{(counts[key] || 0).toLocaleString('fr-FR')}</span>
+      </div>
+    ))}
   </div>
 )
 
@@ -933,7 +982,7 @@ const TopCountries = ({ data, theme }) => {
 
 export default function UnifiedMapView() {
   const navigate = useNavigate()
-  const [activeSources, setActiveSources] = useState(() => new Set(ALL_SOURCES))
+  const [activeSources, setActiveSources] = useState(() => new Set(['DMM']))
   const [statusFilter, setStatusFilter] = useState('')
   // Filtre par statut d'engagement DMM ('' = tous) et sélection fine des
   // engagements DMM à afficher (Set des ids MASQUÉS ; vide = tout affiché).
@@ -942,7 +991,8 @@ export default function UnifiedMapView() {
   const [selected, setSelected] = useState(null)
   // Peuple ciblé via la recherche : la carte n'affiche QUE ses localisations.
   const [focusedPeople, setFocusedPeople] = useState(null) // marker object or null
-  const [mapMode, setMapMode] = useState('terrain') // 'terrain' | 'coverage'
+  const [mapMode, setMapMode] = useState('coverage') // 'terrain' | 'coverage'
+
   // Thème clair/sombre (persisté).
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem('unifiedMap.theme') || 'light' } catch { return 'light' }
@@ -951,13 +1001,14 @@ export default function UnifiedMapView() {
     try { localStorage.setItem('unifiedMap.theme', theme) } catch { /* noop */ }
   }, [theme])
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [miniMapOpen, setMiniMapOpen] = useState(true)
+  const [legendOpen, setLegendOpen] = useState(true)
   const [mapInstance, setMapInstance] = useState(null)
   const [levelOverride, setLevelOverride] = useState(null) // null = auto (zoom)
+  const [zooming, setZooming] = useState(false)
   // Sélection de niveaux administratifs en cascade : { 1: 'Région', 2: 'Dépt', ... }.
   const [adminSel, setAdminSel] = useState({})
-  const [showInfoBubble, setShowInfoBubble] = useState(true)
   const [showKpis, setShowKpis] = useState(true)
+  const [showDmmIndicators, setShowDmmIndicators] = useState(true)
   const [detailTab, setDetailTab] = useState('apercu')
   // Pays sélectionné, PARTAGÉ entre le mode terrain et le mode couverture.
   // '' = tous les pays (terrain) ; sinon un code ISO alpha-3.
@@ -1187,6 +1238,20 @@ export default function UnifiedMapView() {
       byStatus[s] = (byStatus[s] || 0) + 1
     }
     return { total: dmmVisible.length, churches, byStatus }
+  }, [dmmVisible])
+
+  // Counts per DMM stage (pioneer / midway / tipping-point / movement) computed
+  // over the ALREADY-FILTERED engagement list, so the indicators obey the
+  // country / admin / status filters. dmmStageForEngagement canonicalizes the
+  // stored stage ('tippingpoint' → mapped to 'tipping-point' bucket below).
+  const dmmStageCounts = useMemo(() => {
+    const counts = { pioneer: 0, midway: 0, 'tipping-point': 0, movement: 0 }
+    for (const p of dmmVisible) {
+      const raw = dmmStageForEngagement(p) // 'pioneer' | 'midway' | 'tippingpoint' | 'movement'
+      const key = raw === 'tippingpoint' ? 'tipping-point' : raw
+      if (key && counts[key] !== undefined) counts[key] += 1
+    }
+    return counts
   }, [dmmVisible])
 
   const toggleDmm = useCallback((id) => {
@@ -1474,13 +1539,10 @@ export default function UnifiedMapView() {
       )].slice(0, 15)
     : []
 
-  // Stratégique : on met l'accent sur les peuples non atteints / à atteindre.
   const displayMarkers = useMemo(() => {
     if (focusedPeople) return focusedMarkers
-    return mapMode === 'strategic'
-      ? markers.filter((m) => ['UNREACHED', 'FRONTIER', 'MINIMALLY_REACHED'].includes(m.status))
-      : markers
-  }, [focusedPeople, focusedMarkers, mapMode, markers])
+    return markers
+  }, [focusedPeople, focusedMarkers, markers])
 
   const resetFilters = () => {
     setActiveSources(new Set(ALL_SOURCES))
@@ -1491,6 +1553,21 @@ export default function UnifiedMapView() {
     setHiddenDmmIds(new Set())
     setFocusedPeople(null)
   }
+
+  useEffect(() => {
+    if (!mapInstance) return
+    mapInstance.setView([5.9631, 12.3486], 5, { animate: false })
+    const onZoomStart = () => setZooming(true)
+    const onZoomEnd = () => setZooming(false)
+    mapInstance.on('zoomstart', onZoomStart)
+    mapInstance.on('zoomend', onZoomEnd)
+    return () => {
+      mapInstance.off('zoomstart', onZoomStart)
+      mapInstance.off('zoomend', onZoomEnd)
+    }
+  }, [mapInstance])
+
+  const [coverageLegendOpen, setCoverageLegendOpen] = useState(true)
 
   return (
     <div className="relative w-full" style={{ height: 'calc(100vh - 56px)' }}>
@@ -1512,32 +1589,33 @@ export default function UnifiedMapView() {
         >
           <BarChart3 size={16} />
         </button>
-        <ThemeToggle theme={theme} onToggle={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
+        <button
+          onClick={() => setShowDmmIndicators((v) => !v)}
+          title={showDmmIndicators ? 'Masquer les indicateurs DMM' : 'Afficher les indicateurs DMM'}
+          aria-pressed={showDmmIndicators}
+          className={`flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-colors ${
+            showDmmIndicators
+              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+              : theme === 'dark'
+                ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100'
+          }`}
+        >
+          <Layers size={16} />
+        </button>
       </div>
       {/* Cartes KPI — colonne discrète à droite, masquables et cachées quand un peuple est sélectionné */}
       {!isLoading && !error && !selected && showKpis && <KpiBar stats={stats} theme={theme} />}
-      {/* ── Mode toggle (Terrain / Stratégique / Couverture) ───────── */}
+      {/* Indicateurs DMM — sous la colonne KPI quand elle est visible, sinon en haut, pour ne jamais la masquer. */}
+      {!isLoading && !error && !selected && showDmmIndicators && (
+        <DmmIndicatorsPanel counts={dmmStageCounts} theme={theme} style={{ top: showKpis ? '16rem' : '4rem' }} />
+      )}
+      {/* ── Mode toggle (Terrain / Couverture) ───────── */}
       <MapModeToggle mode={mapMode} onChange={setMapMode} theme={theme} />
-
-      {/* Encart niveau (mode couverture) */}
-      {mapMode === 'coverage' && (
-        <div className={`absolute top-14 left-1/2 -translate-x-1/2 z-[1001] rounded-full px-3 py-1 text-[11px] font-medium shadow-md ${panelCls(theme)}`}>
-          Affichage : {LEVEL_LABELS[levelOverride] || 'Auto (zoom)'} — Cliquez une zone pour les détails
-        </div>
-      )}
-
-      {/* Info-bulle terrain / stratégique */}
-      {mapMode !== 'coverage' && showInfoBubble && (
-        <div className={`absolute top-14 left-1/2 -translate-x-1/2 z-[1001] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[11px] shadow-md ${panelCls(theme)}`}>
-          <Info size={13} className="flex-shrink-0 text-indigo-500" />
-          <span>Un seul point = un peuple — Toutes les sources sont regroupées sous une seule identité.</span>
-          <button onClick={() => setShowInfoBubble(false)} className={subtleText(theme)}><X size={12} /></button>
-        </div>
-      )}
 
       {/* Bandeau « peuple ciblé » — visible dans tous les modes quand une recherche cible un peuple */}
       {focusedPeople && (
-        <div className={`absolute ${mapMode === 'coverage' || showInfoBubble ? 'top-24' : 'top-14'} left-1/2 -translate-x-1/2 z-[1002] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md ${panelCls(theme)}`}>
+        <div className={`absolute ${mapMode === 'coverage' ? 'top-24' : 'top-14'} left-1/2 -translate-x-1/2 z-[1002] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md ${panelCls(theme)}`}>
           <MapPin size={13} className="flex-shrink-0 text-indigo-500" />
           <span
             className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
@@ -1568,27 +1646,70 @@ export default function UnifiedMapView() {
         </div>
       )}
 
-      {/* Légende de statut en bas de carte (terrain / stratégique) */}
+      {/* Légende de statut — coin bas-droite (là où était la mini-carte),
+          panneau vertical rétractable vers le bas. */}
       {mapMode !== 'coverage' && (
-        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-full px-4 py-1.5 shadow-md ${panelCls(theme)}`}>
-          {Object.entries(STATUS_LABELS).map(([k, v]) => (
-            <span key={k} className="flex items-center gap-1 text-[11px]">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ background: STATUS_COLORS[k] }} />
-              {v}
-            </span>
-          ))}
-          <span className="flex items-center gap-1 text-[11px] border-l border-black/10 pl-3">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: '#6b7280' }} />
-            master people
-            <span className="ml-1 h-2 w-2 rounded-full" style={{ background: 'transparent', border: '2px solid #6b7280' }} />
-            village
-          </span>
+        <div className={`absolute bottom-4 right-4 z-[1001] w-44 rounded-xl px-3 py-2 shadow-lg ${panelCls(theme)}`}>
+          <button
+            type="button"
+            onClick={() => setLegendOpen((v) => !v)}
+            className="flex w-full items-center justify-between gap-2 text-left"
+            title={legendOpen ? 'Réduire la légende' : 'Afficher la légende'}
+          >
+            <span className={`text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>Légende</span>
+            <ChevronDown size={14} className={`transition-transform ${legendOpen ? '' : '-rotate-90'}`} />
+          </button>
+          {legendOpen && (
+            <div className="mt-2 flex flex-col gap-1">
+              {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                <span key={k} className="flex items-center gap-1.5 text-[11px]">
+                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: STATUS_COLORS[k] }} />
+                  {v}
+                </span>
+              ))}
+              <span className="mt-1 flex items-center gap-1.5 border-t border-black/10 pt-1.5 text-[11px]">
+                <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: '#6b7280' }} />
+                master people
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px]">
+                <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: 'transparent', border: '2px solid #6b7280' }} />
+                village
+              </span>
+            </div>
+          )}
         </div>
       )}
 
 
       {/* Légende Mode Couverture */}
-      <CoverageLegend visible={mapMode === 'coverage'} theme={theme} />
+      {mapMode === 'coverage' && (
+        <div className={`absolute bottom-20 right-4 z-[1001] rounded-xl shadow-lg p-3 ${panelCls(theme)}`}>
+          <button
+            type="button"
+            onClick={() => setCoverageLegendOpen((v) => !v)}
+            className="flex w-full items-center justify-between gap-2 text-left"
+          >
+            <p className={`text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>Couverture DMM</p>
+            <ChevronLeft size={14} className={`transition-transform ${coverageLegendOpen ? '-rotate-90' : 'rotate-90'}`} />
+          </button>
+          {coverageLegendOpen && (
+            <div className="mt-2">
+              {Object.entries(STATUS_COLORS_FILL)
+                .filter(([k]) => k !== 'unknown')
+                .map(([status, cfg]) => (
+                  <div key={status} className="flex items-center gap-2 mb-1.5">
+                    <div className="w-4 h-3 rounded-sm flex-shrink-0" style={{ background: cfg.fill, opacity: 0.85 }} />
+                    <span className="text-xs">{cfg.label}</span>
+                  </div>
+                ))}
+              <div className="flex items-center gap-2 mt-1 pt-1 border-t border-black/10">
+                <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-gray-300" />
+                <span className={`text-xs ${subtleText(theme)}`}>Non renseigné</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Barre latérale rétractable ───────────────────────────────── */}
       {!sidebarOpen && (
@@ -2077,11 +2198,14 @@ export default function UnifiedMapView() {
         </div>
       )}
 
-      {/* Mini-carte de navigation */}
-      <OverviewMiniMap mainMap={mapInstance} theme={theme} collapsed={!miniMapOpen} onToggle={() => setMiniMapOpen((o) => !o)} />
-
       {/* ── Map ───────────────────────────────────────────────────── */}
-      <MapContainer ref={setMapInstance} center={[7, 20]} zoom={3} className="h-full w-full" preferCanvas worldCopyJump>
+      {zooming && mapMode === 'coverage' && (
+        <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-[1001] rounded-full px-3 py-1 text-[11px] font-medium shadow-md backdrop-blur-md ${panelCls(theme)}`}>
+          Affichage : {LEVEL_LABELS[levelOverride] || 'Auto (zoom)'} — Zoom {mapInstance?.getZoom?.() || 5}
+        </div>
+      )}
+
+      <MapContainer ref={setMapInstance} center={[7, 20]} zoom={5} className="h-full w-full" preferCanvas worldCopyJump>
         <TileLayer
           key={theme}
           url={THEME_TILES[theme].url}
@@ -2090,6 +2214,8 @@ export default function UnifiedMapView() {
         />
         {/* Recentre la carte sur le niveau administratif sélectionné. */}
         {selectedAdminFeature && <FitToFeature feature={selectedAdminFeature} />}
+        {/* Tracé orange de la sélection (pays / admin 1-2-3), obéit au filtre. */}
+        {selectedAdminFeature && <SelectionOutline feature={selectedAdminFeature} />}
         {mapMode === 'coverage' && (
           <CoverageLayer visible countryCode={coverageCountry} peoples={coveragePeoples} levelOverride={levelOverride} onPeopleClick={goToPeopleSheet} />
         )}

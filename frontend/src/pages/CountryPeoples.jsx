@@ -204,7 +204,7 @@ const CountryPeoples = () => {
                   <tbody>
                     {engagements.map((e) => {
                       // Nom de l'engagement = « nom du peuple + nom du village ».
-                      const engName = [e.peopleName, e.villageName].filter(Boolean).join(' ') || e.name
+                      const engName = [e.peopleName, e.villageName].filter(Boolean).join(', ') || e.name
                       const level = dmmLevelForEngagement(e)
                       return (
                       <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">

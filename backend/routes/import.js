@@ -279,6 +279,26 @@ const normalizeCountryCode = (country) => {
   return '';
 };
 
+/**
+ * Resolve a single canonical (English) country name for storage so the same
+ * engagement is not split across FR/EN spellings (e.g. "Cameroun" vs
+ * "Cameroon") in the `country` string field. Prefers the name from
+ * COUNTRY_CONFIG (keyed by alpha-3) via a small alpha-2 -> alpha-3 bridge, and
+ * falls back to the raw value when the country is unknown.
+ */
+const canonicalCountryName = (countryCode, rawCountry) => {
+  const fallback = sanitizeString(rawCountry);
+  const code2 = sanitizeString(countryCode).toUpperCase();
+  if (!code2) return fallback;
+  // Find the COUNTRY_CONFIG entry (keyed by alpha-3) whose derived alpha-2
+  // matches, and use its canonical English `name`.
+  for (const [alpha3, cfg] of Object.entries(COUNTRY_CONFIG)) {
+    const derived2 = normalizeCountryCode(alpha3) || normalizeCountryCode(cfg && cfg.name);
+    if (derived2 === code2 && cfg && cfg.name) return cfg.name;
+  }
+  return fallback;
+};
+
 const inferMasterPeopleLink = ({ source, name, country, villageName, peopleGroup }) => {
   if (!isReportingVisibleDmmSource(source)) return null;
 
@@ -749,6 +769,10 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
         // funnel filters on. Prefer an explicit countryCode column, else derive
         // it from the country name/alpha-3 value.
         const countryCode = normalizeCountryCode(data.countryCode) || normalizeCountryCode(country);
+        // Canonical (English) country name so the stored `country` string stays
+        // consistent across quarters (e.g. "Cameroun"/"Cameroon" -> "Cameroon").
+        // Prevents the FR/EN spelling split that previously defeated dedupe.
+        const canonicalCountry = canonicalCountryName(countryCode, country);
         const admin2 = sanitizeString(data.admin2);
         const admin3 = sanitizeString(data.admin3);
         const description = sanitizeString(data.description);
@@ -764,11 +788,28 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
         // quarter AND supports the same people existing in several villages (e.g. "Bana" in
         // Mahaou vs Gamboura), aligned with the geographic reference import.
         const escapeRe = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // NAME-FIRST, COUNTRY-TOLERANT match. The free-text `country` field is NOT
+        // reliable for dedupe: the same engagement was stored as "Cameroun" in one
+        // quarter and "Cameroon" in the next, so a strict country string regex
+        // created 80 duplicates. Match on the normalized ISO alpha-2 `countryCode`
+        // instead (both "Cameroun" and "Cameroon" -> "CM"). Fall back to a
+        // normalized country-name compare (covers legacy docs saved before
+        // countryCode existed / null countryCode).
         const upsertQuery = {
           name: { $regex: new RegExp(`^${escapeRe(name)}$`, 'i') },
-          country: { $regex: new RegExp(`^${escapeRe(country)}$`, 'i') },
           source: { $in: ['DMM', 'Survey', 'manual'] },
         };
+        if (countryCode) {
+          // Same country by code, tolerating legacy docs that have no code yet
+          // (they get repaired below on write).
+          upsertQuery.$or = [
+            { countryCode },
+            { countryCode: { $in: [null, ''] } },
+            ...(country ? [{ country: { $regex: new RegExp(`^${escapeRe(country)}$`, 'i') } }] : []),
+          ];
+        } else if (country) {
+          upsertQuery.country = { $regex: new RegExp(`^${escapeRe(country)}$`, 'i') };
+        }
         // Include villageName in the match key when provided so metrics attach to the
         // correct village-level people group.
         let existing = null;
@@ -800,11 +841,13 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
 
         let peopleGroup;
         let action = 'created';
+        let prevPeriodForReport;
 
         if (existing) {
           // ---- UPDATE existing people group with this quarter's snapshot ----
           action = 'updated';
           const prevPeriod = existing.reportPeriod || 'previous';
+          prevPeriodForReport = prevPeriod;
           existing.numberOfChurches = numberOfChurches;
           existing.churchGeneration = churchGeneration;
           existing.dbs = dbs;
@@ -827,6 +870,7 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
           if (population) existing.population = population;
           if (description) existing.description = description;
           if (region) existing.region = region;
+          if (canonicalCountry) existing.country = canonicalCountry;
           if (countryCode) existing.countryCode = countryCode;
           if (admin2) existing.admin2 = admin2;
           if (admin3) existing.admin3 = admin3;
@@ -887,7 +931,7 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
             villageName: villageName,
             village: villageRef,
             region: region,
-            country: country,
+            country: canonicalCountry || country,
             language: language,
             religion: religion,
             source: source,
@@ -962,7 +1006,9 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
           id: peopleGroup._id,
           name: peopleGroup.name,
           action,
-          engagementStatus: peopleGroup.engagementStatus
+          engagementStatus: peopleGroup.engagementStatus,
+          reportPeriod: peopleGroup.reportPeriod,
+          previousReportPeriod: action === 'updated' ? prevPeriodForReport : undefined,
         });
 
       } catch (err) {
@@ -1085,6 +1131,33 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
       );
     }
 
+    // Consolidated, human-readable post-import report.
+    const report = {
+      totalRows: results.length,
+      counts: {
+        created: createdCount,
+        updated: updatedCount,
+        skipped: skipped.length,
+        errors: errors.length,
+      },
+      created: imported
+        .filter(i => i.action === 'created')
+        .map(i => ({ row: i.row, name: i.name, reportPeriod: i.reportPeriod })),
+      updated: imported
+        .filter(i => i.action === 'updated')
+        .map(i => ({
+          row: i.row,
+          name: i.name,
+          previousReportPeriod: i.previousReportPeriod || null,
+          newReportPeriod: i.reportPeriod || null,
+        })),
+      skipped: skipped.map(s => ({
+        row: s.row,
+        reason: s.reason,
+        field: s.field || (Array.isArray(s.fields) ? s.fields.join(', ') : undefined),
+      })),
+    };
+
     res.json({
       success: imported.length > 0,
       message,
@@ -1096,6 +1169,7 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
         skipped: skipped.length,
         errors: errors.length
       },
+      report,
       imported,
       skipped,
       errors

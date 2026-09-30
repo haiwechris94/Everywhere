@@ -366,6 +366,34 @@ const PeopleGroupImport = ({ onSuccess }) => {
             </div>
           </div>
 
+          {/* Created vs Updated breakdown */}
+          <div className="flex flex-wrap gap-2 mb-4 text-sm">
+            <span className="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700">
+              {importResult.summary.created ?? 0} créés
+            </span>
+            <span className="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-blue-700">
+              {importResult.summary.updated ?? 0} mis à jour
+            </span>
+          </div>
+
+          {/* Updated rows (quarter → quarter) */}
+          {importResult.report?.updated?.length > 0 && (
+            <div className="mt-2">
+              <h4 className="font-medium text-blue-700 mb-2">Mises à jour</h4>
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {importResult.report.updated.map((item, index) => (
+                  <div key={index} className="p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                    <span className="font-medium">Ligne {item.row}:</span>{' '}
+                    {item.name}
+                    {item.previousReportPeriod && item.newReportPeriod && (
+                      <span className="text-blue-600"> ({item.previousReportPeriod} → {item.newReportPeriod})</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Skipped Rows with Details */}
           {importResult.skipped && importResult.skipped.length > 0 && (
             <div className="mt-4">

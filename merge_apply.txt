@@ -1,0 +1,496 @@
+
+Connecting to MongoDB (APPLY MODE — WILL WRITE)...
+Connected.
+
+Loaded 160 reporting-visible engagements.
+
+Groups total: 80 | with duplicates: 80
+
+────────────────────────────────────────────────────────────────────────
+GROUP ADJARAYEKENGA::CM
+  KEEP   _id=6abcd9310b0562a68c7de5f3  name="Adjaraye Kenga"  period=1Q26
+  SNAPSHOT from _id=6aac056a97c0c60aebf17823 period=2Q26
+  RESULT country="Cameroun" code=CM village="Non identifié" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056a97c0c60aebf17823
+────────────────────────────────────────────────────────────────────────
+GROUP AKOM::CM
+  KEEP   _id=6abcd9310b0562a68c7de5f9  name="Akom"  period=1Q26
+  SNAPSHOT from _id=6aac056a97c0c60aebf1782e period=2Q26
+  RESULT country="Cameroun" code=CM village="Akum" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056a97c0c60aebf1782e
+────────────────────────────────────────────────────────────────────────
+GROUP ARABS::CM
+  KEEP   _id=6abcd9310b0562a68c7de5ff  name="Arabs"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1783b period=2Q26
+  RESULT country="Cameroun" code=CM village="Kousseri (zone, non précisé)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1783b
+────────────────────────────────────────────────────────────────────────
+GROUP BAFUT::CM
+  KEEP   _id=6abcd9310b0562a68c7de605  name="Bafut"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17843 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bafut" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17843
+────────────────────────────────────────────────────────────────────────
+GROUP BAMONGA::CM
+  KEEP   _id=6abcd9320b0562a68c7de611  name="Bamonga"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1784b period=2Q26
+  RESULT country="Cameroun" code=CM village="Non identifié" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1784b
+────────────────────────────────────────────────────────────────────────
+GROUP BANA::CM
+  KEEP   _id=6abcd9320b0562a68c7de617  name="Bana"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17853 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mahaou" reportPeriod=2Q26 churches=20
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17853
+────────────────────────────────────────────────────────────────────────
+GROUP BANAGUILI::CM
+  KEEP   _id=6abcd9320b0562a68c7de61d  name="Bana Guili"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17858 period=2Q26
+  RESULT country="Cameroun" code=CM village="Guili" reportPeriod=2Q26 churches=13
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17858
+────────────────────────────────────────────────────────────────────────
+GROUP BANAWAZA::CM
+  KEEP   _id=6abcd9320b0562a68c7de623  name="Bana Waza"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1785c period=2Q26
+  RESULT country="Cameroun" code=CM village="Waza, Oudda, Laka, Mblang" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1785c
+────────────────────────────────────────────────────────────────────────
+GROUP BANGOLANG::CM
+  KEEP   _id=6abcd9320b0562a68c7de629  name="Bangolang"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17863 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bangolan" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17863
+────────────────────────────────────────────────────────────────────────
+GROUP BATIBO::CM
+  KEEP   _id=6abcd9320b0562a68c7de62f  name="Batibo"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17868 period=2Q26
+  RESULT country="Cameroun" code=CM village="Batibo" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17868
+────────────────────────────────────────────────────────────────────────
+GROUP WEDIKOM::CM
+  KEEP   _id=6abcd9340b0562a68c7de7c1  name="Wedikom"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1786b period=2Q26
+  RESULT country="Cameroun" code=CM village="Widikum" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1786b
+────────────────────────────────────────────────────────────────────────
+GROUP DEAF::CM
+  KEEP   _id=6abcd9320b0562a68c7de63b  name="Deaf"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17870 period=2Q26
+  RESULT country="Cameroun" code=CM village="Yaoundé" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17870
+────────────────────────────────────────────────────────────────────────
+GROUP DII::CM
+  KEEP   _id=6abcd9320b0562a68c7de647  name="Dii"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17875 period=2Q26
+  RESULT country="Cameroun" code=CM village="Ngaoundéré (zone)" reportPeriod=2Q26 churches=5
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17875
+────────────────────────────────────────────────────────────────────────
+GROUP TCHOLLIRE::CM
+  KEEP   _id=6abcd9340b0562a68c7de79d  name="Tchollire"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17878 period=2Q26
+  RESULT country="Cameroun" code=CM village="Tchollire" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17878
+────────────────────────────────────────────────────────────────────────
+GROUP DIIMBOUMANDBAYA::CM
+  KEEP   _id=6abcd9320b0562a68c7de64d  name="Dii/Mboum and Baya"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1787d period=2Q26
+  RESULT country="Cameroun" code=CM village="Ngaoundéré (zone, engagement combiné)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1787d
+────────────────────────────────────────────────────────────────────────
+GROUP FANG::CM
+  KEEP   _id=6abcd9320b0562a68c7de653  name="Fang"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17882 period=2Q26
+  RESULT country="Cameroun" code=CM village="Non identifié" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17882
+────────────────────────────────────────────────────────────────────────
+GROUP FULANIMAROUA::CM
+  KEEP   _id=6abcd9320b0562a68c7de659  name="Fulani Maroua"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17887 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mémé (Meme)" reportPeriod=2Q26 churches=8
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17887
+────────────────────────────────────────────────────────────────────────
+GROUP MBOROROFULANI::CM
+  KEEP   _id=6abcd9330b0562a68c7de6cb  name="Mbororo (Fulani)"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1788a period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbé" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1788a
+────────────────────────────────────────────────────────────────────────
+GROUP PEULS::CM
+  KEEP   _id=6abcd9330b0562a68c7de73d  name="Peuls"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1788d period=2Q26
+  RESULT country="Cameroun" code=CM village="Pok Bini, Gomana Beka (Ngaoundéré I)" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1788d
+────────────────────────────────────────────────────────────────────────
+GROUP GBAYA::CM
+  KEEP   _id=6abcd9320b0562a68c7de65f  name="Gbaya"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17892 period=2Q26
+  RESULT country="Cameroun" code=CM village="Ngaoundéré I" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17892
+────────────────────────────────────────────────────────────────────────
+GROUP GOR::CM
+  KEEP   _id=6abcd9320b0562a68c7de665  name="Gor"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf17897 period=2Q26
+  RESULT country="Cameroun" code=CM village="Non identifié" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf17897
+────────────────────────────────────────────────────────────────────────
+GROUP GUIZIGA::CM
+  KEEP   _id=6abcd9320b0562a68c7de671  name="Guiziga"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf1789c period=2Q26
+  RESULT country="Cameroun" code=CM village="Ligazang 1 (Mindif)" reportPeriod=2Q26 churches=11
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf1789c
+────────────────────────────────────────────────────────────────────────
+GROUP KANURIMORA::CM
+  KEEP   _id=6abcd9320b0562a68c7de689  name="Kanuri Mora"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178a1 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mora" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178a1
+────────────────────────────────────────────────────────────────────────
+GROUP KAPSIKI::CM
+  KEEP   _id=6abcd9320b0562a68c7de68f  name="Kapsiki"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178a6 period=2Q26
+  RESULT country="Cameroun" code=CM village="Sir / Ndoug" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178a6
+────────────────────────────────────────────────────────────────────────
+GROUP KAPSIKIAMSA::CM
+  KEEP   _id=6abcd9320b0562a68c7de695  name="Kapsiki Amsa"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178a9 period=2Q26
+  RESULT country="Cameroun" code=CM village="Amsa" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178a9
+────────────────────────────────────────────────────────────────────────
+GROUP KOTOKO::CM
+  KEEP   _id=6abcd9320b0562a68c7de69b  name="Kotoko"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178ae period=2Q26
+  RESULT country="Cameroun" code=CM village="Logone-Birni" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178ae
+────────────────────────────────────────────────────────────────────────
+GROUP KWANDJA::CM
+  KEEP   _id=6abcd9320b0562a68c7de6a1  name="Kwandja"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178b3 period=2Q26
+  RESULT country="Cameroun" code=CM village="Non précisé" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178b3
+────────────────────────────────────────────────────────────────────────
+GROUP LAGDO::CM
+  KEEP   _id=6abcd9320b0562a68c7de6a7  name="Lagdo"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178b8 period=2Q26
+  RESULT country="Cameroun" code=CM village="Lagdo" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178b8
+────────────────────────────────────────────────────────────────────────
+GROUP TOUPOURI::CM
+  KEEP   _id=6abcd9340b0562a68c7de7a3  name="Toupouri"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178bb period=2Q26
+  RESULT country="Cameroun" code=CM village="Gamloum, Yoldeo 1, Mantabou" reportPeriod=2Q26 churches=6
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178bb
+────────────────────────────────────────────────────────────────────────
+GROUP MADAAISSAHARDE::CM
+  KEEP   _id=6abcd9320b0562a68c7de6ad  name="Mada/Aissa-Harde"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178c0 period=2Q26
+  RESULT country="Cameroun" code=CM village="Aissa-Harde" reportPeriod=2Q26 churches=9
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178c0
+────────────────────────────────────────────────────────────────────────
+GROUP MAFA::CM
+  KEEP   _id=6abcd9330b0562a68c7de6b3  name="Mafa"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178c5 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bohoy, Douvar, Houva, Gouedegue, Mokolo Centre" reportPeriod=2Q26 churches=27
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178c5
+────────────────────────────────────────────────────────────────────────
+GROUP MANDARAMORA::CM
+  KEEP   _id=6abcd9330b0562a68c7de6b9  name="Mandara Mora"  period=1Q26
+  SNAPSHOT from _id=6aac056b97c0c60aebf178ca period=2Q26
+  RESULT country="Cameroun" code=CM village="Mora" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056b97c0c60aebf178ca
+────────────────────────────────────────────────────────────────────────
+GROUP MASSA::CM
+  KEEP   _id=6abcd9330b0562a68c7de6bf  name="Massa"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178cf period=2Q26
+  RESULT country="Cameroun" code=CM village="Kousséri" reportPeriod=2Q26 churches=15
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178cf
+────────────────────────────────────────────────────────────────────────
+GROUP MATAL::CM
+  KEEP   _id=6abcd9330b0562a68c7de6c5  name="Matal"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178d4 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbé" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178d4
+────────────────────────────────────────────────────────────────────────
+GROUP MBOUM::CM
+  KEEP   _id=6abcd9330b0562a68c7de6d1  name="Mboum"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178d9 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbal, Garang, Roll-Chang, Mbaka, Mbilo, Akana 1, Nguemsek, Mon Ray, Mayo Bascha" reportPeriod=2Q26 churches=32
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178d9
+────────────────────────────────────────────────────────────────────────
+GROUP MENKA::CM
+  KEEP   _id=6abcd9330b0562a68c7de6d7  name="Menka"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178de period=2Q26
+  RESULT country="Cameroun" code=CM village="Santa (Mezam) — à confirmer" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178de
+────────────────────────────────────────────────────────────────────────
+GROUP MOFOU::CM
+  KEEP   _id=6abcd9330b0562a68c7de6e9  name="Mofou"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178e3 period=2Q26
+  RESULT country="Cameroun" code=CM village="Boula Damdoudi/Longuéré Haoussa, Gawar/Boulawo, Zidim/Wouro Ladde" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178e3
+────────────────────────────────────────────────────────────────────────
+GROUP MOUDANG::CM
+  KEEP   _id=6abcd9330b0562a68c7de6ef  name="Moudang"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178e8 period=2Q26
+  RESULT country="Cameroun" code=CM village="Boboyo, Lara, Mourgouroug, Tidoma, Morbare" reportPeriod=2Q26 churches=16
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178e8
+────────────────────────────────────────────────────────────────────────
+GROUP MOURA::CM
+  KEEP   _id=6abcd9330b0562a68c7de6f5  name="Moura"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178ed period=2Q26
+  RESULT country="Cameroun" code=CM village="Mora (zone, non précisé)" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178ed
+────────────────────────────────────────────────────────────────────────
+GROUP MOUYANG::CM
+  KEEP   _id=6abcd9330b0562a68c7de6fb  name="Mouyang"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178f2 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mora (zone, non précisé)" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178f2
+────────────────────────────────────────────────────────────────────────
+GROUP MUFU::CM
+  KEEP   _id=6abcd9330b0562a68c7de701  name="Mufu"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178f7 period=2Q26
+  RESULT country="Cameroun" code=CM village="Boula Damdoudi/Longuéré Haoussa, Gawar/Boulawo, Zidim/Wouro Ladde" reportPeriod=2Q26 churches=8
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178f7
+────────────────────────────────────────────────────────────────────────
+GROUP MUN::CM
+  KEEP   _id=6abcd9330b0562a68c7de707  name="Mun"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf178fc period=2Q26
+  RESULT country="Cameroun" code=CM village="Foumban" reportPeriod=2Q26 churches=5
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf178fc
+────────────────────────────────────────────────────────────────────────
+GROUP MUSGUM::CM
+  KEEP   _id=6abcd9330b0562a68c7de70d  name="Musgum"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17901 period=2Q26
+  RESULT country="Cameroun" code=CM village="Logone-Birni (1)" reportPeriod=2Q26 churches=5
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17901
+────────────────────────────────────────────────────────────────────────
+GROUP NANGABIBE::CM
+  KEEP   _id=6abcd9330b0562a68c7de719  name="Nanga/Bibe"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17906 period=2Q26
+  RESULT country="Cameroun" code=CM village="Nanga-Eboko (probable)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17906
+────────────────────────────────────────────────────────────────────────
+GROUP NDOP::CM
+  KEEP   _id=6abcd9330b0562a68c7de71f  name="Ndop"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1790b period=2Q26
+  RESULT country="Cameroun" code=CM village="Bamunka, Baba I, Babessi" reportPeriod=2Q26 churches=7
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1790b
+────────────────────────────────────────────────────────────────────────
+GROUP NGAMBAI::CM
+  KEEP   _id=6abcd9330b0562a68c7de725  name="Ngambai"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17910 period=2Q26
+  RESULT country="Cameroun" code=CM village="Ngaoundéré I" reportPeriod=2Q26 churches=6
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17910
+────────────────────────────────────────────────────────────────────────
+GROUP NJONG::CM
+  KEEP   _id=6abcd9330b0562a68c7de72b  name="Njong"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17915 period=2Q26
+  RESULT country="Cameroun" code=CM village="Santa (Mezam) — à confirmer" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17915
+────────────────────────────────────────────────────────────────────────
+GROUP PERE::CM
+  KEEP   _id=6abcd9330b0562a68c7de737  name="Pere"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1791a period=2Q26
+  RESULT country="Cameroun" code=CM village="Mayo-Baléo" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1791a
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMY::CM
+  KEEP   _id=6abcd9330b0562a68c7de743  name="Pygmy"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1791f period=2Q26
+  RESULT country="Cameroun" code=CM village="Non précisé (multi-sites)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1791f
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYBANG::CM
+  KEEP   _id=6abcd9330b0562a68c7de749  name="Pygmy Bang"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17922 period=2Q26
+  RESULT country="Cameroun" code=CM village="Abong-Bang" reportPeriod=2Q26 churches=8
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17922
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYBERTOUA::CM
+  KEEP   _id=6abcd9330b0562a68c7de74f  name="Pygmy Bertoua"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17925 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bertoua" reportPeriod=2Q26 churches=5
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17925
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYDIAKO::CM
+  KEEP   _id=6abcd9330b0562a68c7de75b  name="Pygmy Diako"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17928 period=2Q26
+  RESULT country="Cameroun" code=CM village="Diako" reportPeriod=2Q26 churches=7
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17928
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYMABELE::CM
+  KEEP   _id=6abcd9330b0562a68c7de761  name="Pygmy Mabele"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1792b period=2Q26
+  RESULT country="Cameroun" code=CM village="Mambélé" reportPeriod=2Q26 churches=9
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1792b
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYMOULOUNDOU::CM
+  KEEP   _id=6abcd9330b0562a68c7de767  name="Pygmy Mouloundou"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1792e period=2Q26
+  RESULT country="Cameroun" code=CM village="Moloundou" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1792e
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYNDELELE::CM
+  KEEP   _id=6abcd9330b0562a68c7de76d  name="Pygmy Ndelele"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17931 period=2Q26
+  RESULT country="Cameroun" code=CM village="Ndélélé" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17931
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYSALABOUMB::CM
+  KEEP   _id=6abcd9340b0562a68c7de779  name="Pygmy Salaboumbð"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17934 period=2Q26
+  RESULT country="Cameroun" code=CM village="Salapoumbé" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17934
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYSALABOUMBE::CM
+  KEEP   _id=6abcd9340b0562a68c7de773  name="Pygmy Salaboumbe"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17937 period=2Q26
+  RESULT country="Cameroun" code=CM village="Salapoumbé" reportPeriod=2Q26 churches=9
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17937
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYYOKADOUMA::CM
+  KEEP   _id=6abcd9340b0562a68c7de77f  name="Pygmy Yokadouma"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1793a period=2Q26
+  RESULT country="Cameroun" code=CM village="Yokadouma" reportPeriod=2Q26 churches=8
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1793a
+────────────────────────────────────────────────────────────────────────
+GROUP RUTO::CM
+  KEEP   _id=6abcd9340b0562a68c7de78b  name="Ruto"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1793f period=2Q26
+  RESULT country="Cameroun" code=CM village="Non identifié" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1793f
+────────────────────────────────────────────────────────────────────────
+GROUP SARA::CM
+  KEEP   _id=6abcd9340b0562a68c7de791  name="Sara"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17944 period=2Q26
+  RESULT country="Cameroun" code=CM village="Logone-Birni" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17944
+────────────────────────────────────────────────────────────────────────
+GROUP STREETBOYS::CM
+  KEEP   _id=6abcd9340b0562a68c7de797  name="Street boys"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17949 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bamenda (CHS, Bambui, Bafukom, Finge)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17949
+────────────────────────────────────────────────────────────────────────
+GROUP URBANBAMENDA::CM
+  KEEP   _id=6abcd9340b0562a68c7de7a9  name="Urban Bamenda"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1794c period=2Q26
+  RESULT country="Cameroun" code=CM village="CHS, Bambui, Bafukom, Finge (quartiers de Bamenda)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1794c
+────────────────────────────────────────────────────────────────────────
+GROUP URBANYOUTH::CM
+  KEEP   _id=6abcd9340b0562a68c7de7af  name="Urban Youth"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1794f period=2Q26
+  RESULT country="Cameroun" code=CM village="Bamenda (CHS, Bambui, Bafukom, Finge)" reportPeriod=2Q26 churches=0
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1794f
+────────────────────────────────────────────────────────────────────────
+GROUP MENTEH1::CM
+  KEEP   _id=6abcd9330b0562a68c7de6dd  name="Menteh1"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17952 period=2Q26
+  RESULT country="Cameroun" code=CM village="Menteh" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17952
+────────────────────────────────────────────────────────────────────────
+GROUP MENTEH2::CM
+  KEEP   _id=6abcd9330b0562a68c7de6e3  name="Menteh2"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17955 period=2Q26
+  RESULT country="Cameroun" code=CM village="Menteh" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17955
+────────────────────────────────────────────────────────────────────────
+GROUP NAMOH::CM
+  KEEP   _id=6abcd9330b0562a68c7de713  name="Namoh"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17958 period=2Q26
+  RESULT country="Cameroun" code=CM village="Namoh" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17958
+────────────────────────────────────────────────────────────────────────
+GROUP NTAMUCHE::CM
+  KEEP   _id=6abcd9330b0562a68c7de731  name="Ntamuche"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1795b period=2Q26
+  RESULT country="Cameroun" code=CM village="Ntamuchie" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1795b
+────────────────────────────────────────────────────────────────────────
+GROUP VEKOVI::CM
+  KEEP   _id=6abcd9340b0562a68c7de7b5  name="Vekovi"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1795e period=2Q26
+  RESULT country="Cameroun" code=CM village="Vekovi" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1795e
+────────────────────────────────────────────────────────────────────────
+GROUP WAINAMAH::CM
+  KEEP   _id=6abcd9340b0562a68c7de7bb  name="Wainamah"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17963 period=2Q26
+  RESULT country="Cameroun" code=CM village="Wainamah" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17963
+────────────────────────────────────────────────────────────────────────
+GROUP ZOULGO::CM
+  KEEP   _id=6abcd9340b0562a68c7de7c7  name="Zoulgo"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17968 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbé" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17968
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYBIPINDI::CM
+  KEEP   _id=6abcd9330b0562a68c7de755  name="Pygmy Bipindi"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf1796d period=2Q26
+  RESULT country="Cameroun" code=CM village="Bipindi" reportPeriod=2Q26 churches=5
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf1796d
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYLOLODORF::CM
+  KEEP   _id=6abcd9340b0562a68c7de7cd  name="pygmy lolodorf"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17970 period=2Q26
+  RESULT country="Cameroun" code=CM village="Lolodorf" reportPeriod=2Q26 churches=4
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17970
+────────────────────────────────────────────────────────────────────────
+GROUP PYGMYKRIBI::CM
+  KEEP   _id=6abcd9340b0562a68c7de785  name="Pygmy kribi"  period=1Q26
+  SNAPSHOT from _id=6aac056c97c0c60aebf17973 period=2Q26
+  RESULT country="Cameroun" code=CM village="Kribi" reportPeriod=2Q26 churches=6
+  DELETE 1 duplicate(s): 6aac056c97c0c60aebf17973
+────────────────────────────────────────────────────────────────────────
+GROUP BAMBILI::CM
+  KEEP   _id=6abcd9310b0562a68c7de60b  name="Bambili"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf17978 period=2Q26
+  RESULT country="Cameroun" code=CM village="Bambili" reportPeriod=2Q26 churches=2
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf17978
+────────────────────────────────────────────────────────────────────────
+GROUP DABAGAVALE::CM
+  KEEP   _id=6abcd9320b0562a68c7de635  name="Daba/Gavale"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf1797d period=2Q26
+  RESULT country="Cameroun" code=CM village="Gaval (Gavale)" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf1797d
+────────────────────────────────────────────────────────────────────────
+GROUP DEMZEK::CM
+  KEEP   _id=6abcd9320b0562a68c7de641  name="Demzek"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf17982 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbé" reportPeriod=2Q26 churches=3
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf17982
+────────────────────────────────────────────────────────────────────────
+GROUP GUEMZEK::CM
+  KEEP   _id=6abcd9320b0562a68c7de66b  name="Guemzek"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf17987 period=2Q26
+  RESULT country="Cameroun" code=CM village="Mbé" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf17987
+────────────────────────────────────────────────────────────────────────
+GROUP GUKA::CM
+  KEEP   _id=6abcd9320b0562a68c7de677  name="Guka"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf1798c period=2Q26
+  RESULT country="Cameroun" code=CM village="Guka (à préciser)" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf1798c
+────────────────────────────────────────────────────────────────────────
+GROUP GUZANGA::CM
+  KEEP   _id=6abcd9320b0562a68c7de683  name="Guzanga"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf17991 period=2Q26
+  RESULT country="Cameroun" code=CM village="Guzanga (à préciser)" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf17991
+────────────────────────────────────────────────────────────────────────
+GROUP GUM::CM
+  KEEP   _id=6abcd9320b0562a68c7de67d  name="Gum"  period=1Q26
+  SNAPSHOT from _id=6aac056d97c0c60aebf17996 period=2Q26
+  RESULT country="Cameroun" code=CM village="Jakiri" reportPeriod=2Q26 churches=1
+  DELETE 1 duplicate(s): 6aac056d97c0c60aebf17996
+
+════════════════════════════════════════════════════════════════════════
+SUMMARY (APPLIED)
+  Duplicate groups merged : 80
+  Documents deleted : 80
+  Documents kept          : 80
+════════════════════════════════════════════════════════════════════════
+

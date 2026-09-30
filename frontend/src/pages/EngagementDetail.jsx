@@ -12,7 +12,7 @@ const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '�
 function engagementDisplayName(peopleName, villageName, fallback) {
   const p = (peopleName || '').trim()
   const v = (villageName || '').trim()
-  if (p && v) return `${p} ${v}`
+  if (p && v) return `${p}, ${v}`
   return p || v || fallback || '—'
 }
 
@@ -23,11 +23,14 @@ const ENGAGEMENT_STATUSES = ['pioneer', 'midway', 'tipping-point', 'movement']
 // PeopleDetailLite : nom du village, statut, # églises, génération).
 function EditEngagementForm({ engagement, onSaved, onCancel }) {
   const { isFrench } = useLanguage()
+  const coords = Array.isArray(engagement.location?.coordinates) ? engagement.location.coordinates : []
   const [form, setForm] = useState({
     villageName: engagement.villageName || '',
     engagementStatus: engagement.engagementStatus || 'pioneer',
     numberOfChurches: engagement.numberOfChurches ?? 0,
     churchGeneration: engagement.churchGeneration ?? 0,
+    latitude: coords[1] != null ? String(coords[1]) : '',
+    longitude: coords[0] != null ? String(coords[0]) : '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -36,13 +39,42 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
   const submit = async (e) => {
     e.preventDefault()
     setSaving(true); setError('')
+
+    // Build the payload. Only send villageName when it actually changed
+    // (the backend rejects unknown village names with 400 VILLAGE_NOT_FOUND).
+    const payload = {
+      engagementStatus: form.engagementStatus,
+      numberOfChurches: Number(form.numberOfChurches) || 0,
+      churchGeneration: Number(form.churchGeneration) || 0,
+    }
+
+    const nextVillage = form.villageName.trim()
+    if (nextVillage !== (engagement.villageName || '')) {
+      payload.villageName = nextVillage
+    }
+
+    // Latitude / longitude → GeoJSON Point [lng, lat]. Only include when both
+    // are provided and valid; validate ranges.
+    const latRaw = String(form.latitude).trim()
+    const lngRaw = String(form.longitude).trim()
+    if (latRaw !== '' || lngRaw !== '') {
+      const lat = Number(latRaw)
+      const lng = Number(lngRaw)
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        setSaving(false)
+        setError(isFrench ? 'Latitude et longitude doivent être des nombres valides.' : 'Latitude and longitude must be valid numbers.')
+        return
+      }
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        setSaving(false)
+        setError(isFrench ? 'Coordonnées hors limites (lat ∈ [-90,90], lng ∈ [-180,180]).' : 'Coordinates out of range (lat ∈ [-90,90], lng ∈ [-180,180]).')
+        return
+      }
+      payload.location = { type: 'Point', coordinates: [lng, lat] }
+    }
+
     try {
-      await peopleGroupsApi.update(engagement._id, {
-        villageName: form.villageName.trim(),
-        engagementStatus: form.engagementStatus,
-        numberOfChurches: Number(form.numberOfChurches) || 0,
-        churchGeneration: Number(form.churchGeneration) || 0,
-      })
+      await peopleGroupsApi.update(engagement._id, payload)
       onSaved && onSaved()
     } catch (err) {
       setError(err?.response?.data?.error || (isFrench ? 'Échec de la modification de l’engagement.' : 'Failed to update the engagement.'))
@@ -71,6 +103,14 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
         <label className="text-xs text-slate-500">
           {isFrench ? 'Génération max' : 'Max generation'}
           <input type="number" min="0" value={form.churchGeneration} onChange={set('churchGeneration')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+        </label>
+        <label className="text-xs text-slate-500">
+          {isFrench ? 'Latitude' : 'Latitude'}
+          <input type="number" step="any" min="-90" max="90" value={form.latitude} onChange={set('latitude')} placeholder={isFrench ? 'ex. 4.0511' : 'e.g. 4.0511'} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+        </label>
+        <label className="text-xs text-slate-500">
+          {isFrench ? 'Longitude' : 'Longitude'}
+          <input type="number" step="any" min="-180" max="180" value={form.longitude} onChange={set('longitude')} placeholder={isFrench ? 'ex. 9.7679' : 'e.g. 9.7679'} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
         </label>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
@@ -130,7 +170,22 @@ export default function EngagementDetail() {
     retry: false,
   })
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['engagement', engagementId] })
+  const refresh = () => {
+    // Refresh this page…
+    queryClient.invalidateQueries({ queryKey: ['engagement', engagementId] })
+    // …and every view that renders this engagement's coordinates / metrics so
+    // an edited lat/lng moves the marker on the unified map and updates the
+    // country / people sheets without a manual reload.
+    ;[
+      ['dmm-engagements'],
+      ['dmm-peoples'],
+      ['master-people-markers'],
+      ['ng-country-peoples'],
+      ['ng-region-country'],
+      ['ng-person-profile'],
+      ['ng-person-row'],
+    ].forEach((queryKey) => queryClient.invalidateQueries({ queryKey }))
+  }
 
   if (isLoading) return <div className="p-6"><StateLoading label={isFrench ? "Chargement de l'engagement…" : 'Loading engagement…'} /></div>
   if (isError) {
@@ -176,8 +231,14 @@ export default function EngagementDetail() {
     { label: isFrench ? 'Nouveaux baptisés' : 'New baptisms', value: fmt(eng.newBaptisms ?? 0), accent: 'green' },
   ]
 
+  const engCoords = Array.isArray(eng.location?.coordinates) ? eng.location.coordinates : []
+  const engLat = engCoords[1]
+  const engLng = engCoords[0]
+
   const detailRows = [
     [isFrench ? 'Village' : 'Village', eng.villageName || '—'],
+    ['Latitude', Number.isFinite(engLat) ? engLat : '—'],
+    ['Longitude', Number.isFinite(engLng) ? engLng : '—'],
     [isFrench ? 'Région' : 'Region', eng.region || '—'],
     ['Admin 2', eng.admin2 || eng.departement || '—'],
     ['Admin 3', eng.admin3 || eng.arrondissement || '—'],

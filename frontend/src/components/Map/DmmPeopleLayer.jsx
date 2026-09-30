@@ -66,14 +66,20 @@ function DmmPopupContent({ p }) {
   const navigate = useNavigate()
   const cfg = DMM_STATUS_COLORS[p.dmmStatus] || DMM_STATUS_COLORS.unknown
 
-  // Navigation target: Regions → country → people. Requires regionId + alpha-2.
-  // The people sheet is keyed by the MASTER people id; fall back to the point id
-  // for the legacy master-people layer where `id` already is the master id.
-  const peopleSheetId = p.masterPeopleId || p.id
-  const canNavigate = !!(p.regionId && p.countryCode2 && peopleSheetId)
+  // Navigation target: la FICHE DE L'ENGAGEMENT (et non plus celle du peuple).
+  // `p.id` est l'id de l'engagement (PeopleGroup DMM). Dans le funnel complet
+  // Regions ▸ Pays ▸ Peuple ▸ Engagement quand on a région + pays + peuple,
+  // sinon on retombe sur la route autonome /engagements/:id.
+  const engagementId = p.id
+  const peopleSheetId = p.masterPeopleId
+  const canNavigate = !!engagementId
   const goToSheet = () => {
     if (!canNavigate) return
-    navigate(`/regions/${p.regionId}/countries/${p.countryCode2}/peoples/${peopleSheetId}`)
+    if (p.regionId && p.countryCode2 && peopleSheetId) {
+      navigate(`/regions/${p.regionId}/countries/${p.countryCode2}/peoples/${peopleSheetId}/engagements/${engagementId}`)
+    } else {
+      navigate(`/engagements/${engagementId}`)
+    }
   }
 
   // "nom de l'engagement, Village" — same convention as the Villages/DMM layer.
@@ -123,9 +129,9 @@ function DmmPopupContent({ p }) {
           fontSize: 9,
           cursor: canNavigate ? 'pointer' : 'not-allowed',
         }}
-        title={canNavigate ? 'Ouvrir la fiche du peuple' : 'Fiche indisponible (pays/région non résolus)'}
+        title={canNavigate ? "Ouvrir la fiche de l'engagement" : 'Fiche indisponible'}
       >
-        Voir la fiche du peuple →
+        Voir la fiche de l'engagement →
       </button>
     </div>
   )

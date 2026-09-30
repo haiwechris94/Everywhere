@@ -121,6 +121,7 @@ export function normalizeDmmStage(status) {
 export function dmmStageForEngagement(engagement = {}) {
   return (
     dmmStageFromChurches(engagement.numberOfChurches) ||
+    normalizeDmmStage(engagement.dmmStatus) ||
     normalizeDmmStage(engagement.engagementStatus) ||
     null
   )
