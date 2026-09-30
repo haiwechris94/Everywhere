@@ -14,6 +14,7 @@ const RegionCountries = () => {
   const { isFrench } = useLanguage()
   const { regionId } = useParams()
   const [countriesOpen, setCountriesOpen] = useState(true)
+  const [showAllMetrics, setShowAllMetrics] = useState(false)
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['ng-region', regionId],
@@ -34,6 +35,8 @@ const RegionCountries = () => {
 
   const countries = Array.isArray(data.countries) ? data.countries : []
   const cards = metricCards(data.metrics)
+  const primaryCards = cards.filter((c) => c.primary)
+  const moreCards = cards.filter((c) => !c.primary)
 
   return (
     <div className="p-6 space-y-6">
@@ -54,10 +57,21 @@ const RegionCountries = () => {
               remontent pour combler l'espace au lieu de rester sur une ligne séparée.
               Chaque carte conserve sa couleur d'accent d'origine. */}
           <div className="flex flex-wrap gap-3">
-            {cards.map((c) => (
+            {(showAllMetrics ? cards : primaryCards).map((c) => (
               <StatCard key={c.label} label={c.label} value={c.value} accent={c.accent} />
             ))}
           </div>
+          {moreCards.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAllMetrics((v) => !v)}
+              aria-expanded={showAllMetrics}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+            >
+              {showAllMetrics ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
+            </button>
+          )}
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6">

@@ -15,7 +15,6 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import { masterPeopleApi } from '../services/api'
 import { reportingApi } from '../services/reportingApi'
-import { dmmStageForEngagement } from '../utils/dmmEngagement'
 import MasterPeopleLayer from '../components/Map/MasterPeopleLayer'
 import DmmPeopleLayer from '../components/Map/DmmPeopleLayer'
 import { getCountryConfig, SUPPORTED_COUNTRIES } from '../config/supportedCountries'
@@ -731,20 +730,23 @@ const KpiBar = ({ stats, theme }) => (
   </div>
 )
 
-// ── DMM engagement indicators (counts by stage, filter-aware) ────────────────
-// The four DMM stages with their legend colour. 'movement' has no entry in
-// STATUS_COLORS_FILL, so its colour is defined here.
+// ── DMM engagement indicators (counts by stage, filter-aware, clickable) ─────
+// The four DMM stages. `key` matches the raw `p.dmmStatus` value AND the
+// dmmStatusFilter <select> values ('dmm' = Movement), so a click toggles the
+// same filter used by the sidebar select.
 const DMM_STAGE_META = [
   { key: 'pioneer',        label: 'Pionnier',    color: '#f97316' },
   { key: 'midway',         label: 'Mi-parcours', color: '#eab308' },
   { key: 'tipping-point',  label: 'Basculement', color: '#22c55e' },
-  { key: 'movement',       label: 'Movement',    color: '#2563eb' },
+  { key: 'dmm',            label: 'Movement',    color: '#2563eb' },
 ]
 
 // Panel listing the number of engagements per DMM stage, with a coloured dot.
-// `counts` is keyed by the four stage keys above and is computed from the
-// already-filtered engagement list, so it obeys the active filters.
-const DmmIndicatorsPanel = ({ counts, theme, style }) => (
+// `counts` is keyed by the four stage keys above (+ derived total) and comes
+// from the already-filtered engagement list, so it obeys the active filters.
+// Clicking a stage toggles the map's DMM status filter (activeFilter shows
+// which one is currently applied); a "Total" row is shown at the bottom.
+const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilter, onToggleStage }) => (
   <div
     style={style}
     className={`absolute right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1 rounded-lg px-2.5 py-2 shadow-sm sm:flex ${panelCls(theme)}`}
@@ -752,13 +754,30 @@ const DmmIndicatorsPanel = ({ counts, theme, style }) => (
     <div className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>
       Engagements DMM
     </div>
-    {DMM_STAGE_META.map(({ key, label, color }) => (
-      <div key={key} className="flex items-center gap-1.5 leading-tight">
-        <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
-        <span className="min-w-0 flex-1 truncate text-[10px]">{label}</span>
-        <span className="text-xs font-bold">{(counts[key] || 0).toLocaleString('fr-FR')}</span>
-      </div>
-    ))}
+    {DMM_STAGE_META.map(({ key, label, color }) => {
+      const active = activeFilter === key
+      return (
+        <button
+          key={key}
+          type="button"
+          onClick={() => onToggleStage(key)}
+          title={active ? 'Retirer le filtre' : `Filtrer : ${label}`}
+          aria-pressed={active}
+          className={`flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left leading-tight transition-colors ${
+            active ? 'bg-indigo-500/15 ring-1 ring-indigo-400' : 'hover:bg-black/5'
+          } ${activeFilter && !active ? 'opacity-50' : ''}`}
+        >
+          <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
+          <span className="min-w-0 flex-1 truncate text-[10px]">{label}</span>
+          <span className="text-xs font-bold">{(counts[key] || 0).toLocaleString('fr-FR')}</span>
+        </button>
+      )
+    })}
+    <div className={`mt-1 flex items-center gap-1.5 border-t pt-1 leading-tight ${theme === 'dark' ? 'border-neutral-700' : 'border-black/10'}`}>
+      <span className="h-2.5 w-2.5 flex-shrink-0" />
+      <span className={`min-w-0 flex-1 truncate text-[10px] font-semibold ${subtleText(theme)}`}>Total</span>
+      <span className="text-xs font-bold">{(total || 0).toLocaleString('fr-FR')}</span>
+    </div>
   </div>
 )
 
@@ -1240,16 +1259,15 @@ export default function UnifiedMapView() {
     return { total: dmmVisible.length, churches, byStatus }
   }, [dmmVisible])
 
-  // Counts per DMM stage (pioneer / midway / tipping-point / movement) computed
-  // over the ALREADY-FILTERED engagement list, so the indicators obey the
-  // country / admin / status filters. dmmStageForEngagement canonicalizes the
-  // stored stage ('tippingpoint' → mapped to 'tipping-point' bucket below).
+  // Counts per DMM stage computed over the ALREADY-FILTERED engagement list, so
+  // the indicators obey the country / admin / status filters. Keyed by the raw
+  // `p.dmmStatus` value (pioneer / midway / tipping-point / dmm=Movement) so the
+  // panel keys line up with the dmmStatusFilter values used for click-to-filter.
   const dmmStageCounts = useMemo(() => {
-    const counts = { pioneer: 0, midway: 0, 'tipping-point': 0, movement: 0 }
+    const counts = { pioneer: 0, midway: 0, 'tipping-point': 0, dmm: 0 }
     for (const p of dmmVisible) {
-      const raw = dmmStageForEngagement(p) // 'pioneer' | 'midway' | 'tippingpoint' | 'movement'
-      const key = raw === 'tippingpoint' ? 'tipping-point' : raw
-      if (key && counts[key] !== undefined) counts[key] += 1
+      const key = p.dmmStatus || 'unknown'
+      if (counts[key] !== undefined) counts[key] += 1
     }
     return counts
   }, [dmmVisible])
@@ -1608,7 +1626,14 @@ export default function UnifiedMapView() {
       {!isLoading && !error && !selected && showKpis && <KpiBar stats={stats} theme={theme} />}
       {/* Indicateurs DMM — sous la colonne KPI quand elle est visible, sinon en haut, pour ne jamais la masquer. */}
       {!isLoading && !error && !selected && showDmmIndicators && (
-        <DmmIndicatorsPanel counts={dmmStageCounts} theme={theme} style={{ top: showKpis ? '16rem' : '4rem' }} />
+        <DmmIndicatorsPanel
+          counts={dmmStageCounts}
+          total={dmmVisible.length}
+          activeFilter={dmmStatusFilter}
+          onToggleStage={(key) => setDmmStatusFilter((cur) => (cur === key ? '' : key))}
+          theme={theme}
+          style={{ top: showKpis ? '16rem' : '4rem' }}
+        />
       )}
       {/* ── Mode toggle (Terrain / Couverture) ───────── */}
       <MapModeToggle mode={mapMode} onChange={setMapMode} theme={theme} />

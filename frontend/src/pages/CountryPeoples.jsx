@@ -23,6 +23,7 @@ const CountryPeoples = () => {
   const { regionId, countryCode } = useParams()
   const [peoplesOpen, setPeoplesOpen] = useState(true)
   const [engagementsOpen, setEngagementsOpen] = useState(true)
+  const [showAllMetrics, setShowAllMetrics] = useState(false)
 
   const countryQuery = useQuery({
     queryKey: ['ng-region-country', regionId, countryCode],
@@ -56,6 +57,8 @@ const CountryPeoples = () => {
   if (!country) return <div className="p-6">{isFrench ? 'Pays introuvable.' : 'Country not found.'}</div>
 
   const cards = metricCards(detail.metrics)
+  const primaryCards = cards.filter((c) => c.primary)
+  const moreCards = cards.filter((c) => !c.primary)
   const peoples = peoplesQuery.data || []
   const dmmPeoples = peoples.filter((p) => p.isNGEngaged)
   const engagements = dmmPeoples.flatMap((p) =>
@@ -84,10 +87,21 @@ const CountryPeoples = () => {
           remontent pour combler l'espace au lieu de rester sur une ligne séparée.
           Chaque carte conserve sa couleur d'accent d'origine. */}
       <div className="flex flex-wrap gap-3">
-        {cards.map((c) => (
+        {(showAllMetrics ? cards : primaryCards).map((c) => (
           <StatCard key={c.label} label={c.label} value={c.value} accent={c.accent} />
         ))}
       </div>
+      {moreCards.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowAllMetrics((v) => !v)}
+          aria-expanded={showAllMetrics}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+        >
+          {showAllMetrics ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
+        </button>
+      )}
 
       {/* Peuple en haut, Engagements en bas — deux sections repliables, même
           structure visuelle que le tableau Countries de la page Regions. */}
