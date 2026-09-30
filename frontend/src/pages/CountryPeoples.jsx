@@ -6,6 +6,7 @@ import { reportingApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
 import { DmmStatusBadge } from '../components/DmmStatusBadge'
+import { dmmLevelForEngagement, dmmLevelLabel } from '../utils/dmmEngagement'
 import { useLanguage } from '../i18n'
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
@@ -131,7 +132,10 @@ const CountryPeoples = () => {
                   </thead>
                   <tbody>
                     {dmmPeoples.map((p) => {
-                      const src = referenceSource(p.sourceTypes)
+                      // Source de référence pour le statut du peuple, en excluant
+                      // « DMM » (on ne veut plus afficher le suffixe « (DMM) »).
+                      const rawSrc = referenceSource(p.sourceTypes)
+                      const src = rawSrc && rawSrc.toUpperCase() !== 'DMM' ? rawSrc : null
                       const status = p.status?.global || 'UNKNOWN'
                       return (
                         <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
@@ -190,14 +194,19 @@ const CountryPeoples = () => {
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-slate-200">
-                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Nom du peuple' : 'People group name'}</th>
-                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
-                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
-                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "Nom de l'engagement" : 'Engagement name'}</th>
+                      <th className="py-2 px-6 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[7rem]">{isFrench ? "# d'églises" : '# churches'}</th>
+                      <th className="py-2 px-6 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[6rem]">Max Gen</th>
+                      <th className="py-2 px-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[7rem]">Eng level</th>
+                      <th className="py-2 pl-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[9rem]">DMM Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {engagements.map((e) => (
+                    {engagements.map((e) => {
+                      // Nom de l'engagement = « nom du peuple + nom du village ».
+                      const engName = [e.peopleName, e.villageName].filter(Boolean).join(' ') || e.name
+                      const level = dmmLevelForEngagement(e)
+                      return (
                       <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                         <td className="py-3 pr-4">
                           {/* Le nom d'un engagement mène désormais vers la FICHE
@@ -207,17 +216,19 @@ const CountryPeoples = () => {
                               to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}/engagements/${e.peopleGroupId}`}
                               className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
                             >
-                              {e.villageName || e.peopleName || e.name}
+                              {engName}
                             </Link>
                           ) : (
-                            <span className="font-medium text-slate-700">{e.villageName || e.peopleName || e.name}</span>
+                            <span className="font-medium text-slate-700">{engName}</span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.numberOfChurches ?? 0)}</td>
-                        <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(e.churchGeneration ?? 0)}</td>
-                        <td className="py-3 pl-4 text-left text-slate-700"><DmmStatusBadge engagement={e} /></td>
+                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700">{fmt(e.numberOfChurches ?? 0)}</td>
+                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700">{fmt(e.churchGeneration ?? 0)}</td>
+                        <td className="py-3 px-6 text-left text-slate-700">{level ? dmmLevelLabel(level, isFrench) : '—'}</td>
+                        <td className="py-3 pl-6 text-left text-slate-700"><DmmStatusBadge engagement={e} /></td>
                       </tr>
-                    ))}
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>

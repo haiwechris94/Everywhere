@@ -126,6 +126,55 @@ export function dmmStageForEngagement(engagement = {}) {
   )
 }
 
+/**
+ * NIVEAU DMM (I–IV) d'un engagement d'après la GÉNÉRATION MAX atteinte, selon
+ * le tableau DMM.
+ *
+ * Étapes standard (Pionnier / Mi-parcours / Point de Basculement) :
+ *   1–2 gén → I · 3–4 gén → II · 5–6 gén → III · 7+ gén → IV
+ *
+ * Mouvement (cas particulier — exige 100+ églises ET au moins 4 générations,
+ * donc pas de NIVEAU I) :
+ *   4 gén → II · 5–6 gén → III · 7+ gén → IV
+ *
+ * @param {number} maxGeneration  génération max atteinte par l'engagement
+ * @param {string} [stage]        étape DMM (clé DMM_STAGE) pour gérer le cas Mouvement
+ * @returns {number|null} 1..4, ou null si aucune génération valide.
+ */
+export function dmmLevelFromGeneration(maxGeneration, stage = null) {
+  const g = Number(maxGeneration)
+  if (!Number.isFinite(g) || g < 1) return null
+
+  if (stage === DMM_STAGE.MOVEMENT) {
+    // Mouvement : démarre au NIVEAU II (4 générations).
+    if (g >= 7) return 4
+    if (g >= 5) return 3
+    if (g >= 4) return 2
+    return 2 // sécurité : un Mouvement a par définition ≥ 4 générations
+  }
+
+  if (g >= 7) return 4
+  if (g >= 5) return 3
+  if (g >= 3) return 2
+  return 1 // 1 ou 2 générations
+}
+
+// Chiffres romains pour l'affichage des niveaux.
+const ROMAN = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' }
+
+/** Libellé du niveau DMM, ex. « Niveau III » / « Level III ». Vide si inconnu. */
+export function dmmLevelLabel(level, isFrench = true) {
+  if (!level || !ROMAN[level]) return isFrench ? '—' : '—'
+  return `${isFrench ? 'Niveau' : 'Level'} ${ROMAN[level]}`
+}
+
+/** Niveau DMM d'un engagement (à partir de sa génération max et de son étape). */
+export function dmmLevelForEngagement(engagement = {}) {
+  const stage = dmmStageForEngagement(engagement)
+  const gen = engagement.churchGeneration ?? engagement.maxGeneration
+  return dmmLevelFromGeneration(gen, stage)
+}
+
 /** Libellé d'affichage d'une étape DMM (fr/en). */
 export function dmmStageLabel(stage, isFrench = true) {
   if (!stage) return isFrench ? 'Non engagé' : 'Not engaged'
