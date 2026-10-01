@@ -13,18 +13,18 @@ import {
   X,
   Shield,
   LayoutDashboard,
-  Map,
   MapPin,
   Globe,
   FolderKanban,
   Activity,
-  GraduationCap,
   BarChart3,
   ClipboardList,
   Database,
   Flag,
   PanelLeftClose,
   PanelLeftOpen,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 
 const COLLAPSE_KEY = 'sidebar.collapsed'
@@ -39,26 +39,45 @@ const TopNavbar = () => {
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem(COLLAPSE_KEY) === 'true' } catch { return false }
   })
+  const [mainOpen, setMainOpen] = useState(true)
+  const [reportingOpen, setReportingOpen] = useState(false)
+  const [managementOpen, setManagementOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
 
-  // Base navigation items for all users
-  const baseNavItems = [
-    { path: '/regions', label: 'Regions', icon: Globe },
-    { path: '/countries', label: t('nav.countries') || 'Countries', icon: Flag },
-    { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
-    { path: '/projects', label: 'Projects', icon: FolderKanban },
-    { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
-    { path: '/activities', label: t('nav.activities') || 'Activités', icon: Activity },
-    { path: '/analyse-qualitative', label: t('nav.analyseQualitative') || 'Analyse', icon: ClipboardList },
-    { path: '/data-management', label: t('nav.dataManagement') || 'Données', icon: Database },
-    { path: '/dashboard', label: 'Global Dashboard', icon: LayoutDashboard, exact: true },
+  const navGroups = [
+    {
+      title: 'MAIN',
+      open: mainOpen,
+      setOpen: setMainOpen,
+      items: [
+        { path: '/regions', label: 'Regions', icon: Globe },
+        { path: '/countries', label: t('nav.countries') || 'Countries', icon: Flag },
+        { path: '/projects', label: 'Projects', icon: FolderKanban },
+        { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
+      ],
+    },
+    {
+      title: 'REPORTING',
+      open: reportingOpen,
+      setOpen: setReportingOpen,
+      items: [
+        { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
+        { path: '/activities', label: t('nav.activities') || 'Activities', icon: Activity },
+        { path: '/analyse-qualitative', label: t('nav.analyseQualitative') || 'Qualitative Analysis', icon: ClipboardList },
+        { path: '/dashboard', label: 'Global Dashboard', icon: LayoutDashboard, exact: true },
+      ],
+    },
+    {
+      title: 'MANAGEMENT',
+      open: managementOpen,
+      setOpen: setManagementOpen,
+      items: [
+        { path: '/data-management', label: t('nav.dataManagement') || 'Data Management', icon: Database },
+        ...(user?.role === 'admin' ? [{ path: '/admin/users', label: 'Administration', icon: Shield, admin: true }] : []),
+      ],
+    },
   ]
-
-  // Add Administration link for admin users only
-  const navItems = user?.role === 'admin'
-    ? [...baseNavItems, { path: '/admin/users', label: 'Administration', icon: Shield, admin: true }]
-    : baseNavItems
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -91,6 +110,29 @@ const TopNavbar = () => {
       return location.pathname.startsWith('/map') || location.pathname.startsWith('/geojson-map')
     }
     return location.pathname.startsWith(path)
+  }
+
+  const renderNavItem = (item) => {
+    const active = isActive(item.path)
+    const Icon = item.icon
+    return (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        onClick={() => setMobileOpen(false)}
+        title={collapsed ? item.label : undefined}
+        className={
+          `flex items-center gap-3 rounded-lg text-[15px] font-medium transition-all duration-150 font-[Arial] ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
+            active
+              ? 'bg-neutral-900 text-white'
+              : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
+          }${item.admin ? (active ? '' : ' bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800') : ''}`
+        }
+      >
+        {Icon && <Icon size={18} className="flex-shrink-0" />}
+        <span className={`whitespace-nowrap font-normal font-[Arial] ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
+      </NavLink>
+    )
   }
 
   const width = collapsed ? 'lg:w-16' : 'lg:w-64'
@@ -173,29 +215,25 @@ const TopNavbar = () => {
         )}
 
         {/* Nav items */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {navItems.map((item) => {
-            const active = isActive(item.path)
-            const Icon = item.icon
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileOpen(false)}
-                title={collapsed ? item.label : undefined}
-                className={
-                  `flex items-center gap-3 rounded-lg text-[15px] font-medium transition-all duration-150 font-[Arial] ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
-                    active
-                      ? 'bg-neutral-900 text-white'
-                      : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-                  }${item.admin ? (active ? '' : ' bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800') : ''}`
-                }
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-2">
+          {navGroups.map((group) => (
+            <div key={group.title} className="space-y-1">
+              <button
+                type="button"
+                onClick={() => group.setOpen((v) => !v)}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm tracking-widest text-neutral-400 ${collapsed ? 'lg:justify-center' : ''}`}
+                aria-expanded={group.open}
               >
-                {Icon && <Icon size={18} className="flex-shrink-0" />}
-                <span className={`whitespace-nowrap font-normal font-[Arial] ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
-              </NavLink>
-            )
-          })}
+                <span className={`font-normal ${collapsed ? 'lg:hidden' : ''}`}>{group.title}</span>
+                {!collapsed && (group.open ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+              </button>
+              {group.open && (
+                <div className="space-y-0.5">
+                  {group.items.map(renderNavItem)}
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
 
         {/* Footer: language (desktop) + user */}
