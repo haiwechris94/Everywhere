@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Building2,
@@ -13,6 +14,9 @@ import {
   Search,
   X,
   Loader2,
+  BookOpenText,
+  Headphones,
+  ChevronRight,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { projectsApi } from '../services/api'
@@ -200,6 +204,60 @@ const Projects = () => {
           </div>
         </div>
       </div>
+
+      {/* Initiatives spéciales : projets structurés (ESP 300, YCS) avec un suivi
+          par peuple. Chaque carte mène à la page dédiée de l'initiative. */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-neutral-900">{isFrench ? 'Initiatives' : 'Initiatives'}</h2>
+          <p className="text-sm text-neutral-500">
+            {isFrench
+              ? 'Programmes structurés avec un suivi détaillé par peuple.'
+              : 'Structured programs with detailed per-people tracking.'}
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link
+            to="/projects/initiatives/ESP300"
+            className="group flex items-start gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <BookOpenText size={24} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-neutral-900">ESP 300</h3>
+                <ChevronRight size={18} className="text-neutral-300 transition-colors group-hover:text-blue-500" />
+              </div>
+              <p className="mt-1 text-sm text-neutral-500 line-clamp-2">
+                {isFrench
+                  ? 'Ending Scripture Poverty Initiative — traduction audio des histoires bibliques (4 séries de passages) en langues locales.'
+                  : 'Ending Scripture Poverty Initiative — audio translation of Bible stories (4 Scripture Sets) into local languages.'}
+              </p>
+            </div>
+          </Link>
+
+          <Link
+            to="/projects/initiatives/YCS"
+            className="group flex items-start gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition-all hover:border-blue-300 hover:shadow-md"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <Headphones size={24} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-bold text-neutral-900">YCS</h3>
+                <ChevronRight size={18} className="text-neutral-300 transition-colors group-hover:text-emerald-500" />
+              </div>
+              <p className="mt-1 text-sm text-neutral-500 line-clamp-2">
+                {isFrench
+                  ? 'Initiative YCS — suivi des peuples engagés et de leur progression (contenu enrichi ultérieurement).'
+                  : 'YCS initiative — tracking of engaged peoples and their progress (content enriched later).'}
+              </p>
+            </div>
+          </Link>
+        </div>
+      </section>
 
       <section className="rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">

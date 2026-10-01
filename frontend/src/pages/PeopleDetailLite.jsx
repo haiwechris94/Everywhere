@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { reportingApi } from '../services/reportingApi'
+import { reportingApi, initiativesApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import { jpStageFor, evangelicalRangeFor, bibleStatusLabel } from '../utils/joshuaProjectScales'
@@ -253,6 +253,18 @@ const PeopleDetailLite = () => {
     retry: false,
   })
 
+  // Appartenance aux initiatives (ESP 300, YCS) pour afficher les cases OUI/NON.
+  const membershipQuery = useQuery({
+    queryKey: ['initiative-membership', peopleId],
+    queryFn: async () => {
+      const res = await initiativesApi.membership(peopleId)
+      return res?.data?.data || { ESP300: false, YCS: false }
+    },
+    enabled: !!peopleId,
+    retry: false,
+  })
+  const membership = membershipQuery.data || { ESP300: false, YCS: false }
+
   const loading = profileQuery.isLoading && rowQuery.isLoading
   if (loading) return <div className="p-6"><StateLoading label={isFrench ? 'Chargement du peuple…' : 'Loading people group…'} /></div>
 
@@ -479,6 +491,36 @@ const PeopleDetailLite = () => {
         {cards.map((c) => (
           <StatCard key={c.label} label={c.label} value={c.value} />
         ))}
+      </div>
+
+      {/* Cases « Projets » : ESP 300 et YCS.
+          OUI (vert) et cliquable si le peuple est engagé dans le projet → mène
+          au projet et au détail de ce peuple dans le projet.
+          NON (rouge) et NON cliquable sinon. */}
+      <div className="flex flex-wrap gap-3">
+        {[
+          { key: 'ESP300', label: 'ESP 300' },
+          { key: 'YCS', label: 'YCS' },
+        ].map(({ key, label }) => {
+          const engaged = !!membership[key]
+          const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
+          return (
+            <div key={key} className={base}>
+              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{label}</p>
+              {engaged ? (
+                <Link
+                  to={`/projects/initiatives/${key}/peoples/${peopleId}`}
+                  className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
+                  title={isFrench ? `Voir le détail ${label} de ce peuple` : `View this people's ${label} detail`}
+                >
+                  {isFrench ? 'OUI' : 'YES'}
+                </Link>
+              ) : (
+                <p className="mt-0.5 text-xl font-bold text-red-600">{isFrench ? 'NON' : 'NO'}</p>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {dmmCards.length > 0 && (

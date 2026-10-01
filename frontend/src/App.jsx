@@ -43,6 +43,8 @@ const Profile = lazy(() => import('./pages/Profile'))
 const PeopleGroupDetail = lazy(() => import('./pages/PeopleGroupDetail'))
 const VillageDetail = lazy(() => import('./pages/VillageDetail'))
 const Projects = lazy(() => import('./pages/Projects'))
+const InitiativeDetail = lazy(() => import('./pages/InitiativeDetail'))
+const InitiativePeopleDetail = lazy(() => import('./pages/InitiativePeopleDetail'))
 const DataManagement = lazy(() => import('./pages/DataManagement'))
 const PendingValidations = lazy(() => import('./pages/PendingValidations'))
 const RejectedPeopleGroups = lazy(() => import('./pages/RejectedPeopleGroups'))
@@ -52,6 +54,7 @@ const AnalyseQualitative = lazy(() => import('./pages/AnalyseQualitative'))
 const DmmReporting = lazy(() => import('./pages/DmmReporting'))
 const DmmReviewQueue = lazy(() => import('./pages/DmmReviewQueue'));
 const Regions = lazy(() => import('./pages/Regions'))
+const Pays = lazy(() => import('./pages/Pays'))
 const RegionCountries = lazy(() => import('./pages/RegionCountries'))
 const CountryPeoples = lazy(() => import('./pages/CountryPeoples'))
 const PeopleDetailLite = lazy(() => import('./pages/PeopleDetailLite'))
@@ -231,6 +234,20 @@ function App() {
               <Projects />
             </Suspense>
           } />
+          <Route path="projects/initiatives/:key" element={
+            <ErrorBoundary fallbackMessage="Error loading initiative.">
+              <Suspense fallback={<CompactLoader />}>
+                <InitiativeDetail />
+              </Suspense>
+            </ErrorBoundary>
+          } />
+          <Route path="projects/initiatives/:key/peoples/:peopleId" element={
+            <ErrorBoundary fallbackMessage="Error loading initiative people detail.">
+              <Suspense fallback={<CompactLoader />}>
+                <InitiativePeopleDetail />
+              </Suspense>
+            </ErrorBoundary>
+          } />
           <Route path="pending-validations" element={
             <Suspense fallback={<CompactLoader />}>
               <PendingValidations />
@@ -256,6 +273,11 @@ function App() {
           <Route path="regions" element={
             <Suspense fallback={<CompactLoader />}>
               <Regions />
+            </Suspense>
+          } />
+          <Route path="countries" element={
+            <Suspense fallback={<CompactLoader />}>
+              <Pays />
             </Suspense>
           } />
           <Route path="regions/:regionId" element={

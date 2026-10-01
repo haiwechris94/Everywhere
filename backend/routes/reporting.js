@@ -627,6 +627,96 @@ router.get('/regions', optionalAuth, async (req, res) => {
   }
 });
 
+// GET /api/reporting/countries?year=&quarter=&from=&to=
+// Flat list of EVERY country across ALL NG regions (source of truth: NG_AREAS +
+// COUNTRY_CONFIG), each with:
+//   - engagements   : # of DMM engagements (same source as the region fiche)
+//   - totalPGs       : total people groups (JP + IMB/PeopleGroups.org) in the country
+//   - unreachedPGs   : people groups with an "unreached" status (JP + IMB)
+// Because the list is derived from NG_AREAS/COUNTRY_CONFIG and counted live from
+// the collections, it stays in sync automatically when countries are added to
+// existing regions or when new regions/countries are introduced.
+//
+// Reference (non-DMM) people-group sources used for the PG counts. JP data is
+// stored with source 'Joshua Project'; IMB / PeopleGroups.org data with source
+// 'PeopleGroups.org' (legacy 'IMB' kept for safety). DMM/Survey rows are the
+// *engagements* and are intentionally excluded from the PG totals.
+const REFERENCE_PG_SOURCES = ['Joshua Project', 'PeopleGroups.org', 'IMB'];
+
+router.get('/countries', optionalAuth, async (req, res) => {
+  try {
+    // 1. Build the deduplicated country list across every region. Keep the first
+    //    region a country appears in so the row can deep-link to the existing
+    //    country fiche (/regions/:regionId/countries/:code).
+    const seen = new Map(); // alpha2 -> { ...descriptor, regionId }
+    for (const regionId of Object.keys(NG_AREAS)) {
+      for (const alpha2 of NG_AREAS[regionId]) {
+        const code = String(alpha2).toUpperCase();
+        if (seen.has(code)) continue;
+        const desc = ngCountryDescriptor(code);
+        if (!desc) continue;
+        seen.set(code, { ...desc, regionId });
+      }
+    }
+    const countryList = [...seen.values()];
+
+    // 2. Optional time window (year+quarter takes precedence over from/to),
+    //    mirroring the region/country fiche so the engagement numbers match.
+    let from = req.query.from;
+    let to = req.query.to;
+    let period = req.query.period ? String(req.query.period).trim() : null;
+    if (req.query.year && req.query.quarter) {
+      const w = quarterWindow(req.query.year, req.query.quarter);
+      from = w.from.toISOString();
+      to = w.to.toISOString();
+      period = `${parseInt(req.query.quarter, 10)}Q${String(req.query.year).slice(-2)}`;
+    }
+    const organization = req.query.organization;
+
+    // 3. Per-country rollup. Engagements come from the same numerical report used
+    //    by the region fiche; the PG counts are a live count over PeopleGroup.
+    const data = await Promise.all(
+      countryList.map(async (country) => {
+        const [cm, totalPGs, unreachedPGs] = await Promise.all([
+          buildNumericalReport({ from, to, organization, countries: [country.code], period }),
+          PeopleGroup.countDocuments({
+            countryCode: country.code,
+            source: { $in: REFERENCE_PG_SOURCES },
+          }),
+          PeopleGroup.countDocuments({
+            countryCode: country.code,
+            source: { $in: REFERENCE_PG_SOURCES },
+            $or: [{ engagementStatus: 'unreached' }, { status: 'unreached' }],
+          }),
+        ]);
+        const engagements = cm.churches?.engagements ?? cm.dmmFieldMetrics?.engagements ?? 0;
+        return {
+          code: country.code,
+          code3: country.code3,
+          name: country.name,
+          nameEn: country.nameEn,
+          regionId: country.regionId,
+          summary: {
+            engagements,
+            totalPGs,
+            unreachedPGs,
+          },
+        };
+      })
+    );
+
+    // 4. Stable alphabetical order by display name (French name preferred).
+    data.sort((a, b) =>
+      (a.name || a.nameEn || '').localeCompare(b.name || b.nameEn || '', 'fr')
+    );
+
+    res.json({ data });
+  } catch (error) {
+    console.error('Error building countries list:', error);
+    res.status(500).json({ error: 'Server error', message: error.message });
+  }
+});
+
 // GET /api/reporting/regions/:regionId?year=&quarter=&from=&to=
 // One region: its countries + aggregated DMM metrics for the whole region.
 router.get('/regions/:regionId', optionalAuth, async (req, res) => {

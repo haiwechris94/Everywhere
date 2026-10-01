@@ -66,7 +66,8 @@ const Sidebar = ({ mobileOpen = false, onMobileClose = () => {} }) => {
       icon: Globe,
       children: [
         { path: '/regions', label: 'Regions NG' },
-        { path: '/geography', label: t('nav.countries') || 'Pays' },
+        { path: '/countries', label: t('nav.countries') || 'Pays' },
+        { path: '/geography', label: t('nav.geographyHome') || 'Géographie' },
       ],
     },
     { path: '/peoples', label: t('nav.peoples') || 'Peuples', icon: Users },

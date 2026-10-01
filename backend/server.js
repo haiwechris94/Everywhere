@@ -68,6 +68,7 @@ const coachingSessionsRoutes = require('./routes/coachingSessions');
 const reportingRoutes = require('./routes/reporting');
 const dmmReviewRoutes = require('./routes/dmmReview');
 const projectRoutes = require('./routes/projects');
+const initiativesRoutes = require('./routes/initiatives');
 const { setupWeeklyCron: setupJPWeeklyCron } = require('./routes/joshuaProjectSync');
 
 // Import database seeding script
@@ -392,6 +393,7 @@ app.use('/api/coaching-sessions', coachingSessionsRoutes);
 app.use('/api/reporting', reportingRoutes);
 app.use('/api/dmm-review', dmmReviewRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/initiatives', initiativesRoutes);
 
 // Configure le CRON hebdomadaire JP (chaque lundi 3h)
 try { setupJPWeeklyCron(); } catch (e) { console.warn('⚠️  JP CRON setup failed:', e.message); }

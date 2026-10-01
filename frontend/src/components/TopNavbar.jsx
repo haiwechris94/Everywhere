@@ -22,6 +22,7 @@ import {
   BarChart3,
   ClipboardList,
   Database,
+  Flag,
   PanelLeftClose,
   PanelLeftOpen,
 } from 'lucide-react'
@@ -44,6 +45,7 @@ const TopNavbar = () => {
   // Base navigation items for all users
   const baseNavItems = [
     { path: '/regions', label: 'Regions', icon: Globe },
+    { path: '/countries', label: t('nav.countries') || 'Countries', icon: Flag },
     { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
     { path: '/projects', label: 'Projects', icon: FolderKanban },
     { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
