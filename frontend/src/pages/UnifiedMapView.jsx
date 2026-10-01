@@ -19,6 +19,25 @@ import MasterPeopleLayer from '../components/Map/MasterPeopleLayer'
 import DmmPeopleLayer from '../components/Map/DmmPeopleLayer'
 import { getCountryConfig, SUPPORTED_COUNTRIES } from '../config/supportedCountries'
 import { VORONOI_ZOOM_CONFIG, getVoronoiLevelForZoom } from '../config/countryConfig'
+import { useLanguage } from '../i18n'
+
+// ── i18n local labels (FR/EN) for the Unified Map UI ─────────────────────────
+// Small helper object: pick FR or EN label by current language flag.
+const UI_LABELS = {
+  title:              { fr: 'Carte unifiée des peuples', en: 'Unified Map of People groups' },
+  layers:             { fr: 'Calques',                   en: 'Layers' },
+  adminBoundaries:    { fr: 'Limites administratives',   en: 'Admin boundaries' },
+  activeSources:      { fr: 'Sources actifs',            en: 'Actives sources' },
+  locations:          { fr: 'Lieux',                     en: 'Locations' },
+  country:            { fr: 'Pays',                      en: 'Country' },
+  allCountries:       { fr: 'Tous les pays',             en: 'All countries' },
+  peopleStatus:       { fr: 'Statut des peuples',        en: 'People groups Status' },
+  allStatuses:        { fr: 'Tous les statuts',          en: 'All statuses' },
+  dmmEngagementStatus:{ fr: "Statut d'engagement DMM",   en: 'DMM Engagement Status' },
+  allDmmStatuses:     { fr: 'Tous les statuts DMM',      en: 'All DMM statuses' },
+  level:              { fr: 'Niveau',                    en: 'Level' },
+}
+const uiLabel = (key, isEnglish) => (isEnglish ? UI_LABELS[key].en : UI_LABELS[key].fr)
 
 /**
  * UnifiedMapView — "one people group = one marker" canonical map.
@@ -734,11 +753,16 @@ const KpiBar = ({ stats, theme }) => (
 // The four DMM stages. `key` matches the raw `p.dmmStatus` value AND the
 // dmmStatusFilter <select> values ('dmm' = Movement), so a click toggles the
 // same filter used by the sidebar select.
+// Couleurs ALIGNÉES sur la légende « Couverture DMM » (STATUS_COLORS_FILL) pour
+// que le tableau des indicateurs DMM et la légende soient cohérents. On ajoute
+// aussi les étapes « Non-atteint » et « Non renseigné » présentes dans la légende.
 const DMM_STAGE_META = [
-  { key: 'pioneer',        label: 'Pionnier',    color: '#f97316' },
-  { key: 'midway',         label: 'Mi-parcours', color: '#eab308' },
-  { key: 'tipping-point',  label: 'Basculement', color: '#22c55e' },
-  { key: 'dmm',            label: 'Movement',    color: '#2563eb' },
+  { key: 'pioneer',        label: 'Pionnier',      color: '#f97316' },
+  { key: 'midway',         label: 'Mi-parcours',   color: '#eab308' },
+  { key: 'tipping-point',  label: 'Basculement',   color: '#22c55e' },
+  { key: 'dmm',            label: 'Mouvement',     color: '#15803d' },
+  { key: 'unreached',      label: 'Non-atteint',   color: '#ef4444' },
+  { key: 'unknown',        label: 'Non renseigné', color: '#e5e7eb' },
 ]
 
 // Panel listing the number of engagements per DMM stage, with a coloured dot.
@@ -746,7 +770,7 @@ const DMM_STAGE_META = [
 // from the already-filtered engagement list, so it obeys the active filters.
 // Clicking a stage toggles the map's DMM status filter (activeFilter shows
 // which one is currently applied); a "Total" row is shown at the bottom.
-const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilter, onToggleStage }) => (
+const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilters, onToggleStage }) => (
   <div
     style={style}
     className={`absolute right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1 rounded-lg px-2.5 py-2 shadow-sm sm:flex ${panelCls(theme)}`}
@@ -755,7 +779,7 @@ const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilter, onToggl
       Engagements DMM
     </div>
     {DMM_STAGE_META.map(({ key, label, color }) => {
-      const active = activeFilter === key
+      const active = activeFilters.has(key)
       return (
         <button
           key={key}
@@ -765,7 +789,7 @@ const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilter, onToggl
           aria-pressed={active}
           className={`flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left leading-tight transition-colors ${
             active ? 'bg-indigo-500/15 ring-1 ring-indigo-400' : 'hover:bg-black/5'
-          } ${activeFilter && !active ? 'opacity-50' : ''}`}
+          } ${activeFilters.size > 0 && !active ? 'opacity-50' : ''}`}
         >
           <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
           <span className="min-w-0 flex-1 truncate text-[10px]">{label}</span>
@@ -1001,16 +1025,23 @@ const TopCountries = ({ data, theme }) => {
 
 export default function UnifiedMapView() {
   const navigate = useNavigate()
+  const { isEnglish } = useLanguage()
   const [activeSources, setActiveSources] = useState(() => new Set(['DMM']))
-  const [statusFilter, setStatusFilter] = useState('')
-  // Filtre par statut d'engagement DMM ('' = tous) et sélection fine des
-  // engagements DMM à afficher (Set des ids MASQUÉS ; vide = tout affiché).
-  const [dmmStatusFilter, setDmmStatusFilter] = useState('')
+  // Filtres multi-sélection : Set des statuts ACTIFS (vide = tous affichés).
+  // Permet d'activer/désactiver un ou plusieurs statuts à la fois.
+  const [statusFilters, setStatusFilters] = useState(() => new Set())
+  // Filtre par statut d'engagement DMM (Set actifs ; vide = tous) et sélection
+  // fine des engagements DMM à afficher (Set des ids MASQUÉS ; vide = tout affiché).
+  const [dmmStatusFilters, setDmmStatusFilters] = useState(() => new Set())
   const [hiddenDmmIds, setHiddenDmmIds] = useState(() => new Set())
   const [selected, setSelected] = useState(null)
   // Peuple ciblé via la recherche : la carte n'affiche QUE ses localisations.
   const [focusedPeople, setFocusedPeople] = useState(null) // marker object or null
   const [mapMode, setMapMode] = useState('coverage') // 'terrain' | 'coverage'
+  // Calque « Lieux / Locations » : affiche les POINTS des peuples et engagements
+  // (comme en mode terrain) ; peut être actif EN MÊME TEMPS que la couverture,
+  // pour voir simultanément la couverture et les points.
+  const [showLocations, setShowLocations] = useState(true)
 
   // Thème clair/sombre (persisté).
   const [theme, setTheme] = useState(() => {
@@ -1177,6 +1208,21 @@ export default function UnifiedMapView() {
     }) || null
   }, [adminSel, adminFeatures, nameAtLevel])
 
+  // Contour du PAYS sélectionné : union visuelle de toutes ses entités admin
+  // niveau 1 (FeatureCollection). Sert à tracer en orange le pays entier même
+  // quand aucun sous-niveau administratif n'est encore choisi.
+  const countryOutlineFeature = useMemo(() => {
+    if (!selectedCountry || !adminFeatures.length) return null
+    const lvl1 = adminFeatures.filter((f) => inferAdminLevel(f.properties) === 1)
+    const feats = lvl1.length ? lvl1 : adminFeatures
+    if (!feats.length) return null
+    return { type: 'FeatureCollection', features: feats }
+  }, [selectedCountry, adminFeatures])
+
+  // Entité réellement tracée en orange : le sous-niveau admin si choisi, sinon
+  // le contour du pays sélectionné.
+  const outlineFeature = selectedAdminFeature || countryOutlineFeature
+
   // Prédicat : un point [lng,lat] tombe-t-il dans l'entité admin sélectionnée ?
   const inSelectedAdmin = useCallback((lngLat) => {
     if (!selectedAdminFeature) return true
@@ -1229,11 +1275,11 @@ export default function UnifiedMapView() {
     return dmmPeoples.filter((p) => {
       // Engagements carry no JP/IMB "reached" status — only apply that filter
       // when the point actually has one (backward-compat with the peoples layer).
-      if (statusFilter && p.status !== undefined && p.status !== statusFilter) return false
-      if (dmmStatusFilter && (p.dmmStatus || 'unknown') !== dmmStatusFilter) return false
+      if (statusFilters.size && p.status !== undefined && !statusFilters.has(p.status)) return false
+      if (dmmStatusFilters.size && !dmmStatusFilters.has(p.dmmStatus || 'unknown')) return false
       return true
     })
-  }, [dmmPeoples, statusFilter, dmmStatusFilter])
+  }, [dmmPeoples, statusFilters, dmmStatusFilters])
 
   // Helper: un engagement a-t-il des coordonnées exploitables (≠ null et ≠ 0,0) ?
   const hasValidCoords = React.useCallback((p) => {
@@ -1264,10 +1310,11 @@ export default function UnifiedMapView() {
   // `p.dmmStatus` value (pioneer / midway / tipping-point / dmm=Movement) so the
   // panel keys line up with the dmmStatusFilter values used for click-to-filter.
   const dmmStageCounts = useMemo(() => {
-    const counts = { pioneer: 0, midway: 0, 'tipping-point': 0, dmm: 0 }
+    const counts = { pioneer: 0, midway: 0, 'tipping-point': 0, dmm: 0, unreached: 0, unknown: 0 }
     for (const p of dmmVisible) {
       const key = p.dmmStatus || 'unknown'
       if (counts[key] !== undefined) counts[key] += 1
+      else counts.unknown += 1
     }
     return counts
   }, [dmmVisible])
@@ -1290,12 +1337,12 @@ export default function UnifiedMapView() {
 
   const markers = useMemo(() => {
     let arr = data?.markers || []
-    if (statusFilter) arr = arr.filter((m) => m.status === statusFilter)
+    if (statusFilters.size) arr = arr.filter((m) => statusFilters.has(m.status))
     if (selectedCountry) arr = arr.filter((m) => m.country === selectedCountry)
     // Filtre par niveau administratif sélectionné (région/département/…).
     if (selectedAdminFeature) arr = arr.filter((m) => inSelectedAdmin(m.coordinates))
     return arr
-  }, [data, statusFilter, selectedCountry, selectedAdminFeature, inSelectedAdmin])
+  }, [data, statusFilters, selectedCountry, selectedAdminFeature, inSelectedAdmin])
 
   // Liste des pays réellement présents dans les marqueurs (code ISO alpha-3).
   // On affiche un nom FR pour les pays supportés, sinon le code brut.
@@ -1478,6 +1525,26 @@ export default function UnifiedMapView() {
     })
   }
 
+  // Active/désactive un statut (peuples) dans le filtre multi-sélection.
+  const toggleStatusFilter = useCallback((k) => {
+    setStatusFilters((prev) => {
+      const next = new Set(prev)
+      if (next.has(k)) next.delete(k)
+      else next.add(k)
+      return next
+    })
+  }, [])
+
+  // Active/désactive un statut d'engagement DMM dans le filtre multi-sélection.
+  const toggleDmmStatusFilter = useCallback((k) => {
+    setDmmStatusFilters((prev) => {
+      const next = new Set(prev)
+      if (next.has(k)) next.delete(k)
+      else next.add(k)
+      return next
+    })
+  }, [])
+
   const handleSearchPick = useCallback((m) => {
     setSelected(m)
     setFocusedPeople(m)
@@ -1564,10 +1631,10 @@ export default function UnifiedMapView() {
 
   const resetFilters = () => {
     setActiveSources(new Set(ALL_SOURCES))
-    setStatusFilter('')
+    setStatusFilters(new Set())
     setSelectedCountry('')
     setAdminSel({})
-    setDmmStatusFilter('')
+    setDmmStatusFilters(new Set())
     setHiddenDmmIds(new Set())
     setFocusedPeople(null)
   }
@@ -1585,7 +1652,6 @@ export default function UnifiedMapView() {
     }
   }, [mapInstance])
 
-  const [coverageLegendOpen, setCoverageLegendOpen] = useState(true)
 
   return (
     <div className="relative w-full" style={{ height: 'calc(100vh - 56px)' }}>
@@ -1629,8 +1695,8 @@ export default function UnifiedMapView() {
         <DmmIndicatorsPanel
           counts={dmmStageCounts}
           total={dmmVisible.length}
-          activeFilter={dmmStatusFilter}
-          onToggleStage={(key) => setDmmStatusFilter((cur) => (cur === key ? '' : key))}
+          activeFilters={dmmStatusFilters}
+          onToggleStage={toggleDmmStatusFilter}
           theme={theme}
           style={{ top: showKpis ? '16rem' : '4rem' }}
         />
@@ -1706,35 +1772,8 @@ export default function UnifiedMapView() {
       )}
 
 
-      {/* Légende Mode Couverture */}
-      {mapMode === 'coverage' && (
-        <div className={`absolute bottom-20 right-4 z-[1001] rounded-xl shadow-lg p-3 ${panelCls(theme)}`}>
-          <button
-            type="button"
-            onClick={() => setCoverageLegendOpen((v) => !v)}
-            className="flex w-full items-center justify-between gap-2 text-left"
-          >
-            <p className={`text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>Couverture DMM</p>
-            <ChevronLeft size={14} className={`transition-transform ${coverageLegendOpen ? '-rotate-90' : 'rotate-90'}`} />
-          </button>
-          {coverageLegendOpen && (
-            <div className="mt-2">
-              {Object.entries(STATUS_COLORS_FILL)
-                .filter(([k]) => k !== 'unknown')
-                .map(([status, cfg]) => (
-                  <div key={status} className="flex items-center gap-2 mb-1.5">
-                    <div className="w-4 h-3 rounded-sm flex-shrink-0" style={{ background: cfg.fill, opacity: 0.85 }} />
-                    <span className="text-xs">{cfg.label}</span>
-                  </div>
-                ))}
-              <div className="flex items-center gap-2 mt-1 pt-1 border-t border-black/10">
-                <div className="w-4 h-3 rounded-sm flex-shrink-0 bg-gray-300" />
-                <span className={`text-xs ${subtleText(theme)}`}>Non renseigné</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* La légende « Couverture DMM » a été retirée : les couleurs des statuts
+          sont désormais portées par le tableau des indicateurs DMM. */}
 
       {/* ── Barre latérale rétractable ───────────────────────────────── */}
       {!sidebarOpen && (
@@ -1747,33 +1786,69 @@ export default function UnifiedMapView() {
         </button>
       )}
       {sidebarOpen && (
-      <div className={`absolute top-4 left-4 z-[1000] w-72 max-h-[85vh] overflow-y-auto rounded-xl p-4 shadow-lg ${panelCls(theme)}`}>
+      <div className={`absolute top-4 left-16 z-[1000] w-64 max-h-[85vh] overflow-y-auto rounded-xl p-4 shadow-lg bg-opacity-30 ${panelCls(theme)}`}>
         <div className="mb-1 flex items-start justify-between">
-          <h3 className="font-bold">Carte unifiée des peuples</h3>
+          <h3 className="font-bold">{uiLabel('title', isEnglish)}</h3>
           <button onClick={() => setSidebarOpen(false)} className={subtleText(theme)} title="Réduire le panneau">
             <ChevronLeft size={18} />
           </button>
         </div>
-        <div className="mb-3">
-          <p className="mb-1 text-xs font-semibold text-gray-600">Sources</p>
-          {ALL_SOURCES.map((s) => (
-            <label key={s} className="flex cursor-pointer items-center gap-2 py-0.5 text-sm">
-              <input type="checkbox" checked={activeSources.has(s)} onChange={() => toggleSource(s)} />
-              <span>{SOURCE_LABELS[s]}</span>
+        {/* ── Calques / Layers ─────────────────────────────────────────
+            Groupe des calques superposables : Limites administratives (couverture),
+            Sources actifs, et Lieux (points des peuples/engagements). */}
+        <div className="mb-3 rounded-lg border border-neutral-200/50 p-2">
+          <p className={`mb-1.5 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+            <Layers size={12} /> {uiLabel('layers', isEnglish)}
+          </p>
+
+          {/* Calque « Limites administratives » (ex-« Niveau »). Pilote le niveau
+              administratif affiché par la couche de couverture. */}
+          <div className="mb-2">
+            <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('adminBoundaries', isEnglish)}</p>
+            <select
+              value={levelOverride || ''}
+              onChange={(e) => setLevelOverride(e.target.value || null)}
+              className={`w-full rounded border px-2 py-1 text-sm ${inputCls(theme)}`}
+            >
+              <option value="">{isEnglish ? 'Auto (by zoom)' : 'Auto (selon le zoom)'}</option>
+              <option value="region">{isEnglish ? 'Region' : 'Région'}</option>
+              <option value="departement">{isEnglish ? 'Department' : 'Département'}</option>
+              <option value="arrondissement">{isEnglish ? 'Subdivision' : 'Arrondissement'}</option>
+              <option value="village">{isEnglish ? 'Village' : 'Village'}</option>
+            </select>
+          </div>
+
+          {/* Calque « Sources actifs » (ex-« Sources »). */}
+          <div className="mb-2">
+            <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('activeSources', isEnglish)}</p>
+            {ALL_SOURCES.map((s) => (
+              <label key={s} className="flex cursor-pointer items-center gap-2 py-0.5 text-sm">
+                <input type="checkbox" checked={activeSources.has(s)} onChange={() => toggleSource(s)} />
+                <span>{SOURCE_LABELS[s]}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Calque « Lieux / Locations » : affiche les POINTS des peuples et des
+              engagements (comme en mode terrain). Peut être actif EN MÊME TEMPS
+              que la couverture → voir couverture + points simultanément. */}
+          <div>
+            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600">
+              <input type="checkbox" checked={showLocations} onChange={() => setShowLocations((v) => !v)} />
+              <MapPin size={12} /> <span>{uiLabel('locations', isEnglish)}</span>
             </label>
-          ))}
+          </div>
         </div>
 
-        {/* Pays en premier, puis directement le Niveau (mode couverture),
-            puis le Statut — ordre demandé pour le panneau de filtres. */}
+        {/* Pays, puis le Statut — ordre demandé pour le panneau de filtres. */}
         <div className="mb-3">
-          <p className="mb-1 text-xs font-semibold text-gray-600">Pays</p>
+          <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('country', isEnglish)}</p>
           <select
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
             className="w-full rounded border px-2 py-1 text-sm"
           >
-            <option value="">Tous les pays</option>
+            <option value="">{uiLabel('allCountries', isEnglish)}</option>
             {availableCountries.map(({ code, label }) => (
               <option key={code} value={code}>{label}</option>
             ))}
@@ -1808,54 +1883,43 @@ export default function UnifiedMapView() {
           )
         })}
 
-        {mapMode === 'coverage' && (
-          <div className="mb-3">
-            <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600">
-              <Layers size={12} /> Niveau
-            </p>
-            <select
-              value={levelOverride || ''}
-              onChange={(e) => setLevelOverride(e.target.value || null)}
-              className={`w-full rounded border px-2 py-1 text-sm ${inputCls(theme)}`}
-            >
-              <option value="">Auto (selon le zoom)</option>
-              <option value="region">Région</option>
-              <option value="departement">Département</option>
-              <option value="arrondissement">Arrondissement</option>
-              <option value="village">Village</option>
-            </select>
-          </div>
-        )}
-
         <div className="mb-3">
-          <p className="mb-1 text-xs font-semibold text-gray-600">Statut</p>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full rounded border px-2 py-1 text-sm"
-          >
-            <option value="">Tous les statuts</option>
+          <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('peopleStatus', isEnglish)}</p>
+          {/* Multi-sélection : cochez un ou plusieurs statuts (aucun coché = tous). */}
+          <div className="rounded border border-neutral-200/50 p-1">
             {Object.entries(STATUS_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+              <label key={k} className="flex cursor-pointer items-center gap-2 py-0.5 text-sm hover:bg-neutral-500/10 rounded px-1">
+                <input
+                  type="checkbox"
+                  checked={statusFilters.has(k)}
+                  onChange={() => toggleStatusFilter(k)}
+                />
+                <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: STATUS_COLORS[k] }} />
+                <span>{v}</span>
+              </label>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* ── Filtres DMM (couche séparée) ─────────────────────────── */}
         {activeSources.has('DMM') && (
           <>
             <div className="mb-3">
-              <p className="mb-1 text-xs font-semibold text-gray-600">Statut d'engagement DMM</p>
-              <select
-                value={dmmStatusFilter}
-                onChange={(e) => setDmmStatusFilter(e.target.value)}
-                className="w-full rounded border px-2 py-1 text-sm"
-              >
-                <option value="">Tous les statuts DMM</option>
-                {['pioneer', 'midway', 'tipping-point', 'dmm'].map((k) => (
-                  <option key={k} value={k}>{DMM_ENGAGEMENT_LABELS[k]}</option>
+              <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('dmmEngagementStatus', isEnglish)}</p>
+              {/* Multi-sélection : cochez un ou plusieurs statuts (aucun coché = tous). */}
+              <div className="rounded border border-neutral-200/50 p-1">
+                {DMM_STAGE_META.map(({ key, label, color }) => (
+                  <label key={key} className="flex cursor-pointer items-center gap-2 py-0.5 text-sm hover:bg-neutral-500/10 rounded px-1">
+                    <input
+                      type="checkbox"
+                      checked={dmmStatusFilters.has(key)}
+                      onChange={() => toggleDmmStatusFilter(key)}
+                    />
+                    <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
+                    <span>{label}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             <div className="mb-3">
@@ -1889,7 +1953,6 @@ export default function UnifiedMapView() {
                   const key = String(p.id)
                   const checked = !hiddenDmmIds.has(key)
                   const color = DMM_ENGAGEMENT_COLORS[p.dmmStatus] || DMM_ENGAGEMENT_COLORS.unknown
-                  const sub = [p.region, p.department].filter(Boolean).join(' · ')
                   return (
                     <label key={key} className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 text-xs hover:bg-neutral-500/10">
                       <input type="checkbox" checked={checked} onChange={() => toggleDmm(p.id)} className="mt-0.5" />
@@ -1911,7 +1974,7 @@ export default function UnifiedMapView() {
                             </span>
                           ) : null}
                         </span>
-                        {sub && <span className="block truncate text-[10px] text-gray-400">{sub}</span>}
+
                       </span>
                     </label>
                   )
@@ -2239,12 +2302,16 @@ export default function UnifiedMapView() {
         />
         {/* Recentre la carte sur le niveau administratif sélectionné. */}
         {selectedAdminFeature && <FitToFeature feature={selectedAdminFeature} />}
-        {/* Tracé orange de la sélection (pays / admin 1-2-3), obéit au filtre. */}
-        {selectedAdminFeature && <SelectionOutline feature={selectedAdminFeature} />}
+        {/* Tracé orange de la sélection : sous-niveau admin si choisi, sinon le
+            contour du PAYS sélectionné. Obéit au filtre. */}
+        {outlineFeature && <SelectionOutline feature={outlineFeature} />}
         {mapMode === 'coverage' && (
           <CoverageLayer visible countryCode={coverageCountry} peoples={coveragePeoples} levelOverride={levelOverride} onPeopleClick={goToPeopleSheet} />
         )}
-        {mapMode !== 'coverage' && !isLoading && !error && (
+        {/* Calque « Lieux / Locations » : les POINTS des peuples et engagements.
+            Affiché en mode terrain OU dès que le calque Lieux est actif — donc
+            possible SIMULTANÉMENT avec la couverture. */}
+        {(mapMode !== 'coverage' || showLocations) && !isLoading && !error && (
           <>
             {/* Pastilles rondes JP/IMB (« master people »). */}
             <MasterPeopleLayer markers={displayMarkers} activeSources={activeSources} onSelect={setSelected} />
