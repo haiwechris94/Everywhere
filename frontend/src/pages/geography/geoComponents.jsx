@@ -46,7 +46,7 @@ export const StateLoading = ({ label }) => (
 export const StateError = ({ label }) => (
   <div className="flex items-center justify-center gap-2 py-10 text-red-600 text-sm">
     <AlertCircle size={18} />
-    {label || 'Erreur de chargement.'}
+    {label || (isFrench ? 'Erreur de chargement.' : 'Loading error.')}
   </div>
 )
 export const StateEmpty = ({ label }) => (

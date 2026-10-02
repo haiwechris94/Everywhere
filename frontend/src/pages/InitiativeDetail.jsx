@@ -65,7 +65,7 @@ const SetCard = ({ set }) => {
   )
 }
 
-// Modal to engage a people in the initiative (managers only).
+// Modal to engage a people group in the initiative (managers only).
 const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
   const { isFrench } = useLanguage()
   const [term, setTerm] = useState('')
@@ -88,7 +88,7 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
         language,
       }),
     onSuccess: () => {
-      toast.success(isFrench ? 'Peuple ajouté' : 'People added')
+      toast.success(isFrench ? 'Peuple ajouté' : 'People group added')
       onAdded()
       onClose()
     },
@@ -100,7 +100,7 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
       <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900">
-            {isFrench ? 'Ajouter un peuple' : 'Add a people'}
+            {isFrench ? 'Ajouter un peuple' : 'Add a people group'}
           </h3>
           <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-slate-600"><X size={18} /></button>
         </div>
@@ -111,7 +111,7 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
             autoFocus
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder={isFrench ? 'Rechercher un peuple par nom…' : 'Search a people by name…'}
+            placeholder={isFrench ? 'Rechercher un peuple par nom…' : 'Search a people group by name…'}
             className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -233,7 +233,7 @@ const InitiativeDetail = () => {
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
             <Users2 size={20} className="text-slate-400" />
-            {isFrench ? 'Peuples engagés' : 'Engaged peoples'}
+            {isFrench ? 'Peuples engagés' : 'Engaged people groups'}
             <span className="text-sm font-normal text-slate-400">({peoples.length})</span>
           </h2>
           {canManage && (
@@ -242,20 +242,20 @@ const InitiativeDetail = () => {
               className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
             >
               <Plus size={16} />
-              {isFrench ? 'Ajouter un peuple' : 'Add a people'}
+              {isFrench ? 'Ajouter un peuple' : 'Add a people group'}
             </button>
           )}
         </div>
 
         {peoples.length === 0 ? (
-          <StateEmpty label={isFrench ? 'Aucun peuple engagé pour le moment.' : 'No engaged people yet.'} />
+          <StateEmpty label={isFrench ? 'Aucun peuple engagé pour le moment.' : 'No engaged people groups yet.'} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="py-2 pr-4 text-right text-xs font-semibold tracking-wide text-slate-500 w-12">#</th>
-                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People'}</th>
+                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
                   <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Pays' : 'Country'}</th>
                   <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Langue' : 'Language'}</th>
                   {key === 'ESP300' && (

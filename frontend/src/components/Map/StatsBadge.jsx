@@ -21,7 +21,7 @@ const StatsBadge = ({ peopleCount = 0, churchCount = 0, className = '' }) => {
         <Users size={14} className="text-primary-600" />
         <span className="font-semibold text-neutral-800 tabular-nums">{peopleCount}</span>
         <span className="text-neutral-500 hidden sm:inline">
-          {tx('map.stats.peoples', 'peoples')}
+          {tx('map.stats.peoples', 'people groups')}
         </span>
       </div>
       <div className="w-px h-4 bg-neutral-200" />

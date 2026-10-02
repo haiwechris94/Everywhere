@@ -19,7 +19,7 @@ import { useLanguage } from '../../i18n'
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const PeopleGroupImport = ({ onSuccess }) => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const [file, setFile] = useState(null)
   const [fileError, setFileError] = useState(null)
   const [validationResult, setValidationResult] = useState(null)
@@ -39,9 +39,9 @@ const PeopleGroupImport = ({ onSuccess }) => {
       document.body.appendChild(link)
       link.click()
       link.remove()
-      toast.success('Template downloaded!')
+      toast.success(isFrench ? 'Modèle téléchargé !' : 'Template downloaded!')
     } catch (error) {
-      toast.error('Failed to download template')
+      toast.error(isFrench ? 'Échec du téléchargement du modèle' : 'Failed to download template')
     }
   }
 
@@ -56,13 +56,13 @@ const PeopleGroupImport = ({ onSuccess }) => {
     onSuccess: (data) => {
       setValidationResult(data)
       if (data.summary.invalid === 0) {
-        toast.success(`All ${data.summary.valid} rows are valid!`)
+        toast.success(isFrench ? `Les ${data.summary.valid} lignes sont valides !` : `All ${data.summary.valid} rows are valid!`)
       } else {
-        toast.warning(`${data.summary.valid} valid, ${data.summary.invalid} invalid rows`)
+        toast.warning(isFrench ? `${data.summary.valid} valides, ${data.summary.invalid} lignes invalides` : `${data.summary.valid} valid, ${data.summary.invalid} invalid rows`)
       }
     },
     onError: (error) => {
-      const message = error.response?.data?.message || 'Échec de la validation'
+      const message = error.response?.data?.message || (isFrench ? 'Échec de la validation' : 'Validation failed')
       toast.error(message)
       console.error('Validation error:', error.response?.data)
     }
@@ -78,11 +78,11 @@ const PeopleGroupImport = ({ onSuccess }) => {
     },
     onSuccess: (data) => {
       setImportResult(data)
-      toast.success(`Imported ${data.summary.imported} people groups!`)
+      toast.success(isFrench ? `${data.summary.imported} groupes de peuple importés !` : `Imported ${data.summary.imported} people groups!`)
       if (onSuccess) onSuccess()
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Échec de l'importation"
+      const message = error.response?.data?.message || (isFrench ? "Échec de l'importation" : 'Import failed')
       const details = error.response?.data?.errors || []
       toast.error(message)
       console.error('Import error:', error.response?.data)
@@ -115,21 +115,21 @@ const PeopleGroupImport = ({ onSuccess }) => {
                   selectedFile.type === 'application/csv'
     
     if (!isCSV) {
-      setFileError('Please select a CSV file (.csv)')
+      setFileError(isFrench ? 'Veuillez sélectionner un fichier CSV (.csv)' : 'Please select a CSV file (.csv)')
       setFile(null)
       return
     }
     
     // Validate file size
     if (selectedFile.size > MAX_FILE_SIZE) {
-      setFileError(`File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`)
+      setFileError(isFrench ? `Le fichier est trop volumineux. La taille maximale est de ${MAX_FILE_SIZE / (1024 * 1024)} Mo` : `File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`)
       setFile(null)
       return
     }
     
     // Validate file is not empty
     if (selectedFile.size === 0) {
-      setFileError('File is empty. Please select a file with data.')
+      setFileError(isFrench ? 'Le fichier est vide. Veuillez sélectionner un fichier contenant des données.' : 'File is empty. Please select a file with data.')
       setFile(null)
       return
     }
@@ -139,7 +139,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
 
   const handleValidate = () => {
     if (!file) {
-      toast.error('Please select a file first')
+      toast.error(isFrench ? "Veuillez d'abord sélectionner un fichier" : 'Please select a file first')
       return
     }
     const formData = new FormData()
@@ -149,7 +149,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
 
   const handleImport = () => {
     if (!file) {
-      toast.error('Please select a file first')
+      toast.error(isFrench ? "Veuillez d'abord sélectionner un fichier" : 'Please select a file first')
       return
     }
     const formData = new FormData()
@@ -171,7 +171,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
         <Upload size={24} />
-        Import People Groups
+        {isFrench ? 'Importer des groupes de peuple' : 'Import People Groups'}
       </h2>
 
       {/* Instructions */}
@@ -179,19 +179,19 @@ const PeopleGroupImport = ({ onSuccess }) => {
         <div className="flex gap-3">
           <Info className="text-blue-500 flex-shrink-0 mt-0.5" size={20} />
           <div className="flex-1">
-            <h3 className="font-medium text-blue-800 mb-2">Quick Start</h3>
+            <h3 className="font-medium text-blue-800 mb-2">{isFrench ? 'Démarrage rapide' : 'Quick Start'}</h3>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• <strong>Required fields:</strong> name, latitude, longitude</li>
-              <li>• <strong>Supported formats:</strong> CSV with comma (,) or semicolon (;) delimiter</li>
-              <li>• <strong>Encoding:</strong> UTF-8 (with or without BOM)</li>
-              <li>• <strong>Max file size:</strong> 10MB</li>
+              <li>• <strong>{isFrench ? 'Champs requis :' : 'Required fields:'}</strong> name, latitude, longitude</li>
+              <li>• <strong>{isFrench ? 'Formats pris en charge :' : 'Supported formats:'}</strong> {isFrench ? 'CSV avec séparateur virgule (,) ou point-virgule (;)' : 'CSV with comma (,) or semicolon (;) delimiter'}</li>
+              <li>• <strong>{isFrench ? 'Encodage :' : 'Encoding:'}</strong> {isFrench ? 'UTF-8 (avec ou sans BOM)' : 'UTF-8 (with or without BOM)'}</li>
+              <li>• <strong>{isFrench ? 'Taille max du fichier :' : 'Max file size:'}</strong> 10MB</li>
             </ul>
             <button
               onClick={downloadTemplate}
               className="mt-3 btn-secondary flex items-center gap-2 text-sm"
             >
               <Download size={16} />
-              Download Template
+              {isFrench ? 'Télécharger le modèle' : 'Download Template'}
             </button>
           </div>
         </div>
@@ -200,7 +200,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
       {/* File Upload */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select CSV File
+          {isFrench ? 'Sélectionner un fichier CSV' : 'Select CSV File'}
         </label>
         <div className="flex items-center gap-4">
           <input
@@ -214,7 +214,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
             <button
               onClick={resetForm}
               className="text-gray-500 hover:text-gray-700"
-              title="Clear selection"
+              title={isFrench ? 'Effacer la sélection' : 'Clear selection'}
             >
               <XCircle size={20} />
             </button>
@@ -233,7 +233,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
         {file && !fileError && (
           <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
             <FileText size={16} />
-            {file.name} ({(file.size / 1024).toFixed(1)} KB)
+            {file.name} ({(file.size / 1024).toFixed(1)} {isFrench ? 'Ko' : 'KB'})
           </p>
         )}
       </div>
@@ -250,7 +250,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
           ) : (
             <CheckCircle size={18} />
           )}
-          Validate
+          {isFrench ? 'Valider' : 'Validate'}
         </button>
         <button
           onClick={handleImport}
@@ -262,26 +262,26 @@ const PeopleGroupImport = ({ onSuccess }) => {
           ) : (
             <Upload size={18} />
           )}
-          Import
+          {isFrench ? 'Importer' : 'Import'}
         </button>
       </div>
 
       {/* Validation Results */}
       {validationResult && (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 className="font-semibold text-gray-800 mb-3">Validation Results</h3>
+          <h3 className="font-semibold text-gray-800 mb-3">{isFrench ? 'Résultats de la validation' : 'Validation Results'}</h3>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center p-3 bg-white rounded-lg shadow-sm">
               <p className="text-2xl font-bold text-gray-800">{validationResult.summary.total}</p>
-              <p className="text-sm text-gray-500">Total Rows</p>
+              <p className="text-sm text-gray-500">{isFrench ? 'Total des lignes' : 'Total Rows'}</p>
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
               <p className="text-2xl font-bold text-green-600">{validationResult.summary.valid}</p>
-              <p className="text-sm text-green-600">Ready to Import</p>
+              <p className="text-sm text-green-600">{isFrench ? 'Prêtes à importer' : 'Ready to Import'}</p>
             </div>
             <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
               <p className="text-2xl font-bold text-red-600">{validationResult.summary.invalid}</p>
-              <p className="text-sm text-red-600">Need Fixes</p>
+              <p className="text-sm text-red-600">{isFrench ? 'À corriger' : 'Need Fixes'}</p>
             </div>
           </div>
 
@@ -290,17 +290,17 @@ const PeopleGroupImport = ({ onSuccess }) => {
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h4 className="font-medium text-yellow-700 mb-2 flex items-center gap-2">
                 <AlertTriangle size={16} />
-                Notes ({validationResult.warnings.length})
+                {isFrench ? 'Remarques' : 'Notes'} ({validationResult.warnings.length})
               </h4>
               <div className="max-h-32 overflow-y-auto space-y-1 text-sm text-yellow-700">
                 {validationResult.warnings.slice(0, 5).map((item, index) => (
                   <div key={index}>
-                    Row {item.row}: {item.warnings.map(w => w.message).join('; ')}
+                    {isFrench ? 'Ligne' : 'Row'} {item.row}: {item.warnings.map(w => w.message).join('; ')}
                   </div>
                 ))}
                 {validationResult.warnings.length > 5 && (
                   <div className="text-yellow-600 font-medium">
-                    ... and {validationResult.warnings.length - 5} more
+                    {isFrench ? `... et ${validationResult.warnings.length - 5} de plus` : `... and ${validationResult.warnings.length - 5} more`}
                   </div>
                 )}
               </div>
@@ -312,12 +312,12 @@ const PeopleGroupImport = ({ onSuccess }) => {
             <div className="mt-4">
               <h4 className="font-medium text-red-600 mb-2 flex items-center gap-2">
                 <AlertCircle size={16} />
-                Rows with Errors ({validationResult.invalidRows.length})
+                {isFrench ? 'Lignes avec des erreurs' : 'Rows with Errors'} ({validationResult.invalidRows.length})
               </h4>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {validationResult.invalidRows.map((row, index) => (
                   <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm">
-                    <div className="font-medium text-red-800">Row {row.row}</div>
+                    <div className="font-medium text-red-800">{isFrench ? 'Ligne' : 'Row'} {row.row}</div>
                     <ul className="mt-1 space-y-1 text-red-700">
                       {row.errors.map((error, i) => (
                         <li key={i}>• {error}</li>
@@ -338,7 +338,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
           {validationResult.summary.invalid === 0 && (
             <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
               <CheckCircle size={18} />
-              <span>All rows are valid! Click "Import" to add them to the database.</span>
+              <span>{isFrench ? 'Toutes les lignes sont valides ! Cliquez sur « Importer » pour les ajouter à la base de données.' : 'All rows are valid! Click "Import" to add them to the database.'}</span>
             </div>
           )}
         </div>
@@ -349,41 +349,41 @@ const PeopleGroupImport = ({ onSuccess }) => {
         <div className={`p-4 rounded-lg border ${importResult.summary.imported > 0 ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
           <h3 className={`font-semibold mb-3 flex items-center gap-2 ${importResult.summary.imported > 0 ? 'text-green-800' : 'text-yellow-800'}`}>
             {importResult.summary.imported > 0 ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
-            Import {importResult.summary.imported > 0 ? 'Complete' : 'Finished with Issues'}
+            {isFrench ? 'Importation ' : 'Import '}{importResult.summary.imported > 0 ? (isFrench ? 'terminée' : 'Complete') : (isFrench ? 'terminée avec des problèmes' : 'Finished with Issues')}
           </h3>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center p-3 bg-white rounded-lg shadow-sm">
               <p className="text-2xl font-bold text-gray-800">{importResult.summary.total}</p>
-              <p className="text-sm text-gray-500">Total Rows</p>
+              <p className="text-sm text-gray-500">{isFrench ? 'Total des lignes' : 'Total Rows'}</p>
             </div>
             <div className="text-center p-3 bg-green-100 rounded-lg border border-green-200">
               <p className="text-2xl font-bold text-green-600">{importResult.summary.imported}</p>
-              <p className="text-sm text-green-600">Imported</p>
+              <p className="text-sm text-green-600">{isFrench ? 'Importées' : 'Imported'}</p>
             </div>
             <div className="text-center p-3 bg-yellow-100 rounded-lg border border-yellow-200">
               <p className="text-2xl font-bold text-yellow-600">{importResult.summary.skipped}</p>
-              <p className="text-sm text-yellow-600">Skipped</p>
+              <p className="text-sm text-yellow-600">{isFrench ? 'Ignorées' : 'Skipped'}</p>
             </div>
           </div>
 
           {/* Created vs Updated breakdown */}
           <div className="flex flex-wrap gap-2 mb-4 text-sm">
             <span className="px-2 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700">
-              {importResult.summary.created ?? 0} créés
+              {importResult.summary.created ?? 0} {isFrench ? 'créés' : 'created'}
             </span>
             <span className="px-2 py-1 rounded bg-blue-50 border border-blue-200 text-blue-700">
-              {importResult.summary.updated ?? 0} mis à jour
+              {importResult.summary.updated ?? 0} {isFrench ? 'mis à jour' : 'updated'}
             </span>
           </div>
 
           {/* Updated rows (quarter → quarter) */}
           {importResult.report?.updated?.length > 0 && (
             <div className="mt-2">
-              <h4 className="font-medium text-blue-700 mb-2">Mises à jour</h4>
+              <h4 className="font-medium text-blue-700 mb-2">{isFrench ? 'Mises à jour' : 'Updates'}</h4>
               <div className="max-h-40 overflow-y-auto space-y-1">
                 {importResult.report.updated.map((item, index) => (
                   <div key={index} className="p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-                    <span className="font-medium">Ligne {item.row}:</span>{' '}
+                    <span className="font-medium">{isFrench ? 'Ligne' : 'Row'} {item.row}:</span>{' '}
                     {item.name}
                     {item.previousReportPeriod && item.newReportPeriod && (
                       <span className="text-blue-600"> ({item.previousReportPeriod} → {item.newReportPeriod})</span>
@@ -399,12 +399,12 @@ const PeopleGroupImport = ({ onSuccess }) => {
             <div className="mt-4">
               <h4 className="font-medium text-yellow-700 mb-2 flex items-center gap-2">
                 <AlertTriangle size={16} />
-                Skipped Rows
+                {isFrench ? 'Lignes ignorées' : 'Skipped Rows'}
               </h4>
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {importResult.skipped.map((item, index) => (
                   <div key={index} className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                    <span className="font-medium text-yellow-800">Row {item.row}:</span>{' '}
+                    <span className="font-medium text-yellow-800">{isFrench ? 'Ligne' : 'Row'} {item.row}:</span>{' '}
                     <span className="text-yellow-700">{item.reason}</span>
                   </div>
                 ))}
@@ -416,7 +416,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
           {importResult.summary.imported > 0 && importResult.summary.skipped === 0 && (
             <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded-lg flex items-center gap-2 text-green-800">
               <CheckCircle size={18} />
-              <span>All {importResult.summary.imported} people groups imported successfully!</span>
+              <span>{isFrench ? `Les ${importResult.summary.imported} groupes de peuple ont été importés avec succès !` : `All ${importResult.summary.imported} people groups imported successfully!`}</span>
             </div>
           )}
         </div>

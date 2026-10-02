@@ -607,7 +607,7 @@ const AnalyseQualitative = () => {
               }`}
             >
               <FileText size={20} />
-              {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People'}
+              {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People Group'}
             </button>
             <button
               onClick={() => setActiveTab('resultats')}
@@ -633,7 +633,7 @@ const AnalyseQualitative = () => {
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <Users size={20} className="text-purple-600" />
-                    {language === 'fr' ? 'Sélectionner un peuple' : 'Select a People'}
+                    {language === 'fr' ? 'Sélectionner un peuple' : 'Select a People Group'}
                   </h3>
                   
                   {/* Search */}
@@ -1013,7 +1013,7 @@ const AnalyseQualitative = () => {
                     onClick={() => setActiveTab('analyser')}
                     className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold"
                   >
-                    {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People'}
+                    {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People Group'}
                   </button>
                 </div>
               ) : (

@@ -1786,7 +1786,7 @@ export default function UnifiedMapView() {
         </button>
       )}
       {sidebarOpen && (
-      <div className={`absolute top-4 left-16 z-[1000] w-64 max-h-[85vh] overflow-y-auto rounded-xl p-4 shadow-lg bg-opacity-30 ${panelCls(theme)}`}>
+      <div className={`absolute top-4 left-16 z-[1000] w-64 max-h-[85vh] overflow-y-auto rounded-xl p-4 shadow-lg ${theme === 'dark' ? 'bg-neutral-900/95 text-neutral-100 border border-neutral-700' : 'bg-white/40 text-gray-800 border border-neutral-100'} backdrop-blur`}>
         <div className="mb-1 flex items-start justify-between">
           <h3 className="font-bold">{uiLabel('title', isEnglish)}</h3>
           <button onClick={() => setSidebarOpen(false)} className={subtleText(theme)} title="Réduire le panneau">

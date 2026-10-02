@@ -103,7 +103,7 @@ const EXPORT_FORMATS = [
 ]
 
 const DataManagement = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const queryClient = useQueryClient()
   const fileInputRef = useRef(null)
   const [activeTab, setActiveTab] = useState('import')
@@ -154,9 +154,9 @@ const DataManagement = () => {
     try {
       const res = await api.post('/api/jp-sync/trigger', { dryRun: jpIsDryRun })
       if (res.data.alreadyRunning) {
-        toast('⏳ Sync déjà en cours...', { icon: '🔄' })
+        toast(isFrench ? '⏳ Sync déjà en cours...' : '⏳ Sync already running...', { icon: '🔄' })
       } else {
-        toast.success('🚀 Synchronisation JP démarrée !')
+        toast.success(isFrench ? '🚀 Synchronisation JP démarrée !' : '🚀 JP sync started!')
         refetchStatus()
       }
     } catch (err) {

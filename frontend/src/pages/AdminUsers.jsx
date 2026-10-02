@@ -43,30 +43,36 @@ const ROLE_COLORS = {
 }
 
 const ROLE_LABELS = {
-  admin: 'Admin',
-  supervisor: 'Superviseur',
-  missionary: 'Missionnaire',
-  guest: 'Invité'
+  en: { admin: 'Admin', supervisor: 'Supervisor', missionary: 'Missionary', guest: 'Guest' },
+  fr: { admin: 'Admin', supervisor: 'Superviseur', missionary: 'Missionnaire', guest: 'Invité' },
 }
 
-const RoleBadge = ({ role }) => (
-  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${ROLE_COLORS[role] || ROLE_COLORS.guest}`}>
-    {ROLE_LABELS[role] || role}
-  </span>
-)
+const RoleBadge = ({ role }) => {
+  const { isFrench } = useLanguage()
+  const labels = isFrench ? ROLE_LABELS.fr : ROLE_LABELS.en
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${ROLE_COLORS[role] || ROLE_COLORS.guest}`}>
+      {labels[role] || role}
+    </span>
+  )
+}
 
-const StatusBadge = ({ isActive }) => (
-  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-    isActive 
-      ? 'bg-green-100 text-green-800 border-green-200' 
-      : 'bg-red-100 text-red-800 border-red-200'
-  }`}>
-    {isActive ? 'Actif' : 'Bloqué'}
-  </span>
-)
+const StatusBadge = ({ isActive }) => {
+  const { isFrench } = useLanguage()
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+      isActive 
+        ? 'bg-green-100 text-green-800 border-green-200' 
+        : 'bg-red-100 text-red-800 border-red-200'
+    }`}>
+      {isActive ? (isFrench ? 'Actif' : 'Active') : (isFrench ? 'Bloqué' : 'Blocked')}
+    </span>
+  )
+}
 
 // Confirmation Modal Component
-const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirmer', isDestructive = false, isLoading = false }) => {
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText, isDestructive = false, isLoading = false }) => {
+  const { isFrench } = useLanguage()
   if (!isOpen) return null
   
   return (
@@ -91,7 +97,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
               disabled={isLoading}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
             >
-              Annuler
+              {isFrench ? 'Annuler' : 'Cancel'}
             </button>
             <button
               onClick={onConfirm}
@@ -123,6 +129,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const { isFrench } = useLanguage()
   
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -131,12 +138,12 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
     
     try {
       const response = await api.post('/api/admin/users', formData)
-      toast.success('Utilisateur créé avec succès')
+      toast.success(isFrench ? 'Utilisateur créé avec succès' : 'User created successfully')
       onSuccess(response.data.user)
       onClose()
       setFormData({ name: '', email: '', password: '', role: 'missionary', organizationName: '' })
     } catch (err) {
-      const message = err.response?.data?.message || 'Erreur lors de la création'
+      const message = err.response?.data?.message || (isFrench ? 'Erreur lors de la création' : 'Error while creating')
       setError(message)
       toast.error(message)
     } finally {
@@ -152,7 +159,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
         <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Créer un utilisateur</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{isFrench ? 'Créer un utilisateur' : 'Create a user'}</h3>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X size={20} />
             </button>
@@ -166,7 +173,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Nom *' : 'Name *'}</label>
               <input
                 type="text"
                 required
@@ -190,7 +197,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Mot de passe *' : 'Password *'}</label>
               <input
                 type="password"
                 required
@@ -203,7 +210,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rôle *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Rôle *' : 'Role *'}</label>
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -211,19 +218,19 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
               >
                 <option value="guest">Invité (lecture seule)</option>
                 <option value="missionary">Missionnaire (lecture/écriture)</option>
-                <option value="supervisor">Superviseur</option>
-                <option value="admin">Administrateur</option>
+                <option value="supervisor">{isFrench ? 'Superviseur' : 'Supervisor'}</option>
+                <option value="admin">{isFrench ? 'Administrateur' : 'Administrator'}</option>
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Organisation</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Organisation' : 'Organization'}</label>
               <input
                 type="text"
                 value={formData.organizationName}
                 onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Nom de l'organisation (optionnel)"
+                placeholder={isFrench ? "Nom de l'organisation (optionnel)" : 'Organization name (optional)'}
               />
             </div>
             
@@ -234,7 +241,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
                 disabled={isLoading}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Annuler
+                {isFrench ? 'Annuler' : 'Cancel'}
               </button>
               <button
                 type="submit"
@@ -253,7 +260,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
 }
 
 const AdminUsers = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const { user: currentUser } = useAuth()
   
   // State
@@ -294,7 +301,7 @@ const AdminUsers = () => {
       setTotal(response.data.total)
     } catch (err) {
       console.error('Error fetching users:', err)
-      setError(err.response?.data?.message || 'Erreur lors du chargement des utilisateurs')
+      setError(err.response?.data?.message || (isFrench ? 'Erreur lors du chargement des utilisateurs' : 'Error while loading users'))
     } finally {
       setLoading(false)
     }
@@ -334,7 +341,7 @@ const AdminUsers = () => {
       fetchUsers()
       setConfirmModal({ isOpen: false, type: '', user: null })
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erreur lors de la modification du statut')
+      toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la modification du statut' : 'Error while updating status'))
     } finally {
       setActionLoading(false)
     }
@@ -417,7 +424,7 @@ const AdminUsers = () => {
           >
             <option value="">{t('adminUsers.allRoles') || 'All roles'}</option>
             <option value="admin">Admin</option>
-            <option value="supervisor">Superviseur</option>
+            <option value="supervisor">{isFrench ? 'Superviseur' : 'Supervisor'}</option>
             <option value="missionary">Missionnaire</option>
             <option value="guest">Invité</option>
           </select>
@@ -438,7 +445,7 @@ const AdminUsers = () => {
             onClick={fetchUsers}
             disabled={loading}
             className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Actualiser"
+            title={isFrench ? 'Actualiser' : 'Refresh'}
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -506,7 +513,7 @@ const AdminUsers = () => {
                       >
                         <option value="guest">Invité</option>
                         <option value="missionary">Missionnaire</option>
-                        <option value="supervisor">Superviseur</option>
+                        <option value="supervisor">{isFrench ? 'Superviseur' : 'Supervisor'}</option>
                         <option value="admin">Admin</option>
                       </select>
                     </td>
@@ -537,7 +544,7 @@ const AdminUsers = () => {
                                 ? 'text-yellow-600 hover:bg-yellow-50'
                                 : 'text-green-600 hover:bg-green-50'
                           }`}
-                          title={user.isActive !== false ? 'Bloquer' : 'Débloquer'}
+                          title={user.isActive !== false ? (isFrench ? 'Bloquer' : 'Block') : (isFrench ? 'Débloquer' : 'Unblock')}
                         >
                           {user.isActive !== false ? <UserX size={18} /> : <UserCheck size={18} />}
                         </button>
@@ -555,7 +562,7 @@ const AdminUsers = () => {
                               ? 'text-gray-300 cursor-not-allowed'
                               : 'text-red-600 hover:bg-red-50'
                           }`}
-                          title="Supprimer"
+                          title={isFrench ? 'Supprimer' : 'Delete'}
                         >
                           <Trash2 size={18} />
                         </button>
@@ -567,7 +574,7 @@ const AdminUsers = () => {
                 {users.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
-                      Aucun utilisateur trouvé
+                      {isFrench ? 'Aucun utilisateur trouvé' : 'No user found'}
                     </td>
                   </tr>
                 )}
@@ -614,13 +621,13 @@ const AdminUsers = () => {
         isOpen={confirmModal.isOpen && confirmModal.type === 'toggle'}
         onClose={() => setConfirmModal({ isOpen: false, type: '', user: null })}
         onConfirm={handleToggleActive}
-        title={confirmModal.user?.isActive !== false ? 'Bloquer cet utilisateur ?' : 'Débloquer cet utilisateur ?'}
+        title={confirmModal.user?.isActive !== false ? (isFrench ? 'Bloquer cet utilisateur ?' : 'Block this user?') : (isFrench ? 'Débloquer cet utilisateur ?' : 'Unblock this user?')}
         message={
           confirmModal.user?.isActive !== false
             ? `${confirmModal.user?.name} ne pourra plus se connecter à l'application.`
             : `${confirmModal.user?.name} pourra à nouveau se connecter.`
         }
-        confirmText={confirmModal.user?.isActive !== false ? 'Bloquer' : 'Débloquer'}
+        confirmText={confirmModal.user?.isActive !== false ? (isFrench ? 'Bloquer' : 'Block') : (isFrench ? 'Débloquer' : 'Unblock')}
         isDestructive={confirmModal.user?.isActive !== false}
         isLoading={actionLoading}
       />
@@ -630,9 +637,9 @@ const AdminUsers = () => {
         isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}
         onClose={() => setConfirmModal({ isOpen: false, type: '', user: null })}
         onConfirm={handleDelete}
-        title="Supprimer cet utilisateur ?"
+        title={isFrench ? 'Supprimer cet utilisateur ?' : 'Delete this user?'}
         message={`Cette action est irréversible. Toutes les données associées à ${confirmModal.user?.name} seront perdues.`}
-        confirmText="Supprimer"
+        confirmText={isFrench ? 'Supprimer' : 'Delete'}
         isDestructive={true}
         isLoading={actionLoading}
       />
