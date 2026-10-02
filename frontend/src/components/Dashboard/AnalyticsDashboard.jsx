@@ -16,9 +16,22 @@ import {
   Home, Target, BarChart3, Calendar, Church, Award, ArrowUp, ArrowDown, Flag, Search,
 } from 'lucide-react'
 import axios from 'axios'
-import { statsApi, villagesApi, activitiesApi, peopleGroupsApi, dashboardApi } from '../../services/api'
+import { statsApi, villagesApi, activitiesApi, peopleGroupsApi, dashboardApi, masterPeopleApi } from '../../services/api'
 import SourceDonutChart from './SourceDonutChart'
+import DmmProgressTable from './DmmProgressTable'
 import { useLanguage } from '../../i18n'
+
+// Couleurs des statuts JP/IMB, identiques à Unified Map (STATUS_COLORS).
+// Sert à colorer les cases chiffrées de « Global People Groups ».
+const JP_IMB_STATUS_COLORS = {
+  UNREACHED: '#ef4444',
+  FRONTIER: '#b91c1c',
+  MINIMALLY_REACHED: '#f97316',
+  REACHED: '#15803d',
+  UNKNOWN: '#9ca3af',
+}
+const jpImbStatusColor = (status) =>
+  JP_IMB_STATUS_COLORS[String(status || 'UNKNOWN').toUpperCase()] || '#9ca3af'
 import { initSocket, getSocket, subscribeToPeopleGroupUpdates, subscribeToVillageStatusUpdates } from '../../services/socket'
 import { format } from 'date-fns'
 import { fr, enUS } from 'date-fns/locale'
@@ -992,25 +1005,15 @@ const EvolutionTooltip = ({ active, payload, label }) => {
 // WIDGET — JP Non-Engagés
 // Combien de peuples Joshua Project ont déjà une équipe DMM ?
 // ════════════════════════════════════════════════════════════════════════════
-const JPCoverageWidget = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ['jp-coverage'],
-    queryFn: () => dashboardApi.getJPCoverage().then(r => r.data),
-    staleTime: 300000,
-  })
+// Désormais piloté par le LIEN JP+IMB de la carte : on reçoit en props le total
+// de peuples JP/IMB dédupliqués (JP et IMB fusionnés = 1), le nombre de ces
+// peuples ayant AU MOINS un engagement DMM (engaged) et le reste sans engagement
+// DMM (nonEngaged). Aucune donnée n'est dupliquée : même ensemble que la carte.
+const JPCoverageWidget = ({ total = 0, engaged = 0, nonEngaged = 0 }) => {
+  const pct = total > 0 ? Math.round((engaged / total) * 100) : 0
+  const gapPct = total > 0 ? Math.round((nonEngaged / total) * 100) : 0
 
-  if (isLoading) {
-    return (
-      <Card>
-        <Skeleton className="h-5 w-40 mb-4" />
-        <Skeleton className="h-32 rounded-xl mb-3" />
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-3/4" />
-      </Card>
-    )
-  }
-
-  if (!data || data.jp?.total === 0) {
+  if (!total) {
     return (
       <Card>
         <div className="flex items-center gap-3 mb-4">
@@ -1018,33 +1021,18 @@ const JPCoverageWidget = () => {
             <Globe size={18} className="text-amber-600" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 text-sm">Peuples JP non-engagés</h3>
-            <p className="text-xs text-gray-400">Joshua Project × DMM</p>
+            <h3 className="font-bold text-gray-800 text-sm">Peuples JP/IMB non-engagés</h3>
+            <p className="text-xs text-gray-400">JP + IMB × DMM</p>
           </div>
         </div>
         <div className="text-center py-8 text-gray-400">
           <Globe size={32} className="mx-auto mb-2 opacity-30" />
-          <p className="text-sm font-medium">Aucune donnée JP importée</p>
-          <p className="text-xs mt-1">Importez un CSV Joshua Project pour activer cette vue.</p>
+          <p className="text-sm font-medium">Aucun peuple JP/IMB sur la carte</p>
+          <p className="text-xs mt-1">Importez des données JP / IMB pour activer cette vue.</p>
         </div>
       </Card>
     )
   }
-
-  const jp    = data.jp   || {}
-  const dmm   = data.dmm  || {}
-  const pct   = data.coveragePct || 0
-  const gap   = jp.total - dmm.total
-  const gapPct = jp.total > 0 ? Math.round((gap / jp.total) * 100) : 0
-
-  // Répartition des statuts JP
-  const statusConfig = [
-    { key: 'unreached',       label: 'Non-atteint', color: '#ef4444', bg: 'bg-red-50' },
-    { key: 'pioneer',         label: 'Pionnier',    color: '#f97316', bg: 'bg-orange-50' },
-    { key: 'midway',          label: 'Mi-parcours', color: '#eab308', bg: 'bg-yellow-50' },
-    { key: 'tipping-point',   label: 'Basculement', color: '#22c55e', bg: 'bg-green-50' },
-    { key: 'dmm',             label: 'Mouvement',   color: '#15803d', bg: 'bg-emerald-50' },
-  ]
 
   return (
     <Card>
@@ -1055,12 +1043,12 @@ const JPCoverageWidget = () => {
             <Globe size={18} className="text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-800 text-sm">Peuples JP non-engagés</h3>
-            <p className="text-xs text-gray-400">Joshua Project × DMM terrain</p>
+            <h3 className="font-bold text-gray-800 text-sm">Peuples JP/IMB non-engagés</h3>
+            <p className="text-xs text-gray-400">JP + IMB liés × DMM terrain</p>
           </div>
         </div>
         <span className="text-xs font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
-          {pct}% couverts
+          {pct}% engagés
         </span>
       </div>
 
@@ -1070,8 +1058,8 @@ const JPCoverageWidget = () => {
           <PieChart>
             <Pie
               data={[
-                { value: dmm.total || 0, fill: C.success },
-                { value: Math.max(0, gap),    fill: '#FEE2E2' },
+                { value: engaged, fill: C.success },
+                { value: Math.max(0, nonEngaged), fill: '#FEE2E2' },
               ]}
               cx="50%" cy="85%"
               startAngle={180} endAngle={0}
@@ -1092,69 +1080,47 @@ const JPCoverageWidget = () => {
         </div>
       </div>
 
-      {/* 3 stats principales */}
+      {/* 3 stats principales : Total JP+IMB · avec engagement DMM · sans engagement */}
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="text-center rounded-xl p-3 bg-gray-50 border border-gray-100">
-          <p className="text-xl font-bold text-gray-800">{jp.total}</p>
-          <p className="text-[10px] text-gray-500 font-medium leading-tight">Total JP</p>
+          <p className="text-xl font-bold text-gray-800">{total}</p>
+          <p className="text-[10px] text-gray-500 font-medium leading-tight">Total JP+IMB</p>
         </div>
         <div className="text-center rounded-xl p-3 bg-emerald-50 border border-emerald-100">
-          <p className="text-xl font-bold text-emerald-700">{dmm.total}</p>
-          <p className="text-[10px] text-emerald-600 font-medium leading-tight">DMM actif</p>
+          <p className="text-xl font-bold text-emerald-700">{engaged}</p>
+          <p className="text-[10px] text-emerald-600 font-medium leading-tight">Avec engagement DMM</p>
         </div>
         <div className="text-center rounded-xl p-3 bg-red-50 border border-red-100">
-          <p className="text-xl font-bold text-red-600">{Math.max(0, gap)}</p>
-          <p className="text-[10px] text-red-500 font-medium leading-tight">Sans équipe</p>
+          <p className="text-xl font-bold text-red-600">{Math.max(0, nonEngaged)}</p>
+          <p className="text-[10px] text-red-500 font-medium leading-tight">Sans engagement DMM</p>
         </div>
       </div>
 
-      {/* Badges Frontier + Least Reached */}
-      {(jp.frontier > 0 || jp.leastReached > 0) && (
-        <div className="flex gap-2 mb-4">
-          {jp.frontier > 0 && (
-            <div className="flex-1 text-center rounded-lg p-2 bg-red-100 border border-red-200">
-              <p className="text-base font-bold text-red-700">{jp.frontier}</p>
-              <p className="text-[10px] text-red-600 font-medium">🔴 Frontier</p>
-            </div>
-          )}
-          {jp.leastReached > 0 && (
-            <div className="flex-1 text-center rounded-lg p-2 bg-orange-100 border border-orange-200">
-              <p className="text-base font-bold text-orange-700">{jp.leastReached}</p>
-              <p className="text-[10px] text-orange-600 font-medium">⚠ Least Reached</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Barre de progression par statut JP */}
+      {/* Barre engagés vs non-engagés */}
       <div className="space-y-1.5">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Répartition JP par statut</p>
-        {statusConfig.map(s => {
-          const count = jp.byStatus?.[s.key] || 0
-          if (count === 0) return null
-          const w = jp.total > 0 ? Math.round((count / jp.total) * 100) : 0
-          return (
-            <div key={s.key} className="flex items-center gap-2">
-              <span className="text-[10px] text-gray-500 w-20 flex-shrink-0 truncate">{s.label}</span>
-              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{ width: `${w}%`, backgroundColor: s.color }}
-                />
-              </div>
-              <span className="text-[10px] font-bold text-gray-600 w-6 text-right">{count}</span>
-            </div>
-          )
-        })}
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Lien JP+IMB × DMM</p>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">Avec DMM</span>
+          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: '#15803d' }} />
+          </div>
+          <span className="text-[10px] font-bold text-gray-600 w-6 text-right">{engaged}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">Sans DMM</span>
+          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${gapPct}%`, backgroundColor: '#ef4444' }} />
+          </div>
+          <span className="text-[10px] font-bold text-gray-600 w-6 text-right">{Math.max(0, nonEngaged)}</span>
+        </div>
       </div>
 
       {/* Appel à l'action si gros gap */}
       {gapPct > 50 && (
         <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
           <p className="text-xs font-semibold text-amber-800">
-            ⚡ {gapPct}% des peuples JP n'ont pas encore d'équipe DMM terrain.
+            ⚡ {gapPct}% des peuples JP+IMB n'ont pas encore d'engagement DMM.
           </p>
-          <p className="text-[11px] text-amber-600 mt-0.5">Priorisez les {jp.frontier} peuples Frontier.</p>
         </div>
       )}
     </Card>
@@ -1424,6 +1390,35 @@ const AnalyticsDashboard = () => {
     refetchInterval: 30000,
   })
 
+  // ── Source de vérité « carte » : peuples JP/IMB dédupliqués ────────────────
+  // Le dashboard global doit refléter EXACTEMENT ce qui s'affiche sur la carte.
+  // /api/master-people/map/markers renvoie UN point par master people (les
+  // enregistrements JP + IMB décrivant le même groupe ethnique sont fusionnés en
+  // un seul point). On ne compte donc jamais deux fois le même peuple.
+  const { data: mapMarkersData } = useQuery({
+    queryKey: ['dashboard', 'map-markers'],
+    queryFn: async () => {
+      try {
+        const res = await masterPeopleApi.getMarkers({ limit: 20000 })
+        return res.data?.markers || []
+      } catch { return [] }
+    },
+    refetchInterval: 30000,
+  })
+
+  // Engagements DMM (un point par engagement, niveau village) — même couche que
+  // la carte. Sert à la section « Global DMM Engagements » et au lien JP+IMB.
+  const { data: dmmEngagementsData } = useQuery({
+    queryKey: ['dashboard', 'map-dmm-engagements'],
+    queryFn: async () => {
+      try {
+        const res = await masterPeopleApi.getDmmEngagements({ limit: 20000 })
+        return res.data?.peoples || []
+      } catch { return [] }
+    },
+    refetchInterval: 30000,
+  })
+
   const { data: villagesData } = useQuery({
     queryKey: ['villages', search, statusFilter, sortBy, sortOrder],
     queryFn: async () => {
@@ -1466,6 +1461,67 @@ const AnalyticsDashboard = () => {
     fttSource: peopleGroups.filter(p => p.source === 'Finishing the Task').length,
   }), [peopleGroups])
 
+  // ── Stats « carte » dédupliquées (JP+IMB fusionnés = 1 peuple) ─────────────
+  const mapMarkers = mapMarkersData || []
+  const dmmEngagements = dmmEngagementsData || []
+
+  // Peuples JP/IMB uniques tels qu'affichés sur la carte (un point par master
+  // people). C'est le TOTAL de peuples « officiel » du dashboard.
+  const mapPeopleStats = useMemo(() => {
+    // Statut JP/IMB (status.status renvoyé par /map/markers), ex. UNREACHED,
+    // FRONTIER, UNENGAGED, REACHED, UNKNOWN… On regroupe par statut brut.
+    const byStatus = {}
+    mapMarkers.forEach((m) => {
+      const key = (m.status || 'UNKNOWN').toString().toUpperCase()
+      byStatus[key] = (byStatus[key] || 0) + 1
+    })
+    const statusList = Object.entries(byStatus)
+      .map(([status, count]) => ({ status, count, color: jpImbStatusColor(status) }))
+      .sort((a, b) => b.count - a.count)
+    return { total: mapMarkers.length, byStatus, statusList }
+  }, [mapMarkers])
+
+  // Peuples JP/IMB dédupliqués "aplatis" pour le donut Source (un peuple = 1 point
+  // carte, jamais dupliqué). La source est déduite de sourceTypes du marqueur :
+  // IMB (CPPI) prioritaire, sinon JP, sinon Survey.
+  const mapSourcePeople = useMemo(() => mapMarkers.map((m) => {
+    const types = (m.sourceTypes || []).map((s) => String(s).toUpperCase())
+    let source = 'Manual'
+    if (types.includes('CPPI') || types.includes('IMB')) source = 'PeopleGroups.org'
+    else if (types.includes('JP')) source = 'Joshua Project'
+    else if (types.includes('SURVEY')) source = 'Survey'
+    return { source, masterPeopleId: m.id }
+  }), [mapMarkers])
+
+  // Lien JP+IMB : parmi les peuples JP/IMB de la carte, combien ont AU MOINS un
+  // engagement DMM (ids de master people présents dans la couche engagements),
+  // et combien restent sans engagement DMM.
+  const jpImbEngagementStats = useMemo(() => {
+    const engagedMasterIds = new Set(
+      dmmEngagements.map((e) => e.masterPeopleId && String(e.masterPeopleId)).filter(Boolean)
+    )
+    const total = mapMarkers.length
+    const engaged = mapMarkers.filter((m) => engagedMasterIds.has(String(m.id))).length
+    return { total, engaged, nonEngaged: Math.max(0, total - engaged) }
+  }, [mapMarkers, dmmEngagements])
+
+  // Engagements DMM répartis par STATUT et par NIVEAU (tableau DMM).
+  const dmmEngagementStats = useMemo(() => {
+    const byStatus = {}
+    const byLevel = {}
+    dmmEngagements.forEach((e) => {
+      const s = (e.dmmStatus || 'unknown').toString().toLowerCase()
+      byStatus[s] = (byStatus[s] || 0) + 1
+      const lvl = (e.engagementLevel != null && e.engagementLevel !== '')
+        ? String(e.engagementLevel)
+        : '—'
+      byLevel[lvl] = (byLevel[lvl] || 0) + 1
+    })
+    const statusList = Object.entries(byStatus).map(([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count)
+    const levelList = Object.entries(byLevel).map(([level, count]) => ({ level, count })).sort((a, b) => b.count - a.count)
+    return { total: dmmEngagements.length, byStatus, byLevel, statusList, levelList }
+  }, [dmmEngagements])
+
   const { peopleGroupsByCountry, countryDataList, peopleGroupsByCountryList } = useMemo(() => {
     const byCountry = {}
     const byCountryList = {}
@@ -1506,13 +1562,17 @@ const AnalyticsDashboard = () => {
     totalPopulation: villages.reduce((sum, v) => sum + (v.population || 0), 0),
   }), [villages])
 
-  const engagementStatusData = useMemo(() => [
-    { status: 'unreached', count: peopleStats.unreached, label: engagementStatusLabels.unreached },
-    { status: 'pioneer', count: peopleStats.pioneer, label: engagementStatusLabels.pioneer },
-    { status: 'midway', count: peopleStats.midway, label: engagementStatusLabels.midway },
-    { status: 'tipping-point', count: peopleStats.tippingPoint, label: engagementStatusLabels['tipping-point'] },
-    { status: 'dmm', count: peopleStats.dmm, label: engagementStatusLabels.dmm },
-  ].filter(item => item.count > 0), [peopleStats])
+  // Camembert « People Group Status » basé sur les statuts JP/IMB dédupliqués de
+  // la carte (un peuple fusionné JP+IMB = 1), et non sur les people groups bruts.
+  const engagementStatusData = useMemo(
+    () => mapPeopleStats.statusList.map((s) => ({
+      status: s.status,
+      count: s.count,
+      color: s.color,
+      label: s.status.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    })),
+    [mapPeopleStats]
+  )
 
   const comparisonData = useMemo(() => [
     { name: 'Unreached', peopleGroups: peopleStats.unreached, villages: villageStats.byStatus.unreached || 0 },
@@ -1585,40 +1645,51 @@ const AnalyticsDashboard = () => {
 
         </div>
 
-        {/* ── DMM Engagement Status (People Groups) ── */}
+        {/* ── Global People Groups (JP + IMB uniquement, par statut) ──
+            Source : couche carte /map/markers (JP et IMB fusionnés = 1 point).
+            On ne compte jamais deux fois le même peuple. */}
         <div className="bg-white/75 backdrop-blur-lg rounded-2xl shadow-md border border-white/60 dark:bg-slate-900/60 dark:border-white/10 p-5 mb-6 relative z-10">
-          <div className="flex items-center gap-3 mb-5">
-            <Target size={22} className="text-sky-600" />
-            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Global Peoples Groups</h2>
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <div className="flex items-center gap-3">
+              <Target size={22} className="text-sky-600" />
+              <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Global People Groups</h2>
+              <span className="text-xs font-medium text-gray-400 dark:text-slate-400">JP + IMB</span>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-black text-sky-700 dark:text-sky-300 leading-none">{mapPeopleStats.total}</p>
+              <p className="text-[11px] text-gray-400 dark:text-slate-400 mt-1">peuples (carte)</p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="bg-red-50/80 rounded-2xl p-4 text-center border border-red-100 hover:border-red-200 transition-colors dark:bg-red-500/10 dark:border-red-500/20">
-              <p className="text-4xl font-bold text-red-600 dark:text-red-400 mb-1">{peopleStats.unreached}</p>
-              <p className="text-base text-red-700 dark:text-red-300 font-semibold">Unreached</p>
-              <p className="text-xs text-red-500 dark:text-red-400 mt-2">0 churches, 0 gen.</p>
+          {mapPeopleStats.statusList.length === 0 ? (
+            <div className="flex items-center justify-center h-24 text-gray-400 dark:text-slate-500 text-sm">
+              Aucun peuple JP/IMB disponible
             </div>
-            <div className="bg-orange-50/80 rounded-2xl p-4 text-center border border-orange-100 hover:border-orange-200 transition-colors dark:bg-orange-500/10 dark:border-orange-500/20">
-              <p className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-1">{peopleStats.pioneer}</p>
-              <p className="text-base text-orange-700 dark:text-orange-300 font-semibold">Pioneer</p>
-              <p className="text-xs text-orange-500 dark:text-orange-400 mt-2">1-33 churches</p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {mapPeopleStats.statusList.map(({ status, count, color }) => (
+                <div
+                  key={status}
+                  className="rounded-2xl p-4 text-center border transition-colors"
+                  style={{ backgroundColor: `${color}1A`, borderColor: `${color}55` }}
+                >
+                  <p className="text-4xl font-bold mb-1" style={{ color }}>{count}</p>
+                  <p className="text-sm font-semibold capitalize" style={{ color }}>{status.toLowerCase().replace(/_/g, ' ')}</p>
+                </div>
+              ))}
             </div>
-            <div className="bg-yellow-50/80 rounded-2xl p-4 text-center border border-yellow-100 hover:border-yellow-200 transition-colors dark:bg-yellow-500/10 dark:border-yellow-500/20">
-              <p className="text-4xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">{peopleStats.midway}</p>
-              <p className="text-base text-yellow-700 dark:text-yellow-300 font-semibold">Midway</p>
-              <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-2">34-66 churches</p>
-            </div>
-            <div className="bg-emerald-50/80 rounded-2xl p-4 text-center border border-emerald-100 hover:border-emerald-200 transition-colors dark:bg-emerald-500/10 dark:border-emerald-500/20">
-              <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{peopleStats.tippingPoint}</p>
-              <p className="text-base text-emerald-700 dark:text-emerald-300 font-semibold">Tipping Point</p>
-              <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-2">67-99 churches</p>
-            </div>
-            <div className="bg-green-50/80 rounded-2xl p-4 text-center border border-green-100 hover:border-green-200 transition-colors dark:bg-green-500/10 dark:border-green-500/20">
-              <p className="text-4xl font-bold text-green-700 dark:text-green-400 mb-1">{peopleStats.dmm}</p>
-              <p className="text-base text-green-800 dark:text-green-300 font-semibold">DMM (Reached)</p>
-              <p className="text-xs text-green-600 dark:text-green-400 mt-2">100+ churches & 4+ gen.</p>
-            </div>
-          </div>
+          )}
+        </div>
+
+        {/* ── Global DMM Engagements — tableau DMM coloré (étape × niveau) ──
+            Source : couche carte /map/dmm-engagements (un point par engagement).
+            Chiffres GLOBAUX réels. Couleurs = statuts DMM d'Unified Map. */}
+        <div className="mb-6 relative z-10">
+          <DmmProgressTable
+            engagements={dmmEngagements}
+            isFrench={isFrench}
+            title={isFrench ? 'Global DMM Engagements — Tableau DMM (étape × niveau)' : 'Global DMM Engagements — DMM table (stage × level)'}
+          />
         </div>
 
         {/* ── Répartition People Groups : Source · Statut · JP non-engagés ── */}
@@ -1626,7 +1697,7 @@ const AnalyticsDashboard = () => {
 
           {/* People Groups by Source (Donut) — apporte sa propre carte */}
           <div className="[&>div]:h-full [&>div]:mb-0 flex flex-col">
-            <SourceDonutChart peopleGroups={peopleGroups} />
+            <SourceDonutChart peopleGroups={mapSourcePeople} />
           </div>
 
           {/* People Groups by Status (Pie) */}
@@ -1654,7 +1725,7 @@ const AnalyticsDashboard = () => {
                       {engagementStatusData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={engagementStatusColors[entry.status]}
+                          fill={entry.color || engagementStatusColors[entry.status] || '#9ca3af'}
                         />
                       ))}
                     </Pie>
@@ -1675,7 +1746,7 @@ const AnalyticsDashboard = () => {
                       <div className="flex items-center gap-3">
                         <div
                           className="w-3.5 h-3.5 rounded-full shadow-sm"
-                          style={{ backgroundColor: engagementStatusColors[item.status] }}
+                          style={{ backgroundColor: item.color || engagementStatusColors[item.status] || '#9ca3af' }}
                         />
                         <span className="text-gray-700 dark:text-slate-200 font-medium">{item.label}</span>
                       </div>
@@ -1691,9 +1762,13 @@ const AnalyticsDashboard = () => {
             )}
           </div>
 
-          {/* Peuples JP non-engagés */}
+          {/* Peuples JP/IMB non-engagés — piloté par le lien JP+IMB de la carte */}
           <div className="md:col-span-2 xl:col-span-1 flex flex-col [&>div]:h-full [&>div]:rounded-xl">
-            <JPCoverageWidget />
+            <JPCoverageWidget
+              total={jpImbEngagementStats.total}
+              engaged={jpImbEngagementStats.engaged}
+              nonEngaged={jpImbEngagementStats.nonEngaged}
+            />
           </div>
 
         </div>

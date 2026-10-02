@@ -482,7 +482,7 @@ const PeopleDetailLite = () => {
       <div className="flex flex-wrap gap-3">
         {/* Carte Statut : point rond coloré selon le statut + texte coloré (cas « unreached » en rouge). */}
         <div className="bg-white rounded-lg border border-neutral-200 border-t border-neutral-200 px-3 py-2 w-36">
-          <p className="text-[10.5px] font-bold leading-tight text-neutral-400">Status</p>
+          <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{isFrench ? 'Statut' : 'Status'}</p>
           <p className="text-xl font-bold mt-0.5 flex items-center gap-1.5">
             <span className={`inline-block h-2.5 w-2.5 rounded-full shrink-0 ${statusColors.dot}`} />
             <span className={statusColors.text}>{statusGlobal}</span>

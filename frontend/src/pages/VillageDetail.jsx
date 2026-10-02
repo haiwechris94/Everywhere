@@ -62,7 +62,7 @@ const statusBgColors = {
 const niveauOptions = ['I', 'II', 'III', 'IV']
 
 const VillageDetail = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -170,8 +170,8 @@ const VillageDetail = () => {
         <div className="text-red-500 mb-4">
           <X size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">Village non trouvé</h3>
-        <p className="text-gray-500 mt-2">Ce village n'existe pas ou a été supprimé</p>
+        <h3 className="text-lg font-medium text-gray-900">{isFrench ? 'Village non trouvé' : 'Village not found'}</h3>
+        <p className="text-gray-500 mt-2">{isFrench ? "Ce village n'existe pas ou a été supprimé" : 'This village does not exist or has been deleted'}</p>
         <Link to="/villages" className="btn-primary mt-4 inline-block">
           Retour aux villages
         </Link>
@@ -213,7 +213,7 @@ const VillageDetail = () => {
             <>
               <button onClick={handleCancel} className="btn-secondary flex items-center gap-2">
                 <X size={18} />
-                Annuler
+                {isFrench ? 'Annuler' : 'Cancel'}
               </button>
               <button
                 onClick={handleSave}
@@ -221,14 +221,14 @@ const VillageDetail = () => {
                 className="btn-primary flex items-center gap-2"
               >
                 <Save size={18} />
-                {updateMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
+                {updateMutation.isPending ? (isFrench ? 'Enregistrement...' : 'Saving...') : (isFrench ? 'Enregistrer' : 'Save')}
               </button>
             </>
           ) : (
             <>
               <button onClick={handleEdit} className="btn-secondary flex items-center gap-2">
                 <Edit size={18} />
-                Modifier
+                {isFrench ? 'Modifier' : 'Edit'}
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
@@ -246,7 +246,7 @@ const VillageDetail = () => {
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Informations générales</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{isFrench ? 'Informations générales' : 'General information'}</h3>
             
             {isEditing ? (
               <div className="space-y-4">
@@ -261,7 +261,7 @@ const VillageDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Statut</label>
+                    <label className="form-label">{isFrench ? 'Statut' : 'Status'}</label>
                     <select
                       value={editData.status}
                       onChange={(e) => setEditData((prev) => ({ ...prev, status: e.target.value }))}
@@ -275,7 +275,7 @@ const VillageDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Région</label>
+                    <label className="form-label">{isFrench ? 'Région' : 'Region'}</label>
                     <input
                       type="text"
                       value={editData.region}
@@ -284,7 +284,7 @@ const VillageDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Pays</label>
+                    <label className="form-label">{isFrench ? 'Pays' : 'Country'}</label>
                     <input
                       type="text"
                       value={editData.country}
@@ -338,7 +338,7 @@ const VillageDetail = () => {
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                     <Home size={24} className="text-primary-600" />
                     <div>
-                      <p className="text-sm text-gray-500">Statut</p>
+                      <p className="text-sm text-gray-500">{isFrench ? 'Statut' : 'Status'}</p>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusBgColors[village.status]}`}>
                         <span className={`w-2 h-2 rounded-full ${statusColors[village.status]}`}></span>
                         {statusLabels[village.status]}
@@ -350,7 +350,7 @@ const VillageDetail = () => {
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                     <MapPin size={24} className="text-primary-600" />
                     <div>
-                      <p className="text-sm text-gray-500">Coordonnées</p>
+                      <p className="text-sm text-gray-500">{isFrench ? 'Coordonnées' : 'Coordinates'}</p>
                       <p className="font-medium">
                         {village.location.coordinates[1].toFixed(6)}, {village.location.coordinates[0].toFixed(6)}
                       </p>
@@ -370,7 +370,7 @@ const VillageDetail = () => {
           {/* Activities */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Activités récentes</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Activités récentes' : 'Recent activities'}</h3>
               <Link to={`/activities?village=${id}`} className="text-primary-600 text-sm hover:underline">
                 Voir tout
               </Link>
@@ -396,7 +396,7 @@ const VillageDetail = () => {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <Activity size={32} className="mx-auto mb-2 opacity-50" />
-                <p>Aucune activité enregistrée</p>
+                <p>{isFrench ? 'Aucune activité enregistrée' : 'No activity recorded'}</p>
               </div>
             )}
           </div>
@@ -407,7 +407,7 @@ const VillageDetail = () => {
           {/* Churches */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Églises</h3>
+              <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Églises' : 'Churches'}</h3>
               <span className="bg-primary-100 text-primary-600 px-2 py-1 rounded-full text-sm font-medium">
                 {churches?.length || 0}
               </span>
@@ -433,26 +433,26 @@ const VillageDetail = () => {
             ) : (
               <div className="text-center py-6 text-gray-500">
                 <Church size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Aucune église</p>
+                <p className="text-sm">{isFrench ? 'Aucune église' : 'No church'}</p>
               </div>
             )}
           </div>
 
           {/* Quick Stats */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Statistiques</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{isFrench ? 'Statistiques' : 'Statistics'}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-500">Églises</span>
+                <span className="text-gray-500">{isFrench ? 'Églises' : 'Churches'}</span>
                 <span className="font-semibold">{churches?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-500">Activités</span>
+                <span className="text-gray-500">{isFrench ? 'Activités' : 'Activities'}</span>
                 <span className="font-semibold">{activities?.length || 0}</span>
               </div>
               {village.createdAt && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Créé le</span>
+                  <span className="text-gray-500">{isFrench ? 'Créé le' : 'Created on'}</span>
                   <span className="font-semibold text-sm">
                     {format(new Date(village.createdAt), 'dd/MM/yyyy')}
                   </span>
@@ -467,23 +467,23 @@ const VillageDetail = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Supprimer le village</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le village' : 'Delete village'}</h3>
             <p className="text-gray-600 mb-6">
-              Êtes-vous sûr de vouloir supprimer <strong>{village.name}</strong> ? Cette action est irréversible.
+              {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{village.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
                 className="flex-1 btn-secondary"
               >
-                Annuler
+                {isFrench ? 'Annuler' : 'Cancel'}
               </button>
               <button
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
-                {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
+                {deleteMutation.isPending ? (isFrench ? 'Suppression...' : 'Deleting...') : (isFrench ? 'Supprimer' : 'Delete')}
               </button>
             </div>
           </div>

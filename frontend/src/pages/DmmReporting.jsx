@@ -8,7 +8,19 @@ import html2canvas from 'html2canvas'
 import toast from 'react-hot-toast'
 import { Loader2, Download, BarChart3, FileDown, TrendingUp, ImageDown, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronRight, Users } from 'lucide-react'
 import { reportingApi } from '../services/api'
+import { StatusBadge } from './geography/geoComponents'
 import { useLanguage } from '../i18n'
+
+// Formatage des nombres identique à la section « Peuples » des fiches Pays
+// (ex. 45000 -> 45 000).
+const peoplesFmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
+
+// Source de référence (non-DMM) pour le statut d'un peuple, ex. JP / IMB / FTT.
+// Reprend exactement la logique de la section « Peuples » de CountryPeoples.
+const peoplesReferenceSource = (sourceTypes = []) => {
+  const preferred = sourceTypes.find((s) => s && s.toUpperCase() !== 'DMM')
+  return (preferred || sourceTypes[0] || '').toUpperCase() || null
+}
 
 const now = new Date()
 const CURRENT_YEAR = now.getUTCFullYear()
@@ -1230,62 +1242,43 @@ export default function DmmReporting() {
             ) : peoplesRows.length === 0 ? (
               <div className="bg-white rounded-xl shadow-sm p-4 text-sm text-gray-500">{isFrench ? 'Aucun peuple pour cette sélection.' : 'No people groups for this selection.'}</div>
             ) : (
-              <div className="space-y-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                {peoplesRows.map((p) => {
-                  const isOpen = expandedPeoples.has(p.masterPeopleId);
-                  const engagements = p.dmm?.engagements || [];
-                  const w = p.dmm?.window;
-                  return (
-                    <div key={p.masterPeopleId} className="border-b border-slate-100 last:border-0">
-                      <button type="button" onClick={() => togglePeople(p.masterPeopleId)} className="w-full flex items-center justify-between gap-3 p-3 text-left">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {engagements.length > 0 ? (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />) : <span className="w-4" />}
-                          <span className="font-semibold text-blue-600 truncate">{p.canonicalName}</span>
-                          {p.isNGEngaged
-                            ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">{isFrench ? 'Engagé NG' : 'NG engaged'}</span>
-                            : <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">{isFrench ? 'Référence JP/IMB' : 'JP/IMB reference'}</span>}
-                          {p.primaryCountryCode && <span className="text-xs text-gray-400">{p.primaryCountryCode}</span>}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-600 shrink-0">
-                          {p.dmm && <span><span className="font-bold">{p.dmm.engagementCount}</span> eng.</span>}
-                          {p.dmm && <span><span className="font-bold">{p.dmm.totalChurches}</span> égl.</span>}
-                          {p.dmm && <span className="font-bold">G{p.dmm.maxGeneration}</span>}
-                          {w && <span><span className="font-bold">{w.newDisciples || 0}</span> disc. / <span className="font-bold">{w.baptisms || 0}</span> bapt.</span>}
-                        </div>
-                      </button>
-                      {isOpen && engagements.length > 0 && (
-                        <div className="border-t border-slate-100 px-3 py-2 overflow-x-auto">
-                          <table className="w-full text-sm border-collapse">
-                            <thead>
-                              <tr className="border-b border-slate-200">
-                                <th className="py-2 pr-4 text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Engagement' : 'Engagement'}</th>
-                                <th className="py-2 px-4 text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Localité' : 'Locality'}</th>
-                                <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? '# Églises' : '# Churches'}</th>
-                                <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Génération max' : 'Max gen'}</th>
-                                <th className="py-2 pl-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut DMM' : 'DMM Status'}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {engagements.map((e) => (
-                                <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-                                  <td className="py-3 pr-4 text-blue-600">{peopleVillageName(p.canonicalName || e.name, e.villageName)}</td>
-                                  <td className="py-3 px-4 text-slate-600">{[e.region, e.admin2, e.admin3].filter(Boolean).join(' · ')}</td>
-                                  <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{e.numberOfChurches ?? 0}</td>
-                                  <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{e.churchGeneration ?? 0}</td>
-                                  <td className="py-3 pl-4 text-right">
-                                    <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                                      {e.engagementStatus || '—'}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              // Liste des peuples au MÊME format que la section « Peuples » des
+              // fiches Pays (CountryPeoples) : tableau à plat, mêmes colonnes,
+              // mêmes intitulés, mêmes badges de statut.
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm overflow-x-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'engagements" : '# engagements'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
+                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {peoplesRows.map((p) => {
+                      // Source de référence pour le statut du peuple, en excluant
+                      // « DMM » (on ne veut plus afficher le suffixe « (DMM) »).
+                      const rawSrc = peoplesReferenceSource(p.sourceTypes)
+                      const src = rawSrc && rawSrc.toUpperCase() !== 'DMM' ? rawSrc : null
+                      const status = p.status?.global || 'UNKNOWN'
+                      return (
+                        <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                          <td className="py-3 pr-4">
+                            <span className="font-medium text-blue-600">{p.canonicalName}</span>
+                          </td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.engagementCount ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.totalChurches ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.maxGeneration ?? 0)}</td>
+                          <td className="py-3 pl-4 text-left text-slate-700">
+                            <StatusBadge status={`${status}${src ? ` (${src})` : ''}`} />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
             {peoplesMeta?.pagination && peoplesMeta.pagination.totalPages > 1 && (

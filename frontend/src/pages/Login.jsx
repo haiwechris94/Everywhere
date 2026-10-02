@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../i18n'
@@ -153,13 +153,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Register Link */}
-        <p className="text-center mt-6 text-gray-900 font-medium drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
-          {t('auth.noAccount')}{' '}
-          <Link to="/register" className="text-primary-600 hover:underline font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
-            {t('auth.signUp')}
-          </Link>
-        </p>
       </div>
 
       {/* Forgot Password Modal */}

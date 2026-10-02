@@ -389,7 +389,7 @@ const AdminUsers = () => {
             {t('adminUsers.title') || 'User Management'}
           </h1>
           <p className="text-gray-600 mt-1">
-            {total} {t('adminUsers.usersTotal') || 'users total'}
+            {total} {t('adminUsers.usersTotal') || 'Total Users'}
           </p>
         </div>
         <button
@@ -397,7 +397,7 @@ const AdminUsers = () => {
           className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus size={18} />
-          {t('adminUsers.newUser') || 'New User'}
+          {t('adminUsers.newUser') || 'Add new user'}
         </button>
       </div>
       

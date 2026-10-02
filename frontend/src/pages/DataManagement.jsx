@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import api, { peopleGroupsApi } from '../services/api'
+import api, { peopleGroupsApi, masterPeopleApi } from '../services/api'
 import { useLanguage } from '../i18n'
 import {
   Upload,
@@ -205,8 +205,21 @@ const DataManagement = () => {
       return meta.totalCount ?? meta.total ?? res.data?.total ?? null
     },
   })
-  // Real number of peoples to display everywhere on this page.
-  const peoplesCount = (peoplesTotal ?? (Array.isArray(peoplesData) ? peoplesData.length : 0))
+  // Nombre de peuples DÉDUPLIQUÉ, identique à ce qu'affiche la carte : un point
+  // par master people (JP + IMB fusionnés = 1 peuple, jamais compté deux fois).
+  const { data: mapPeoplesCount } = useQuery({
+    queryKey: ['master-people-markers', 'count'],
+    queryFn: async () => {
+      try {
+        const res = await masterPeopleApi.getMarkers({ limit: 20000 })
+        return res.data?.count ?? (res.data?.markers?.length ?? null)
+      } catch { return null }
+    },
+  })
+
+  // Real number of peoples to display everywhere on this page. On privilégie le
+  // décompte dédupliqué de la carte (pas de doublon JP/IMB).
+  const peoplesCount = (mapPeoplesCount ?? peoplesTotal ?? (Array.isArray(peoplesData) ? peoplesData.length : 0))
 
   // Handle drag events
   const handleDragEnter = useCallback((e) => {

@@ -6,6 +6,7 @@ import { reportingApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
 import { DmmStatusBadge } from '../components/DmmStatusBadge'
+import DmmProgressTable from '../components/Dashboard/DmmProgressTable'
 import { dmmLevelForEngagement, dmmLevelLabel } from '../utils/dmmEngagement'
 import { useLanguage } from '../i18n'
 
@@ -102,6 +103,14 @@ const CountryPeoples = () => {
           {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
         </button>
       )}
+
+      {/* Tableau DMM coloré (étape × niveau) — mêmes couleurs/structure que le
+          Global Dashboard, mais avec les chiffres des engagements DE CE PAYS. */}
+      <DmmProgressTable
+        engagements={engagements}
+        isFrench={isFrench}
+        title={isFrench ? 'Tableau DMM — Engagements du pays' : 'DMM table — Country engagements'}
+      />
 
       {/* Peuple en haut, Engagements en bas — deux sections repliables, même
           structure visuelle que le tableau Countries de la page Regions. */}

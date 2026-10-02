@@ -51,7 +51,7 @@ const statusBgColors = {
 const engagementLevelOptions = ['I', 'II', 'III', 'IV']
 
 const PeopleGroupDetail = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const { id } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -298,7 +298,7 @@ const PeopleGroupDetail = () => {
                       onChange={(e) => setEditData((prev) => ({ ...prev, engagementLevel: e.target.value }))}
                       className="form-input"
                     >
-                      <option value="">Select level</option>
+                      <option value="">{isFrench ? 'Sélectionner un niveau' : 'Select level'}</option>
                       {engagementLevelOptions.map((level) => (
                         <option key={level} value={level}>{level}</option>
                       ))}
@@ -433,7 +433,7 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Affinity Group</label>
+                    <label className="form-label">{isFrench ? "Groupe d'affinité" : 'Affinity Group'}</label>
                     <input
                       type="text"
                       value={editData.affinityGroup}
@@ -453,7 +453,7 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Start Year</label>
+                    <label className="form-label">{isFrench ? 'Année de début' : 'Start Year'}</label>
                     <input
                       type="number"
                       value={editData.startYear}
@@ -462,7 +462,7 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Donor</label>
+                    <label className="form-label">{isFrench ? 'Donateur' : 'Donor'}</label>
                     <input
                       type="text"
                       value={editData.donor}
@@ -473,7 +473,7 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">National Coordinator</label>
+                    <label className="form-label">{isFrench ? 'Coordinateur national' : 'National Coordinator'}</label>
                     <input
                       type="text"
                       value={editData.nationalCoordinator}
@@ -482,7 +482,7 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Church Planter</label>
+                    <label className="form-label">{isFrench ? "Implanteur d'église" : 'Church Planter'}</label>
                     <input
                       type="text"
                       value={editData.churchPlanter}
@@ -653,7 +653,7 @@ const PeopleGroupDetail = () => {
           {/* Activities */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-800">Activities</h3>
+              <h3 className="text-lg font-bold text-gray-800">{isFrench ? 'Activités' : 'Activities'}</h3>
               <Link to={`/activities?peopleGroup=${id}`} className="text-primary-600 text-sm hover:underline">
                 View all
               </Link>
@@ -679,7 +679,7 @@ const PeopleGroupDetail = () => {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 <Activity size={32} className="mx-auto mb-2 opacity-50" />
-                <p>No activities recorded</p>
+                <p>{isFrench ? 'Aucune activité enregistrée' : 'No activities recorded'}</p>
               </div>
             )}
           </div>
@@ -689,7 +689,7 @@ const PeopleGroupDetail = () => {
         <div className="space-y-6">
           {/* Quick Stats */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Details</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{isFrench ? 'Détails' : 'Details'}</h3>
             <div className="space-y-3">
               {peopleGroup.villageName && (
                 <div className="flex items-center justify-between">
@@ -699,31 +699,31 @@ const PeopleGroupDetail = () => {
               )}
               {peopleGroup.region && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Region</span>
+                  <span className="text-gray-500">{isFrench ? 'Région' : 'Region'}</span>
                   <span className="font-semibold">{peopleGroup.region}</span>
                 </div>
               )}
               {peopleGroup.country && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Country</span>
+                  <span className="text-gray-500">{isFrench ? 'Pays' : 'Country'}</span>
                   <span className="font-semibold">{peopleGroup.country}</span>
                 </div>
               )}
               {peopleGroup.language && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Language</span>
+                  <span className="text-gray-500">{isFrench ? 'Langue' : 'Language'}</span>
                   <span className="font-semibold">{peopleGroup.language}</span>
                 </div>
               )}
               {peopleGroup.religion && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Religion</span>
+                  <span className="text-gray-500">{isFrench ? 'Religion' : 'Religion'}</span>
                   <span className="font-semibold">{peopleGroup.religion}</span>
                 </div>
               )}
               {peopleGroup.affinityGroup && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Affinity Group</span>
+                  <span className="text-gray-500">{isFrench ? "Groupe d'affinité" : 'Affinity Group'}</span>
                   <span className="font-semibold text-right">{peopleGroup.affinityGroup}</span>
                 </div>
               )}
@@ -735,25 +735,25 @@ const PeopleGroupDetail = () => {
               )}
               {peopleGroup.startYear && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Start Year</span>
+                  <span className="text-gray-500">{isFrench ? 'Année de début' : 'Start Year'}</span>
                   <span className="font-semibold">{peopleGroup.startYear}</span>
                 </div>
               )}
               {peopleGroup.donor && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Donor</span>
+                  <span className="text-gray-500">{isFrench ? 'Donateur' : 'Donor'}</span>
                   <span className="font-semibold text-right">{peopleGroup.donor}</span>
                 </div>
               )}
               {peopleGroup.nationalCoordinator && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">National Coordinator</span>
+                  <span className="text-gray-500">{isFrench ? 'Coordinateur national' : 'National Coordinator'}</span>
                   <span className="font-semibold text-right">{peopleGroup.nationalCoordinator}</span>
                 </div>
               )}
               {peopleGroup.churchPlanter && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Church Planter</span>
+                  <span className="text-gray-500">{isFrench ? "Implanteur d'église" : 'Church Planter'}</span>
                   <span className="font-semibold text-right">
                     <Link to={`/planters/${encodeURIComponent(peopleGroup.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
                       {peopleGroup.churchPlanter}
@@ -763,7 +763,7 @@ const PeopleGroupDetail = () => {
               )}
               {peopleGroup.createdAt && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Created</span>
+                  <span className="text-gray-500">{isFrench ? 'Créé le' : 'Created'}</span>
                   <span className="font-semibold text-sm">
                     {format(new Date(peopleGroup.createdAt), 'dd/MM/yyyy')}
                   </span>
@@ -771,7 +771,7 @@ const PeopleGroupDetail = () => {
               )}
               {peopleGroup.createdBy?.name && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Created by</span>
+                  <span className="text-gray-500">{isFrench ? 'Créé par' : 'Created by'}</span>
                   <span className="font-semibold text-sm">{peopleGroup.createdBy.name}</span>
                 </div>
               )}
@@ -780,25 +780,25 @@ const PeopleGroupDetail = () => {
 
           {/* Approval Status */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Status</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{isFrench ? 'Statut' : 'Status'}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-500">Approved</span>
+                <span className="text-gray-500">{isFrench ? 'Approuvé' : 'Approved'}</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   peopleGroup.approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                 }`}>
-                  {peopleGroup.approved ? 'Yes' : 'Pending'}
+                  {peopleGroup.approved ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'En attente' : 'Pending')}
                 </span>
               </div>
               {peopleGroup.approvedBy?.name && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Approved by</span>
+                  <span className="text-gray-500">{isFrench ? 'Approuvé par' : 'Approved by'}</span>
                   <span className="font-semibold text-sm">{peopleGroup.approvedBy.name}</span>
                 </div>
               )}
               {peopleGroup.approvedAt && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Approved on</span>
+                  <span className="text-gray-500">{isFrench ? 'Approuvé le' : 'Approved on'}</span>
                   <span className="font-semibold text-sm">
                     {format(new Date(peopleGroup.approvedAt), 'dd/MM/yyyy')}
                   </span>
@@ -814,7 +814,7 @@ const PeopleGroupDetail = () => {
                     className="w-full btn-primary flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700"
                   >
                     <CheckCircle size={18} />
-                    {approveMutation.isPending ? 'Approving...' : 'Approve People Group'}
+                    {approveMutation.isPending ? (isFrench ? 'Approbation...' : 'Approving...') : (isFrench ? 'Approuver le groupe de peuple' : 'Approve People Group')}
                   </button>
                 </div>
               )}
@@ -827,23 +827,23 @@ const PeopleGroupDetail = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Delete People Group</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le groupe de peuple' : 'Delete People Group'}</h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete <strong>{peopleGroup.name}</strong>? This action cannot be undone.
+              {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{peopleGroup.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
                 className="flex-1 btn-secondary"
               >
-                Cancel
+                {isFrench ? 'Annuler' : 'Cancel'}
               </button>
               <button
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
               >
-                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                {deleteMutation.isPending ? (isFrench ? 'Suppression...' : 'Deleting...') : (isFrench ? 'Supprimer' : 'Delete')}
               </button>
             </div>
           </div>

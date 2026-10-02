@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { peopleGroupsApi, qualitativeAnalysisApi } from '../services/api'
+import { reportingApi } from '../services/reportingApi'
 import { useLanguage } from '../i18n'
 import toast from 'react-hot-toast'
 import {
@@ -191,58 +192,6 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
             </div>
           </div>
 
-          {/* AI Analysis Section - ALWAYS VISIBLE AND PROMINENT */}
-          <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Brain size={24} />
-              </div>
-              <div>
-                <h4 className="text-xl font-bold flex items-center gap-2">
-                  <Sparkles size={20} />
-                  {language === 'fr' ? 'Analyse IA (DeepSeek)' : 'AI Analysis (DeepSeek)'}
-                </h4>
-                <p className="text-purple-100 text-sm">Interprétation et recommandations générées par IA</p>
-              </div>
-            </div>
-            
-            {(analysis.aiInterpretation || analysis.aiRecommendations) ? (
-              <div className="space-y-4">
-                {analysis.aiInterpretation && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <h5 className="text-sm font-semibold text-purple-200 mb-2 flex items-center gap-2">
-                      <Eye size={16} />
-                      {language === 'fr' ? 'Interprétation' : 'Interpretation'}
-                    </h5>
-                    <p className="text-white/90 text-sm whitespace-pre-wrap leading-relaxed">
-                      {analysis.aiInterpretation}
-                    </p>
-                  </div>
-                )}
-                {analysis.aiRecommendations && (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <h5 className="text-sm font-semibold text-purple-200 mb-2 flex items-center gap-2">
-                      <Star size={16} />
-                      {language === 'fr' ? 'Recommandations IA' : 'AI Recommendations'}
-                    </h5>
-                    <p className="text-white/90 text-sm whitespace-pre-wrap leading-relaxed">
-                      {analysis.aiRecommendations}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
-                <Brain size={40} className="mx-auto mb-3 opacity-50" />
-                <p className="text-purple-200">
-                  {language === 'fr' 
-                    ? 'Aucune analyse IA disponible pour cette évaluation'
-                    : 'No AI analysis available for this evaluation'}
-                </p>
-              </div>
-            )}
-          </div>
-
           {/* Criteria Scores */}
           <div className="bg-gray-50 rounded-2xl p-6">
             <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -335,37 +284,37 @@ const AnalyseQualitative = () => {
   const [recommendations, setRecommendations] = useState('')
   const [aiInterpretation, setAiInterpretation] = useState('')
   const [aiRecommendations, setAiRecommendations] = useState('')
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false)
   const [selectedAnalysis, setSelectedAnalysis] = useState(null)
   const [paginationProgress, setPaginationProgress] = useState(null)
 
-  // Fetch all people groups for qualitative analysis with pagination
+  // Fetch ONLY DMM engagements for qualitative analysis.
+  // Source de vérité : /api/reporting/peoples (modèle "master people"), filtré
+  // sur les peuples DMM-engagés (isNGEngaged). Chaque engagement DMM devient une
+  // entrée sélectionnable pour l'analyse. Quand un pays est sélectionné dans le
+  // filtre, on ne récupère que les engagements DMM de ce pays.
   const { data: peopleGroupsData, isLoading } = useQuery({
-    queryKey: ['peopleGroups', 'qualitativeAnalysis', selectedCountry, selectedRegion, selectedAdmin2, selectedAdmin3],
+    queryKey: ['dmm-engagements', 'qualitativeAnalysis', selectedCountry],
     queryFn: async () => {
-      console.log('[AnalyseQualitative] Fetching people groups WITHOUT geometry using pagination...')
-      
-      const filters = {}
-      if (selectedCountry) filters.countryCode = selectedCountry
-      if (selectedRegion) filters.region = selectedRegion
-      if (selectedAdmin2) filters.admin2 = selectedAdmin2
-      if (selectedAdmin3) filters.admin3 = selectedAdmin3
-      
-      setPaginationProgress({ page: 0, totalPages: 1, recordsFetched: 0, totalCount: 0, isComplete: false })
-      
-      try {
-        const allData = await peopleGroupsApi.getAllPaginated(filters, {
-          onProgress: (progress) => {
-            setPaginationProgress(progress)
-          }
-        })
-        
-        setPaginationProgress(null)
-        return allData
-      } catch (err) {
-        setPaginationProgress(null)
-        throw err
-      }
+      const params = { limit: 1000 }
+      if (selectedCountry) params.countries = selectedCountry
+      const res = await reportingApi.getPeoples(params)
+      const peoples = Array.isArray(res?.data?.data) ? res.data.data : []
+      // Garder uniquement les peuples DMM-engagés, puis aplatir leurs engagements
+      // DMM en entrées analysables (une ligne par engagement/village).
+      const dmmPeoples = peoples.filter((p) => p.isNGEngaged)
+      const engagements = dmmPeoples.flatMap((p) =>
+        (p.dmm?.engagements || []).map((e) => ({
+          ...e,
+          _id: e.peopleGroupId || `${p.masterPeopleId}-${e.villageName || ''}`,
+          masterPeopleId: p.masterPeopleId,
+          // Nom affiché = « nom du peuple + nom du village » (comme la fiche pays).
+          name: [p.canonicalName, e.villageName].filter(Boolean).join(', ') || e.name || p.canonicalName,
+          peopleName: p.canonicalName,
+          country: p.primaryCountryCode || e.country || null,
+          engagementStatus: e.dmmStatus || e.status || p.status || null,
+        }))
+      )
+      return engagements
     },
   })
 
@@ -461,59 +410,6 @@ const AnalyseQualitative = () => {
     setAiInterpretation('')
     setAiRecommendations('')
     setSelectedPeople(null)
-  }
-
-  // Generate AI insights - FIXED to include ALL 10 criteria scores, remarks, AND recommendations
-  const generateAIInsights = async () => {
-    if (!selectedPeople || Object.keys(analysisData).length === 0) {
-      toast.error(language === 'fr' ? 'Veuillez d\'abord évaluer les critères' : 'Please evaluate criteria first')
-      return
-    }
-
-    setIsGeneratingAI(true)
-    try {
-      // Build criteria scores array with ALL 10 criteria
-      const criteriaScores = []
-      Object.values(ANALYSIS_CRITERIA).forEach(category => {
-        category.criteria.forEach(criterion => {
-          criteriaScores.push({
-            criterionId: criterion.id,
-            criterionName: language === 'fr' ? criterion.label : criterion.labelEn,
-            score: analysisData[criterion.id] || 0, // Include even if not rated (score 0)
-            weight: criterion.weight,
-            description: criterion.description,
-          })
-        })
-      })
-
-      const totalScore = calculateTotalScore()
-      const priority = getPriorityLevel(totalScore)
-
-      // FIXED: Include recommendations in the API call
-      const response = await qualitativeAnalysisApi.generateAIInsights({
-        peopleGroupName: selectedPeople.name,
-        villageName: selectedPeople.villageName,
-        country: selectedPeople.country,
-        criteriaScores, // All 10 criteria
-        overallScore: totalScore,
-        priorityLevel: priority.level,
-        remarks, // User remarks
-        recommendations, // ADDED: User recommendations
-      })
-
-      if (response.data.success) {
-        setAiInterpretation(response.data.interpretation || '')
-        setAiRecommendations(response.data.recommendations || '')
-        toast.success(language === 'fr' ? 'Analyse IA générée!' : 'AI analysis generated!')
-      } else {
-        throw new Error(response.data.error)
-      }
-    } catch (error) {
-      console.error('Error generating AI insights:', error)
-      toast.error(language === 'fr' ? 'Erreur lors de la génération IA' : 'Error generating AI insights')
-    } finally {
-      setIsGeneratingAI(false)
-    }
   }
 
   // Save analysis
@@ -871,70 +767,6 @@ const AnalyseQualitative = () => {
                       </div>
                     </div>
 
-                    {/* AI Insights Section - Gradient Purple Card */}
-                    <div className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 rounded-xl p-6 text-white shadow-xl">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="p-3 bg-white/20 rounded-xl">
-                            <Brain size={24} />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-lg flex items-center gap-2">
-                              <Sparkles size={18} />
-                              {language === 'fr' ? 'Analyse IA (DeepSeek)' : 'AI Analysis (DeepSeek)'}
-                            </h4>
-                            <p className="text-purple-200 text-sm">Génération automatique d'insights</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={generateAIInsights}
-                          disabled={isGeneratingAI || evaluatedCriteria === 0}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-white text-purple-700 rounded-xl hover:bg-purple-50 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {isGeneratingAI ? (
-                            <>
-                              <Loader2 className="animate-spin" size={18} />
-                              {language === 'fr' ? 'Génération...' : 'Generating...'}
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles size={18} />
-                              {language === 'fr' ? 'Générer' : 'Generate'}
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      {(aiInterpretation || aiRecommendations) ? (
-                        <div className="space-y-4">
-                          {aiInterpretation && (
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                              <h5 className="text-sm font-semibold text-purple-200 mb-2">
-                                {language === 'fr' ? 'Interprétation' : 'Interpretation'}
-                              </h5>
-                              <p className="text-white/90 text-sm whitespace-pre-wrap">{aiInterpretation}</p>
-                            </div>
-                          )}
-                          {aiRecommendations && (
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                              <h5 className="text-sm font-semibold text-purple-200 mb-2">
-                                {language === 'fr' ? 'Recommandations IA' : 'AI Recommendations'}
-                              </h5>
-                              <p className="text-white/90 text-sm whitespace-pre-wrap">{aiRecommendations}</p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
-                          <Brain size={40} className="mx-auto mb-3 opacity-50" />
-                          <p className="text-purple-200 text-sm">
-                            {language === 'fr' 
-                              ? 'Cliquez sur "Générer" pour obtenir une analyse IA basée sur vos évaluations.'
-                              : 'Click "Generate" to get AI analysis based on your evaluations.'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
 
                     {/* Actions */}
                     <div className="flex justify-end gap-4">
@@ -1070,11 +902,6 @@ const AnalyseQualitative = () => {
                                   <div className={`px-3 py-1.5 rounded-full text-sm font-bold ${getScoreColor(analysis.overallScore)}`}>
                                     {analysis.overallScore}%
                                   </div>
-                                  {(analysis.aiInterpretation || analysis.aiRecommendations) && (
-                                    <div className="p-2 bg-purple-100 rounded-lg" title="AI Analysis Available">
-                                      <Brain size={16} className="text-purple-600" />
-                                    </div>
-                                  )}
                                   <Eye size={18} className="text-gray-400" />
                                 </div>
                               </div>
