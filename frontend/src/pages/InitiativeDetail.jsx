@@ -192,7 +192,7 @@ const InitiativeDetail = () => {
     <div className="p-6 space-y-6">
       {/* Fil d'Ariane */}
       <p className="text-sm text-gray-500">
-        <Link to="/projects" className="font-bold hover:text-slate-700">{isFrench ? 'Projets' : 'Projects'}</Link> / {data.name}
+        <Link to="/initiatives" className="font-bold hover:text-slate-700">{isFrench ? 'Initiatives' : 'Initiatives'}</Link> / {data.name}
       </p>
 
       {/* En-tête */}
@@ -269,7 +269,7 @@ const InitiativeDetail = () => {
                     <td className="py-3 pr-4 text-right tabular-nums text-slate-400">{index + 1}</td>
                     <td className="py-3 px-4">
                       <Link
-                        to={`/projects/initiatives/${key}/peoples/${p.masterPeopleId}`}
+                        to={`/initiatives/${key}/peoples/${p.masterPeopleId}`}
                         className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
                       >
                         {p.peopleName || p.masterPeopleId}

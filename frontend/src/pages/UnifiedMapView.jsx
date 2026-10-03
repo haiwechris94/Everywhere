@@ -29,6 +29,7 @@ const UI_LABELS = {
   adminBoundaries:    { fr: 'Limites administratives',   en: 'Admin boundaries' },
   activeSources:      { fr: 'Sources actifs',            en: 'Actives sources' },
   locations:          { fr: 'Lieux',                     en: 'Locations' },
+  boundaries:         { fr: 'Frontières',                en: 'Boundaries' },
   country:            { fr: 'Pays',                      en: 'Country' },
   allCountries:       { fr: 'Tous les pays',             en: 'All countries' },
   peopleStatus:       { fr: 'Statut des peuples',        en: 'People groups Status' },
@@ -1037,11 +1038,17 @@ export default function UnifiedMapView() {
   const [selected, setSelected] = useState(null)
   // Peuple ciblé via la recherche : la carte n'affiche QUE ses localisations.
   const [focusedPeople, setFocusedPeople] = useState(null) // marker object or null
-  const [mapMode, setMapMode] = useState('coverage') // 'terrain' | 'coverage'
+  // Carte TOUJOURS en mode couverture : les boutons de bascule terrain/couverture
+  // ont été retirés. On garde une constante `mapMode` pour que les branches
+  // existantes `mapMode === 'coverage'` / `!== 'coverage'` restent valides.
+  const mapMode = 'coverage'
   // Calque « Lieux / Locations » : affiche les POINTS des peuples et engagements
   // (comme en mode terrain) ; peut être actif EN MÊME TEMPS que la couverture,
   // pour voir simultanément la couverture et les points.
   const [showLocations, setShowLocations] = useState(true)
+  // Calque « Frontières / Boundaries » : affiche/masque les limites
+  // administratives (polygones de couverture). Actif par défaut.
+  const [showBoundaries, setShowBoundaries] = useState(true)
 
   // Thème clair/sombre (persisté).
   const [theme, setTheme] = useState(() => {
@@ -1701,9 +1708,6 @@ export default function UnifiedMapView() {
           style={{ top: showKpis ? '16rem' : '4rem' }}
         />
       )}
-      {/* ── Mode toggle (Terrain / Couverture) ───────── */}
-      <MapModeToggle mode={mapMode} onChange={setMapMode} theme={theme} />
-
       {/* Bandeau « peuple ciblé » — visible dans tous les modes quand une recherche cible un peuple */}
       {focusedPeople && (
         <div className={`absolute ${mapMode === 'coverage' ? 'top-24' : 'top-14'} left-1/2 -translate-x-1/2 z-[1002] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md ${panelCls(theme)}`}>
@@ -1788,7 +1792,9 @@ export default function UnifiedMapView() {
       {sidebarOpen && (
       <div className={`absolute top-4 left-16 z-[1000] w-64 max-h-[85vh] overflow-y-auto rounded-xl p-4 shadow-lg ${theme === 'dark' ? 'bg-neutral-900/95 text-neutral-100 border border-neutral-700' : 'bg-white/40 text-gray-800 border border-neutral-100'} backdrop-blur`}>
         <div className="mb-1 flex items-start justify-between">
-          <h3 className="font-bold">{uiLabel('title', isEnglish)}</h3>
+          {/* Titre « Carte unifiée des peuples » retiré à la demande. On garde un
+              span vide pour conserver l'alignement (justify-between) du bouton. */}
+          <span />
           <button onClick={() => setSidebarOpen(false)} className={subtleText(theme)} title="Réduire le panneau">
             <ChevronLeft size={18} />
           </button>
@@ -1836,6 +1842,16 @@ export default function UnifiedMapView() {
             <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600">
               <input type="checkbox" checked={showLocations} onChange={() => setShowLocations((v) => !v)} />
               <MapPin size={12} /> <span>{uiLabel('locations', isEnglish)}</span>
+            </label>
+          </div>
+
+          {/* Calque « Frontières / Boundaries » : affiche/masque les limites
+              administratives (polygones de couverture). Comme pour le mode
+              terrain où les tracés sont masqués, décocher cache les frontières. */}
+          <div>
+            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600">
+              <input type="checkbox" checked={showBoundaries} onChange={() => setShowBoundaries((v) => !v)} />
+              <MapIcon size={12} /> <span>{uiLabel('boundaries', isEnglish)}</span>
             </label>
           </div>
         </div>
@@ -2248,7 +2264,7 @@ export default function UnifiedMapView() {
                   <p className={subtleText(theme)}>Calcul de la couverture…</p>
                 )}
                 <button
-                  onClick={() => { setMapMode('coverage'); if (selected.country) setSelectedCountry(selected.country) }}
+                  onClick={() => { if (selected.country) setSelectedCountry(selected.country) }}
                   className="mt-1 self-start rounded-md bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700"
                 >
                   Voir en mode Couverture
@@ -2305,7 +2321,7 @@ export default function UnifiedMapView() {
         {/* Tracé orange de la sélection : sous-niveau admin si choisi, sinon le
             contour du PAYS sélectionné. Obéit au filtre. */}
         {outlineFeature && <SelectionOutline feature={outlineFeature} />}
-        {mapMode === 'coverage' && (
+        {mapMode === 'coverage' && showBoundaries && (
           <CoverageLayer visible countryCode={coverageCountry} peoples={coveragePeoples} levelOverride={levelOverride} onPeopleClick={goToPeopleSheet} />
         )}
         {/* Calque « Lieux / Locations » : les POINTS des peuples et engagements.

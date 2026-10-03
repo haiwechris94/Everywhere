@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { reportingApi } from '../services/reportingApi'
+import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
 import { DmmStatusBadge } from '../components/DmmStatusBadge'
@@ -41,6 +42,19 @@ const CountryPeoples = () => {
     queryFn: async () => {
       const res = await reportingApi.getPeoples({ countries: countryCode, limit: 100 })
       return Array.isArray(res?.data?.data) ? res.data.data : []
+    },
+    enabled: !!countryCode,
+    retry: false,
+  })
+
+  // Engagements DMM du pays — MÊME source que la carte (/map/dmm-engagements),
+  // afin que le tableau DMM compte le même total que la carte (ex. 80 pour le
+  // Cameroun), c.-à-d. les ENGAGEMENTS DMM et non les peuples.
+  const dmmEngagementsQuery = useQuery({
+    queryKey: ['ng-country-dmm-engagements', countryCode],
+    queryFn: async () => {
+      const res = await masterPeopleApi.getDmmEngagements({ country: countryCode, limit: 20000 })
+      return Array.isArray(res?.data?.peoples) ? res.data.peoples : []
     },
     enabled: !!countryCode,
     retry: false,
@@ -107,7 +121,7 @@ const CountryPeoples = () => {
       {/* Tableau DMM coloré (étape × niveau) — mêmes couleurs/structure que le
           Global Dashboard, mais avec les chiffres des engagements DE CE PAYS. */}
       <DmmProgressTable
-        engagements={engagements}
+        engagements={dmmEngagementsQuery.data || []}
         isFrench={isFrench}
         title={isFrench ? 'Tableau DMM — Engagements du pays' : 'DMM table — Country engagements'}
       />

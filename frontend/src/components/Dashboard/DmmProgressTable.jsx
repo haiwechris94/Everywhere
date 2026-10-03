@@ -58,7 +58,10 @@ const resolveStageAndLevel = (e = {}) => {
     normalizeDmmStage(e.dmmStatus) ||
     normalizeDmmStage(e.engagementStatus) ||
     null
-  const level = dmmLevelFromGeneration(gen, stage)
+  // Niveau : règle du tableau (générations). Si l'étape est connue mais la
+  // génération manque (0), on retombe au Niveau I pour ne PERDRE aucun engagement
+  // (le total du tableau doit égaler le nombre d'engagements de la carte).
+  const level = dmmLevelFromGeneration(gen, stage) || (stage ? (stage === DMM_STAGE.MOVEMENT ? 2 : 1) : null)
   return { stage, level }
 }
 
@@ -88,7 +91,7 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
       <div className="flex items-center justify-between gap-3 mb-4">
         <h3 className="text-base font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-100">{heading}</h3>
         <span className="text-sm text-slate-400">
-          {total} {isFrench ? 'engagements' : 'engagements'}
+          {engagements.length} {isFrench ? 'engagements' : 'engagements'}
         </span>
       </div>
 
@@ -116,7 +119,7 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
                 <tr key={stage}>
                   {/* Cellule d'étape : fond coloré au statut DMM de la carte. */}
                   <td
-                    className="py-2.5 px-3 font-semibold text-white rounded-l-lg"
+                    className="py-1.5 px-2.5 text-xs font-semibold text-white rounded-l-md"
                     style={{ backgroundColor: color }}
                   >
                     {stageLabels[stage]}
@@ -124,29 +127,19 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
                   {LEVELS.map((lvl) => {
                     const value = counts[stage][lvl]
                     return (
-                      <td key={lvl} className="py-1.5 px-1.5 text-center">
-                        <div
-                          className="mx-auto flex h-12 min-w-[3rem] items-center justify-center rounded-lg text-base font-bold tabular-nums"
-                          style={{
-                            // Teinte légère de la couleur d'étape pour la cellule,
-                            // chiffre lisible dans la couleur d'étape pleine.
-                            backgroundColor: value > 0 ? `${color}22` : 'transparent',
-                            color: value > 0 ? color : '#cbd5e1',
-                            border: `1px solid ${value > 0 ? color : '#e2e8f0'}`,
-                          }}
-                        >
-                          {value}
-                        </div>
+                      <td key={lvl} className="py-1 px-1 text-center text-sm font-bold tabular-nums"
+                        style={{
+                          color: value > 0 ? color : '#cbd5e1',
+                        }}
+                      >
+                        {value}
                       </td>
                     )
                   })}
-                  <td className="py-1.5 px-1.5 text-center">
-                    <div
-                      className="mx-auto flex h-12 min-w-[3rem] items-center justify-center rounded-lg text-base font-black tabular-nums text-white"
-                      style={{ backgroundColor: color }}
-                    >
-                      {counts[stage]._total}
-                    </div>
+                  <td className="py-1.5 px-1.5 text-center text-sm font-black tabular-nums"
+                    style={{ color }}
+                  >
+                    {counts[stage]._total}
                   </td>
                 </tr>
               )

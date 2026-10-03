@@ -86,8 +86,8 @@ const InitiativePeopleDetail = () => {
     <div className="p-6 space-y-6">
       {/* Fil d'Ariane : Projets ▸ Initiative ▸ Peuple */}
       <p className="text-sm text-gray-500">
-        <Link to="/projects" className="hover:text-slate-700">{isFrench ? 'Projets' : 'Projects'}</Link> /{' '}
-        <Link to={`/projects/initiatives/${key}`} className="font-bold hover:text-slate-700">{initiative?.name}</Link> /{' '}
+        <Link to="/initiatives" className="hover:text-slate-700">{isFrench ? 'Initiatives' : 'Initiatives'}</Link> /{' '}
+        <Link to={`/initiatives/${key}`} className="font-bold hover:text-slate-700">{initiative?.name}</Link> /{' '}
         {engagement?.peopleName || peopleId}
       </p>
 

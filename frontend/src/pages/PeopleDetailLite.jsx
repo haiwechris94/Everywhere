@@ -509,7 +509,7 @@ const PeopleDetailLite = () => {
               <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{label}</p>
               {engaged ? (
                 <Link
-                  to={`/projects/initiatives/${key}/peoples/${peopleId}`}
+                  to={`/initiatives/${key}/peoples/${peopleId}`}
                   className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
                   title={isFrench ? `Voir le détail ${label} de ce peuple` : `View this people's ${label} detail`}
                 >

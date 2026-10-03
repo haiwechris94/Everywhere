@@ -53,7 +53,7 @@ const TopNavbar = () => {
       items: [
         { path: '/regions', label: 'Regions', icon: Globe },
         { path: '/countries', label: t('nav.countries') || 'Countries', icon: Flag },
-        { path: '/projects', label: 'Projects', icon: FolderKanban },
+        { path: '/initiatives', label: 'Initiatives', icon: FolderKanban },
         { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
       ],
     },

@@ -3,6 +3,7 @@ import { useQueries, useQuery } from '@tanstack/react-query'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell,
 } from 'recharts'
 import html2canvas from 'html2canvas'
 import toast from 'react-hot-toast'
@@ -731,11 +732,270 @@ function buildPeopleVillageCsv(peoplesRows = [], primaryPair = {}, isFrench = tr
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
+// ── Analyses graphiques riches (comparaisons, taux, tendances, mesures) ──────
+// Alimentée par `periodReports` (séries trimestrielles, chaque entrée =
+// { label, report }) et `peoplesRows` (engagements DMM de la sélection, chaque
+// entrée = { canonicalName, dmm:{ engagementCount, totalChurches, maxGeneration },
+// status:{ global } }). Tolère des données vides sans planter.
+const RA_COLORS = ['#6366f1', '#22c55e', '#eab308', '#f97316', '#06b6d4', '#ec4899', '#8b5cf6', '#64748b']
+const RA_STATUS_COLORS = {
+  MOVEMENT: '#15803d', 'TIPPING-POINT': '#22c55e', MIDWAY: '#eab308', PIONEER: '#f97316',
+  ENGAGED: '#6366f1', UNREACHED: '#64748b', FRONTIER: '#f97316', UNKNOWN: '#94a3b8',
+}
+const raNum = (n) => (typeof n === 'number' && isFinite(n) ? n : 0)
+
+function RichAnalytics({ report = {}, periodReports = [], areaReports = [], selectedAreas = [], peoplesRows = [], isFrench = true }) {
+  const L = (fr, en) => (isFrench ? fr : en)
+
+  // NB : toutes les données reçues (report, periodReports, areaReports,
+  // peoplesRows) proviennent de requêtes déjà filtrées par les « Engagements DMM »
+  // sélectionnés (param `peoples` / `peopleIds`). Ces graphiques respectent donc
+  // automatiquement le filtre DMM Engagements, en plus de Zone/Pays/Trimestres.
+
+  // 1) Tendances trimestrielles : églises, nouveaux disciples, baptisés, groupes actifs.
+  const trend = (periodReports || []).map((p) => ({
+    label: p.label,
+    churches: raNum(p.report?.churches?.total),
+    disciples: raNum(p.report?.disciples?.newDisciples),
+    baptized: raNum(p.report?.disciples?.baptized),
+    dbsActive: raNum(p.report?.discoveryGroups?.active),
+  }))
+
+  // 1b) Taux de croissance trimestre sur trimestre (QoQ) des églises et des
+  // nouveaux disciples. Pour chaque trimestre t>0 : (v[t]-v[t-1]) / v[t-1] * 100.
+  const growth = trend.map((row, i) => {
+    if (i === 0) return { label: row.label, churchesGrowth: null, disciplesGrowth: null }
+    const prev = trend[i - 1]
+    const pct = (cur, old) => (old > 0 ? Math.round(((cur - old) / old) * 1000) / 10 : null)
+    return {
+      label: row.label,
+      churchesGrowth: pct(row.churches, prev.churches),
+      disciplesGrowth: pct(row.disciples, prev.disciples),
+    }
+  })
+  // Dernière variation QoQ non nulle (pour les badges d'indicateur).
+  const lastGrowth = [...growth].reverse().find((g) => g.churchesGrowth !== null || g.disciplesGrowth !== null) || {}
+  const churchesQoQ = lastGrowth.churchesGrowth
+  const disciplesQoQ = lastGrowth.disciplesGrowth
+
+  // 1c) Comparaison PAR ZONE NG (uniquement quand ≥ 2 zones sélectionnées).
+  // On pivote areaReports ([{areaId, areaLabel, label, report}]) en une série
+  // par trimestre, avec une colonne « églises » par zone.
+  const hasAreaCompare = Array.isArray(areaReports) && areaReports.length > 0 && (selectedAreas || []).length > 1
+  const areaCompare = (() => {
+    if (!hasAreaCompare) return []
+    const byLabel = new Map()
+    for (const ar of areaReports) {
+      if (!byLabel.has(ar.label)) byLabel.set(ar.label, { label: ar.label })
+      byLabel.get(ar.label)[ar.areaId] = raNum(ar.report?.churches?.total)
+    }
+    return [...byLabel.values()]
+  })()
+
+  // 2) Comparaison des mesures clés (snapshot agrégé courant).
+  const measures = [
+    { key: 'churches',  label: L('Églises', 'Churches'),       value: raNum(report?.churches?.total) },
+    { key: 'disciples', label: L('Nv. disciples', 'New disciples'), value: raNum(report?.disciples?.newDisciples) },
+    { key: 'baptized',  label: L('Baptisés', 'Baptized'),      value: raNum(report?.disciples?.baptized) },
+    { key: 'dbs',       label: L('EBD actifs', 'Active DBS'),  value: raNum(report?.discoveryGroups?.active) },
+    { key: 'leaders',   label: L('Coachs', 'Coaches'),         value: raNum(report?.leaders?.activeCoaches) },
+  ]
+
+  // 3) Répartition des engagements DMM par statut (part relative).
+  const statusCounts = {}
+  for (const p of peoplesRows || []) {
+    const s = (p?.status?.global || 'UNKNOWN').toUpperCase()
+    statusCounts[s] = (statusCounts[s] || 0) + 1
+  }
+  const statusData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }))
+
+  // 4) Top 8 des peuples par nombre d'églises (mesure comparative).
+  const topChurches = [...(peoplesRows || [])]
+    .map((p) => ({ name: p.canonicalName || '—', churches: raNum(p?.dmm?.totalChurches), engagements: raNum(p?.dmm?.engagementCount) }))
+    .sort((a, b) => b.churches - a.churches)
+    .slice(0, 8)
+
+  // 5) Taux / indicateurs dérivés.
+  const totalEng = (peoplesRows || []).reduce((s, p) => s + raNum(p?.dmm?.engagementCount), 0)
+  const totalChurches = raNum(report?.churches?.total)
+  const movements = statusCounts['MOVEMENT'] || 0
+  const peoplesCount = (peoplesRows || []).length
+  const dbsTotal = raNum(report?.discoveryGroups?.total)
+  const dbsBecameChurch = raNum(report?.discoveryGroups?.becameChurch)
+  const baptismRate = (() => {
+    const nd = raNum(report?.disciples?.newDisciples)
+    const nb = raNum(report?.disciples?.baptized)
+    return nd > 0 ? Math.round((nb / nd) * 100) : 0
+  })()
+  const dbsConversion = dbsTotal > 0 ? Math.round((dbsBecameChurch / dbsTotal) * 100) : 0
+  const avgChurchesPerPeople = peoplesCount > 0 ? (totalChurches / peoplesCount) : 0
+  const movementRate = peoplesCount > 0 ? Math.round((movements / peoplesCount) * 100) : 0
+
+  // Formatage d'une variation QoQ en texte signé (ex. +12.5 %, −4 %, —).
+  const fmtGrowth = (g) => (g === null || g === undefined ? '—' : `${g > 0 ? '+' : ''}${g}%`)
+  const growthAccent = (g) => (g === null || g === undefined ? 'text-gray-400' : g > 0 ? 'text-emerald-600' : g < 0 ? 'text-red-600' : 'text-gray-500')
+
+  const kpis = [
+    { label: L("Engagements DMM", 'DMM engagements'), value: peoplesFmt(totalEng), accent: 'text-indigo-600' },
+    { label: L('Taux de baptême', 'Baptism rate'), value: `${baptismRate}%`, accent: 'text-emerald-600' },
+    { label: L('EBD → églises', 'DBS → churches'), value: `${dbsConversion}%`, accent: 'text-blue-600' },
+    { label: L('Églises / peuple', 'Churches / people group'), value: peoplesFmt(Math.round(avgChurchesPerPeople * 10) / 10), accent: 'text-amber-600' },
+    { label: L('Taux de mouvements', 'Movement rate'), value: `${movementRate}%`, accent: 'text-green-700' },
+    // Indicateurs de croissance trimestre sur trimestre (QoQ).
+    { label: L('Croissance églises (QoQ)', 'Churches growth (QoQ)'), value: fmtGrowth(churchesQoQ), accent: growthAccent(churchesQoQ) },
+    { label: L('Croissance disciples (QoQ)', 'Disciples growth (QoQ)'), value: fmtGrowth(disciplesQoQ), accent: growthAccent(disciplesQoQ) },
+  ]
+
+  const card = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'
+  const titleCls = 'mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600'
+
+  return (
+    <div className="mt-6 space-y-4">
+      <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase">
+        <BarChart3 size={18} className="text-indigo-600" /> {L('Analyses & tendances DMM', 'DMM analytics & trends')}
+      </h2>
+
+      {/* Bandeau d'indicateurs (taux & mesures) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {kpis.map((k) => (
+          <div key={k.label} className={card}>
+            <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{k.label}</p>
+            <p className={`mt-1 text-xl font-extrabold tabular-nums ${k.accent}`}>{k.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* Tendance trimestrielle (multi-mesures) */}
+        <div className={card}>
+          <p className={titleCls}><TrendingUp size={16} /> {L('Tendance par trimestre', 'Trend by quarter')}</p>
+          {trend.length === 0 ? (
+            <p className="py-10 text-center text-sm text-gray-400">{L('Aucune donnée de période.', 'No period data.')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <LineChart data={trend} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Line type="monotone" dataKey="churches"  name={L('Églises', 'Churches')} stroke="#6366f1" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="disciples" name={L('Nv. disciples', 'New disciples')} stroke="#22c55e" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="baptized"  name={L('Baptisés', 'Baptized')} stroke="#06b6d4" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="dbsActive" name={L('EBD actifs', 'Active DBS')} stroke="#f97316" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Comparaison des mesures clés */}
+        <div className={card}>
+          <p className={titleCls}><BarChart3 size={16} /> {L('Comparaison des mesures', 'Measures comparison')}</p>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={measures} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                {measures.map((m, i) => <Cell key={m.key} fill={RA_COLORS[i % RA_COLORS.length]} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Répartition par statut d'engagement */}
+        <div className={card}>
+          <p className={titleCls}><Users size={16} /> {L("Répartition par statut", 'Breakdown by status')}</p>
+          {statusData.length === 0 ? (
+            <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label={(e) => `${e.name} (${e.value})`} labelLine={false}>
+                  {statusData.map((d) => <Cell key={d.name} fill={RA_STATUS_COLORS[d.name] || '#94a3b8'} />)}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Top peuples par nombre d'églises */}
+        <div className={card}>
+          <p className={titleCls}><TrendingUp size={16} /> {L("Top peuples (églises)", 'Top people groups (churches)')}</p>
+          {topChurches.length === 0 ? (
+            <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart layout="vertical" data={topChurches} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis type="number" tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Bar dataKey="churches" name={L('Églises', 'Churches')} fill="#6366f1" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Taux de croissance trimestre sur trimestre (QoQ) */}
+        <div className={card}>
+          <p className={titleCls}><TrendingUp size={16} /> {L('Croissance QoQ (%)', 'QoQ growth (%)')}</p>
+          {growth.filter((g) => g.churchesGrowth !== null || g.disciplesGrowth !== null).length === 0 ? (
+            <p className="py-10 text-center text-sm text-gray-400">{L('Au moins deux trimestres requis.', 'At least two quarters required.')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <LineChart data={growth} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} unit="%" />
+                <Tooltip formatter={(v) => (v === null || v === undefined ? '—' : `${v}%`)} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Line type="monotone" dataKey="churchesGrowth"  name={L('Églises (QoQ)', 'Churches (QoQ)')} stroke="#6366f1" strokeWidth={2} connectNulls dot />
+                <Line type="monotone" dataKey="disciplesGrowth" name={L('Disciples (QoQ)', 'Disciples (QoQ)')} stroke="#22c55e" strokeWidth={2} connectNulls dot />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Comparaison par Zone NG (églises par trimestre, une série par zone) */}
+        <div className={`${card} lg:col-span-2`}>
+          <p className={titleCls}><BarChart3 size={16} /> {L('Comparaison par Zone NG (églises)', 'Comparison by NG area (churches)')}</p>
+          {!hasAreaCompare ? (
+            <p className="py-10 text-center text-sm text-gray-400">{L('Sélectionnez au moins 2 Zones NG pour comparer.', 'Select at least 2 NG areas to compare.')}</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={areaCompare} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                {(selectedAreas || []).map((a, i) => (
+                  <Bar
+                    key={a.id}
+                    dataKey={a.id}
+                    name={isFrench ? a.labelFr : a.labelEn}
+                    fill={a.color || RA_COLORS[i % RA_COLORS.length]}
+                    radius={[4, 4, 0, 0]}
+                  />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function DmmReporting() {
   const { t, isFrench } = useLanguage()
 
   const [years, setYears]           = useState([CURRENT_YEAR])
-  const [quarters, setQuarters]     = useState([CURRENT_QUARTER])
+  // Tous les trimestres actifs par défaut (T1–T4).
+  const [quarters, setQuarters]     = useState([1, 2, 3, 4])
   const [areaIds, setAreaIds]       = useState([])
   const [countryIds, setCountryIds] = useState([])
   const [peopleIds, setPeopleIds]   = useState([]) // selected NG (DMM) masterPeopleIds
@@ -1090,11 +1350,11 @@ export default function DmmReporting() {
           <MultiSelect label={t('dmmReporting.filterQuarter')} options={quarterOptions} selected={quarters.map(String)} onChange={(ids) => setQuarters(ids.map(Number))} allLabel={t('dmmReporting.allQuarters')} />
           {(areaIds.length > 0 || countryIds.length > 0) && (
             <MultiSelect
-              label={isFrench ? 'Peuples NG (DMM)' : 'NG people groups (DMM)'}
+              label={isFrench ? 'Engagements DMM' : 'DMM Engagements'}
               options={peopleOptions}
               selected={peopleIds}
               onChange={setPeopleIds}
-              allLabel={isFrench ? 'Tous les peuples NG' : 'All NG people groups'}
+              allLabel={isFrench ? 'Tous les engagements DMM' : 'All DMM engagements'}
             />
           )}
           <button onClick={downloadCsv} disabled={downloadingCsv || (areaIds.length === 0 && countryIds.length === 0)} className="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50">
@@ -1103,36 +1363,9 @@ export default function DmmReporting() {
         </div>
       </div>
 
-      {/* ── Filter chips ── */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700 ring-1 ring-indigo-200">
-          {periodLabel}
-          {pairs.length > 1 && (
-            <span className="ml-1 rounded-full bg-indigo-200 px-1.5 text-indigo-800">{pairs.length} {isFrench ? 'périodes' : 'periods'}</span>
-          )}
-        </span>
-        {areaIds.map((id) => {
-          const area = NG_AREAS.find((a) => a.id === id)
-          return (
-            <span key={id} className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
-              {isFrench ? area?.labelFr : area?.labelEn}
-              <button onClick={() => handleAreaChange(areaIds.filter((a) => a !== id))} className="ml-0.5 text-indigo-400 hover:text-indigo-700">×</button>
-            </span>
-          )
-        })}
-        {years.length > 1 && years.map((y) => (
-          <span key={y} className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
-            {y}
-            <button onClick={() => setYears(years.filter((v) => v !== y))} className="ml-0.5 text-gray-400 hover:text-gray-700">×</button>
-          </span>
-        ))}
-        {quarters.length > 1 && quarters.map((q) => (
-          <span key={q} className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
-            T{q}
-            <button onClick={() => setQuarters(quarters.filter((v) => v !== q))} className="ml-0.5 text-gray-400 hover:text-gray-700">×</button>
-          </span>
-        ))}
-      </div>
+      {/* Les « puces » de filtres sélectionnés (période / zone / année /
+          trimestre) ont été retirées à la demande. L'état des filtres reste
+          visible dans les menus déroulants ci-dessus. */}
 
       {/* ── Data ── */}
       {isLoading ? (
@@ -1216,6 +1449,23 @@ export default function DmmReporting() {
             <Stat label="Personnes de paix"  value={report.personsOfPeace?.total} />
           </Section>
 
+          {/* ── Analyses graphiques riches ──────────────────────────────────
+              Remplace l'ancienne liste « Peuples engagés par zone / pays » par
+              des graphiques analytiques : tendances par trimestre, comparaisons,
+              taux de progression DMM et mesures clés. Toutes les données
+              proviennent de `periodReports` (séries trimestrielles) et de
+              `peoplesRows` (engagements DMM de la sélection). */}
+          <RichAnalytics
+            report={report}
+            periodReports={periodReports}
+            areaReports={areaReports}
+            selectedAreas={selectedAreas}
+            peoplesRows={peoplesRows}
+            isFrench={isFrench}
+          />
+
+          {/* Bloc historique conservé pour mémoire mais désactivé (false). */}
+          {false && (
           <div className="mt-6">
             <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
               <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase">
@@ -1289,6 +1539,7 @@ export default function DmmReporting() {
               </div>
             )}
           </div>
+          )}
         </>
       ) : null}
     </div>

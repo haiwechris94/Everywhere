@@ -1203,7 +1203,7 @@ const translations = {
       churches: 'Églises',
       activities: 'Activités',
       analyseQualitative: 'Analyse qualitative',
-      projects: 'Projects',
+      initiatives: 'Initiatives',
       profile: 'Mon Profil',
       dataManagement: 'Gestion des données',
       advancedSearch: 'Recherche Avancée',

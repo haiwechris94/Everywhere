@@ -42,7 +42,7 @@ const UnifiedMapView = lazy(() => import('./pages/UnifiedMapView'))
 const Profile = lazy(() => import('./pages/Profile'))
 const PeopleGroupDetail = lazy(() => import('./pages/PeopleGroupDetail'))
 const VillageDetail = lazy(() => import('./pages/VillageDetail'))
-const Projects = lazy(() => import('./pages/Projects'))
+const Initiatives = lazy(() => import('./pages/Initiatives'))
 const InitiativeDetail = lazy(() => import('./pages/InitiativeDetail'))
 const InitiativePeopleDetail = lazy(() => import('./pages/InitiativePeopleDetail'))
 const DataManagement = lazy(() => import('./pages/DataManagement'))
@@ -229,25 +229,30 @@ function App() {
               <Activities />
             </Suspense>
           } />
-          <Route path="projects" element={
+          <Route path="initiatives" element={
             <Suspense fallback={<CompactLoader />}>
-              <Projects />
+              <Initiatives />
             </Suspense>
           } />
-          <Route path="projects/initiatives/:key" element={
+          {/* Legacy path kept so existing /projects links/bookmarks keep working. */}
+          <Route path="projects" element={<Navigate to="/initiatives" replace />} />
+          <Route path="initiatives/:key" element={
             <ErrorBoundary fallbackMessage="Error loading initiative.">
               <Suspense fallback={<CompactLoader />}>
                 <InitiativeDetail />
               </Suspense>
             </ErrorBoundary>
           } />
-          <Route path="projects/initiatives/:key/peoples/:peopleId" element={
+          <Route path="initiatives/:key/peoples/:peopleId" element={
             <ErrorBoundary fallbackMessage="Error loading initiative people detail.">
               <Suspense fallback={<CompactLoader />}>
                 <InitiativePeopleDetail />
               </Suspense>
             </ErrorBoundary>
           } />
+          {/* Legacy initiative paths kept working with a redirect. */}
+          <Route path="projects/initiatives/:key" element={<Navigate to="/initiatives" replace />} />
+          <Route path="projects/initiatives/:key/peoples/:peopleId" element={<Navigate to="/initiatives" replace />} />
           <Route path="pending-validations" element={
             <Suspense fallback={<CompactLoader />}>
               <PendingValidations />

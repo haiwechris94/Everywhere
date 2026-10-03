@@ -330,13 +330,19 @@ const AnalyseQualitative = () => {
   const peopleGroups = peopleGroupsData || []
   const savedAnalyses = analysesData || []
 
-  // Filter people groups by search and country
+  // Filter people groups by search only.
+  // Le filtre pays est appliqué CÔTÉ SERVEUR via le paramètre `countries`
+  // (alpha-2) de reportingApi.getPeoples — voir la query ci-dessus. On NE refait
+  // PAS de filtre pays côté client ici : `pg.country` est un code ISO alpha-3
+  // (ex. « CMR ») renvoyé par /api/reporting/peoples, alors que `selectedCountry`
+  // est alpha-2 (ex. « CM »). La comparaison directe échouait toujours et vidait
+  // la liste quand un pays était sélectionné. Le serveur ayant déjà restreint les
+  // données au pays demandé, un second filtre client est inutile.
   const filteredPeopleGroups = peopleGroups.filter(pg => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       pg.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pg.villageName?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCountry = !selectedCountry || pg.country === selectedCountry
-    return matchesSearch && matchesCountry
+    return matchesSearch
   })
 
   // Save analysis mutation

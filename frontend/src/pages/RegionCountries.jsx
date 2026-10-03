@@ -3,8 +3,10 @@ import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { reportingApi } from '../services/reportingApi'
+import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StateEmpty, StatCard } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
+import DmmProgressTable from '../components/Dashboard/DmmProgressTable'
 import { useLanguage } from '../i18n'
 
 // Locale-aware thousands formatting for the numeric columns (e.g. 45000 -> 45 000).
@@ -26,6 +28,18 @@ const RegionCountries = () => {
     retry: false,
   })
 
+  // Tous les engagements DMM (même source que la carte). On agrège ensuite ceux
+  // des pays de CETTE région pour le tableau DMM. Requête déclarée avant tout
+  // retour anticipé pour garder l'ordre des hooks stable.
+  const { data: allDmmEngagements } = useQuery({
+    queryKey: ['region-dmm-engagements', 'all'],
+    queryFn: async () => {
+      const res = await masterPeopleApi.getDmmEngagements({ limit: 20000 })
+      return Array.isArray(res?.data?.peoples) ? res.data.peoples : []
+    },
+    retry: false,
+  })
+
   if (isLoading) return <div className="p-6"><StateLoading label={isFrench ? 'Chargement de la région…' : 'Loading region…'} /></div>
   if (isError) {
     const notFound = error?.response?.status === 404
@@ -37,6 +51,12 @@ const RegionCountries = () => {
   const cards = metricCards(data.metrics)
   const primaryCards = cards.filter((c) => c.primary)
   const moreCards = cards.filter((c) => !c.primary)
+
+  // Engagements DMM agrégés sur les pays de la région (filtre par code alpha-2).
+  const regionCountryCodes = new Set(countries.map((c) => (c.code || '').toUpperCase()).filter(Boolean))
+  const regionDmmEngagements = (allDmmEngagements || []).filter(
+    (e) => e.countryCode2 && regionCountryCodes.has(String(e.countryCode2).toUpperCase())
+  )
 
   return (
     <div className="p-6 space-y-6">
@@ -74,6 +94,14 @@ const RegionCountries = () => {
           )}
         </section>
 
+        {/* Tableau DMM coloré (étape × niveau) — engagements AGRÉGÉS de la région
+            (somme des pays), même composant/couleurs que le Dashboard et les pays. */}
+        <DmmProgressTable
+          engagements={regionDmmEngagements}
+          isFrench={isFrench}
+          title={isFrench ? 'Tableau DMM — Engagements de la région' : 'DMM table — Region engagements'}
+        />
+
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
           {/* Collapsible Countries header: chevron on the left, blue title */}
           <button
@@ -87,7 +115,7 @@ const RegionCountries = () => {
             ) : (
               <ChevronRight size={20} className="text-blue-600" />
             )}
-            <span className="text-base font-semibold text-black uppercase">
+            <span className="text-sm font-semibold text-black uppercase">
               countries
             </span>
             <span className="text-slate-400 text-sm">({countries.length})</span>

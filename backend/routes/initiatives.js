@@ -210,8 +210,47 @@ function defaultEsp300Sets() {
 }
 
 // ── GET /api/initiatives ──────────────────────────────────────────────────────
+// Each initiative is returned with the number of DISTINCT countries and DISTINCT
+// people groups engaged, derived from the ProjectEngagement records. These feed
+// the Initiatives list table (Countries / People groups columns).
 router.get('/', optionalAuth, async (req, res) => {
   try {
+    // Aggregate per-initiative distinct counts in one pass. countryCode may be
+    // alpha-2 or alpha-3 depending on when the engagement was created; we just
+    // dedupe whatever (non-empty) code is stored. People groups are deduped by
+    // masterPeopleId when present, otherwise by the engagement id.
+    let countsByKey = {};
+    try {
+      const rows = await ProjectEngagement.aggregate([
+        {
+          $group: {
+            _id: '$projectKey',
+            countries: {
+              $addToSet: {
+                $toUpper: { $ifNull: ['$countryCode', ''] },
+              },
+            },
+            peoples: {
+              $addToSet: { $ifNull: ['$masterPeopleId', '$_id'] },
+            },
+          },
+        },
+      ]);
+      countsByKey = rows.reduce((acc, r) => {
+        const countries = (r.countries || []).filter((c) => c && c !== '');
+        acc[r._id] = {
+          countryCount: countries.length,
+          peopleCount: (r.peoples || []).length,
+        };
+        return acc;
+      }, {});
+    } catch (aggErr) {
+      // If the aggregation fails for any reason, fall back to zero counts so the
+      // list still renders instead of 500-ing.
+      console.error('[initiatives] counts aggregation error:', aggErr);
+      countsByKey = {};
+    }
+
     const data = Object.values(INITIATIVES).map((i) => ({
       key: i.key,
       name: i.name,
@@ -219,6 +258,8 @@ router.get('/', optionalAuth, async (req, res) => {
       kind: i.kind,
       summary: i.summary,
       setCount: (i.sets || []).length,
+      countryCount: countsByKey[i.key]?.countryCount || 0,
+      peopleCount: countsByKey[i.key]?.peopleCount || 0,
     }));
     res.json({ success: true, data });
   } catch (err) {
