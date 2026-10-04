@@ -41,6 +41,25 @@ const photoSchema = new mongoose.Schema({
   },
 }, { _id: true });
 
+// Per-quarter DMM metrics history entry. Each entry is one reporting period
+// (e.g. "2Q26"). Importing a new quarter PUSHES a new entry; re-importing the
+// same quarter UPDATES the matching entry in place (no duplicate quarters).
+// The top-level fields on PeopleGroup mirror the MOST RECENT quarter.
+const quarterlyReportSchema = new mongoose.Schema({
+  reportPeriod: { type: String, trim: true },
+  numberOfChurches: { type: Number, default: 0 },
+  churchGeneration: { type: Number, default: 0 },
+  dbs: { type: Number, default: 0 },
+  com: { type: Number, default: 0 },
+  cat: { type: Number, default: 0 },
+  newDisciples: { type: Number, default: 0 },
+  newBaptisms: { type: Number, default: 0 },
+  leadersInTraining: { type: Number, default: 0 },
+  activeCoaches: { type: Number, default: 0 },
+  trainingsHeld: { type: Number, default: 0 },
+  importedAt: { type: Date, default: Date.now },
+});
+
 const peopleGroupSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -188,6 +207,10 @@ const peopleGroupSchema = new mongoose.Schema({
   },
   // Progress history for timeline
   progressHistory: [progressHistorySchema],
+  // Per-quarter DMM metrics history. Each entry is one reporting period.
+  // Top-level metric fields mirror the most recent quarter in this array.
+  // Legacy docs without this array simply have an empty array.
+  quarterlyReports: [quarterlyReportSchema],
   // Photos array
   photos: [photoSchema],
   // Organization tags for filtering

@@ -47,7 +47,7 @@ const CENTRAL_AFRICAN_COUNTRIES = [
 const ANALYSIS_CRITERIA = {
   foundation: {
     title: 'Fondation DMM',
-    titleEn: 'DMM Foundation',
+    titleEn: 'DMM FOUNDATION',
     icon: Target,
     color: 'from-blue-500 to-indigo-600',
     criteria: [
@@ -58,7 +58,7 @@ const ANALYSIS_CRITERIA = {
   },
   discipleship: {
     title: 'Formation de Disciples',
-    titleEn: 'Discipleship',
+    titleEn: 'DISCIPLESHIP',
     icon: Users,
     color: 'from-emerald-500 to-teal-600',
     criteria: [
@@ -69,7 +69,7 @@ const ANALYSIS_CRITERIA = {
   },
   multiplication: {
     title: 'Multiplication',
-    titleEn: 'Multiplication',
+    titleEn: 'MULTIPLICATION',
     icon: Zap,
     color: 'from-purple-500 to-pink-600',
     criteria: [
@@ -165,22 +165,16 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
             <div className="flex-1 grid grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-xl shadow-sm">
                 <p className="text-sm text-gray-500">Village</p>
-                <p className="font-semibold text-gray-800">{analysis.villageName || '-'}</p>
+                <p className="font-semibold text-gray-800">{safeText(analysis.villageName)}</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
                 <p className="text-sm text-gray-500">Pays</p>
-                <p className="font-semibold text-gray-800">{analysis.country || '-'}</p>
+                <p className="font-semibold text-gray-800">{safeText(analysis.country)}</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
                 <p className="text-sm text-gray-500">Priorité</p>
-                <p className={`font-semibold capitalize ${
-                  analysis.priorityLevel === 'critical' ? 'text-red-600' :
-                  analysis.priorityLevel === 'very-high' ? 'text-orange-600' :
-                  analysis.priorityLevel === 'high' ? 'text-yellow-600' :
-                  analysis.priorityLevel === 'moderate' ? 'text-blue-600' :
-                  'text-green-600'
-                }`}>
-                  {analysis.priorityLevel}
+                <p className="font-semibold capitalize text-gray-700">
+                  {normalizePriorityLevel(analysis?.priorityLevel, language)}
                 </p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
@@ -268,6 +262,32 @@ const RATING_OPTIONS = [
   { value: 5, label: 'Excellent', labelEn: 'Excellent', color: 'bg-green-500', hoverColor: 'hover:bg-green-400' },
 ]
 
+const safeText = (value, fallback = '-') => {
+  if (value == null || value === '') return fallback
+  if (typeof value === 'string' || typeof value === 'number') return value
+  return fallback
+}
+
+const normalizePriorityLevel = (priorityLevel, language) => {
+  if (!priorityLevel) return '-'
+  if (typeof priorityLevel === 'string' || typeof priorityLevel === 'number') return priorityLevel
+  if (typeof priorityLevel !== 'object') return '-'
+
+  return (
+    (language === 'fr' ? priorityLevel.levelFr : priorityLevel.levelEn) ||
+    priorityLevel.levelFr ||
+    priorityLevel.levelEn ||
+    priorityLevel.labelFr ||
+    priorityLevel.labelEn ||
+    priorityLevel.label ||
+    priorityLevel.level ||
+    priorityLevel.global ||
+    priorityLevel.jpScale ||
+    priorityLevel.leastReached ||
+    '-'
+  )
+}
+
 const AnalyseQualitative = () => {
   const { t, language } = useLanguage()
   const queryClient = useQueryClient()
@@ -295,13 +315,29 @@ const AnalyseQualitative = () => {
   const { data: peopleGroupsData, isLoading } = useQuery({
     queryKey: ['dmm-engagements', 'qualitativeAnalysis', selectedCountry],
     queryFn: async () => {
-      const params = { limit: 1000 }
-      if (selectedCountry) params.countries = selectedCountry
+      // /api/reporting/peoples EXIGE un périmètre géographique (areas ou
+      // countries) : sans paramètre il répond 400. Quand aucun pays n'est
+      // sélectionné, on envoie donc par défaut TOUS les pays d'Afrique centrale
+      // (codes alpha-2) pour récupérer l'ensemble des engagements DMM.
+      const params = { limit: 200 }
+      params.countries = selectedCountry
+        ? selectedCountry
+        : CENTRAL_AFRICAN_COUNTRIES.map((c) => c.code).join(',')
       const res = await reportingApi.getPeoples(params)
       const peoples = Array.isArray(res?.data?.data) ? res.data.data : []
       // Garder uniquement les peuples DMM-engagés, puis aplatir leurs engagements
       // DMM en entrées analysables (une ligne par engagement/village).
       const dmmPeoples = peoples.filter((p) => p.isNGEngaged)
+      // Normalise un statut qui peut arriver sous forme de chaîne OU d'objet
+      // ({ global, jpScale, ... }). On ne garde qu'une CHAÎNE pour l'affichage —
+      // rendre l'objet directement dans un <span> fait planter React
+      // (« Objects are not valid as a React child »).
+      const statusString = (s) => {
+        if (s == null) return null
+        if (typeof s === 'string') return s
+        if (typeof s === 'object') return s.global || s.status || s.level || null
+        return String(s)
+      }
       const engagements = dmmPeoples.flatMap((p) =>
         (p.dmm?.engagements || []).map((e) => ({
           ...e,
@@ -311,7 +347,11 @@ const AnalyseQualitative = () => {
           name: [p.canonicalName, e.villageName].filter(Boolean).join(', ') || e.name || p.canonicalName,
           peopleName: p.canonicalName,
           country: p.primaryCountryCode || e.country || null,
-          engagementStatus: e.dmmStatus || e.status || p.status || null,
+          engagementStatus:
+            statusString(e.dmmStatus) ||
+            statusString(e.status) ||
+            statusString(p.status) ||
+            null,
         }))
       )
       return engagements
@@ -465,68 +505,66 @@ const AnalyseQualitative = () => {
 
   const totalScore = calculateTotalScore()
   const priority = getPriorityLevel(totalScore)
+  const priorityLabel = normalizePriorityLevel(priority, language)
   const totalCriteria = Object.values(ANALYSIS_CRITERIA).reduce((acc, cat) => acc + cat.criteria.length, 0)
   const evaluatedCriteria = Object.keys(analysisData).length
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {language === 'fr' ? 'Analyse Qualitative' : 'Qualitative Analysis'}
-            </h1>
-            <p className="text-purple-100 text-lg">
-              {language === 'fr' 
-                ? 'Évaluez les groupes de peuples selon les critères du processus YCS RA'
-                : 'Evaluate people groups according to YCS RA process criteria'}
+      {/* Header — titre noir en haut, infos clés en ligne légère dessous */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          {language === 'fr' ? 'Analyse Qualitative' : 'Qualitative Analysis'}
+        </h1>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-[80%] mx-auto">
+          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-yellow-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full">
+            <p className="text-base leading-tight font-medium text-yellow-700 break-words">
+              {language === 'fr' ? '# Groupes de peuples disponibles' : '# People groups available'}
             </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="bg-white/15 backdrop-blur-sm px-5 py-3 rounded-xl">
-              <p className="text-sm text-purple-100">Peuples disponibles</p>
-              <p className="text-2xl font-bold">{peopleGroups.length}</p>
+            <div>
+              <span className="text-2xl font-semibold leading-none text-gray-900">{peopleGroups.length}</span>
             </div>
-            <div className="bg-white/15 backdrop-blur-sm px-5 py-3 rounded-xl">
-              <p className="text-sm text-purple-100">Analyses sauvées</p>
-              <p className="text-2xl font-bold">{savedAnalyses.reduce((acc, c) => acc + c.count, 0)}</p>
+          </div>
+          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-green-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full">
+            <p className="text-base leading-tight font-medium text-green-700 break-words">
+              {language === 'fr' ? '# Analyses sauvegardées' : '# Saved analysis'}
+            </p>
+            <div>
+              <span className="text-2xl font-semibold leading-none text-gray-900">{savedAnalyses.reduce((acc, c) => acc + c.count, 0)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modern Tabs */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="border-b border-gray-100">
-          <nav className="flex">
+      {/* Tabs — accent neutre, sans grand cadre */}
+      <div>
+        <div className="border-b border-gray-200">
+          <nav className="flex gap-6">
             <button
               onClick={() => setActiveTab('analyser')}
-              className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
+              className={`-mb-px px-1 py-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
                 activeTab === 'analyser'
-                  ? 'text-purple-600 border-b-3 border-purple-600 bg-purple-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'text-gray-900 border-gray-900'
+                  : 'text-gray-500 border-transparent hover:text-gray-700'
               }`}
             >
-              <FileText size={20} />
               {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People Group'}
             </button>
             <button
               onClick={() => setActiveTab('resultats')}
-              className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
+              className={`-mb-px px-1 py-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-colors ${
                 activeTab === 'resultats'
-                  ? 'text-purple-600 border-b-3 border-purple-600 bg-purple-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'text-gray-900 border-gray-900'
+                  : 'text-gray-500 border-transparent hover:text-gray-700'
               }`}
             >
-              <TrendingUp size={20} />
               {language === 'fr' ? 'Résultats d\'Analyse' : 'Analysis Results'}
             </button>
           </nav>
         </div>
 
         {/* Tab Content */}
-        <div className="p-6">
+        <div className="pt-6">
           {activeTab === 'analyser' ? (
             /* Analysis Tab - Two Column Layout */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -534,7 +572,7 @@ const AnalyseQualitative = () => {
               <div className="lg:col-span-1 space-y-4">
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Users size={20} className="text-purple-600" />
+                    <Users size={20} className="text-gray-500" />
                     {language === 'fr' ? 'Sélectionner un peuple' : 'Select a People Group'}
                   </h3>
                   
@@ -546,7 +584,7 @@ const AnalyseQualitative = () => {
                       placeholder={language === 'fr' ? 'Rechercher...' : 'Search...'}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     />
                   </div>
 
@@ -554,7 +592,7 @@ const AnalyseQualitative = () => {
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-4"
+                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent mb-4"
                   >
                     <option value="">{language === 'fr' ? 'Tous les pays' : 'All Countries'}</option>
                     {CENTRAL_AFRICAN_COUNTRIES.map(country => (
@@ -568,7 +606,7 @@ const AnalyseQualitative = () => {
                   <div className="max-h-[400px] overflow-y-auto border border-gray-200 rounded-xl bg-white">
                     {isLoading ? (
                       <div className="p-6 text-center">
-                        <Loader2 className="animate-spin mx-auto mb-2 text-purple-600" size={24} />
+                        <Loader2 className="animate-spin mx-auto mb-2 text-gray-500" size={24} />
                         {paginationProgress && (
                           <p className="text-sm text-gray-500">
                             Page {paginationProgress.page}/{paginationProgress.totalPages}
@@ -594,18 +632,12 @@ const AnalyseQualitative = () => {
                           }}
                           className={`w-full text-left px-4 py-3 border-b last:border-b-0 transition-all ${
                             selectedPeople?._id === pg._id 
-                              ? 'bg-purple-50 border-l-4 border-l-purple-500' 
+                              ? 'bg-gray-100 border-l-4 border-l-gray-900' 
                               : 'hover:bg-gray-50'
                           }`}
                         >
                           <div className="font-medium text-gray-800">{pg.name}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
-                            <MapPin size={12} />
-                            {pg.villageName || '-'}
-                            {pg.country && (
-                              <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">{pg.country}</span>
-                            )}
-                          </div>
+                          {null}
                         </button>
                       ))
                     )}
@@ -618,9 +650,9 @@ const AnalyseQualitative = () => {
                 {selectedPeople ? (
                   <>
                     {/* Selected People Info */}
-                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-5 border border-purple-200">
-                      <h4 className="font-bold text-purple-800 flex items-center gap-2 mb-3">
-                        <Info size={18} />
+                    <div className="rounded-lg p-5 border border-gray-200 bg-gray-50">
+                      <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-3">
+                        <Info size={18} className="text-gray-500" />
                         {selectedPeople.name}
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -647,31 +679,32 @@ const AnalyseQualitative = () => {
                     {Object.entries(ANALYSIS_CRITERIA).map(([key, category]) => {
                       const CategoryIcon = category.icon
                       return (
-                        <div key={key} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                          <div className={`bg-gradient-to-r ${category.color} px-5 py-3`}>
-                            <h4 className="font-bold text-white flex items-center gap-2">
-                              <CategoryIcon size={20} />
-                              {language === 'fr' ? category.title : category.titleEn}
+                        <div key={key}>
+                          <div className="px-1 pb-2 mb-3 border-b border-gray-200">
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                              <CategoryIcon size={18} className="text-gray-500" />
+                              <span className="text-orange-600">
+                                {language === 'fr' ? category.title : category.titleEn}
+                              </span>
                             </h4>
                           </div>
-                          <div className="p-5 space-y-4">
+                          <div className="px-1 space-y-4">
                             {category.criteria.map(criterion => (
                               <div key={criterion.id} className="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <div className="flex-1">
                                   <label className="text-sm font-medium text-gray-700">
                                     {language === 'fr' ? criterion.label : criterion.labelEn}
                                   </label>
-                                  <span className="text-xs text-gray-400 ml-2">(x{criterion.weight})</span>
                                 </div>
                                 <div className="flex gap-2">
                                   {RATING_OPTIONS.map(option => (
                                     <button
                                       key={option.value}
                                       onClick={() => handleRatingChange(criterion.id, option.value)}
-                                      className={`w-11 h-11 rounded-xl text-sm font-bold transition-all ${
+                                      className={`w-11 h-11 rounded-xl text-sm font-bold transition-all border border-blue-300 bg-blue-50 text-blue-700 ${
                                         analysisData[criterion.id] === option.value
                                           ? `${option.color} text-white shadow-lg scale-110 ring-2 ring-offset-2`
-                                          : `bg-gray-100 text-gray-600 ${option.hoverColor}`
+                                          : `${option.hoverColor}`
                                       }`}
                                       title={language === 'fr' ? option.label : option.labelEn}
                                     >
@@ -695,7 +728,7 @@ const AnalyseQualitative = () => {
                         <textarea
                           value={remarks}
                           onChange={(e) => setRemarks(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none h-32"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"
                           placeholder={language === 'fr' ? 'Ajoutez vos remarques...' : 'Add your remarks...'}
                         />
                       </div>
@@ -706,7 +739,7 @@ const AnalyseQualitative = () => {
                         <textarea
                           value={recommendations}
                           onChange={(e) => setRecommendations(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none h-32"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"
                           placeholder={language === 'fr' ? 'Ajoutez vos recommandations...' : 'Add your recommendations...'}
                         />
                       </div>
@@ -759,7 +792,7 @@ const AnalyseQualitative = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white p-4 rounded-xl shadow-sm text-center">
                             <p className={`text-xl font-bold ${priority.color}`}>
-                              {language === 'fr' ? priority.levelFr : priority.levelEn}
+                              {priorityLabel}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">Priorité</p>
                           </div>
@@ -783,7 +816,7 @@ const AnalyseQualitative = () => {
                         {language === 'fr' ? 'Réinitialiser' : 'Reset'}
                       </button>
                       <button
-                        className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold shadow-lg flex items-center gap-2 disabled:opacity-50"
+                        className="px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-semibold shadow-lg flex items-center gap-2 disabled:opacity-50"
                         onClick={handleSaveAnalysis}
                         disabled={saveAnalysisMutation.isLoading}
                       >
@@ -799,8 +832,8 @@ const AnalyseQualitative = () => {
                 ) : (
                   /* Empty State */
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                      <Users size={48} className="text-purple-400" />
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                      <Users size={48} className="text-gray-400" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">
                       {language === 'fr' ? 'Sélectionnez un peuple' : 'Select a People Group'}
@@ -831,7 +864,7 @@ const AnalyseQualitative = () => {
 
               {isLoadingAnalyses ? (
                 <div className="text-center py-12">
-                  <Loader2 className="animate-spin mx-auto mb-3 text-purple-600" size={40} />
+                  <Loader2 className="animate-spin mx-auto mb-3 text-gray-500" size={40} />
                   <p className="text-gray-500">{language === 'fr' ? 'Chargement des analyses...' : 'Loading analyses...'}</p>
                 </div>
               ) : savedAnalyses.length === 0 ? (
@@ -849,7 +882,7 @@ const AnalyseQualitative = () => {
                   </p>
                   <button
                     onClick={() => setActiveTab('analyser')}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold"
+                    className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-semibold"
                   >
                     {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People Group'}
                   </button>
@@ -879,7 +912,7 @@ const AnalyseQualitative = () => {
                         <div className="flex items-center gap-4">
                           <div className="text-right">
                             <span className="text-sm text-gray-500 block">Score moyen</span>
-                            <span className="font-bold text-purple-600">{countryGroup.avgScore}%</span>
+                            <span className="font-bold text-gray-900">{countryGroup.avgScore}%</span>
                           </div>
                           {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                         </div>
@@ -890,7 +923,7 @@ const AnalyseQualitative = () => {
                           {countryGroup.analyses.map(analysis => (
                             <div 
                               key={analysis._id} 
-                              className="p-4 bg-white hover:bg-purple-50 cursor-pointer transition-colors"
+                              className="p-4 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                               onClick={() => setSelectedAnalysis(analysis)}
                             >
                               <div className="flex items-center justify-between">
@@ -899,7 +932,7 @@ const AnalyseQualitative = () => {
                                   <div className="text-sm text-gray-500 mt-1 flex items-center gap-4">
                                     <span className="flex items-center gap-1">
                                       <MapPin size={12} />
-                                      {analysis.villageName || '-'}
+                                      {safeText(analysis.villageName)}
                                     </span>
                                     <span>{new Date(analysis.analyzedAt).toLocaleDateString()}</span>
                                   </div>

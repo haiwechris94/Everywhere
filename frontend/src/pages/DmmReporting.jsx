@@ -8,7 +8,7 @@ import {
 import html2canvas from 'html2canvas'
 import toast from 'react-hot-toast'
 import { Loader2, Download, BarChart3, FileDown, TrendingUp, ImageDown, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronRight, Users } from 'lucide-react'
-import { reportingApi } from '../services/api'
+import { reportingApi, masterPeopleApi } from '../services/api'
 import { StatusBadge } from './geography/geoComponents'
 import { useLanguage } from '../i18n'
 
@@ -113,15 +113,19 @@ function aggregateReports(reports) {
       total: max('churches', 'total'),
       commissioned: max('churches', 'commissioned'),
       catalytic: max('churches', 'catalytic'),
-      // Preserve the engagement count and the highest generation across reports
-      // so the region/Data Reporting cards keep working after aggregation.
-      engagements: sum('churches', 'engagements'),
+      // Engagements is a STOCK (the number of distinct DMM engagements), NOT a
+      // flow: the SAME engagements are reported again every quarter, so summing
+      // across periods double-counts them (e.g. 80 engagements over 2–3 quarters
+      // became 180). Take the MAX across periods — like churches.total and
+      // maxGeneration — so the count reflects the real number of engagements.
+      engagements: max('churches', 'engagements'),
       maxGeneration: max('churches', 'maxGeneration'),
       byGeneration,
       mergedOrDied: { merged: 0, died: 0 },
     },
     dmmFieldMetrics: {
-      engagements: sum('dmmFieldMetrics', 'engagements'),
+      // Stock metric — MAX across periods (not SUM), see churches.engagements above.
+      engagements: max('dmmFieldMetrics', 'engagements'),
       maxGeneration: max('dmmFieldMetrics', 'maxGeneration'),
     },
     leaders: {
@@ -586,6 +590,12 @@ function reportPeriodLabel(year, quarter) {
   return `${quarter}Q${String(year).slice(-2)}`
 }
 
+// Libellé de trimestre localisé : FR « T1 » / EN « 1Q ». Avec année si fournie.
+function qLabel(quarter, year, isFrench) {
+  const q = isFrench ? `T${quarter}` : `${quarter}Q`
+  return year != null ? `${q} ${year}` : q
+}
+
 // Map a peoples alpha-3 primaryCountryCode to a human-readable country name via
 // NG_AREAS (which stores alpha-2 codes). Falls back to the raw code when the
 // alpha-3 to alpha-2 mapping is unavailable.
@@ -780,26 +790,29 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
 
   // 1c) Comparaison PAR ZONE NG (uniquement quand ≥ 2 zones sélectionnées).
   // On pivote areaReports ([{areaId, areaLabel, label, report}]) en une série
-  // par trimestre, avec une colonne « églises » par zone.
+  // par trimestre, avec une colonne par zone pour la mesure choisie.
+  // La mesure est pilotée par un petit sélecteur (églises / nouveaux disciples /
+  // baptisés / EBD actifs) au lieu d'être figée sur les églises.
+  const AREA_METRICS = [
+    { id: 'churches',  labelFr: 'Églises',          labelEn: 'Churches',       pick: (r) => raNum(r?.churches?.total) },
+    { id: 'disciples', labelFr: 'Nouveaux disciples', labelEn: 'New disciples', pick: (r) => raNum(r?.disciples?.newDisciples) },
+    { id: 'baptized',  labelFr: 'Baptisés',         labelEn: 'Baptized',       pick: (r) => raNum(r?.disciples?.baptized) },
+    { id: 'dbsActive', labelFr: 'EBD actifs',       labelEn: 'Active DBS',     pick: (r) => raNum(r?.discoveryGroups?.active) },
+  ]
+  const [areaMetric, setAreaMetric] = useState('churches')
+  const areaMetricDef = AREA_METRICS.find((m) => m.id === areaMetric) || AREA_METRICS[0]
+  const areaMetricLabel = isFrench ? areaMetricDef.labelFr : areaMetricDef.labelEn
+
   const hasAreaCompare = Array.isArray(areaReports) && areaReports.length > 0 && (selectedAreas || []).length > 1
   const areaCompare = (() => {
     if (!hasAreaCompare) return []
     const byLabel = new Map()
     for (const ar of areaReports) {
       if (!byLabel.has(ar.label)) byLabel.set(ar.label, { label: ar.label })
-      byLabel.get(ar.label)[ar.areaId] = raNum(ar.report?.churches?.total)
+      byLabel.get(ar.label)[ar.areaId] = areaMetricDef.pick(ar.report)
     }
     return [...byLabel.values()]
   })()
-
-  // 2) Comparaison des mesures clés (snapshot agrégé courant).
-  const measures = [
-    { key: 'churches',  label: L('Églises', 'Churches'),       value: raNum(report?.churches?.total) },
-    { key: 'disciples', label: L('Nv. disciples', 'New disciples'), value: raNum(report?.disciples?.newDisciples) },
-    { key: 'baptized',  label: L('Baptisés', 'Baptized'),      value: raNum(report?.disciples?.baptized) },
-    { key: 'dbs',       label: L('EBD actifs', 'Active DBS'),  value: raNum(report?.discoveryGroups?.active) },
-    { key: 'leaders',   label: L('Coachs', 'Coaches'),         value: raNum(report?.leaders?.activeCoaches) },
-  ]
 
   // 3) Répartition des engagements DMM par statut (part relative).
   const statusCounts = {}
@@ -816,7 +829,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
     .slice(0, 8)
 
   // 5) Taux / indicateurs dérivés.
-  const totalEng = (peoplesRows || []).reduce((s, p) => s + raNum(p?.dmm?.engagementCount), 0)
+  const totalEng = raNum(report?.churches?.engagements) || raNum(report?.dmmFieldMetrics?.engagements) || (peoplesRows || []).reduce((s, p) => s + raNum(p?.dmm?.engagementCount), 0)
   const totalChurches = raNum(report?.churches?.total)
   const movements = statusCounts['MOVEMENT'] || 0
   const peoplesCount = (peoplesRows || []).length
@@ -849,6 +862,34 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
   const card = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'
   const titleCls = 'mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600'
 
+  // ── Per-chart PNG export ──
+  // One ref per chart card so a discreet, icon-only download button can capture
+  // just that card (not the whole page) via html2canvas.
+  const trendRef = useRef(null)
+  const statusRef = useRef(null)
+  const topRef = useRef(null)
+  const growthRef = useRef(null)
+  const areaRef = useRef(null)
+  const downloadCardPng = async (ref, name) => {
+    if (!ref.current) return
+    const canvas = await html2canvas(ref.current, { backgroundColor: '#ffffff', scale: 2 })
+    const link = document.createElement('a')
+    link.download = `dmm-${name}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+  // Small icon-only download button rendered in each chart card header.
+  const DlBtn = ({ onClick }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+      title={L('Télécharger', 'Download')}
+    >
+      <Download size={14} />
+    </button>
+  )
+
   return (
     <div className="mt-6 space-y-4">
       <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase">
@@ -867,8 +908,11 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Tendance trimestrielle (multi-mesures) */}
-        <div className={card}>
-          <p className={titleCls}><TrendingUp size={16} /> {L('Tendance par trimestre', 'Trend by quarter')}</p>
+        <div className={card} ref={trendRef}>
+          <div className="flex items-center justify-between">
+            <p className={titleCls}><TrendingUp size={16} /> {L('Tendance par trimestre', 'Trend by quarter')}</p>
+            <DlBtn onClick={() => downloadCardPng(trendRef, 'tendance')} />
+          </div>
           {trend.length === 0 ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Aucune donnée de période.', 'No period data.')}</p>
           ) : (
@@ -888,25 +932,12 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
           )}
         </div>
 
-        {/* Comparaison des mesures clés */}
-        <div className={card}>
-          <p className={titleCls}><BarChart3 size={16} /> {L('Comparaison des mesures', 'Measures comparison')}</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={measures} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
-              <YAxis tick={{ fontSize: 11 }} />
-              <Tooltip />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                {measures.map((m, i) => <Cell key={m.key} fill={RA_COLORS[i % RA_COLORS.length]} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
         {/* Répartition par statut d'engagement */}
-        <div className={card}>
-          <p className={titleCls}><Users size={16} /> {L("Répartition par statut", 'Breakdown by status')}</p>
+        <div className={card} ref={statusRef}>
+          <div className="flex items-center justify-between">
+            <p className={titleCls}><Users size={16} /> {L("Répartition par statut", 'Breakdown by status')}</p>
+            <DlBtn onClick={() => downloadCardPng(statusRef, 'statut')} />
+          </div>
           {statusData.length === 0 ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
           ) : (
@@ -922,8 +953,11 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
         </div>
 
         {/* Top peuples par nombre d'églises */}
-        <div className={card}>
-          <p className={titleCls}><TrendingUp size={16} /> {L("Top peuples (églises)", 'Top people groups (churches)')}</p>
+        <div className={card} ref={topRef}>
+          <div className="flex items-center justify-between">
+            <p className={titleCls}><TrendingUp size={16} /> {L("Top peuples (églises)", 'Top people groups (churches)')}</p>
+            <DlBtn onClick={() => downloadCardPng(topRef, 'top-peuples')} />
+          </div>
           {topChurches.length === 0 ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
           ) : (
@@ -940,8 +974,11 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
         </div>
 
         {/* Taux de croissance trimestre sur trimestre (QoQ) */}
-        <div className={card}>
-          <p className={titleCls}><TrendingUp size={16} /> {L('Croissance QoQ (%)', 'QoQ growth (%)')}</p>
+        <div className={card} ref={growthRef}>
+          <div className="flex items-center justify-between">
+            <p className={titleCls}><TrendingUp size={16} /> {L('Croissance QoQ (%)', 'QoQ growth (%)')}</p>
+            <DlBtn onClick={() => downloadCardPng(growthRef, 'croissance-qoq')} />
+          </div>
           {growth.filter((g) => g.churchesGrowth !== null || g.disciplesGrowth !== null).length === 0 ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Au moins deux trimestres requis.', 'At least two quarters required.')}</p>
           ) : (
@@ -959,9 +996,25 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
           )}
         </div>
 
-        {/* Comparaison par Zone NG (églises par trimestre, une série par zone) */}
-        <div className={`${card} lg:col-span-2`}>
-          <p className={titleCls}><BarChart3 size={16} /> {L('Comparaison par Zone NG (églises)', 'Comparison by NG area (churches)')}</p>
+        {/* Comparaison par Zone NG — mesure pilotée par le sélecteur (une série par zone) */}
+        <div className={`${card} lg:col-span-2`} ref={areaRef}>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600">
+              <BarChart3 size={16} /> {L('Comparaison par Zone NG', 'Comparison by NG area')} — {areaMetricLabel}
+            </p>
+            {/* Sélecteur de mesure : églises / nouveaux disciples / baptisés / EBD actifs */}
+            <select
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600"
+              value={areaMetric}
+              onChange={(e) => setAreaMetric(e.target.value)}
+              aria-label={L('Mesure comparée', 'Compared measure')}
+            >
+              {AREA_METRICS.map((m) => (
+                <option key={m.id} value={m.id}>{isFrench ? m.labelFr : m.labelEn}</option>
+              ))}
+            </select>
+            <DlBtn onClick={() => downloadCardPng(areaRef, 'comparaison-zones')} />
+          </div>
           {!hasAreaCompare ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Sélectionnez au moins 2 Zones NG pour comparer.', 'Select at least 2 NG areas to compare.')}</p>
           ) : (
@@ -998,7 +1051,7 @@ export default function DmmReporting() {
   const [quarters, setQuarters]     = useState([1, 2, 3, 4])
   const [areaIds, setAreaIds]       = useState([])
   const [countryIds, setCountryIds] = useState([])
-  const [peopleIds, setPeopleIds]   = useState([]) // selected NG (DMM) masterPeopleIds
+  const [engagementIds, setEngagementIds] = useState([]) // selected NG (DMM) engagement option ids
   const [exporting, setExporting]   = useState(false)
   const [peoplesPage, setPeoplesPage] = useState(1);
   const [expandedPeoples, setExpandedPeoples] = useState(() => new Set());
@@ -1028,12 +1081,12 @@ export default function DmmReporting() {
     setCountryIds(all)
     // The available peoples depend on the area/country scope, so reset the
     // peoples selection whenever the geographic scope changes.
-    setPeopleIds([])
+    setEngagementIds([])
   }
 
   const handleCountryChange = (ids) => {
     setCountryIds(ids)
-    setPeopleIds([])
+    setEngagementIds([])
   }
 
   const areaOptions       = NG_AREAS.map((a) => ({ id: a.id, label: isFrench ? a.labelFr : a.labelEn }))
@@ -1067,12 +1120,67 @@ export default function DmmReporting() {
     return pairs.map((p) => ({ ...p, areaId: null }))
   }, [pairs, selectedAreas, compareAreas])
 
-  // Serialize the selected NG (DMM) peoples so it can be part of the query key.
-  const peoplesParam = useMemo(() => [...peopleIds].sort().join(','), [peopleIds])
+  // ── NG (DMM) peoples available for the current geographic scope ──
+  // Feeds the "DMM Engagements" filter box. Restricted to NG-engaged peoples
+  // (sourceTypes=DMM), independent of the year/quarter so the option list stays
+  // stable while the user switches periods.
+  // NOTE: declared BEFORE the report queries below, because `peoplesParam` /
+  // `peopleIds` are referenced inside the useQueries() query keys.
+  const peopleOptionsQuery = useQuery({
+    queryKey: ['reporting-people-options', areaIds.join(','), countryIds.join(',')],
+    queryFn: () => reportingApi.peoples({
+      areas: areaIds.length ? areaIds.join(',') : undefined,
+      countries: countryIds.length ? countryIds.join(',') : undefined,
+      sourceTypes: 'DMM',
+      page: 1,
+      limit: 200,
+    }).then((r) => r.data),
+    enabled: areaIds.length > 0 || countryIds.length > 0,
+    keepPreviousData: true,
+  });
+  // One option PER ENGAGEMENT (not per people) for the "DMM Engagements" filter.
+  // Each NG-engaged people may hold several engagements (one per village); we
+  // flatten them so the dropdown lists engagements. Each option keeps a stable
+  // id and the owning masterPeopleId, so the server (which filters by
+  // masterPeopleId) can still be scoped from the engagement selection.
+  const engagementOptions = useMemo(() => {
+    const rows = (peopleOptionsQuery.data?.data || []).filter((p) => p.isNGEngaged);
+    const out = [];
+    rows.forEach((p) => {
+      const mpId = String(p.masterPeopleId);
+      const cc = p.primaryCountryCode ? ` (${p.primaryCountryCode})` : '';
+      const engs = p?.dmm?.engagements || [];
+      if (engs.length === 0) {
+        // Legacy / no nested engagement array: treat the people as one engagement.
+        out.push({ id: `${mpId}::_`, label: `${p.canonicalName}${cc}`, masterPeopleId: mpId });
+        return;
+      }
+      engs.forEach((eng, idx) => {
+        const engName = eng?.name || eng?.villageName || p.canonicalName;
+        out.push({
+          id: `${mpId}::${eng?.name || eng?.villageName || idx}`,
+          label: `${engName}${cc}`,
+          masterPeopleId: mpId,
+        });
+      });
+    });
+    return out;
+  }, [peopleOptionsQuery.data]);
+
+  // Translate the engagement selection into the deduped masterPeopleId list the
+  // report queries (and the `peoples` param) understand.
+  const peopleIds = useMemo(
+    () => [...new Set(
+      engagementIds
+        .map((id) => engagementOptions.find((o) => o.id === id)?.masterPeopleId)
+        .filter(Boolean)
+    )],
+    [engagementIds, engagementOptions]
+  );
 
   const queryResults = useQueries({
     queries: queryDescriptors.map((d) => ({
-      queryKey: ['reporting', d.year, d.quarter, d.areaId ?? areaIds.join(','), d.areaId ? '' : countryIds.join(','), peoplesParam],
+      queryKey: ['reporting', d.year, d.quarter, d.areaId ?? areaIds.join(','), d.areaId ? '' : countryIds.join(','), peopleIds.join(',')],
       queryFn: () => {
         // Determine filter params for this query
         let params = { year: d.year, quarter: d.quarter }
@@ -1085,7 +1193,7 @@ export default function DmmReporting() {
           if (countryIds.length > 0) params.countries = countryIds.join(',')
         }
         // Restrict the whole report to the selected NG (DMM) peoples.
-        if (peopleIds.length > 0) params.peoples = peoplesParam
+        if (peopleIds.length > 0) params.peoples = peopleIds.join(',')
         return reportingApi.quarterly(params).then((r) => r.data?.data)
       },
     })),
@@ -1110,7 +1218,7 @@ export default function DmmReporting() {
         .map((x) => x.data)
       const merged = finalizeReport(aggregateReports(matches)) || {}
       return {
-        label: `T${p.quarter} ${p.year}`,
+        label: qLabel(p.quarter, p.year, isFrench),
         disciples: merged?.disciples?.newDisciples ?? 0,
         baptized:  merged?.disciples?.baptized ?? 0,
         churches:  merged?.churches?.total ?? 0,
@@ -1123,7 +1231,7 @@ export default function DmmReporting() {
   const areaData = useMemo(() => {
     if (!compareAreas) return []
     return pairs.map((p) => {
-      const point = { label: `T${p.quarter} ${p.year}` }
+      const point = { label: qLabel(p.quarter, p.year, isFrench) }
       selectedAreas.forEach((area) => {
         const idx = queryDescriptors.findIndex(
           (d) => d.year === p.year && d.quarter === p.quarter && d.areaId === area.id
@@ -1174,37 +1282,11 @@ export default function DmmReporting() {
   const peoplesRows = peoplesData?.data || [];
   const peoplesMeta = peoplesData?.meta;
 
-  // ── NG (DMM) peoples available for the current geographic scope ──
-  // Feeds the "peoples" filter box. Restricted to NG-engaged peoples (sourceTypes=DMM),
-  // independent of the year/quarter so the option list stays stable while the user
-  // switches periods.
-  const peopleOptionsQuery = useQuery({
-    queryKey: ['reporting-people-options', areaIds.join(','), countryIds.join(',')],
-    queryFn: () => reportingApi.peoples({
-      areas: areaIds.length ? areaIds.join(',') : undefined,
-      countries: countryIds.length ? countryIds.join(',') : undefined,
-      sourceTypes: 'DMM',
-      page: 1,
-      limit: 200,
-    }).then((r) => r.data),
-    enabled: areaIds.length > 0 || countryIds.length > 0,
-    keepPreviousData: true,
-  });
-  const peopleOptions = useMemo(() => {
-    const rows = peopleOptionsQuery.data?.data || [];
-    return rows
-      .filter((p) => p.isNGEngaged)
-      .map((p) => ({
-        id: String(p.masterPeopleId),
-        label: p.primaryCountryCode ? `${p.canonicalName} (${p.primaryCountryCode})` : p.canonicalName,
-      }));
-  }, [peopleOptionsQuery.data]);
-
   // Human-readable labels for the currently selected NG (DMM) peoples, used in
   // CSV exports (header section + template columns + file name).
   const selectedPeopleLabels = useMemo(
-    () => peopleIds.map((id) => peopleOptions.find((o) => o.id === id)?.label || id),
-    [peopleIds, peopleOptions]
+    () => peopleIds.map((mpId) => engagementOptions.find((o) => o.masterPeopleId === mpId)?.label || mpId),
+    [peopleIds, engagementOptions]
   );
 
   // File-name suffix summarising the selected NG peoples (used for CSV downloads).
@@ -1231,7 +1313,7 @@ export default function DmmReporting() {
         .map((d, i) => ({ d, data: queryResults[i]?.data }))
         .filter((x) => x.d.year === p.year && x.d.quarter === p.quarter && x.data)
         .map((x) => x.data)
-      return { label: `T${p.quarter} ${p.year}`, report: finalizeReport(aggregateReports(matches)) || {} }
+      return { label: qLabel(p.quarter, p.year, isFrench), report: finalizeReport(aggregateReports(matches)) || {} }
     })
   }, [pairs, queryDescriptors, queryResults])
 
@@ -1248,7 +1330,7 @@ export default function DmmReporting() {
         list.push({
           areaId: area.id,
           areaLabel: isFrench ? area.labelFr : area.labelEn,
-          label: `T${p.quarter} ${p.year}`,
+          label: qLabel(p.quarter, p.year, isFrench),
           report: r || {},
         })
       })
@@ -1321,7 +1403,7 @@ export default function DmmReporting() {
   }
 
   const yearOptions = [CURRENT_YEAR - 2, CURRENT_YEAR - 1, CURRENT_YEAR, CURRENT_YEAR + 1].map((y) => ({ id: String(y), label: String(y) }))
-  const quarterOptions = [1, 2, 3, 4].map((q) => ({ id: String(q), label: `T${q}` }))
+  const quarterOptions = [1, 2, 3, 4].map((q) => ({ id: String(q), label: qLabel(q, null, isFrench) }))
 
   const periodLabel = useMemo(() => {
     if (pairs.length === 1) return `${pairs[0].year} · T${pairs[0].quarter}`
@@ -1351,9 +1433,9 @@ export default function DmmReporting() {
           {(areaIds.length > 0 || countryIds.length > 0) && (
             <MultiSelect
               label={isFrench ? 'Engagements DMM' : 'DMM Engagements'}
-              options={peopleOptions}
-              selected={peopleIds}
-              onChange={setPeopleIds}
+              options={engagementOptions}
+              selected={engagementIds}
+              onChange={setEngagementIds}
               allLabel={isFrench ? 'Tous les engagements DMM' : 'All DMM engagements'}
             />
           )}

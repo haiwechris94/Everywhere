@@ -226,6 +226,71 @@ const calculateEngagementStatus = (numberOfChurches) => {
   return 'dmm';
 };
 
+// ── Historique trimestriel (accumulation) ───────────────────────────────────
+// Convertit un libellé de période « <q>Q<yy> » (ex. « 2Q26 ») en un entier
+// ordonnable (année*4 + trimestre) pour comparer la récence des trimestres.
+const quarterOrder = (period) => {
+  const m = /^\s*([1-4])\s*Q\s*(\d{2,4})\s*$/i.exec(String(period || ''));
+  if (!m) return -1;
+  const q = parseInt(m[1], 10);
+  let yy = parseInt(m[2], 10);
+  if (yy < 100) yy = 2000 + yy;
+  return yy * 4 + q;
+};
+
+// Métriques trimestrielles portées par une entrée d'historique.
+const QUARTERLY_METRIC_KEYS = [
+  'numberOfChurches', 'churchGeneration', 'dbs', 'com', 'cat',
+  'newDisciples', 'newBaptisms', 'leadersInTraining', 'activeCoaches', 'trainingsHeld',
+];
+
+/**
+ * Insère/actualise l'entrée d'historique trimestriel d'un engagement puis
+ * recopie, dans les champs de premier niveau, les valeurs du trimestre LE PLUS
+ * RÉCENT (afin que le stade DMM progresse). Garantit l'absence de doublon de
+ * trimestre : réimporter le même « reportPeriod » met à jour l'entrée existante.
+ *
+ * @param {object} doc      - document PeopleGroup (mongoose) ou newDoc (objet brut)
+ * @param {string} period   - libellé de période, ex. « 2Q26 »
+ * @param {object} metrics  - { numberOfChurches, churchGeneration, dbs, com, cat, newDisciples, newBaptisms, leadersInTraining, activeCoaches, trainingsHeld }
+ * @returns {object} les métriques du trimestre le plus récent (pour miroir top-level)
+ */
+const upsertQuarterlyReport = (doc, period, metrics) => {
+  const entry = { reportPeriod: period || '', importedAt: new Date() };
+  for (const k of QUARTERLY_METRIC_KEYS) entry[k] = Number(metrics[k]) || 0;
+
+  if (!Array.isArray(doc.quarterlyReports)) doc.quarterlyReports = [];
+
+  if (period) {
+    const norm = String(period).trim().toLowerCase();
+    const idx = doc.quarterlyReports.findIndex(
+      (q) => String(q.reportPeriod || '').trim().toLowerCase() === norm
+    );
+    if (idx >= 0) {
+      // Même trimestre réimporté → correction en place (pas de doublon).
+      doc.quarterlyReports[idx] = { ...(doc.quarterlyReports[idx].toObject ? doc.quarterlyReports[idx].toObject() : doc.quarterlyReports[idx]), ...entry };
+    } else {
+      doc.quarterlyReports.push(entry);
+    }
+  } else {
+    // Pas de période fournie : on garde une seule entrée « sans période ».
+    const idx = doc.quarterlyReports.findIndex((q) => !q.reportPeriod);
+    if (idx >= 0) doc.quarterlyReports[idx] = entry;
+    else doc.quarterlyReports.push(entry);
+  }
+
+  // Détermine le trimestre le plus récent (ordre max). À défaut d'ordre, on
+  // prend la dernière entrée insérée.
+  let latest = null;
+  let bestOrder = -Infinity;
+  doc.quarterlyReports.forEach((q, i) => {
+    const o = quarterOrder(q.reportPeriod);
+    const rank = o >= 0 ? o : -1 + i / 1000; // garde l'ordre d'insertion si non parsable
+    if (rank >= bestOrder) { bestOrder = rank; latest = q; }
+  });
+  return latest || entry;
+};
+
 /**
  * Determine whether an imported people group should be linked into the DMM
  * reporting/query chain.
@@ -848,23 +913,37 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
           action = 'updated';
           const prevPeriod = existing.reportPeriod || 'previous';
           prevPeriodForReport = prevPeriod;
-          existing.numberOfChurches = numberOfChurches;
-          existing.churchGeneration = churchGeneration;
-          existing.dbs = dbs;
-          existing.com = com;
-          existing.cat = cat;
+
+          // ACCUMULATION TRIMESTRIELLE : au lieu d'écraser les chiffres du
+          // trimestre précédent, on insère/actualise une entrée d'historique
+          // pour CE trimestre (réimporter le même trimestre = correction en
+          // place, pas de doublon), puis on recopie dans les champs top-level
+          // les valeurs du trimestre LE PLUS RÉCENT pour que le stade DMM
+          // progresse (églises/génération qui montent au fil des trimestres).
+          const latestQ = upsertQuarterlyReport(existing, reportPeriod, {
+            numberOfChurches, churchGeneration, dbs, com, cat,
+            newDisciples, newBaptisms, leadersInTraining, activeCoaches, trainingsHeld,
+          });
+          existing.numberOfChurches = Number(latestQ.numberOfChurches) || 0;
+          existing.churchGeneration = Number(latestQ.churchGeneration) || 0;
+          existing.dbs = Number(latestQ.dbs) || 0;
+          existing.com = Number(latestQ.com) || 0;
+          existing.cat = Number(latestQ.cat) || 0;
+          existing.newDisciples = Number(latestQ.newDisciples) || 0;
+          existing.newBaptisms = Number(latestQ.newBaptisms) || 0;
+          existing.leadersInTraining = Number(latestQ.leadersInTraining) || 0;
+          existing.activeCoaches = Number(latestQ.activeCoaches) || 0;
+          existing.trainingsHeld = Number(latestQ.trainingsHeld) || 0;
           existing.avgChurchSize = avgChurchSize;
-          existing.newDisciples = newDisciples;
-          existing.newBaptisms = newBaptisms;
-          existing.leadersInTraining = leadersInTraining;
-          existing.activeCoaches = activeCoaches;
-          existing.trainingsHeld = trainingsHeld;
           existing.lostChurches = lostChurches;
           existing.mergedChurches = mergedChurches;
           if (normalizedPeopleGroup) existing.peopleGroup = normalizedPeopleGroup;
           if (notes) existing.notes = notes;
-          existing.reportPeriod = reportPeriod || existing.reportPeriod;
-          existing.engagementStatus = engagementStatus;
+          // reportPeriod top-level = trimestre le plus récent de l'historique.
+          existing.reportPeriod = latestQ.reportPeriod || reportPeriod || existing.reportPeriod;
+          // Statut recalculé d'après les églises du trimestre le plus récent
+          // (il suit le tableau DMM après accumulation).
+          existing.engagementStatus = calculateEngagementStatus(existing.numberOfChurches);
           existing.status = status;
           if (engagementLevel) existing.engagementLevel = engagementLevel;
           if (population) existing.population = population;
@@ -925,6 +1004,15 @@ router.post('/people-groups', auth, isMissionary, upload.single('file'), handleM
             trainingsHeld: trainingsHeld,
             lostChurches: lostChurches,
             mergedChurches: mergedChurches,
+            // Première entrée d'historique trimestriel (accumulation). Les
+            // imports suivants ajouteront/mettront à jour les trimestres via
+            // upsertQuarterlyReport sans écraser celui-ci.
+            quarterlyReports: reportPeriod ? [{
+              reportPeriod,
+              numberOfChurches, churchGeneration, dbs, com, cat,
+              newDisciples, newBaptisms, leadersInTraining, activeCoaches, trainingsHeld,
+              importedAt: new Date(),
+            }] : [],
             peopleGroup: normalizedPeopleGroup || undefined,
             notes: notes || undefined,
             reportPeriod: reportPeriod,

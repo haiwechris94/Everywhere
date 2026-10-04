@@ -71,4 +71,20 @@ export function bibleStatusLabel(bibleStatus) {
   return `${key} — ${meaning}`
 }
 
+/**
+ * Décompose un Bible Translation status en { code, meaning } normalisés.
+ * Retourne { code: null, meaning: null } si absent, et conserve une valeur
+ * non répertoriée telle quelle (code brut, meaning null).
+ */
+export function bibleStatusParts(bibleStatus) {
+  if (bibleStatus === null || bibleStatus === undefined || bibleStatus === '') {
+    return { code: null, meaning: null }
+  }
+  const raw = String(bibleStatus).trim()
+  const key = String(parseInt(raw, 10))
+  const meaning = BIBLE_STATUS_TABLE[key]
+  if (!meaning) return { code: raw, meaning: null }
+  return { code: key, meaning }
+}
+
 export { JP_SCALE_TABLE, BIBLE_STATUS_TABLE }

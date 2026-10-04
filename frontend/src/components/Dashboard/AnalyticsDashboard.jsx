@@ -1688,7 +1688,7 @@ const AnalyticsDashboard = () => {
           <DmmProgressTable
             engagements={dmmEngagements}
             isFrench={isFrench}
-            title={isFrench ? 'Global DMM Engagements — Tableau DMM (étape × niveau)' : 'Global DMM Engagements — DMM table (stage × level)'}
+            title={isFrench ? 'Global DMM Engagements' : 'Global DMM Engagements'}
           />
         </div>
 

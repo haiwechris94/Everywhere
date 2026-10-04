@@ -69,7 +69,7 @@ const RegionCountries = () => {
 
       {/* Layout paysage : Reporting en haut (pleine largeur), Countries en dessous */}
       <div className="space-y-6">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="p-0">
           <h2 className="text-xl font-bold mb-4">Reporting</h2>
           {/* Cartes de métriques : une seule grille fluide. Les groupes bleu (ligne 1)
               et vert (ligne 2) partagent désormais le même conteneur, donc quand une
@@ -86,7 +86,7 @@ const RegionCountries = () => {
               type="button"
               onClick={() => setShowAllMetrics((v) => !v)}
               aria-expanded={showAllMetrics}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+              className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-800"
             >
               {showAllMetrics ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
@@ -94,15 +94,19 @@ const RegionCountries = () => {
           )}
         </section>
 
+        <div className="border-t border-slate-200" />
+
         {/* Tableau DMM coloré (étape × niveau) — engagements AGRÉGÉS de la région
             (somme des pays), même composant/couleurs que le Dashboard et les pays. */}
-        <DmmProgressTable
+        <div className="p-0">
+          <DmmProgressTable
           engagements={regionDmmEngagements}
           isFrench={isFrench}
           title={isFrench ? 'Tableau DMM — Engagements de la région' : 'DMM table — Region engagements'}
-        />
+          />
+        </div>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="p-0">
           {/* Collapsible Countries header: chevron on the left, blue title */}
           <button
             type="button"

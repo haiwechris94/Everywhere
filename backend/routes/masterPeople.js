@@ -22,6 +22,11 @@ const Village = require('../models/Village');
 const { COUNTRY_CONFIG } = require('./countries');
 const { auth } = require('../middleware/auth');
 const { recomputeDmmRollup } = require('../services/dmmRollup');
+const {
+  jpStageFor,
+  jpScaleDescriptionFor,
+  bibleStatusLabel,
+} = require('../utils/joshuaProjectScales');
 
 const fs = require('fs');
 const path = require('path');
@@ -1052,21 +1057,77 @@ router.get('/:id/profile', async (req, res, next) => {
         approved: true,
         masterPeopleId: master._id,
       })
-        .select('name villageName region admin2 admin3 language religion description donor nationalCoordinator churchPlanter affinityGroup urbanRural startYear population engagementStatus engagementLevel numberOfChurches churchGeneration')
+        .select('name villageName region admin2 admin3 language religion description donor nationalCoordinator churchPlanter affinityGroup urbanRural startYear population engagementStatus engagementLevel numberOfChurches churchGeneration newDisciples newBaptisms leadersInTraining activeCoaches trainingsHeld dbs com cat')
         .lean(),
     ]);
 
     // DMM engagement detail (from linked DMM PeopleGroups, e.g. Cameroon_PGs import).
     // null when this master has no DMM engagement.
+    // `dmm` carries the CUMULATIVE engagement-metric totals (summed across every
+    // linked engagement) so the people-detail "DMM Rollup" cards can show real
+    // totals (churches, disciples, baptisms, leaders, …) rather than 0.
     let dmmDetail = null;
+    let dmm = null;
+    const toInt = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? Math.trunc(n) : 0;
+    };
     if (Array.isArray(dmmGroups) && dmmGroups.length) {
       const rep = dmmGroups[0] || {};
+      const sum = (field) => dmmGroups.reduce((s, g) => s + toInt(g[field]), 0);
+      const maxOf = (field) => dmmGroups.reduce((mx, g) => Math.max(mx, toInt(g[field])), 0);
+      const villagesTouched = new Set(
+        dmmGroups.map((g) => (g.villageName || '').trim()).filter(Boolean)
+      ).size;
+
+      // Per-engagement rows, carrying the full metric set so the client can
+      // cumulate (or display) any engagement metric it needs.
+      const engagements = dmmGroups.map((g) => ({
+        id: g._id,
+        _id: g._id,
+        peopleGroupId: g._id,
+        peopleName: master.canonicalName,
+        villageName: g.villageName || null,
+        engagementStatus: g.engagementStatus || null,
+        engagementLevel: g.engagementLevel || null,
+        numberOfChurches: toInt(g.numberOfChurches),
+        churchGeneration: toInt(g.churchGeneration),
+        newDisciples: toInt(g.newDisciples),
+        newBaptisms: toInt(g.newBaptisms),
+        leadersInTraining: toInt(g.leadersInTraining),
+        activeCoaches: toInt(g.activeCoaches),
+        trainingsHeld: toInt(g.trainingsHeld),
+        dbs: toInt(g.dbs),
+        com: toInt(g.com),
+        cat: toInt(g.cat),
+        region: g.region || null,
+        admin2: g.admin2 || null,
+        admin3: g.admin3 || null,
+      }));
+
+      // Cumulative engagement-metric totals across ALL linked engagements.
+      dmm = {
+        engagementCount: dmmGroups.length,
+        villagesTouched,
+        totalChurches: sum('numberOfChurches'),
+        maxGeneration: maxOf('churchGeneration'),
+        totalNewDisciples: sum('newDisciples'),
+        totalNewBaptisms: sum('newBaptisms'),
+        totalLeadersInTraining: sum('leadersInTraining'),
+        totalActiveCoaches: sum('activeCoaches'),
+        totalTrainingsHeld: sum('trainingsHeld'),
+        totalDbs: sum('dbs'),
+        totalCom: sum('com'),
+        totalCat: sum('cat'),
+        engagements,
+      };
+
       dmmDetail = {
         engagementStatus: rep.engagementStatus || null,
         engagementLevel: rep.engagementLevel || null,
-        numberOfChurches: dmmGroups.reduce((s, g) => s + (g.numberOfChurches || 0), 0),
-        churchGeneration: dmmGroups.reduce((mx, g) => Math.max(mx, g.churchGeneration || 0), 0),
-        villagesTouched: new Set(dmmGroups.map((g) => (g.villageName || '').trim()).filter(Boolean)).size,
+        numberOfChurches: dmm.totalChurches,
+        churchGeneration: dmm.maxGeneration,
+        villagesTouched,
         region: rep.region || null,
         department: rep.admin2 || null,
         subdivision: rep.admin3 || null,
@@ -1081,17 +1142,7 @@ router.get('/:id/profile', async (req, res, next) => {
         startYear: rep.startYear || null,
         population: rep.population || null,
         peopleName: master.canonicalName,
-        villages: dmmGroups.map((g) => ({
-          id: g._id,
-          peopleName: master.canonicalName,
-          villageName: g.villageName || null,
-          engagementStatus: g.engagementStatus || null,
-          numberOfChurches: g.numberOfChurches || 0,
-          churchGeneration: g.churchGeneration || 0,
-          region: g.region || null,
-          admin2: g.admin2 || null,
-          admin3: g.admin3 || null,
-        })),
+        villages: engagements,
       };
     }
 
@@ -1172,6 +1223,22 @@ router.get('/:id/profile', async (req, res, next) => {
           (statusDetail && statusDetail.percentEvangelical != null
             ? statusDetail.percentEvangelical
             : (master.status ? master.status.percentEvangelical : null)),
+        // Native (denormalized) human-readable JP descriptions. Prefer the
+        // stored master.status.* fields when present, else derive on the fly
+        // from the numeric JPScale / BibleStatus so the client never has to.
+        jpStage:
+          (master.status && master.status.jpStage) ||
+          jpStageFor(master.status ? master.status.jpScale : null),
+        jpScaleDescription:
+          (master.status && master.status.jpScaleDescription) ||
+          jpScaleDescriptionFor(master.status ? master.status.jpScale : null),
+        bibleTranslation:
+          (master.status && master.status.bibleTranslation) ||
+          bibleStatusLabel(
+            statusDetail && statusDetail.bibleStatus != null
+              ? statusDetail.bibleStatus
+              : (master.status ? master.status.bibleStatus : null)
+          ),
       },
       sources: sourceRows,
       population: {
@@ -1189,6 +1256,9 @@ router.get('/:id/profile', async (req, res, next) => {
       aliases: aliases.map((a) => a.alias).filter(Boolean),
       statusDetail: statusDetail || null,
       dmmDetail,
+      // Cumulative DMM engagement-metric totals (+ per-engagement rows) so the
+      // people-detail "DMM Rollup" cards show real cumulative totals.
+      dmm,
     });
   } catch (err) {
     next(err);

@@ -27,6 +27,17 @@ const MasterStatusSummarySchema = new Schema(
     leastReached: { type: Boolean, default: null },
     percentEvangelical: { type: Number, default: null }, // JP PercentEvangelical (denormalized)
     bibleStatus: { type: String, default: null },        // JP BibleStatus code (0–5, denormalized)
+
+    // Native (denormalized) human-readable JP descriptions, so clients (map
+    // cards, people detail) can render the labels WITHOUT re-deriving them from
+    // the numeric codes. Populated from the JP reference scales
+    // (see frontend/src/utils/joshuaProjectScales.js / backend equivalent):
+    //   jpStage            — label for the JP Progress Scale (e.g. "Unreached (All)")
+    //   jpScaleDescription — "<scale> — <stage>" convenience string (e.g. "1 — Unreached (All)")
+    //   bibleTranslation   — "<code> — <meaning>" (e.g. "4 — New Testament")
+    jpStage: { type: String, default: null },
+    jpScaleDescription: { type: String, default: null },
+    bibleTranslation: { type: String, default: null },
   },
   { _id: false }
 );

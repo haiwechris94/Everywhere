@@ -390,33 +390,48 @@ const PeopleDetailLite = () => {
   const photoUrl = overview.photoUrl || null
   const subtitleChips = [overview.region, overview.language, overview.religion].filter(Boolean)
 
-  // # Churches = somme des églises de TOUS les engagements du peuple.
-  // On additionne engagements[].numberOfChurches ; repli sur le rollup
-  // totalChurches lorsque la liste détaillée des engagements est absente.
-  const totalChurchesFromEngagements = Array.isArray(dmm?.engagements)
-    ? dmm.engagements.reduce((sum, e) => sum + (Number(e.numberOfChurches) || 0), 0)
-    : 0
-  const churchesTotal = totalChurchesFromEngagements || (dmm?.totalChurches ?? 0)
+  // ── DMM Rollup = CUMUL des mesures d'engagement sur TOUS les engagements ─────
+  // Chaque carte additionne la mesure correspondante sur engagements[] ; repli
+  // sur le total cumulé renvoyé par le backend (dmm.total*), puis sur le rollup
+  // Option-B stocké sur le master (dmm.totalChurches / engagementCount / …).
+  // Les engagements proviennent soit de la liste détaillée (profile.dmm /
+  // reporting), soit — à défaut — du rollup agrégé.
+  const engagementsList = Array.isArray(dmm?.engagements) ? dmm.engagements : []
+  const sumEng = (field) =>
+    engagementsList.reduce((sum, e) => sum + (Number(e[field]) || 0), 0)
+  const maxEng = (field) =>
+    engagementsList.reduce((mx, e) => Math.max(mx, Number(e[field]) || 0), 0)
 
-  // # Total believers = total des nouveaux disciples/croyants des engagements du peuple.
-  // On additionne engagements[].newDisciples ; repli sur le rollup
-  // totalNewDisciples, puis sur la fenêtre DBS (window.newDisciples).
-  const believersFromEngagements = Array.isArray(dmm?.engagements)
-    ? dmm.engagements.reduce((sum, e) => sum + (Number(e.newDisciples) || 0), 0)
-    : 0
+  // # Churches = somme des églises de TOUS les engagements (repli sur les totaux cumulés).
+  const churchesTotal = sumEng('numberOfChurches') || (dmm?.totalChurches ?? 0)
+  // # max Gen reached = génération maximale atteinte sur l'ensemble des engagements.
+  const maxGenerationTotal = Math.max(maxEng('churchGeneration'), dmm?.maxGeneration ?? 0)
+  // # Total believers = cumul des nouveaux disciples/croyants.
   const totalBelievers =
-    believersFromEngagements ||
+    sumEng('newDisciples') ||
     dmm?.totalNewDisciples ||
     dmm?.window?.newDisciples ||
+    0
+  // # Baptisms = cumul des nouveaux baptisés.
+  const totalBaptisms = sumEng('newBaptisms') || (dmm?.totalNewBaptisms ?? 0)
+  // # Leaders in training = cumul des leaders en formation.
+  const totalLeaders = sumEng('leadersInTraining') || (dmm?.totalLeadersInTraining ?? 0)
+  // # Engagements / # Villages touched — nombre d'engagements / de villages distincts.
+  const engagementCount = dmm?.engagementCount ?? engagementsList.length ?? 0
+  const villagesTouchedTotal =
+    dmm?.villagesTouched ??
+    new Set(engagementsList.map((e) => (e.villageName || '').trim()).filter(Boolean)).size ??
     0
 
   const dmmCards = dmm
     ? [
-        { label: '# Engagements', value: dmm.engagementCount ?? 0 },
+        { label: '# Engagements', value: engagementCount },
         { label: '# Churches', value: churchesTotal },
-        { label: '# max Gen reached', value: dmm.maxGeneration ?? 0 },
+        { label: '# max Gen reached', value: maxGenerationTotal },
         { label: '# Total believers', value: totalBelievers },
-        { label: '# Villages Touched', value: dmm.villagesTouched ?? 0 },
+        { label: '# Baptisms', value: totalBaptisms },
+        { label: '# Leaders in training', value: totalLeaders },
+        { label: '# Villages Touched', value: villagesTouchedTotal },
       ]
     : []
 

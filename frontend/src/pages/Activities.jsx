@@ -305,9 +305,9 @@ const Activities = () => {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-fade-in">
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8">
-          <div className="h-8 w-48 bg-white/20 rounded-lg animate-pulse mb-4"></div>
-          <div className="h-6 w-32 bg-white/20 rounded-lg animate-pulse"></div>
+        <div>
+          <div className="h-8 w-48 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+          <div className="h-6 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
         </div>
         <div className="space-y-4">
           {[1, 2, 3, 4].map(i => (
@@ -342,54 +342,52 @@ const Activities = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{t('activities.title')}</h1>
-            <p className="text-emerald-100 text-lg">
-              {t('activities.totalCount').replace('{count}', activities.length)}
-            </p>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-3">
-            {canValidate && (
-              <>
-                <button
-                  onClick={() => navigate('/pending-validations')}
-                  className="relative flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-sm rounded-xl hover:bg-white/25 transition-all"
-                >
-                  <ClipboardCheck size={18} />
-                  <span className="text-sm font-medium">{t('validation.pendingValidations')}</span>
-                  {pendingCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-lg">
-                      {pendingCount > 99 ? '99+' : pendingCount}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => navigate('/rejected-people-groups')}
-                  className="relative flex items-center gap-2 px-4 py-2 bg-red-500/20 backdrop-blur-sm rounded-xl hover:bg-red-500/30 transition-all"
-                >
-                  <AlertCircle size={18} />
-                  <span className="text-sm font-medium">{t('rejected.rejectedPeopleGroups')}</span>
-                  {rejectedCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-lg">
-                      {rejectedCount > 99 ? '99+' : rejectedCount}
-                    </span>
-                  )}
-                </button>
-              </>
-            )}
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-5 py-2 bg-white text-emerald-700 rounded-xl hover:bg-emerald-50 transition-all font-semibold shadow-lg"
-            >
-              <Plus size={18} />
-              {t('activities.newActivity')}
-            </button>
-          </div>
+      {/* Header — titre noir en haut, actions neutres à droite, sans grand cadre */}
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('activities.title')}</h1>
+          <p className="text-gray-500 mt-1">
+            {t('activities.totalCount').replace('{count}', activities.length)}
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-3">
+          {canValidate && (
+            <>
+              <button
+                onClick={() => navigate('/pending-validations')}
+                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <ClipboardCheck size={18} />
+                <span className="text-sm font-medium">{t('validation.pendingValidations')}</span>
+                {pendingCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center shadow">
+                    {pendingCount > 99 ? '99+' : pendingCount}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => navigate('/rejected-people-groups')}
+                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <AlertCircle size={18} />
+                <span className="text-sm font-medium">{t('rejected.rejectedPeopleGroups')}</span>
+                {rejectedCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center shadow">
+                    {rejectedCount > 99 ? '99+' : rejectedCount}
+                  </span>
+                )}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold"
+          >
+            <Plus size={18} />
+            {t('activities.newActivity')}
+          </button>
         </div>
       </div>
 
@@ -399,7 +397,7 @@ const Activities = () => {
           href="https://goeverywhere.org"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           goeverywhere.org ↗
         </a>
@@ -414,7 +412,7 @@ const Activities = () => {
       </div>
 
       {/* Search and Type Filter Tabs */}
-      <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {/* Search Bar */}
         <div className="p-4 border-b border-gray-100">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -425,7 +423,7 @@ const Activities = () => {
                 placeholder={t('activities.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
               />
             </div>
             <div className="flex gap-2">
@@ -433,14 +431,14 @@ const Activities = () => {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
                   showFilters 
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-700' 
+                    ? 'bg-gray-900 border-gray-900 text-white' 
                     : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 <Filter size={18} />
                 {t('common.filters')}
                 {hasActiveFilters && (
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                  <span className="w-2 h-2 bg-gray-900 rounded-full"></span>
                 )}
                 <ChevronDown size={16} className={`transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
@@ -470,7 +468,7 @@ const Activities = () => {
               onClick={() => setTypeFilter('')}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 typeFilter === '' 
-                  ? 'bg-emerald-600 text-white shadow-md' 
+                  ? 'bg-gray-900 text-white shadow-sm' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -519,7 +517,7 @@ const Activities = () => {
                 <select
                   value={villageFilter}
                   onChange={(e) => setVillageFilter(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.filters.allVillages')}</option>
                   {villages?.map((village) => (
@@ -532,7 +530,7 @@ const Activities = () => {
                 <select
                   value={churchFilter}
                   onChange={(e) => setChurchFilter(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.filters.allChurches')}</option>
                   {churches?.map((church) => (
@@ -546,7 +544,7 @@ const Activities = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 />
               </div>
               <div>
@@ -555,7 +553,7 @@ const Activities = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 />
               </div>
             </div>
@@ -680,9 +678,9 @@ const Activities = () => {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-          <div className="w-32 h-32 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Calendar size={56} className="text-emerald-400" />
+        <div className="p-12 text-center">
+          <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Calendar size={56} className="text-gray-400" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('activities.empty.title')}</h3>
           <p className="text-gray-500 max-w-md mx-auto mb-6">
@@ -693,7 +691,7 @@ const Activities = () => {
           {!hasActiveFilters && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg font-medium"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
             >
               <Plus size={20} />
               {t('activities.addActivity')}
@@ -705,7 +703,7 @@ const Activities = () => {
       {/* Floating Add Button (Mobile) */}
       <button
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:scale-110 transition-all"
+        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-gray-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:scale-110 transition-all"
       >
         <Plus size={24} />
       </button>
@@ -715,11 +713,11 @@ const Activities = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 rounded-t-2xl">
+            <div className="border-b border-gray-200 px-6 py-5 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-white">{t('activities.newActivity')}</h3>
-                  <p className="text-emerald-100 text-sm mt-1">{t('activities.addActivityDesc') || 'Enregistrez une nouvelle activité'}</p>
+                  <h3 className="text-xl font-bold text-gray-900">{t('activities.newActivity')}</h3>
+                  <p className="text-gray-500 text-sm mt-1">{t('activities.addActivityDesc') || 'Enregistrez une nouvelle activité'}</p>
                 </div>
                 <button 
                   onClick={resetForm} 
@@ -739,7 +737,7 @@ const Activities = () => {
                 <select
                   value={newActivity.type}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, type: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                   required
                 >
                   {activityTypes.map((type) => (
@@ -755,7 +753,7 @@ const Activities = () => {
                 <textarea
                   value={newActivity.description}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
                   rows={3}
                   required
                   placeholder={t('activities.placeholders.description') || 'Décrivez l\'activité...'}
@@ -771,7 +769,7 @@ const Activities = () => {
                     type="date"
                     value={newActivity.date}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, date: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     required
                   />
                 </div>
@@ -783,7 +781,7 @@ const Activities = () => {
                     type="number"
                     value={newActivity.participants}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, participants: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     min="0"
                     placeholder="0"
                   />
@@ -797,7 +795,7 @@ const Activities = () => {
                 <select
                   value={newActivity.village}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, village: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.placeholders.selectVillage')}</option>
                   {villages?.map((village) => (
@@ -813,7 +811,7 @@ const Activities = () => {
                 <select
                   value={newActivity.church}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, church: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.placeholders.selectChurch')}</option>
                   {churches?.map((church) => (
@@ -829,7 +827,7 @@ const Activities = () => {
                 <textarea
                   value={newActivity.notes}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, notes: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
                   rows={2}
                   placeholder={t('activities.placeholders.notes') || 'Notes additionnelles...'}
                 />
@@ -837,7 +835,7 @@ const Activities = () => {
 
               {/* Coaching iGROW specific fields */}
               {newActivity.type === 'coaching-igrow' && (
-                <div className="space-y-4 p-4 bg-teal-50 rounded-xl border border-teal-200">
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-teal-800 flex items-center gap-2">
                     <MessageCircle size={18} />
                     {t('activities.coaching.title') || 'Détails du coaching iGROW'}
@@ -852,7 +850,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, conversationWith: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     >
                       <option value="">{t('common.select') || 'Sélectionner...'}</option>
                       {coachingConversationWithOptions.map((opt) => (
@@ -871,7 +869,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, conversationTheme: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                       placeholder={t('activities.coaching.themePlaceholder') || 'Ex: Leadership, Vision...'}
                     />
                   </div>
@@ -886,7 +884,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, duration: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                       min="0"
                       placeholder="30"
                     />
@@ -905,7 +903,7 @@ const Activities = () => {
                 <button
                   type="submit"
                   disabled={createMutation.isLoading}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all font-medium disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50"
                 >
                   {createMutation.isLoading ? (
                     <span className="flex items-center justify-center gap-2">

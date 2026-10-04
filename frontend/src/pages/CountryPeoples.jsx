@@ -111,7 +111,7 @@ const CountryPeoples = () => {
           type="button"
           onClick={() => setShowAllMetrics((v) => !v)}
           aria-expanded={showAllMetrics}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-800"
         >
           {showAllMetrics ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
@@ -120,6 +120,7 @@ const CountryPeoples = () => {
 
       {/* Tableau DMM coloré (étape × niveau) — mêmes couleurs/structure que le
           Global Dashboard, mais avec les chiffres des engagements DE CE PAYS. */}
+      <div className="border-t border-slate-200 mb-4" />
       <DmmProgressTable
         engagements={dmmEngagementsQuery.data || []}
         isFrench={isFrench}
@@ -130,7 +131,7 @@ const CountryPeoples = () => {
           structure visuelle que le tableau Countries de la page Regions. */}
       <div className="space-y-6">
         {/* ── Peuple ─────────────────────────────────────────────────────── */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="p-0">
           <button
             type="button"
             onClick={() => setPeoplesOpen((v) => !v)}
@@ -201,7 +202,7 @@ const CountryPeoples = () => {
         </section>
 
         {/* ── Engagements ────────────────────────────────────────────────── */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="p-0">
           <button
             type="button"
             onClick={() => setEngagementsOpen((v) => !v)}

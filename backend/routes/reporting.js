@@ -257,33 +257,120 @@ async function buildNumericalReport({ from, to, organization, areas = [], countr
     // A country/peoples filter was applied → restrict to those groups (may be []).
     pgMatch._id = { $in: (peopleGroupIds || []) };
   }
-  // Quarter/year filter: engagements carry a reportPeriod like "2Q26". When a
-  // period is requested, only sum the engagements reported for that quarter so
-  // switching 2Q26 ↔ 3Q26 shows different numbers (case-insensitive match).
+  // Quarter/year filter: engagements accumulate per quarter in the
+  // `quarterlyReports[]` array (reportPeriod like "2Q26"). When a period is
+  // requested we sum the metrics of the MATCHING quarter entry per engagement
+  // (so earlier quarters remain queryable after later imports). Legacy docs
+  // that predate the array (no quarterlyReports but a top-level reportPeriod)
+  // still match via the top-level field for backward compatibility.
+  let pgAgg;
   if (period) {
-    pgMatch.reportPeriod = { $regex: new RegExp('^' + String(period).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') };
-  }
-  const [pgAgg] = await PeopleGroup.aggregate([
-    { $match: pgMatch },
-    {
-      $group: {
-        _id: null,
-        engagements: { $sum: 1 },
-        numberOfChurches: { $sum: { $ifNull: ['$numberOfChurches', 0] } },
-        maxGeneration: { $max: { $ifNull: ['$churchGeneration', 0] } },
-        dbs: { $sum: { $ifNull: ['$dbs', 0] } },
-        com: { $sum: { $ifNull: ['$com', 0] } },
-        cat: { $sum: { $ifNull: ['$cat', 0] } },
-        newDisciples: { $sum: { $ifNull: ['$newDisciples', 0] } },
-        newBaptisms: { $sum: { $ifNull: ['$newBaptisms', 0] } },
-        leadersInTraining: { $sum: { $ifNull: ['$leadersInTraining', 0] } },
-        activeCoaches: { $sum: { $ifNull: ['$activeCoaches', 0] } },
-        trainingsHeld: { $sum: { $ifNull: ['$trainingsHeld', 0] } },
-        lostChurches: { $sum: { $ifNull: ['$lostChurches', 0] } },
-        mergedChurches: { $sum: { $ifNull: ['$mergedChurches', 0] } },
+    const periodRe = new RegExp('^' + String(period).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i');
+    // Only engagements that have EITHER a matching quarterly entry OR (legacy)
+    // a matching top-level reportPeriod.
+    pgMatch.$or = [
+      { 'quarterlyReports.reportPeriod': { $regex: periodRe } },
+      { quarterlyReports: { $in: [null, []] }, reportPeriod: { $regex: periodRe } },
+    ];
+    [pgAgg] = await PeopleGroup.aggregate([
+      { $match: pgMatch },
+      {
+        // Pour chaque engagement, isole les métriques du trimestre demandé :
+        // on prend l'entrée quarterlyReports correspondante si elle existe,
+        // sinon on retombe sur les champs top-level (docs legacy).
+        $addFields: {
+          _q: {
+            $let: {
+              vars: {
+                match: {
+                  $first: {
+                    $filter: {
+                      input: { $ifNull: ['$quarterlyReports', []] },
+                      as: 'qr',
+                      cond: { $regexMatch: { input: { $ifNull: ['$$qr.reportPeriod', ''] }, regex: periodRe } },
+                    },
+                  },
+                },
+              },
+              in: {
+                numberOfChurches: { $ifNull: ['$$match.numberOfChurches', '$numberOfChurches'] },
+                churchGeneration: { $ifNull: ['$$match.churchGeneration', '$churchGeneration'] },
+                dbs: { $ifNull: ['$$match.dbs', '$dbs'] },
+                com: { $ifNull: ['$$match.com', '$com'] },
+                cat: { $ifNull: ['$$match.cat', '$cat'] },
+                newDisciples: { $ifNull: ['$$match.newDisciples', '$newDisciples'] },
+                newBaptisms: { $ifNull: ['$$match.newBaptisms', '$newBaptisms'] },
+                leadersInTraining: { $ifNull: ['$$match.leadersInTraining', '$leadersInTraining'] },
+                activeCoaches: { $ifNull: ['$$match.activeCoaches', '$activeCoaches'] },
+                trainingsHeld: { $ifNull: ['$$match.trainingsHeld', '$trainingsHeld'] },
+              },
+            },
+          },
+        },
       },
-    },
-  ]);
+      {
+        $group: {
+          _id: null,
+          engagements: { $sum: 1 },
+          numberOfChurches: { $sum: { $ifNull: ['$_q.numberOfChurches', 0] } },
+          maxGeneration: { $max: { $ifNull: ['$_q.churchGeneration', 0] } },
+          dbs: { $sum: { $ifNull: ['$_q.dbs', 0] } },
+          com: { $sum: { $ifNull: ['$_q.com', 0] } },
+          cat: { $sum: { $ifNull: ['$_q.cat', 0] } },
+          newDisciples: { $sum: { $ifNull: ['$_q.newDisciples', 0] } },
+          newBaptisms: { $sum: { $ifNull: ['$_q.newBaptisms', 0] } },
+          leadersInTraining: { $sum: { $ifNull: ['$_q.leadersInTraining', 0] } },
+          activeCoaches: { $sum: { $ifNull: ['$_q.activeCoaches', 0] } },
+          trainingsHeld: { $sum: { $ifNull: ['$_q.trainingsHeld', 0] } },
+          lostChurches: { $sum: { $ifNull: ['$lostChurches', 0] } },
+          mergedChurches: { $sum: { $ifNull: ['$mergedChurches', 0] } },
+        },
+      },
+    ]);
+  } else {
+    // Sans période (= TOTAUX CUMULÉS sur tous les trimestres). Deux familles de
+    // mesures :
+    //   • ÉTAT (églises, génération, DBS/COM/CAT, leaders, coachs) → on prend
+    //     la valeur du trimestre le plus récent = champs top-level (le miroir
+    //     d'import pointe déjà sur le dernier trimestre). On SOMME ces champs
+    //     entre engagements.
+    //   • FLUX (nouveaux disciples/baptisés, formations tenues) → vrai cumul :
+    //     on SOMME toutes les entrées quarterlyReports de chaque engagement
+    //     (repli sur le champ top-level pour les docs legacy sans historique),
+    //     puis on somme entre engagements.
+    [pgAgg] = await PeopleGroup.aggregate([
+      { $match: pgMatch },
+      {
+        // Pré-calcule, par engagement, le cumul des mesures de flux sur tout
+        // l'historique trimestriel.
+        $addFields: {
+          _hasQ: { $gt: [{ $size: { $ifNull: ['$quarterlyReports', []] } }, 0] },
+          _sumNewDisciples: { $sum: { $ifNull: ['$quarterlyReports.newDisciples', []] } },
+          _sumNewBaptisms: { $sum: { $ifNull: ['$quarterlyReports.newBaptisms', []] } },
+          _sumTrainings: { $sum: { $ifNull: ['$quarterlyReports.trainingsHeld', []] } },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          engagements: { $sum: 1 },
+          numberOfChurches: { $sum: { $ifNull: ['$numberOfChurches', 0] } },
+          maxGeneration: { $max: { $ifNull: ['$churchGeneration', 0] } },
+          dbs: { $sum: { $ifNull: ['$dbs', 0] } },
+          com: { $sum: { $ifNull: ['$com', 0] } },
+          cat: { $sum: { $ifNull: ['$cat', 0] } },
+          // Flux : cumul historique si disponible, sinon champ top-level legacy.
+          newDisciples: { $sum: { $cond: ['$_hasQ', '$_sumNewDisciples', { $ifNull: ['$newDisciples', 0] }] } },
+          newBaptisms: { $sum: { $cond: ['$_hasQ', '$_sumNewBaptisms', { $ifNull: ['$newBaptisms', 0] }] } },
+          leadersInTraining: { $sum: { $ifNull: ['$leadersInTraining', 0] } },
+          activeCoaches: { $sum: { $ifNull: ['$activeCoaches', 0] } },
+          trainingsHeld: { $sum: { $cond: ['$_hasQ', '$_sumTrainings', { $ifNull: ['$trainingsHeld', 0] }] } },
+          lostChurches: { $sum: { $ifNull: ['$lostChurches', 0] } },
+          mergedChurches: { $sum: { $ifNull: ['$mergedChurches', 0] } },
+        },
+      },
+    ]);
+  }
   const pg = pgAgg || {};
   const pgNum = (f) => pg[f] || 0;
 

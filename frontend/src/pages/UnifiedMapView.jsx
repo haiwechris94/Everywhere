@@ -20,6 +20,7 @@ import DmmPeopleLayer from '../components/Map/DmmPeopleLayer'
 import { getCountryConfig, SUPPORTED_COUNTRIES } from '../config/supportedCountries'
 import { VORONOI_ZOOM_CONFIG, getVoronoiLevelForZoom } from '../config/countryConfig'
 import { useLanguage } from '../i18n'
+import { jpStageFor, bibleStatusParts } from '../utils/joshuaProjectScales'
 
 // ── i18n local labels (FR/EN) for the Unified Map UI ─────────────────────────
 // Small helper object: pick FR or EN label by current language flag.
@@ -1623,6 +1624,33 @@ export default function UnifiedMapView() {
   }
 
   const activeSourceRows = (detail?.sources || []).filter((src) => activeSources.has(src.sourceType))
+
+  // ── Indicateurs Joshua Project enrichis pour la fiche (onglet Population) ────
+  // Champs réels portés par le profil master-people :
+  //   overview.jpScale              → JPScale (Progress Scale 1–5)
+  //   overview.status               → statut atteint (UNREACHED/… → JPStage)
+  //   overview.bibleStatus          → Bible Translation status (code 0–5)
+  //   overview.jpStage              → libellé natif du JPStage (dénormalisé)
+  //   overview.jpScaleDescription   → « <scale> — <stage> » natif (dénormalisé)
+  //   overview.bibleTranslation     → « <code> — <signification> » natif (dénormalisé)
+  // Les cartes utilisent EN PRIORITÉ les champs natifs dénormalisés et ne
+  // retombent sur la dérivation côté client (jpStageFor / bibleStatusParts) que
+  // lorsque le champ natif est absent. Repli gracieux ('—') si rien n'est connu.
+  const jpScaleValue = ov.jpScale ?? null
+  const jpStageLabel =
+    ov.jpStage ||
+    (ov.status && (STATUS_LABELS[ov.status] || ov.status)) ||
+    jpStageFor(jpScaleValue) ||
+    null
+  const jpScaleDescription = ov.jpScaleDescription || ov.jpStage || jpStageFor(jpScaleValue)
+  // Bible : préférer la description native « code — signification », sinon dériver.
+  const nativeBibleParts = (() => {
+    if (!ov.bibleTranslation) return null
+    const str = String(ov.bibleTranslation)
+    const m = str.match(/^\s*(\d+)\s*[—-]\s*(.+)$/)
+    return m ? { code: m[1], meaning: m[2].trim() } : { code: null, meaning: str }
+  })()
+  const bibleParts = nativeBibleParts || bibleStatusParts(ov.bibleStatus)
   const aliasNames = detail
     ? [...new Set(
         detail.aliases
@@ -2183,20 +2211,50 @@ export default function UnifiedMapView() {
             )}
 
             {detailTab === 'population' && (
-              <div className="flex flex-col gap-1.5">
-                {/* Population par source, jamais cumulée : chaque source (JP,
-                    IMB/CPPI, …) conserve son propre chiffre. */}
-                <p className="font-semibold">Population par source</p>
-                {activeSourceRows.length ? activeSourceRows.map((src) => (
-                  <div key={src._id} className="flex items-center justify-between">
-                    <span>{SOURCE_LABELS[src.sourceType] || src.sourceType}</span>
-                    <span>{src.population ? Number(src.population).toLocaleString('fr-FR') : '—'}</span>
+              <div className="flex flex-col gap-2">
+                {/* ── Carte 1 : Population par source ────────────────────────
+                    Chaque source (JP, IMB/CPPI, …) garde SON propre chiffre :
+                    les populations ne sont jamais cumulées entre sources. */}
+                <div>
+                  <p className="font-semibold">Population par source</p>
+                  {activeSourceRows.length ? activeSourceRows.map((src) => (
+                    <div key={src._id} className="flex items-center justify-between">
+                      <span>{SOURCE_LABELS[src.sourceType] || src.sourceType}</span>
+                      <span>{src.population != null ? Number(src.population).toLocaleString('fr-FR') : '—'}</span>
+                    </div>
+                  )) : <p className={`italic ${subtleText(theme)}`}>Non disponible.</p>}
+                  <p className={`mt-1 text-[11px] italic ${subtleText(theme)}`}>
+                    {isEnglish
+                      ? 'Populations are not summed across sources (the same population may be described by several sources).'
+                      : 'Les populations ne sont pas additionnées entre sources (une même population peut être décrite par plusieurs sources).'}
+                  </p>
+                </div>
+
+                {/* ── Indicateurs Joshua Project (statut + échelle + Bible) ──
+                    Repli gracieux « — » si un champ est absent du profil. */}
+                <div className="grid grid-cols-3 gap-1.5 border-t border-neutral-200/40 pt-2">
+                  {/* Carte 2 : Status (JPStage dérivé du statut atteint). */}
+                  <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
+                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Status</span>
+                    <span className="text-[11px] font-bold leading-tight">{jpStageLabel || '—'}</span>
                   </div>
-                )) : <p className={`italic ${subtleText(theme)}`}>Non disponible.</p>}
-                <p className={`mt-1 text-[11px] italic ${subtleText(theme)}`}>
-                  Les populations ne sont pas additionnées entre sources (une même
-                  population peut être décrite par plusieurs sources).
-                </p>
+                  {/* Carte 3 : JPScale (valeur 11px gras) + description 9px. */}
+                  <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
+                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>JPScale</span>
+                    <span className="text-[11px] font-bold leading-tight">{jpScaleValue != null ? jpScaleValue : '—'}</span>
+                    {jpScaleDescription ? (
+                      <span className={`text-[9px] leading-tight ${subtleText(theme)}`}>{jpScaleDescription}</span>
+                    ) : null}
+                  </div>
+                  {/* Carte 4 : Bible Translation status — code 11px gras + description 9px. */}
+                  <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
+                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Bible Translation status</span>
+                    <span className="text-[11px] font-bold leading-tight">{bibleParts.code != null ? bibleParts.code : '—'}</span>
+                    {bibleParts.meaning ? (
+                      <span className={`text-[9px] leading-tight ${subtleText(theme)}`}>{bibleParts.meaning}</span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             )}
 
