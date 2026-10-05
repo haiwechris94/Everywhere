@@ -278,6 +278,11 @@ const translations = {
       advancedSearch: 'Advanced Search',
     },
 
+    // Initiatives
+    initiatives: {
+      ycsName: 'Yearly Celebration and Strengthening (YCS)',
+    },
+
     // Data Management
     dataManagement: {
       title: 'Data Management',
@@ -1209,6 +1214,10 @@ const translations = {
       advancedSearch: 'Recherche Avancée',
     },
 
+    // Initiatives
+    initiatives: {
+      ycsName: 'Célébration Annuel et Renforcement (CAR)',
+    },
     // Data Management
     dataManagement: {
       title: 'Gestion des données',

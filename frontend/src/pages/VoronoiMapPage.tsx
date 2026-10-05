@@ -7,6 +7,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { MapPin, Layers, BarChart3, AlertTriangle, RefreshCw, Download, Settings } from 'lucide-react';
+import { useLanguage } from '../i18n';
 import { VoronoiMapContainer } from '../components/Voronoi';
 import { VoronoiCell, CoverageGap } from '../types/voronoi.types';
 import { featureFlags } from '../config/api.config';
@@ -26,6 +27,7 @@ interface ApiHealthStatus {
 // =============================================================================
 
 const VoronoiMapPage: React.FC = () => {
+  const { isFrench } = useLanguage();
   // State
   const [selectedCell, setSelectedCell] = useState<VoronoiCell | null>(null);
   const [selectedGap, setSelectedGap] = useState<CoverageGap | null>(null);
@@ -115,7 +117,7 @@ const VoronoiMapPage: React.FC = () => {
         <button
           onClick={handleRefreshHealth}
           className="ml-2 p-1 hover:bg-white/50 rounded-full transition-colors"
-          title="Rafraîchir le statut"
+          title={isFrench ? 'Rafraîchir le statut' : 'Refresh status'}
         >
           <RefreshCw className={`w-3 h-3 ${apiHealth.status === 'checking' ? 'animate-spin' : ''}`} />
         </button>
@@ -155,7 +157,7 @@ const VoronoiMapPage: React.FC = () => {
             </div>
             <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
               <Layers className="w-4 h-4" />
-              <span>Zones d'influence des églises</span>
+              <span>{isFrench ? "Zones d'influence des églises" : 'Church influence zones'}</span>
             </div>
           </div>
 
@@ -165,7 +167,7 @@ const VoronoiMapPage: React.FC = () => {
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Paramètres"
+              title={isFrench ? 'Paramètres' : 'Settings'}
             >
               <Settings className="w-5 h-5" />
             </button>
@@ -234,9 +236,9 @@ const VoronoiMapPage: React.FC = () => {
           <div className="absolute bottom-4 left-4 z-50 bg-white rounded-lg shadow-lg p-4 max-w-sm">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-gray-900">Zone non couverte</h3>
+                <h3 className="font-medium text-gray-900">{isFrench ? 'Zone non couverte' : 'Uncovered area'}</h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Sévérité: <span className={`font-medium ${
+                  {isFrench ? 'Sévérité :' : 'Severity:'} <span className={`font-medium ${
                     selectedGap.severity === 'critical' ? 'text-red-600' :
                     selectedGap.severity === 'high' ? 'text-orange-600' :
                     selectedGap.severity === 'medium' ? 'text-yellow-600' :
@@ -267,7 +269,7 @@ const VoronoiMapPage: React.FC = () => {
           <div className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Paramètres</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{isFrench ? 'Paramètres' : 'Settings'}</h2>
                 <button
                   onClick={() => setShowSettings(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -278,7 +280,7 @@ const VoronoiMapPage: React.FC = () => {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Couches</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">{isFrench ? 'Couches' : 'Layers'}</h3>
                   <div className="space-y-2">
                     <label className="flex items-center">
                       <input
@@ -287,7 +289,7 @@ const VoronoiMapPage: React.FC = () => {
                         disabled
                         className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       />
-                      <span className="ml-2 text-sm text-gray-600">Diagramme Voronoi</span>
+                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Diagramme Voronoi' : 'Voronoi diagram'}</span>
                     </label>
                     <label className="flex items-center">
                       <input
@@ -296,7 +298,7 @@ const VoronoiMapPage: React.FC = () => {
                         disabled
                         className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       />
-                      <span className="ml-2 text-sm text-gray-600">Zones non couvertes</span>
+                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Zones non couvertes' : 'Uncovered areas'}</span>
                     </label>
                     <label className="flex items-center">
                       <input
@@ -305,13 +307,13 @@ const VoronoiMapPage: React.FC = () => {
                         disabled
                         className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       />
-                      <span className="ml-2 text-sm text-gray-600">Panneau statistiques</span>
+                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Panneau statistiques' : 'Statistics panel'}</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Informations API</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">{isFrench ? 'Informations API' : 'API information'}</h3>
                   <div className="bg-gray-50 rounded-lg p-3 text-sm">
                     <p className="text-gray-600">
                       URL: <code className="text-xs bg-gray-200 px-1 rounded">
@@ -333,7 +335,7 @@ const VoronoiMapPage: React.FC = () => {
                   <h3 className="text-sm font-medium text-gray-700 mb-3">Export</h3>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
                     <Download className="w-4 h-4" />
-                    <span>Exporter les données</span>
+                    <span>{isFrench ? 'Exporter les données' : 'Export data'}</span>
                   </button>
                 </div>
               </div>

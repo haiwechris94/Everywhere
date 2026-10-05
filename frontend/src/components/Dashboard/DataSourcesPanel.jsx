@@ -125,7 +125,7 @@ const SourceCard = ({
               {syncDate}
             </p>
           ) : (
-            <p className="text-xs text-gray-400 italic">Jamais synchronisé</p>
+            <p className="text-xs text-gray-400 italic">{isFrench ? 'Jamais synchronisé' : 'Never synced'}</p>
           )}
         </div>
       </div>
@@ -350,7 +350,7 @@ const DataSourcesPanel = () => {
       {/* Panel header */}
       <div className="flex items-center gap-2 mb-5">
         <Globe className="w-5 h-5 text-primary-600" />
-        <h3 className="text-lg font-semibold text-gray-800">Sources de données</h3>
+        <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Sources de données' : 'Data sources'}</h3>
         <span className="ml-auto text-xs text-gray-400">3 sources actives</span>
       </div>
 
@@ -361,7 +361,7 @@ const DataSourcesPanel = () => {
           color="blue"
           icon={Globe}
           title="Joshua Project"
-          subtitle="Synchronisation API REST"
+          subtitle={isFrench ? 'Synchronisation API REST' : 'REST API sync'}
           count={jpCount}
           lastSync={jpDate}
           isLoading={jpLoading}
@@ -379,7 +379,7 @@ const DataSourcesPanel = () => {
           color="emerald"
           icon={Upload}
           title="IMB / PeopleGroups.org"
-          subtitle="Import CSV"
+          subtitle={isFrench ? 'Import CSV' : 'CSV import'}
           count={imbCount}
           lastSync={imbDate}
           isLoading={imbLoading}
@@ -397,7 +397,7 @@ const DataSourcesPanel = () => {
           color="violet"
           icon={Upload}
           title="Finishing the Task"
-          subtitle="Import CSV (UUPGs)"
+          subtitle={isFrench ? 'Import CSV (UUPGs)' : 'CSV import (UUPGs)'}
           count={fttCount}
           lastSync={fttDate}
           isLoading={fttLoading}

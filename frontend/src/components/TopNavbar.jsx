@@ -18,7 +18,6 @@ import {
   FolderKanban,
   Activity,
   BarChart3,
-  ClipboardList,
   Database,
   Flag,
   PanelLeftClose,
@@ -64,7 +63,6 @@ const TopNavbar = () => {
       items: [
         { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
         { path: '/activities', label: t('nav.activities') || 'Activities', icon: Activity },
-        { path: '/analyse-qualitative', label: t('nav.analyseQualitative') || 'Qualitative Analysis', icon: ClipboardList },
         { path: '/dashboard', label: 'Global Dashboard', icon: LayoutDashboard, exact: true },
       ],
     },

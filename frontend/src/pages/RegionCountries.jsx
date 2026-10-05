@@ -102,7 +102,7 @@ const RegionCountries = () => {
           <DmmProgressTable
           engagements={regionDmmEngagements}
           isFrench={isFrench}
-          title={isFrench ? 'Tableau DMM — Engagements de la région' : 'DMM table — Region engagements'}
+          title={isFrench ? '#Peuples par Statut & Niveau' : '#people groups by stages & levels'}
           />
         </div>
 

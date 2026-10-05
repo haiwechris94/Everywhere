@@ -8,6 +8,8 @@ import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StateEmpty } from './geography/geoComponents'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../i18n'
+import { initiativeDisplayName } from '../utils/initiativeLabel'
+import AnalyseQualitative from './AnalyseQualitative'
 
 // Accent colours per initiative so each page has its own identity.
 const THEME = {
@@ -192,7 +194,7 @@ const InitiativeDetail = () => {
     <div className="p-6 space-y-6">
       {/* Fil d'Ariane */}
       <p className="text-sm text-gray-500">
-        <Link to="/initiatives" className="font-bold hover:text-slate-700">{isFrench ? 'Initiatives' : 'Initiatives'}</Link> / {data.name}
+        <Link to="/initiatives" className="font-bold hover:text-slate-700">{isFrench ? 'Initiatives' : 'Initiatives'}</Link> / {initiativeDisplayName(key || data.name, { isFrench }, data.name)}
       </p>
 
       {/* En-tête */}
@@ -201,8 +203,8 @@ const InitiativeDetail = () => {
           <BookOpenText size={28} />
         </div>
         <div className="min-w-0">
-          <h1 className="text-4xl font-bold text-slate-900">{data.name}</h1>
-          {data.fullName && data.fullName !== data.name && (
+          <h1 className="text-4xl font-bold text-slate-900">{initiativeDisplayName(key || data.name, { isFrench }, data.name)}</h1>
+          {data.fullName && data.fullName !== data.name && key !== 'YCS' && (
             <p className="mt-1 text-sm text-slate-500">{data.fullName}</p>
           )}
         </div>
@@ -228,65 +230,15 @@ const InitiativeDetail = () => {
         </section>
       )}
 
-      {/* Peuples engagés */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <Users2 size={20} className="text-slate-400" />
-            {isFrench ? 'Peuples engagés' : 'Engaged people groups'}
-            <span className="text-sm font-normal text-slate-400">({peoples.length})</span>
-          </h2>
-          {canManage && (
-            <button
-              onClick={() => setShowAdd(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
-            >
-              <Plus size={16} />
-              {isFrench ? 'Ajouter un peuple' : 'Add a people group'}
-            </button>
-          )}
-        </div>
-
-        {peoples.length === 0 ? (
-          <StateEmpty label={isFrench ? 'Aucun peuple engagé pour le moment.' : 'No engaged people groups yet.'} />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="py-2 pr-4 text-right text-xs font-semibold tracking-wide text-slate-500 w-12">#</th>
-                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
-                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Pays' : 'Country'}</th>
-                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Langue' : 'Language'}</th>
-                  {key === 'ESP300' && (
-                    <th className="py-2 pl-4 text-right text-xs font-semibold tracking-wide text-slate-500">{isFrench ? 'Séries enregistrées' : 'Sets recorded'}</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {peoples.map((p, index) => (
-                  <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="py-3 pr-4 text-right tabular-nums text-slate-400">{index + 1}</td>
-                    <td className="py-3 px-4">
-                      <Link
-                        to={`/initiatives/${key}/peoples/${p.masterPeopleId}`}
-                        className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                      >
-                        {p.peopleName || p.masterPeopleId}
-                      </Link>
-                    </td>
-                    <td className="py-3 px-4 text-slate-600">{p.countryCode || '—'}</td>
-                    <td className="py-3 px-4 text-slate-600">{p.language || '—'}</td>
-                    {key === 'ESP300' && (
-                      <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-700">{p.setsRecorded ?? 0} / {sets.length}</td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      {/* Analyse Qualitative — affichée uniquement pour l'initiative YCS.
+          Le contenu, les composants et la configuration proviennent de la page
+          AnalyseQualitative, désormais rendue ici (ne s'affiche pas pour
+          ESP300 ni les autres initiatives). */}
+      {key === 'YCS' && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <AnalyseQualitative />
+        </section>
+      )}
 
       {showAdd && (
         <AddPeopleModal initiativeKey={key} onClose={() => setShowAdd(false)} onAdded={refresh} />

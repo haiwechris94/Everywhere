@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { initiativesApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty } from './geography/geoComponents'
 import { useLanguage } from '../i18n'
+import { initiativeDisplayName } from '../utils/initiativeLabel'
 
 // Locale-aware thousands formatting for the numeric columns (e.g. 45000 -> 45 000).
 // Même formatage que les colonnes numériques des pages Regions / Pays.
@@ -91,8 +92,11 @@ const Initiatives = () => {
                   <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500">
                     {isFrench ? 'Pays' : 'Countries'}
                   </th>
-                  <th className="py-2 pl-4 text-right text-xs font-semibold tracking-wide text-slate-500">
+                  <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500">
                     {isFrench ? 'Peuples' : 'People groups'}
+                  </th>
+                  <th className="py-2 pl-4 text-left text-xs font-semibold tracking-wide text-slate-500">
+                    {isFrench ? 'Statut du projet' : 'Project Status'}
                   </th>
                 </tr>
               </thead>
@@ -110,17 +114,28 @@ const Initiatives = () => {
                           to={`/initiatives/${initiative.key}`}
                           className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
                         >
-                          {initiative.name}
+                          {initiativeDisplayName(initiative.key || initiative.name, { isFrench }, initiative.name)}
                         </Link>
                       ) : (
-                        <span className="font-medium text-slate-700">{initiative.name}</span>
+                        <span className="font-medium text-slate-700">{initiativeDisplayName(initiative.key || initiative.name, { isFrench }, initiative.name)}</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">
                       {fmt(initiative.countryCount ?? 0)}
                     </td>
-                    <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-700">
+                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">
                       {fmt(initiative.peopleCount ?? 0)}
+                    </td>
+                    <td className="py-3 pl-4 text-left">
+                      {((initiative.countryCount ?? 0) > 0 || (initiative.peopleCount ?? 0) > 0) ? (
+                        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                          {isFrench ? 'Actif' : 'Active'}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+                          {isFrench ? 'Inactif' : 'Inactive'}
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -180,7 +180,7 @@ const Pays = () => {
                   {isFrench ? 'Nom' : 'Name'}
                 </SortableTh>
                 <SortableTh column="engagements" align="right" className="px-4 text-right">
-                  # Engagements
+                  #DMM Engagements
                 </SortableTh>
                 <SortableTh column="totalPGs" align="right" className="px-4 text-right">
                   Total PGs
@@ -210,7 +210,7 @@ const Pays = () => {
                     </td>
                     <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.engagements ?? 0)}</td>
                     <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.totalPGs ?? 0)}</td>
-                    <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.unreachedPGs ?? 0)}</td>
+                    <td className="py-3 pl-4 text-right tabular-nums font-medium text-red-600">{fmt(s.unreachedPGs ?? 0)}</td>
                   </tr>
                 )
               })}
@@ -224,7 +224,7 @@ const Pays = () => {
                 </td>
                 <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900">{fmt(totals.engagements)}</td>
                 <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900">{fmt(totals.totalPGs)}</td>
-                <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-900">{fmt(totals.unreachedPGs)}</td>
+                <td className="py-3 pl-4 text-right tabular-nums font-bold text-red-600">{fmt(totals.unreachedPGs)}</td>
               </tr>
             </tfoot>
           </table>

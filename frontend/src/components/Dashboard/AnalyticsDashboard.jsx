@@ -240,7 +240,7 @@ const MonthlyActivityChart = () => {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800 dark:text-slate-100">Monthly Activity</h3>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Activité mensuelle' : 'Monthly Activity'}</h3>
           <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Villages, groups & trainings</p>
         </div>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-orange-50 dark:bg-orange-500/10">
@@ -345,8 +345,8 @@ const RecentActivity = () => {
     <Card className="col-span-1 md:col-span-2 lg:col-span-1">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800 dark:text-slate-100">Recent Activity</h3>
-          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Latest missionary actions</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Activité récente' : 'Recent Activity'}</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">{isFrench ? 'Dernières actions missionnaires' : 'Latest missionary actions'}</p>
         </div>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10">
           <Activity size={16} style={{ color: C.primary }} />
@@ -406,8 +406,8 @@ const MovementGrowth = () => {
     <Card className="flex flex-col items-center">
       <div className="w-full flex items-center justify-between mb-2">
         <div>
-          <h3 className="font-bold text-gray-800 dark:text-slate-100">DMM Growth</h3>
-          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">Movement progress</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Croissance DMM' : 'DMM Growth'}</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">{isFrench ? 'Progression du mouvement' : 'Movement progress'}</p>
         </div>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-500/10">
           <TrendingUp size={16} style={{ color: '#8B5CF6' }} />
@@ -468,8 +468,8 @@ const TopRegions = () => {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-gray-800 dark:text-slate-100">Top Active Regions</h3>
-          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">By village count</p>
+          <h3 className="font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Régions les plus actives' : 'Top Active Regions'}</h3>
+          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">{isFrench ? 'Par nombre de villages' : 'By village count'}</p>
         </div>
         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-500/10">
           <Users size={16} style={{ color: C.primary }} />
@@ -705,7 +705,7 @@ const PeopleGroupsWidget = () => {
             onChange={(e) => handleCountryChange(e.target.value)}
             className="text-xs border border-gray-200 dark:border-white/10 rounded-xl px-3 py-1.5 bg-white dark:bg-white/5 text-gray-700 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 cursor-pointer shadow-sm"
           >
-            <option value="">Tous les pays</option>
+            <option value="">{isFrench ? 'Tous les pays' : 'All countries'}</option>
             {APP_COUNTRIES.map(c => (
               <option key={c.value} value={c.value}>{c.label}</option>
             ))}
@@ -718,7 +718,7 @@ const PeopleGroupsWidget = () => {
               onChange={(e) => setSelectedRegion(e.target.value)}
               className="text-xs border border-gray-200 rounded-xl px-3 py-1.5 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 cursor-pointer shadow-sm"
             >
-              <option value="">Toutes les régions</option>
+              <option value="">{isFrench ? 'Toutes les régions' : 'All regions'}</option>
               {(data?.regions || []).map(r => (
                 <option key={r} value={r}>{r}</option>
               ))}
@@ -729,7 +729,7 @@ const PeopleGroupsWidget = () => {
             disabled={isExporting}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50"
             style={{ color: C.primary }}
-            title="Exporter en CSV"
+            title={isFrench ? 'Exporter en CSV' : 'Export to CSV'}
           >
             <Download size={12} className={isExporting ? 'animate-bounce' : ''} />
             {isExporting ? 'Export...' : 'CSV'}
@@ -764,7 +764,7 @@ const PeopleGroupsWidget = () => {
 
         {/* Sub-section 1 — Engagement Status bar chart */}
         <div>
-          <SectionTitle>Engagement Status</SectionTitle>
+          <SectionTitle>{isFrench ? "Statut d'engagement" : 'Engagement Status'}</SectionTitle>
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -804,7 +804,7 @@ const PeopleGroupsWidget = () => {
 
         {/* Sub-section 2 — Top 5 people groups table */}
         <div>
-          <SectionTitle>Top Groupes par Population</SectionTitle>
+          <SectionTitle>{isFrench ? 'Top groupes par population' : 'Top groups by population'}</SectionTitle>
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -846,7 +846,7 @@ const PeopleGroupsWidget = () => {
                 </div>
               ))}
               {top5.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-6">Aucune donnée disponible</p>
+                <p className="text-sm text-gray-400 text-center py-6">{isFrench ? 'Aucune donnée disponible' : 'No data available'}</p>
               )}
             </div>
           )}
@@ -856,7 +856,7 @@ const PeopleGroupsWidget = () => {
         <div className="space-y-5">
           {/* Religions */}
           <div>
-            <SectionTitle>Religions</SectionTitle>
+            <SectionTitle>{isFrench ? 'Religions' : 'Religions'}</SectionTitle>
             {isLoading ? (
               <div className="space-y-2">
                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-6 w-full rounded-lg" />)}
@@ -880,14 +880,14 @@ const PeopleGroupsWidget = () => {
                     </div>
                   </div>
                 ))}
-                {religions.length === 0 && <p className="text-xs text-gray-400">Aucune donnée</p>}
+                {religions.length === 0 && <p className="text-xs text-gray-400">{isFrench ? 'Aucune donnée' : 'No data'}</p>}
               </div>
             )}
           </div>
 
           {/* Languages */}
           <div>
-            <SectionTitle>Langues</SectionTitle>
+            <SectionTitle>{isFrench ? 'Langues' : 'Languages'}</SectionTitle>
             {isLoading ? (
               <div className="space-y-2">
                 {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-6 w-full rounded-lg" />)}
@@ -911,7 +911,7 @@ const PeopleGroupsWidget = () => {
                     </div>
                   </div>
                 ))}
-                {languages.length === 0 && <p className="text-xs text-gray-400">Aucune donnée</p>}
+                {languages.length === 0 && <p className="text-xs text-gray-400">{isFrench ? 'Aucune donnée' : 'No data'}</p>}
               </div>
             )}
           </div>
@@ -923,11 +923,11 @@ const PeopleGroupsWidget = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6 pt-6 border-t border-gray-100 dark:border-white/10">
         {/* Par donateur (camembert) */}
         <div>
-          <SectionTitle>Par donateur</SectionTitle>
+          <SectionTitle>{isFrench ? 'Par donateur' : 'By donor'}</SectionTitle>
           {isLoading ? (
             <Skeleton className="h-56 w-full rounded-xl" />
           ) : donors.length === 0 ? (
-            <p className="text-xs text-gray-400">Aucune donnée</p>
+            <p className="text-xs text-gray-400">{isFrench ? 'Aucune donnée' : 'No data'}</p>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
@@ -954,11 +954,11 @@ const PeopleGroupsWidget = () => {
 
         {/* Par année de début (barres) */}
         <div>
-          <SectionTitle>Par année de début</SectionTitle>
+          <SectionTitle>{isFrench ? 'Par année de début' : 'By start year'}</SectionTitle>
           {isLoading ? (
             <Skeleton className="h-56 w-full rounded-xl" />
           ) : startYears.length === 0 ? (
-            <p className="text-xs text-gray-400">Aucune donnée</p>
+            <p className="text-xs text-gray-400">{isFrench ? 'Aucune donnée' : 'No data'}</p>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={startYears} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
@@ -1088,11 +1088,11 @@ const JPCoverageWidget = ({ total = 0, engaged = 0, nonEngaged = 0 }) => {
         </div>
         <div className="text-center rounded-xl p-3 bg-emerald-50 border border-emerald-100">
           <p className="text-xl font-bold text-emerald-700">{engaged}</p>
-          <p className="text-[10px] text-emerald-600 font-medium leading-tight">Avec engagement DMM</p>
+          <p className="text-[10px] text-emerald-600 font-medium leading-tight">{isFrench ? 'Avec engagement DMM' : 'With DMM engagement'}</p>
         </div>
         <div className="text-center rounded-xl p-3 bg-red-50 border border-red-100">
           <p className="text-xl font-bold text-red-600">{Math.max(0, nonEngaged)}</p>
-          <p className="text-[10px] text-red-500 font-medium leading-tight">Sans engagement DMM</p>
+          <p className="text-[10px] text-red-500 font-medium leading-tight">{isFrench ? 'Sans engagement DMM' : 'Without DMM engagement'}</p>
         </div>
       </div>
 
@@ -1100,14 +1100,14 @@ const JPCoverageWidget = ({ total = 0, engaged = 0, nonEngaged = 0 }) => {
       <div className="space-y-1.5">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Lien JP+IMB × DMM</p>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">Avec DMM</span>
+          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">{isFrench ? 'Avec DMM' : 'With DMM'}</span>
           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: '#15803d' }} />
           </div>
           <span className="text-[10px] font-bold text-gray-600 w-6 text-right">{engaged}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">Sans DMM</span>
+          <span className="text-[10px] text-gray-500 w-24 flex-shrink-0 truncate">{isFrench ? 'Sans DMM' : 'Without DMM'}</span>
           <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full rounded-full transition-all duration-500" style={{ width: `${gapPct}%`, backgroundColor: '#ef4444' }} />
           </div>
@@ -1158,8 +1158,8 @@ const EvolutionChart = () => {
             <TrendingUp size={20} style={{ color: '#8B5CF6' }} />
           </div>
           <div>
-            <h3 className="font-extrabold text-gray-800 text-base">Évolution de l'Évangélisation</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Nouveaux groupes par mois</p>
+            <h3 className="font-extrabold text-gray-800 text-base">{isFrench ? "Évolution de l'Évangélisation" : 'Evangelization Trend'}</h3>
+            <p className="text-xs text-gray-400 mt-0.5">{isFrench ? 'Nouveaux groupes par mois' : 'New groups per month'}</p>
           </div>
         </div>
       </div>
@@ -1190,7 +1190,7 @@ const EvolutionChart = () => {
       ) : chartData.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-gray-400 gap-2">
           <Activity size={28} className="opacity-40" />
-          <p className="text-sm">Aucune donnée de timeline disponible</p>
+          <p className="text-sm">{isFrench ? 'Aucune donnée de timeline disponible' : 'No timeline data available'}</p>
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={220}>
@@ -1652,7 +1652,7 @@ const AnalyticsDashboard = () => {
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-3">
               <Target size={22} className="text-sky-600" />
-              <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">Global People Groups</h2>
+              <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Groupes de peuple mondiaux' : 'Global People Groups'}</h2>
               <span className="text-xs font-medium text-gray-400 dark:text-slate-400">JP + IMB</span>
             </div>
             <div className="text-right">
@@ -1757,7 +1757,7 @@ const AnalyticsDashboard = () => {
               </>
             ) : (
               <div className="flex items-center justify-center h-48 text-gray-400 dark:text-slate-500">
-                <p>No people groups data available</p>
+                <p>{isFrench ? 'Aucune donnée de groupe de peuple' : 'No people groups data available'}</p>
               </div>
             )}
           </div>
@@ -1793,7 +1793,7 @@ const AnalyticsDashboard = () => {
                 </p>
               </div>
               <div className="rounded-xl p-3.5 text-center border border-green-100 bg-green-50/80 dark:bg-green-500/10 dark:border-green-500/20">
-                <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">Mouvement</p>
+                <p className="text-xs font-semibold text-green-700 dark:text-green-400 mb-1">{isFrench ? 'Mouvement' : 'Movement'}</p>
                 <p className="text-3xl font-bold text-green-700 dark:text-green-400">
                   {kpiSummary?.villageStatusCounts?.dmm
                     ?? coverageGauge?.statusCounts?.dmm
@@ -1802,7 +1802,7 @@ const AnalyticsDashboard = () => {
                 </p>
               </div>
               <div className="rounded-xl p-3.5 text-center border border-yellow-100 bg-yellow-50/80 dark:bg-yellow-500/10 dark:border-yellow-500/20">
-                <p className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mb-1">En cours</p>
+                <p className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 mb-1">{isFrench ? 'En cours' : 'In progress'}</p>
                 <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                   {kpiSummary?.villageStatusCounts
                     ? (kpiSummary.villageStatusCounts.pioneer || 0)
@@ -1813,7 +1813,7 @@ const AnalyticsDashboard = () => {
                 <p className="text-xs text-yellow-500 dark:text-yellow-400 mt-1">avec données</p>
               </div>
               <div className="rounded-xl p-3.5 text-center border border-gray-100 bg-gray-50/80 dark:bg-white/5 dark:border-white/10">
-                <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">Sans données</p>
+                <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 mb-1">{isFrench ? 'Sans données' : 'No data'}</p>
                 <p className="text-3xl font-bold text-gray-500 dark:text-slate-400">
                   {coverageGauge?.villageCoverage?.withoutData
                     ?? kpiSummary?.villageStatusCounts?.noData

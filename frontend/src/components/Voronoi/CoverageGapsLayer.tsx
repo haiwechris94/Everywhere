@@ -8,6 +8,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { GeoJSON, CircleMarker, Popup, useMap, Marker } from 'react-leaflet';
 import L from 'leaflet';
+import { useLanguage } from '../../i18n';
 import {
   CoverageGapsLayerProps,
   CoverageGap,
@@ -114,6 +115,7 @@ export const CoverageGapsLayer: React.FC<CoverageGapsLayerProps> = ({
   animateCritical = true,
   onGapClick,
 }) => {
+  const { isFrench } = useLanguage();
   const map = useMap();
 
   // ============================================================================
@@ -151,21 +153,21 @@ export const CoverageGapsLayer: React.FC<CoverageGapsLayerProps> = ({
     
     return (
       <div style={styles.popupContainer}>
-        <div style={styles.popupTitle}>Zone de couverture</div>
+        <div style={styles.popupTitle}>{isFrench ? 'Zone de couverture' : 'Coverage area'}</div>
         
         <div style={styles.popupRow}>
-          <span style={styles.popupLabel}>Surface:</span>
+          <span style={styles.popupLabel}>{isFrench ? 'Surface :' : 'Area:'}</span>
           <span style={styles.popupValue}>{formatArea(gap.area)}</span>
         </div>
         
         {gap.nearestChurch && (
           <>
             <div style={styles.popupRow}>
-              <span style={styles.popupLabel}>Église proche:</span>
+              <span style={styles.popupLabel}>{isFrench ? 'Église proche :' : 'Nearby church:'}</span>
               <span style={styles.popupValue}>{gap.nearestChurch.name}</span>
             </div>
             <div style={styles.popupRow}>
-              <span style={styles.popupLabel}>Distance:</span>
+              <span style={styles.popupLabel}>{isFrench ? 'Distance :' : 'Distance:'}</span>
               <span style={styles.popupValue}>
                 {formatDistance(gap.nearestChurch.distance)}
               </span>
@@ -175,7 +177,7 @@ export const CoverageGapsLayer: React.FC<CoverageGapsLayerProps> = ({
         
         {gap.adminLocation.level1 && (
           <div style={styles.popupRow}>
-            <span style={styles.popupLabel}>Région:</span>
+            <span style={styles.popupLabel}>{isFrench ? 'Région :' : 'Region:'}</span>
             <span style={styles.popupValue}>{gap.adminLocation.level1}</span>
           </div>
         )}

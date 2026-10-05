@@ -3,6 +3,7 @@ import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { useGeoJSON } from '../../hooks/useGeoJSON'
 import { fetchVoronoiDiagram } from '../../services/voronoiService'
+import { useLanguage } from '../../i18n'
 
 // Default URLs for Voronoi data
 const VORONOI_CLIPPED_URL = '/data/villages_voronoi_clipped.geojson'
@@ -30,6 +31,7 @@ const VoronoiLayer = ({
   style = {} 
 }) => {
   const map = useMap()
+  const { isFrench } = useLanguage()
   const [apiData, setApiData] = useState(null)
   const [apiLoading, setApiLoading] = useState(false)
   const [apiError, setApiError] = useState(null)
@@ -100,7 +102,7 @@ const VoronoiLayer = ({
         if (feature.properties) {
           const props = feature.properties
           let popupContent = '<div class="p-2">'
-          popupContent += '<h3 class="font-bold text-sm mb-1">Polygone Voronoi</h3>'
+          popupContent += `<h3 class="font-bold text-sm mb-1">${isFrench ? 'Polygone Voronoi' : 'Voronoi Polygon'}</h3>`
           
           // Support both 'name' and 'village_name' properties
           const villageName = props.village_name || props.name

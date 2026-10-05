@@ -157,7 +157,7 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
                 <span className={`text-4xl font-bold ${getScoreColor(analysis.overallScore)}`}>
                   {analysis.overallScore}%
                 </span>
-                <span className="text-sm text-gray-500">Score global</span>
+                <span className="text-sm text-gray-500">{language === 'fr' ? 'Score global' : 'Global score'}</span>
               </div>
             </div>
             
@@ -168,17 +168,17 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
                 <p className="font-semibold text-gray-800">{safeText(analysis.villageName)}</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
-                <p className="text-sm text-gray-500">Pays</p>
+                <p className="text-sm text-gray-500">{language === 'fr' ? 'Pays' : 'Country'}</p>
                 <p className="font-semibold text-gray-800">{safeText(analysis.country)}</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
-                <p className="text-sm text-gray-500">Priorité</p>
+                <p className="text-sm text-gray-500">{language === 'fr' ? 'Priorité' : 'Priority'}</p>
                 <p className="font-semibold capitalize text-gray-700">
                   {normalizePriorityLevel(analysis?.priorityLevel, language)}
                 </p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm">
-                <p className="text-sm text-gray-500">Date d'analyse</p>
+                <p className="text-sm text-gray-500">{language === 'fr' ? "Date d'analyse" : 'Analysis date'}</p>
                 <p className="font-semibold text-gray-800">
                   {new Date(analysis.analyzedAt).toLocaleDateString()}
                 </p>
@@ -661,15 +661,15 @@ const AnalyseQualitative = () => {
                           <span className="font-semibold">{selectedPeople.villageName || '-'}</span>
                         </div>
                         <div className="bg-white/70 p-3 rounded-lg">
-                          <span className="text-gray-500 block">Pays</span>
+                          <span className="text-gray-500 block">{language === 'fr' ? 'Pays' : 'Country'}</span>
                           <span className="font-semibold">{selectedPeople.country || '-'}</span>
                         </div>
                         <div className="bg-white/70 p-3 rounded-lg">
-                          <span className="text-gray-500 block">Églises</span>
+                          <span className="text-gray-500 block">{language === 'fr' ? 'Églises' : 'Churches'}</span>
                           <span className="font-semibold">{selectedPeople.numberOfChurches || 0}</span>
                         </div>
                         <div className="bg-white/70 p-3 rounded-lg">
-                          <span className="text-gray-500 block">Statut</span>
+                          <span className="text-gray-500 block">{language === 'fr' ? 'Statut' : 'Status'}</span>
                           <span className="font-semibold capitalize">{selectedPeople.engagementStatus || '-'}</span>
                         </div>
                       </div>
@@ -794,13 +794,13 @@ const AnalyseQualitative = () => {
                             <p className={`text-xl font-bold ${priority.color}`}>
                               {priorityLabel}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">Priorité</p>
+                            <p className="text-xs text-gray-500 mt-1">{language === 'fr' ? 'Priorité' : 'Priority'}</p>
                           </div>
                           <div className="bg-white p-4 rounded-xl shadow-sm text-center">
                             <p className="text-xl font-bold text-gray-700">
                               {evaluatedCriteria}/{totalCriteria}
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">Critères</p>
+                            <p className="text-xs text-gray-500 mt-1">{language === 'fr' ? 'Critères' : 'Criteria'}</p>
                           </div>
                         </div>
                       </div>
@@ -911,7 +911,7 @@ const AnalyseQualitative = () => {
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <span className="text-sm text-gray-500 block">Score moyen</span>
+                            <span className="text-sm text-gray-500 block">{language === 'fr' ? 'Score moyen' : 'Average score'}</span>
                             <span className="font-bold text-gray-900">{countryGroup.avgScore}%</span>
                           </div>
                           {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}

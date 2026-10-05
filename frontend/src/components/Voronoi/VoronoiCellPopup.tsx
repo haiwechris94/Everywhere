@@ -7,6 +7,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { useLanguage } from '../../i18n';
 import { VoronoiCellPopupProps, GapSeverity } from '@/types/voronoi.types';
 import {
   formatArea,
@@ -191,6 +192,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
   onNavigateToChurch,
   showRecommendation = true,
 }) => {
+  const { isFrench } = useLanguage();
   // ============================================================================
   // Event Handlers
   // ============================================================================
@@ -218,11 +220,11 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.titleContainer}>
-          <h4 style={styles.title}>{properties.pointName || 'Cellule Voronoi'}</h4>
+          <h4 style={styles.title}>{properties.pointName || (isFrench ? 'Cellule Voronoi' : 'Voronoi cell')}</h4>
           <p style={styles.subtitle}>ID: {properties.cellId}</p>
         </div>
         {onClose && (
-          <button style={styles.closeButton} onClick={onClose} aria-label="Fermer">
+          <button style={styles.closeButton} onClick={onClose} aria-label={isFrench ? 'Fermer' : 'Close'}>
             ×
           </button>
         )}
@@ -230,28 +232,28 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
 
       {/* Cell Information */}
       <div style={styles.section}>
-        <div style={styles.sectionTitle}>Informations</div>
+        <div style={styles.sectionTitle}>{isFrench ? 'Informations' : 'Information'}</div>
         
         <div style={styles.infoRow}>
-          <span style={styles.infoLabel}>Surface</span>
+          <span style={styles.infoLabel}>{isFrench ? 'Surface' : 'Area'}</span>
           <span style={styles.infoValue}>{formatArea(properties.area)}</span>
         </div>
         
         <div style={styles.infoRow}>
-          <span style={styles.infoLabel}>Centre</span>
+          <span style={styles.infoLabel}>{isFrench ? 'Centre' : 'Center'}</span>
           <span style={styles.infoValue}>{formatCoordinates(properties.center)}</span>
         </div>
 
         {properties.perimeter && (
           <div style={styles.infoRow}>
-            <span style={styles.infoLabel}>Périmètre</span>
+            <span style={styles.infoLabel}>{isFrench ? 'Périmètre' : 'Perimeter'}</span>
             <span style={styles.infoValue}>{formatDistance(properties.perimeter)}</span>
           </div>
         )}
 
         {properties.neighborCount !== undefined && (
           <div style={styles.infoRow}>
-            <span style={styles.infoLabel}>Voisins</span>
+            <span style={styles.infoLabel}>{isFrench ? 'Voisins' : 'Neighbors'}</span>
             <span style={styles.infoValue}>{properties.neighborCount}</span>
           </div>
         )}
@@ -259,7 +261,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
         {/* Severity Badge */}
         {severity && (
           <div style={{ ...styles.infoRow, borderBottom: 'none', paddingTop: '8px' }}>
-            <span style={styles.infoLabel}>Statut</span>
+            <span style={styles.infoLabel}>{isFrench ? 'Statut' : 'Status'}</span>
             <span
               style={{
                 ...styles.severityBadge,
@@ -276,7 +278,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
       {/* Administrative Location */}
       {(properties.adminLevel1 || properties.adminLevel2 || properties.adminLevel3) && (
         <div style={styles.section}>
-          <div style={styles.sectionTitle}>Localisation administrative</div>
+          <div style={styles.sectionTitle}>{isFrench ? 'Localisation administrative' : 'Administrative location'}</div>
           <div style={styles.adminLocation}>
             {properties.adminLevel1 && (
               <div style={styles.adminItem}>
@@ -303,10 +305,10 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
       {/* Nearest Church */}
       {properties.nearestChurchId && (
         <div style={styles.section}>
-          <div style={styles.sectionTitle}>Église la plus proche</div>
+          <div style={styles.sectionTitle}>{isFrench ? 'Église la plus proche' : 'Nearest church'}</div>
           <div style={styles.churchCard}>
             <div style={styles.churchName}>
-              {properties.nearestChurchName || 'Église'}
+              {properties.nearestChurchName || (isFrench ? 'Église' : 'Church')}
             </div>
             {properties.nearestChurchDistance !== undefined && (
               <div style={styles.churchDistance}>
@@ -318,7 +320,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
                 style={styles.navigateButton}
                 onClick={handleNavigateToChurch}
               >
-                Voir sur la carte
+                {isFrench ? 'Voir sur la carte' : 'View on map'}
               </button>
             )}
           </div>
@@ -331,7 +333,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
           <div style={styles.sectionTitle}>Population</div>
           {properties.population !== undefined && (
             <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>Population estimée</span>
+              <span style={styles.infoLabel}>{isFrench ? 'Population estimée' : 'Estimated population'}</span>
               <span style={styles.infoValue}>
                 {properties.population.toLocaleString()}
               </span>
@@ -339,7 +341,7 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
           )}
           {properties.populationDensity !== undefined && (
             <div style={styles.infoRow}>
-              <span style={styles.infoLabel}>Densité</span>
+              <span style={styles.infoLabel}>{isFrench ? 'Densité' : 'Density'}</span>
               <span style={styles.infoValue}>
                 {properties.populationDensity.toFixed(1)} hab/km²
               </span>
@@ -353,15 +355,21 @@ export const VoronoiCellPopup: React.FC<VoronoiCellPopupProps> = ({
         <div style={styles.recommendationBox}>
           <div style={styles.recommendationTitle}>
             <span>💡</span>
-            Recommandation
+            {isFrench ? 'Recommandation' : 'Recommendation'}
           </div>
           <p style={styles.recommendationText}>
-            Cette zone présente une lacune de couverture {getSeverityLabel(severity).toLowerCase()}.
+            {isFrench
+              ? <>Cette zone présente une lacune de couverture {getSeverityLabel(severity).toLowerCase()}.</>
+              : <>This area has a {getSeverityLabel(severity).toLowerCase()} coverage gap.</>}
             {severity === 'critical' && (
-              <> Il est fortement recommandé d'envisager l'implantation d'une nouvelle église dans cette région.</>
+              isFrench
+                ? <> Il est fortement recommandé d'envisager l'implantation d'une nouvelle église dans cette région.</>
+                : <> It is strongly recommended to consider planting a new church in this region.</>
             )}
             {severity === 'high' && (
-              <> Une évaluation approfondie de cette zone pourrait révéler des opportunités d'implantation.</>
+              isFrench
+                ? <> Une évaluation approfondie de cette zone pourrait révéler des opportunités d'implantation.</>
+                : <> A thorough assessment of this area could reveal church planting opportunities.</>
             )}
           </p>
         </div>

@@ -25,7 +25,7 @@ const SOURCE_OPTIONS = [
 ]
 
 const DataExport = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const [format, setFormat] = useState('json')
   const [selectedVillages, setSelectedVillages] = useState([])
   const [exportType, setExportType] = useState('all') // 'all' or 'selected'
@@ -63,7 +63,7 @@ const DataExport = () => {
       document.body.appendChild(link)
       link.click()
       link.remove()
-      toast.success('Export downloaded!')
+      toast.success(isFrench ? 'Export téléchargé !' : 'Export downloaded!')
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Export failed')
@@ -94,7 +94,7 @@ const DataExport = () => {
       document.body.appendChild(link)
       link.click()
       link.remove()
-      toast.success('Export downloaded!')
+      toast.success(isFrench ? 'Export téléchargé !' : 'Export downloaded!')
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Export failed')
@@ -123,7 +123,7 @@ const DataExport = () => {
       document.body.appendChild(link)
       link.click()
       link.remove()
-      toast.success('Export downloaded!')
+      toast.success(isFrench ? 'Export téléchargé !' : 'Export downloaded!')
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Export failed')
@@ -162,7 +162,7 @@ const DataExport = () => {
     } else if (selectedVillages.length > 0) {
       exportSelectedMutation.mutate()
     } else {
-      toast.error('Please select at least one village')
+      toast.error(isFrench ? 'Veuillez sélectionner au moins un village' : 'Please select at least one village')
     }
   }
 
@@ -190,7 +190,7 @@ const DataExport = () => {
               onChange={(e) => setExportType(e.target.value)}
               className="text-primary-600"
             />
-            <span>All Data</span>
+            <span>{isFrench ? 'Toutes les données' : 'All Data'}</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -201,7 +201,7 @@ const DataExport = () => {
               onChange={(e) => setExportType(e.target.value)}
               className="text-primary-600"
             />
-            <span>Selected Villages</span>
+            <span>{isFrench ? 'Villages sélectionnés' : 'Selected Villages'}</span>
           </label>
         </div>
       </div>
@@ -281,7 +281,7 @@ const DataExport = () => {
                   </label>
                 ))
               ) : (
-                <p className="text-center text-gray-500 py-4">No villages found</p>
+                <p className="text-center text-gray-500 py-4">{isFrench ? 'Aucun village trouvé' : 'No villages found'}</p>
               )}
             </div>
           )}
@@ -347,7 +347,7 @@ const DataExport = () => {
 
       {/* Info */}
       <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-medium text-gray-800 mb-2">Export Information</h4>
+        <h4 className="font-medium text-gray-800 mb-2">{isFrench ? "Informations sur l'export" : 'Export Information'}</h4>
         <ul className="text-sm text-gray-600 space-y-1">
           <li>• <strong>All Data:</strong> Exports villages, people groups, and activities</li>
           <li>• <strong>Selected Villages:</strong> Exports selected villages with their related people groups and activities</li>

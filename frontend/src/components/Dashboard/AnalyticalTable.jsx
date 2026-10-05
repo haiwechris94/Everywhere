@@ -365,7 +365,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder={isFrench ? 'Rechercher...' : 'Search...'}
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 focus:bg-white rounded-t-lg text-sm outline-none transition-all"
@@ -376,7 +376,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             onChange={(e) => { setCountryFilter(e.target.value); setCurrentPage(1) }}
             className="px-3 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600"
           >
-            <option value="all">Tous les pays</option>
+            <option value="all">{isFrench ? 'Tous les pays' : 'All countries'}</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
           <select
@@ -384,7 +384,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
             className="px-3 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600"
           >
-            <option value="all">Tous les statuts</option>
+            <option value="all">{isFrench ? 'Tous les statuts' : 'All statuses'}</option>
             {Object.entries(STATUS_CONFIG).map(([s, c]) => <option key={s} value={s}>{c.label}</option>)}
           </select>
           {(searchTerm || statusFilter !== 'all' || countryFilter !== 'all') && (
@@ -499,8 +499,8 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 <td colSpan="10" className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2 text-gray-500">
                     <Search className="w-8 h-8 text-gray-300" />
-                    <p className="font-medium">Aucun résultat trouvé</p>
-                    <p className="text-sm">Essayez de modifier vos filtres</p>
+                    <p className="font-medium">{isFrench ? 'Aucun résultat trouvé' : 'No result found'}</p>
+                    <p className="text-sm">{isFrench ? 'Essayez de modifier vos filtres' : 'Try adjusting your filters'}</p>
                   </div>
                 </td>
               </tr>
@@ -552,7 +552,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-500 block">Coordonnées</span>
+                            <span className="text-gray-500 block">{isFrench ? 'Coordonnées' : 'Coordinates'}</span>
                             <span className="font-medium text-gray-800">
                               {item.latitude && item.longitude 
                                 ? `${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}`
@@ -572,7 +572,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                             <span className="font-medium text-gray-800">{item.arrondissement}</span>
                           </div>
                           <div className="md:hidden">
-                            <span className="text-gray-500 block">Génération</span>
+                            <span className="text-gray-500 block">{isFrench ? 'Génération' : 'Generation'}</span>
                             <span className="font-medium text-gray-800">
                               {item.generation > 0 ? `Génération ${item.generation}` : '-'}
                             </span>

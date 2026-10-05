@@ -124,7 +124,7 @@ const CountryPeoples = () => {
       <DmmProgressTable
         engagements={dmmEngagementsQuery.data || []}
         isFrench={isFrench}
-        title={isFrench ? 'Tableau DMM — Engagements du pays' : 'DMM table — Country engagements'}
+        title={isFrench ? '#Peuples par Statut & Niveau' : '#people groups by stages & levels'}
       />
 
       {/* Peuple en haut, Engagements en bas — deux sections repliables, même

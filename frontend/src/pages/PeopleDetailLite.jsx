@@ -7,6 +7,7 @@ import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import { jpStageFor, evangelicalRangeFor, bibleStatusLabel } from '../utils/joshuaProjectScales'
 import { DmmStatusDot } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
+import { initiativeDisplayName } from '../utils/initiativeLabel'
 
 // Libellés lisibles pour les codes de source de population.
 const SOURCE_LABELS = {
@@ -515,18 +516,18 @@ const PeopleDetailLite = () => {
       <div className="flex flex-wrap gap-3">
         {[
           { key: 'ESP300', label: 'ESP 300' },
-          { key: 'YCS', label: 'YCS' },
+          { key: 'YCS', label: initiativeDisplayName('YCS', { isFrench }, 'YCS') },
         ].map(({ key, label }) => {
           const engaged = !!membership[key]
           const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
           return (
             <div key={key} className={base}>
-              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{label}</p>
+              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, label)}</p>
               {engaged ? (
                 <Link
                   to={`/initiatives/${key}/peoples/${peopleId}`}
                   className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
-                  title={isFrench ? `Voir le détail ${label} de ce peuple` : `View this people's ${label} detail`}
+                  title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, label)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, label)} detail`}
                 >
                   {isFrench ? 'OUI' : 'YES'}
                 </Link>

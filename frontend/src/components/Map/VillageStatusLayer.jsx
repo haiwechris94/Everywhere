@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { villagesApi, peopleGroupsApi } from '../../services/api'
+import { useLanguage } from '../../i18n'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POINT-IN-POLYGON HELPERS
@@ -164,6 +165,7 @@ const VillageStatusLayer = ({
   onAddPeople // Callback function when "Add People Group" button is clicked
 }) => {
   const map = useMap()
+  const { isFrench } = useLanguage()
   const [villageStatuses, setVillageStatuses] = useState({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -1138,7 +1140,7 @@ const VillageStatusLayer = ({
           `
         } else {
           popupContent += `
-            <div style="font-size:9px;color:#6b7280;margin-bottom:3px;">Aucune donnée de statut</div>
+            <div style="font-size:9px;color:#6b7280;margin-bottom:3px;">${isFrench ? 'Aucune donnée de statut' : 'No status data'}</div>
             <button class="village-details-btn" data-village-name="${villageName}" data-polygon='${encodeURIComponent(JSON.stringify(feature.geometry))}'
               style="margin-top:3px;width:100%;padding:3px 6px;background-color:#6b7280;color:white;font-size:9px;font-weight:500;border-radius:4px;border:none;cursor:pointer;">
               Rechercher groupes

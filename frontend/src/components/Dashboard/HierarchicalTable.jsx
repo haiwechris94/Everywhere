@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from '../../services/api'
 import { ChevronRight, ChevronDown, ChevronLeft, Home, ArrowUpDown, Loader2 } from 'lucide-react'
+import { useLanguage } from '../../i18n'
 
 // Status colors
 const STATUS_COLORS = {
@@ -25,6 +26,7 @@ const LEVEL_LABELS = {
 }
 
 const HierarchicalTable = () => {
+  const { isFrench } = useLanguage()
   const [level, setLevel] = useState('country')
   const [parent, setParent] = useState(null)
   const [breadcrumbs, setBreadcrumbs] = useState([])
@@ -115,7 +117,7 @@ const HierarchicalTable = () => {
             className="flex items-center gap-1 text-primary-600 hover:text-primary-800"
           >
             <Home className="w-4 h-4" />
-            <span>Accueil</span>
+            <span>{isFrench ? 'Accueil' : 'Home'}</span>
           </button>
           
           {breadcrumbs.map((crumb, index) => (

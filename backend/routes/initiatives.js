@@ -176,8 +176,8 @@ const ESP300_SETS = [
 const INITIATIVES = {
   ESP300: {
     key: 'ESP300',
-    name: 'ESP 300',
-    fullName: 'Ending Scripture Poverty Initiative (ESP300)',
+    name: 'Ending Scriptures Poverty (ESP) 300',
+    fullName: 'Ending Scriptures Poverty (ESP) 300',
     kind: 'audio_scripture_translation',
     summary:
       'Audio translation of Bible stories into local languages. The vision is to record 4 Scripture Sets (series); these foundation Scriptures are adjusted to each context, after which trained indigenous specialists add further sets.',
@@ -188,8 +188,7 @@ const INITIATIVES = {
     name: 'YCS',
     fullName: 'YCS',
     kind: 'initiative',
-    summary:
-      'YCS initiative. The detailed curriculum will be enriched later; this page already tracks the peoples engaged and their per-people progress.',
+    summary: '',
     sets: [],
   },
 };

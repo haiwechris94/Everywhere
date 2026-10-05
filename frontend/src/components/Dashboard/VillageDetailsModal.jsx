@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from '../../services/api'
 import { X, Users, Church, MapPin, TrendingUp, Loader2 } from 'lucide-react'
+import { useLanguage } from '../../i18n'
 
 // Status colors
 const STATUS_COLORS = {
@@ -27,6 +28,7 @@ const STATUS_LABELS = {
 }
 
 const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
+  const { isFrench } = useLanguage()
   const { data, isLoading, error } = useQuery({
     queryKey: ['village-details', villageName],
     queryFn: async () => {
@@ -101,14 +103,14 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                   <p className="text-2xl font-bold text-gray-800">
                     {data.totalPeopleGroups}
                   </p>
-                  <p className="text-xs text-gray-500">Groupes de peuples</p>
+                  <p className="text-xs text-gray-500">{isFrench ? 'Groupes de peuples' : 'People groups'}</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
                   <Church className="w-6 h-6 text-green-500 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-gray-800">
                     {data.totalChurches}
                   </p>
-                  <p className="text-xs text-gray-500">Églises</p>
+                  <p className="text-xs text-gray-500">{isFrench ? 'Églises' : 'Churches'}</p>
                 </div>
               </div>
 
@@ -117,7 +119,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">Localisation</span>
+                    <span className="text-sm font-medium text-gray-700">{isFrench ? 'Localisation' : 'Location'}</span>
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
                     {data.region && <p>Région: <span className="font-medium">{data.region}</span></p>}
@@ -167,7 +169,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
               {data.peopleGroups && data.peopleGroups.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-3">
-                    Groupes de peuples ({data.peopleGroups.length})
+                    {isFrench ? 'Groupes de peuples' : 'People groups'} ({data.peopleGroups.length})
                   </h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {data.peopleGroups.map((pg, index) => (

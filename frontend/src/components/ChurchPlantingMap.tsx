@@ -20,6 +20,7 @@ import {
 import { mapStyles, getDensityColor, getOpacityByZoom } from '@/config/mapStyles.config';
 import { GeoJSONFeatureCollection } from '@/types';
 import { loadGeoJSON, getBounds, getCenter } from '@/utils/geoJsonUtils';
+import { useLanguage } from '../i18n';
 
 /**
  * Composant pour ajuster la vue de la carte
@@ -44,6 +45,7 @@ function MapController({ data }: { data: GeoJSONFeatureCollection | null }) {
  * Composant principal de la carte
  */
 export function ChurchPlantingMap() {
+  const { isFrench } = useLanguage();
   const [layersData, setLayersData] = useState<Record<string, GeoJSONFeatureCollection>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -263,7 +265,7 @@ export function ChurchPlantingMap() {
             zIndex: 1000,
           }}
         >
-          <h3 style={{ margin: '0 0 10px 0' }}>Informations</h3>
+          <h3 style={{ margin: '0 0 10px 0' }}>{isFrench ? 'Informations' : 'Information'}</h3>
           <button
             onClick={() => setSelectedFeature(null)}
             style={{
@@ -297,7 +299,7 @@ export function ChurchPlantingMap() {
           zIndex: 1000,
         }}
       >
-        <h4 style={{ margin: '0 0 10px 0' }}>Légende</h4>
+        <h4 style={{ margin: '0 0 10px 0' }}>{isFrench ? 'Légende' : 'Legend'}</h4>
         {mapStyles.legendConfig.items.map((item, index) => (
           <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
             <div

@@ -143,7 +143,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
           ) : peopleGroups.length === 0 ? (
             <div className="text-center py-12">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 font-medium">Aucun peuple trouvé</p>
+              <p className="text-gray-600 font-medium">{isFrench ? 'Aucun peuple trouvé' : 'No people group found'}</p>
               <p className="text-sm text-gray-400 mt-2">
                 Aucun groupe de peuples n'est enregistré dans ce village.
               </p>
@@ -188,7 +188,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
                     <button
                       onClick={() => navigate(`/people-groups/${pg._id}`)}
                       className="ml-4 p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                      title="Voir les détails"
+                      title={isFrench ? 'Voir les détails' : 'View details'}
                     >
                       <ExternalLink size={18} />
                     </button>
@@ -270,7 +270,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
     mutationFn: (data) => peopleGroupsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['peopleGroups'])
-      toast.success('Groupe de peuples ajouté avec succès!')
+      toast.success(isFrench ? 'Groupe de peuple ajouté avec succès !' : 'People group added successfully!')
       if (onSuccess) onSuccess()
       onClose()
     },
@@ -348,7 +348,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
               value={formData.name}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder="Ex: Peuple Bamiléké"
+              placeholder={isFrench ? 'Ex : Peuple Bamiléké' : 'e.g. Bamileke people group'}
               required
             />
           </div>
@@ -436,7 +436,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
               onChange={handleChange}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              placeholder="Description du groupe de peuples..."
+              placeholder={isFrench ? 'Description du groupe de peuple...' : 'People group description...'}
             />
           </div>
           
@@ -799,6 +799,7 @@ const VoronoiClippedLayer = ({ data, cameroonBoundary, visible, style, onPolygon
 // Coverage Gaps Layer
 const CoverageGapsLayer = ({ voronoiData, adminData, visible, minGapArea = 10 }) => {
   const map = useMap()
+  const { isFrench } = useLanguage()
   
   // This would calculate gaps based on Voronoi coverage vs admin boundaries
   // For now, we'll highlight areas with large Voronoi cells as potential gaps
@@ -856,10 +857,10 @@ const CoverageGapsLayer = ({ voronoiData, adminData, visible, minGapArea = 10 })
         else if (area > 25) severity = 'Modéré'
         
         layer.bindPopup(`<div class="p-2">
-          <h3 class="font-bold text-sm mb-1 text-orange-600">⚠️ Zone de couverture faible</h3>
+          <h3 class="font-bold text-sm mb-1 text-orange-600">⚠️ ${isFrench ? 'Zone de couverture faible' : 'Low coverage area'}</h3>
           <p class="text-xs"><strong>Surface:</strong> ${area.toFixed(2)} km²</p>
-          <p class="text-xs"><strong>Sévérité:</strong> ${severity}</p>
-          <p class="text-xs text-gray-500 mt-1">Cette zone pourrait nécessiter plus d'églises</p>
+          <p class="text-xs"><strong>${isFrench ? 'Sévérité :' : 'Severity:'}</strong> ${severity}</p>
+          <p class="text-xs text-gray-500 mt-1">${isFrench ? "Cette zone pourrait nécessiter plus d'églises" : 'This area may need more churches'}</p>
         </div>`)
       }
     })
@@ -875,7 +876,7 @@ const CoverageGapsLayer = ({ voronoiData, adminData, visible, minGapArea = 10 })
 }
 
 const GeoJSONMapView = () => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   
   // State
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -1388,7 +1389,7 @@ const GeoJSONMapView = () => {
         (position) => {
           setMapCenter([position.coords.latitude, position.coords.longitude])
           setMapZoom(12)
-          toast.success('Position trouvée!')
+          toast.success(isFrench ? 'Position trouvée !' : 'Position found!')
         },
         () => toast.error("Impossible d'obtenir votre position")
       )
@@ -1586,7 +1587,7 @@ const GeoJSONMapView = () => {
                     <button
                       onClick={refreshVillageStatuses}
                       className="p-1.5 rounded text-indigo-500 hover:bg-indigo-50 transition-colors"
-                      title="Actualiser"
+                      title={isFrench ? 'Actualiser' : 'Refresh'}
                     >
                       <RefreshCw size={12} />
                     </button>
@@ -1696,14 +1697,14 @@ const GeoJSONMapView = () => {
           <button 
             onClick={handleLocateMe} 
             className="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50" 
-            title="Ma position"
+            title={isFrench ? 'Ma position' : 'My location'}
           >
             <Navigation size={20} />
           </button>
           <button 
             onClick={handleFitAll} 
             className="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50" 
-            title="Voir tout le Cameroun"
+            title={isFrench ? 'Voir tout le Cameroun' : 'View all Cameroon'}
           >
             <Maximize2 size={20} />
           </button>
@@ -1716,7 +1717,7 @@ const GeoJSONMapView = () => {
             onClick={() => setLegendExpanded(!legendExpanded)}
             className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-t-lg transition-colors"
           >
-            <h4 className="font-semibold text-gray-700">Légende</h4>
+            <h4 className="font-semibold text-gray-700">{isFrench ? 'Légende' : 'Legend'}</h4>
             <ChevronDown 
               size={16} 
               className={`text-gray-500 transition-transform duration-200 ${legendExpanded ? 'rotate-180' : ''}`} 
@@ -1742,7 +1743,7 @@ const GeoJSONMapView = () => {
               onClick={() => setStatusLegendExpanded(!statusLegendExpanded)}
               className="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-t-lg transition-colors"
             >
-              <h4 className="font-semibold text-gray-700 text-xs">Statistiques des villages</h4>
+              <h4 className="font-semibold text-gray-700 text-xs">{isFrench ? 'Statistiques des villages' : 'Village statistics'}</h4>
               <ChevronDown 
                 size={16} 
                 className={`text-gray-500 transition-transform duration-200 ${statusLegendExpanded ? 'rotate-180' : ''}`} 

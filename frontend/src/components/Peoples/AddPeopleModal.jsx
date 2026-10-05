@@ -79,7 +79,7 @@ const COUNTRY_OPTIONS = Object.values(SUPPORTED_COUNTRIES).map(c => ({
 }))
 
 const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const { user } = useAuth()
   const [formData, setFormData] = useState(INITIAL_FORM_STATE)
   const [loading, setLoading] = useState(false)
@@ -281,7 +281,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
       const response = await peoplesApi.create(submitData)
       
-      toast.success('Population data added successfully!')
+      toast.success(isFrench ? 'Données de population ajoutées avec succès !' : 'Population data added successfully!')
       
       if (onSuccess) {
         onSuccess(response.data.people)
@@ -423,7 +423,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       errors.name ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="People group name"
+                    placeholder={isFrench ? 'Nom du groupe de peuple' : 'People group name'}
                   />
                   {errors.name && (
                     <p className="mt-1 text-xs text-red-500">{errors.name}</p>
@@ -521,7 +521,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.polygonId}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Associated polygon ID"
+                    placeholder={isFrench ? 'ID du polygone associé' : 'Associated polygon ID'}
                   />
                 </div>
               </div>
@@ -713,7 +713,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.language}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Primary language"
+                    placeholder={isFrench ? 'Langue principale' : 'Primary language'}
                   />
                 </div>
 
@@ -727,7 +727,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.religion}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Primary religion"
+                    placeholder={isFrench ? 'Religion principale' : 'Primary religion'}
                   />
                 </div>
 
@@ -741,7 +741,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.ethnicity}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ethnic group"
+                    placeholder={isFrench ? 'Groupe ethnique' : 'Ethnic group'}
                   />
                 </div>
               </div>
@@ -783,7 +783,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.region}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Region"
+                    placeholder={isFrench ? 'Région' : 'Region'}
                   />
                 </div>
 
@@ -797,7 +797,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.departement}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Departement"
+                    placeholder={isFrench ? 'Département' : 'Departement'}
                   />
                 </div>
 
@@ -811,7 +811,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.arrondissement}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Arrondissement"
+                    placeholder={isFrench ? 'Arrondissement' : 'Arrondissement'}
                   />
                 </div>
               </div>
@@ -881,7 +881,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.dataSource}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Data source (e.g., Census 2020)"
+                    placeholder={isFrench ? 'Source des données (ex. Recensement 2020)' : 'Data source (e.g., Census 2020)'}
                   />
                 </div>
 
@@ -897,7 +897,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     min="1900"
                     max="2100"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Year"
+                    placeholder={isFrench ? 'Année' : 'Year'}
                   />
                 </div>
               </div>
@@ -914,7 +914,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 onChange={handleChange}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Additional notes or description..."
+                placeholder={isFrench ? 'Notes ou description supplémentaires...' : 'Additional notes or description...'}
               />
             </div>
 

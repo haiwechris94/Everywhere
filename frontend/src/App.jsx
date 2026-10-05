@@ -48,7 +48,6 @@ const InitiativePeopleDetail = lazy(() => import('./pages/InitiativePeopleDetail
 const DataManagement = lazy(() => import('./pages/DataManagement'))
 const PendingValidations = lazy(() => import('./pages/PendingValidations'))
 const RejectedPeopleGroups = lazy(() => import('./pages/RejectedPeopleGroups'))
-const AnalyseQualitative = lazy(() => import('./pages/AnalyseQualitative'))
 
 // DMM pillars — nouvelles pages
 const DmmReporting = lazy(() => import('./pages/DmmReporting'))
@@ -262,11 +261,6 @@ function App() {
           <Route path="rejected-people-groups" element={
             <Suspense fallback={<CompactLoader />}>
               <RejectedPeopleGroups />
-            </Suspense>
-          } />
-          <Route path="analyse-qualitative" element={
-            <Suspense fallback={<CompactLoader />}>
-              <AnalyseQualitative />
             </Suspense>
           } />
           {/* DMM pillars — groupes DBS, reporting */}
