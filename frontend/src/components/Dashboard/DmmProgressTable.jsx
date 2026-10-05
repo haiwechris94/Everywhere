@@ -120,10 +120,6 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
                   {/* Cellule d'étape : pas de fond, seul le mot est coloré. */}
                   <td className="py-1.5 px-2.5 text-xs font-semibold" style={{ color }}>
                     <div>{stageLabels[stage]}</div>
-                    <div
-                      className="mt-1 h-0.5 w-full rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
                   </td>
                   {LEVELS.map((lvl) => {
                     const value = counts[stage][lvl]
