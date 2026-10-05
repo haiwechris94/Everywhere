@@ -1012,6 +1012,7 @@ const EvolutionTooltip = ({ active, payload, label }) => {
 const JPCoverageWidget = ({ total = 0, engaged = 0, nonEngaged = 0 }) => {
   const pct = total > 0 ? Math.round((engaged / total) * 100) : 0
   const gapPct = total > 0 ? Math.round((nonEngaged / total) * 100) : 0
+  const { isFrench } = useLanguage()
 
   if (!total) {
     return (
