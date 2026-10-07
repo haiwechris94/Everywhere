@@ -184,6 +184,13 @@ router.post('/login', logAuth('login'), async (req, res) => {
     // Update last login and location
     user.lastLogin = new Date();
     user.loginCount += 1;
+
+    // Record a capped login-history entry (most recent 50)
+    const ip = (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || req.connection?.remoteAddress || null;
+    const userAgent = req.headers['user-agent'] || null;
+    user.loginHistory = user.loginHistory || [];
+    user.loginHistory.push({ at: new Date(), ip, userAgent });
+    if (user.loginHistory.length > 50) user.loginHistory = user.loginHistory.slice(-50);
     
     if (location && location.coordinates) {
       user.lastKnownLocation = {

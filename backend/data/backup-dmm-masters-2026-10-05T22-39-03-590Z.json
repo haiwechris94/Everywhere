@@ -1,0 +1,2927 @@
+{
+  "createdAt": "2026-10-05T22:39:03.590Z",
+  "country": "CMR",
+  "deletedMasters": [
+    {
+      "referenceData": null,
+      "_id": "6aac056a97c0c60aebf1781e",
+      "canonicalName": "Adjaraye Kenga",
+      "groupNaturalKey": "DMM:adjaraye kenga",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé avec certitude",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.908Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:14.707Z",
+      "updatedAt": "2026-09-20T10:51:49.909Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056a97c0c60aebf17826",
+      "canonicalName": "Akom",
+      "groupNaturalKey": "DMM:akom",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Akum",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.1854561,
+          6.8263122
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.892Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:14.914Z",
+      "updatedAt": "2026-09-20T10:51:49.893Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17833",
+      "canonicalName": "Arabs",
+      "groupNaturalKey": "DMM:arabs",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Chowa / Shuwa Arabic",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          15.0191262,
+          12.0831175
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.876Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.011Z",
+      "updatedAt": "2026-09-20T10:51:49.876Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf1783e",
+      "canonicalName": "Bafut",
+      "groupNaturalKey": "DMM:bafut",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Bafut (Fut)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.214104,
+          6.0045045
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.859Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.099Z",
+      "updatedAt": "2026-09-20T10:51:49.860Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17846",
+      "canonicalName": "Bamonga",
+      "groupNaturalKey": "DMM:bamonga",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.843Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.141Z",
+      "updatedAt": "2026-09-20T10:51:49.843Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf1784e",
+      "canonicalName": "Bana",
+      "groupNaturalKey": "DMM:bana",
+      "rop3": "100941",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Bana",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 36000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.51033,
+          10.25075
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 3,
+        "villagesTouched": 3,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.826Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.183Z",
+      "updatedAt": "2026-09-20T20:17:16.723Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "JP+CPPI(xref)",
+        "matchedBy": "xref-name",
+        "matchedName": "Fali",
+        "rop3": "100941",
+        "population": 36000,
+        "primaryLanguage": "Bana",
+        "primaryReligion": "Ethnic Religions",
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": null,
+        "percentChristian": 12,
+        "percentEvangelical": 4,
+        "latitude": null,
+        "longitude": null,
+        "updatedAt": "2026-09-20T20:17:16.720Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17865",
+      "canonicalName": "Wedikom",
+      "groupNaturalKey": "DMM:wedikom",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          9.8887873,
+          5.8382171
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 2,
+        "villagesTouched": 2,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:48.942Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.356Z",
+      "updatedAt": "2026-09-20T10:51:48.943Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf17872",
+      "canonicalName": "Dii",
+      "groupNaturalKey": "DMM:dii",
+      "rop3": "102609",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Dii (Duru)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 74000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.5878214,
+          7.3211536
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 2,
+        "villagesTouched": 2,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.434Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.446Z",
+      "updatedAt": "2026-09-20T20:17:16.799Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Dii",
+        "rop3": "102609",
+        "population": 74000,
+        "primaryLanguage": "Dii",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 8.00336,
+        "longitude": 14.01575,
+        "updatedAt": "2026-09-20T20:17:16.798Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf1787a",
+      "canonicalName": "Dii/Mboum and Baya",
+      "groupNaturalKey": "DMM:dii mboum and baya",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Dii, Mbum et Baya (engagement combiné)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.5878214,
+          7.3211536
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.726Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.506Z",
+      "updatedAt": "2026-09-20T10:51:49.726Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf1787f",
+      "canonicalName": "Fang",
+      "groupNaturalKey": "DMM:fang",
+      "rop3": "102997",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Fang",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 207000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.711Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.538Z",
+      "updatedAt": "2026-09-20T20:17:16.824Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "JP+CPPI(xref)",
+        "matchedBy": "xref-name",
+        "matchedName": "Fang, Ntum",
+        "rop3": "102997",
+        "population": 207000,
+        "primaryLanguage": "Fang (Equatorial Guinea)",
+        "primaryReligion": "Christianity",
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": null,
+        "percentChristian": 74,
+        "percentEvangelical": 5,
+        "latitude": null,
+        "longitude": null,
+        "updatedAt": "2026-09-20T20:17:16.823Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17884",
+      "canonicalName": "Fulani",
+      "groupNaturalKey": "DMM:fulani",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Fulfulde (Adamaoua)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.3281625,
+          10.6033083
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 3,
+        "villagesTouched": 3,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.467Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.569Z",
+      "updatedAt": "2026-09-17T15:21:17.467Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf1788f",
+      "canonicalName": "Gbaya",
+      "groupNaturalKey": "DMM:gbaya",
+      "rop3": "101166",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Gbaya, Nord-Ouest",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 217000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.5462694,
+          7.278665
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.685Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.649Z",
+      "updatedAt": "2026-09-20T20:17:16.842Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "JP+CPPI(xref)",
+        "matchedBy": "xref-name",
+        "matchedName": "Gbaya, Northwest",
+        "rop3": "101166",
+        "population": 217000,
+        "primaryLanguage": "Gbaya, Northwest",
+        "primaryReligion": "Christianity",
+        "jpScale": 5,
+        "leastReached": false,
+        "reachedStatus": null,
+        "percentChristian": 63,
+        "percentEvangelical": 20,
+        "latitude": null,
+        "longitude": null,
+        "updatedAt": "2026-09-20T20:17:16.841Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17894",
+      "canonicalName": "Gor",
+      "groupNaturalKey": "DMM:gor",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.670Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.679Z",
+      "updatedAt": "2026-09-20T10:51:49.670Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf17899",
+      "canonicalName": "Guiziga",
+      "groupNaturalKey": "DMM:guiziga",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Giziga (Sud/Nord)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.4425653,
+          10.4014393
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.653Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.714Z",
+      "updatedAt": "2026-09-20T10:51:49.653Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf1789e",
+      "canonicalName": "Kanuri",
+      "groupNaturalKey": "DMM:kanuri",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Kanuri, Yerwa",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.1342835,
+          11.0484452
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.511Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.744Z",
+      "updatedAt": "2026-09-17T15:21:17.512Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf178a3",
+      "canonicalName": "Kapsiki",
+      "groupNaturalKey": "DMM:kapsiki",
+      "rop3": "104619",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Psikye (Kapsiki)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 134000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.798742,
+          10.74103
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 2,
+        "villagesTouched": 2,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.522Z"
+      },
+      "status": {
+        "status": "MINIMALLY_REACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.771Z",
+      "updatedAt": "2026-09-20T20:17:16.877Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Kapsiki",
+        "rop3": "104619",
+        "population": 134000,
+        "primaryLanguage": "Psikye",
+        "primaryReligion": null,
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": "MINIMALLY_REACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 10.5859,
+        "longitude": 13.6724,
+        "updatedAt": "2026-09-20T20:17:16.877Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "_id": "6aac056b97c0c60aebf178ab",
+      "canonicalName": "Kotoko",
+      "groupNaturalKey": "DMM:kotoko",
+      "rop3": "105271",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Lagwan et autres langues Kotoko",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 16000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          15.103912,
+          11.780627
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.593Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.820Z",
+      "updatedAt": "2026-09-20T20:17:16.883Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "JP+CPPI(xref)",
+        "matchedBy": "xref-name",
+        "matchedName": "Kotoko, Lagwan",
+        "rop3": "105271",
+        "population": 16000,
+        "primaryLanguage": "Lagwan",
+        "primaryReligion": "Islam",
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": null,
+        "percentChristian": 10,
+        "percentEvangelical": 5,
+        "latitude": null,
+        "longitude": null,
+        "updatedAt": "2026-09-20T20:17:16.883Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf178b0",
+      "canonicalName": "Kwandja",
+      "groupNaturalKey": "DMM:kwandja",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Kwandja",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.577Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.847Z",
+      "updatedAt": "2026-09-20T10:51:49.577Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf178b5",
+      "canonicalName": "Toupouri",
+      "groupNaturalKey": "DMM:toupouri",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.6653588,
+          9.0574802
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 2,
+        "villagesTouched": 2,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.039Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.872Z",
+      "updatedAt": "2026-09-20T10:51:49.040Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056b97c0c60aebf178bd",
+      "canonicalName": "Mada",
+      "groupNaturalKey": "DMM:mada",
+      "rop3": "105977",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mada",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 56000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.568Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.917Z",
+      "updatedAt": "2026-09-20T20:17:16.909Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Mada",
+        "rop3": "105977",
+        "population": 56000,
+        "primaryLanguage": "Mada (Cameroon)",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 10.88089,
+        "longitude": 14.11406,
+        "updatedAt": "2026-09-20T20:17:16.909Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "_id": "6aac056b97c0c60aebf178c2",
+      "canonicalName": "Mafa",
+      "groupNaturalKey": "DMM:mafa",
+      "rop3": "106001",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mafa",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 1072000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.798742,
+          10.74103
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.581Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.945Z",
+      "updatedAt": "2026-09-20T20:17:16.916Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Mafa",
+        "rop3": "106001",
+        "population": 1072000,
+        "primaryLanguage": "Mafa",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 10.85718,
+        "longitude": 13.88396,
+        "updatedAt": "2026-09-20T20:17:16.915Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "_id": "6aac056b97c0c60aebf178c7",
+      "canonicalName": "Mandara",
+      "groupNaturalKey": "DMM:mandara",
+      "rop3": "106228",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Wandala (Mandara)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 78000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.1342835,
+          11.0484452
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.600Z"
+      },
+      "status": {
+        "status": "FRONTIER",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:15.972Z",
+      "updatedAt": "2026-09-20T20:17:16.923Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Mandara",
+        "rop3": "106228",
+        "population": 78000,
+        "primaryLanguage": "Wandala",
+        "primaryReligion": null,
+        "jpScale": 1,
+        "leastReached": true,
+        "reachedStatus": "FRONTIER",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 11.11089,
+        "longitude": 14.0809,
+        "updatedAt": "2026-09-20T20:17:16.923Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056b97c0c60aebf178cc",
+      "canonicalName": "Massa",
+      "groupNaturalKey": "DMM:massa",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Masa",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          15.0191262,
+          12.0831175
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.508Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.000Z",
+      "updatedAt": "2026-09-20T10:51:49.508Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf178d1",
+      "canonicalName": "Matal",
+      "groupNaturalKey": "DMM:matal",
+      "rop3": "106395",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Matal (langue tchadique)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 60000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          11.156444,
+          4.8673555
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.622Z"
+      },
+      "status": {
+        "status": "MINIMALLY_REACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.028Z",
+      "updatedAt": "2026-09-20T20:17:16.940Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Matal",
+        "rop3": "106395",
+        "population": 60000,
+        "primaryLanguage": "Matal",
+        "primaryReligion": null,
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": "MINIMALLY_REACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 10.92833,
+        "longitude": 14.04734,
+        "updatedAt": "2026-09-20T20:17:16.940Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178d6",
+      "canonicalName": "Mboum",
+      "groupNaturalKey": "DMM:mboum",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mbum",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.2947879,
+          6.5172123
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.463Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.055Z",
+      "updatedAt": "2026-09-20T10:51:49.464Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf178db",
+      "canonicalName": "Menka",
+      "groupNaturalKey": "DMM:menka",
+      "rop3": "106547",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Menka (à confirmer selon le Menka concerné)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 11000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.162518,
+          5.796164
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.648Z"
+      },
+      "status": {
+        "status": "MINIMALLY_REACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.082Z",
+      "updatedAt": "2026-09-20T20:17:16.956Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Menka",
+        "rop3": "106547",
+        "population": 11000,
+        "primaryLanguage": "Menka",
+        "primaryReligion": null,
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": "MINIMALLY_REACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 5.94479,
+        "longitude": 9.69448,
+        "updatedAt": "2026-09-20T20:17:16.955Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178e0",
+      "canonicalName": "Mofou",
+      "groupNaturalKey": "DMM:mofou",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mofu (Nord/Sud)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.798742,
+          10.74103
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.431Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.108Z",
+      "updatedAt": "2026-09-20T10:51:49.432Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178e5",
+      "canonicalName": "Moudang",
+      "groupNaturalKey": "DMM:moudang",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mundang",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.415Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.137Z",
+      "updatedAt": "2026-09-20T10:51:49.415Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178ea",
+      "canonicalName": "Moura",
+      "groupNaturalKey": "DMM:moura",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé avec certitude (probablement apparenté au Wandala/Mura)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.1342835,
+          11.0484452
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.399Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.163Z",
+      "updatedAt": "2026-09-20T10:51:49.399Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178ef",
+      "canonicalName": "Mouyang",
+      "groupNaturalKey": "DMM:mouyang",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Mouyang (Muyang)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          14.1342835,
+          11.0484452
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.382Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.191Z",
+      "updatedAt": "2026-09-20T10:51:49.383Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178f4",
+      "canonicalName": "Mufu",
+      "groupNaturalKey": "DMM:mufu",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé avec certitude",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.798742,
+          10.74103
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.366Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.221Z",
+      "updatedAt": "2026-09-20T10:51:49.366Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf178f9",
+      "canonicalName": "Mun",
+      "groupNaturalKey": "DMM:mun",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Bamoun (Shü Pamom)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.8971603,
+          5.7282262
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.348Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.247Z",
+      "updatedAt": "2026-09-20T10:51:49.349Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf178fe",
+      "canonicalName": "Musgum",
+      "groupNaturalKey": "DMM:musgum",
+      "rop3": "106832",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Musgum (Mulwi)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 230000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          15.103912,
+          11.780627
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.332Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.275Z",
+      "updatedAt": "2026-09-20T20:17:17.014Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "JP+CPPI(xref)",
+        "matchedBy": "xref-name",
+        "matchedName": "Musgum, Mulwi",
+        "rop3": "106832",
+        "population": 230000,
+        "primaryLanguage": "Musgu",
+        "primaryReligion": "Islam",
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": null,
+        "percentChristian": 25,
+        "percentEvangelical": 2,
+        "latitude": null,
+        "longitude": null,
+        "updatedAt": "2026-09-20T20:17:17.013Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf17908",
+      "canonicalName": "Ndop",
+      "groupNaturalKey": "DMM:ndop",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Bamunka (plaine de Ndop)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.579231,
+          6.033808
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.298Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.330Z",
+      "updatedAt": "2026-09-20T10:51:49.299Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf1790d",
+      "canonicalName": "Ngambai",
+      "groupNaturalKey": "DMM:ngambai",
+      "rop3": "108711",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Ngambay (Sara)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 95000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          13.5462694,
+          7.278665
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.280Z"
+      },
+      "status": {
+        "status": "MINIMALLY_REACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.356Z",
+      "updatedAt": "2026-09-20T20:17:17.071Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-fuzzy(0.60)",
+        "matchedName": "Ngambay",
+        "rop3": "108711",
+        "population": 95000,
+        "primaryLanguage": "Ngambay",
+        "primaryReligion": null,
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": "MINIMALLY_REACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 8.42629,
+        "longitude": 15.11618,
+        "updatedAt": "2026-09-20T20:17:17.071Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf17912",
+      "canonicalName": "Njong",
+      "groupNaturalKey": "DMM:njong",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé avec certitude (zone Ngemba, Santa/Mezam)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.162518,
+          5.796164
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.263Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.384Z",
+      "updatedAt": "2026-09-20T10:51:49.263Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf17917",
+      "canonicalName": "Pere",
+      "groupNaturalKey": "DMM:pere",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Pere (Koutin)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          12.329942,
+          7.662773
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.246Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.411Z",
+      "updatedAt": "2026-09-20T10:51:49.247Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf1791c",
+      "canonicalName": "Pygmy Baka",
+      "groupNaturalKey": "DMM:pygmy baka",
+      "rop3": "100811",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Baka",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 64000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 10,
+        "villagesTouched": 9,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.825Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.438Z",
+      "updatedAt": "2026-09-20T20:17:17.109Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Pygmy, Baka",
+        "rop3": "100811",
+        "population": 64000,
+        "primaryLanguage": "Baka (Cameroon)",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 2.1213300001793,
+        "longitude": 14.733790000108,
+        "updatedAt": "2026-09-20T20:17:17.109Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf1793c",
+      "canonicalName": "Ruto",
+      "groupNaturalKey": "DMM:ruto",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Non déterminé avec certitude",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.098Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.636Z",
+      "updatedAt": "2026-09-20T10:51:49.098Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf17941",
+      "canonicalName": "Sara",
+      "groupNaturalKey": "DMM:sara",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Sara (groupe de langues)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          15.103912,
+          11.780627
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:49.081Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.663Z",
+      "updatedAt": "2026-09-20T10:51:49.082Z",
+      "__v": 0
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056c97c0c60aebf17965",
+      "canonicalName": "Zoulgo",
+      "groupNaturalKey": "DMM:zoulgo",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Zulgo-Gemzek",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          11.156444,
+          4.8673555
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:48.905Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.892Z",
+      "updatedAt": "2026-09-20T10:51:48.905Z",
+      "__v": 0
+    },
+    {
+      "_id": "6aac056c97c0c60aebf1796a",
+      "canonicalName": "Pygmy Bakola",
+      "groupNaturalKey": "DMM:pygmy bakola",
+      "rop3": "100811",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Gyeli (Bakola)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 64000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.4112806,
+          3.0779049
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 3,
+        "villagesTouched": 3,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.893Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.918Z",
+      "updatedAt": "2026-09-20T20:17:17.172Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-fuzzy(0.60)",
+        "matchedName": "Pygmy, Baka",
+        "rop3": "100811",
+        "population": 64000,
+        "primaryLanguage": "Baka (Cameroon)",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 2.1213300001793,
+        "longitude": 14.733790000108,
+        "updatedAt": "2026-09-20T20:17:17.172Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "_id": "6aac056c97c0c60aebf17975",
+      "canonicalName": "Bambili",
+      "groupNaturalKey": "DMM:bambili",
+      "rop3": "100926",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Bambili-Bambui",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 32000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          10.2907876,
+          6.0384487
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.903Z"
+      },
+      "status": {
+        "status": "MINIMALLY_REACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:16.999Z",
+      "updatedAt": "2026-09-20T20:17:17.177Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Bambili",
+        "rop3": "100926",
+        "population": 32000,
+        "primaryLanguage": "Bambili-Bambui",
+        "primaryReligion": null,
+        "jpScale": 4,
+        "leastReached": false,
+        "reachedStatus": "MINIMALLY_REACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 6.10567,
+        "longitude": 10.22428,
+        "updatedAt": "2026-09-20T20:17:17.177Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "_id": "6aac056d97c0c60aebf1797a",
+      "canonicalName": "Daba",
+      "groupNaturalKey": "DMM:daba",
+      "rop3": "102351",
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Daba",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 40000,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          0,
+          0
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-17T15:21:17.914Z"
+      },
+      "status": {
+        "status": "UNREACHED",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:17.025Z",
+      "updatedAt": "2026-09-20T20:17:17.183Z",
+      "__v": 0,
+      "referenceData": {
+        "source": "MasterPeople(JP/CPPI)",
+        "matchedBy": "ref-master-name",
+        "matchedName": "Daba",
+        "rop3": "102351",
+        "population": 40000,
+        "primaryLanguage": "Daba",
+        "primaryReligion": null,
+        "jpScale": 2,
+        "leastReached": false,
+        "reachedStatus": "UNREACHED",
+        "percentChristian": null,
+        "percentEvangelical": null,
+        "latitude": 10.19458,
+        "longitude": 13.90037,
+        "updatedAt": "2026-09-20T20:17:17.183Z",
+        "bibleStatus": null,
+        "cppiEvangelicalEngagement": null
+      }
+    },
+    {
+      "referenceData": null,
+      "_id": "6aac056d97c0c60aebf17984",
+      "canonicalName": "Guemzek",
+      "groupNaturalKey": "DMM:guemzek",
+      "rop3": null,
+      "rop2": null,
+      "rop1": null,
+      "primaryCountryCode": "CMR",
+      "primaryLanguageName": "Zulgo-Gemzek (Gemzek)",
+      "rol3": null,
+      "affinityBloc": null,
+      "peopleCluster": null,
+      "totalPopulation": 0,
+      "migrationRunId": null,
+      "version": null,
+      "sourceTypes": [
+        "DMM"
+      ],
+      "primaryLocation": {
+        "type": "Point",
+        "coordinates": [
+          11.156444,
+          4.8673555
+        ]
+      },
+      "dmmRollup": {
+        "engagementCount": 1,
+        "villagesTouched": 1,
+        "totalChurches": 0,
+        "maxGeneration": 0,
+        "status": "unreached",
+        "level": "I",
+        "updatedAt": "2026-09-20T10:51:48.549Z"
+      },
+      "status": {
+        "status": "UNKNOWN",
+        "jpScale": null,
+        "leastReached": null,
+        "percentEvangelical": null,
+        "bibleStatus": null,
+        "jpStage": null,
+        "jpScaleDescription": null,
+        "bibleTranslation": null
+      },
+      "createdAt": "2026-09-17T15:21:17.128Z",
+      "updatedAt": "2026-09-20T10:51:48.550Z",
+      "__v": 0
+    }
+  ],
+  "relinkChanges": [
+    {
+      "engagementId": "6aac056a97c0c60aebf17823",
+      "oldMasterId": "6aac056a97c0c60aebf1781e",
+      "newMasterId": "6ac42706460fb88e14d89512",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056a97c0c60aebf1782e",
+      "oldMasterId": "6aac056a97c0c60aebf17826",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa26",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1783b",
+      "oldMasterId": "6aac056b97c0c60aebf17833",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa29",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17843",
+      "oldMasterId": "6aac056b97c0c60aebf1783e",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa8d",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1784b",
+      "oldMasterId": "6aac056b97c0c60aebf17846",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafae8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17853",
+      "oldMasterId": "6aac056b97c0c60aebf1784e",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa85",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17858",
+      "oldMasterId": "6aac056b97c0c60aebf1784e",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa85",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1785c",
+      "oldMasterId": "6aac056b97c0c60aebf1784e",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa85",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17868",
+      "oldMasterId": "6aac056b97c0c60aebf17865",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb1d",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17870",
+      "oldMasterId": "6aac056b97c0c60aebf1786d",
+      "newMasterId": "6aac056b97c0c60aebf1786d",
+      "matchedBy": "peopleId"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17875",
+      "oldMasterId": "6aac056b97c0c60aebf17872",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa73",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1787d",
+      "oldMasterId": "6aac056b97c0c60aebf1787a",
+      "newMasterId": "6a4a0d7def09c6e5c0ab1bb2",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17882",
+      "oldMasterId": "6aac056b97c0c60aebf1787f",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa89",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17887",
+      "oldMasterId": "6aac056b97c0c60aebf17884",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa8a",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17892",
+      "oldMasterId": "6aac056b97c0c60aebf1788f",
+      "newMasterId": "6a4a0d7def09c6e5c0ab1bb2",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17897",
+      "oldMasterId": "6aac056b97c0c60aebf17894",
+      "newMasterId": "6ac42707460fb88e14d89577",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1789c",
+      "oldMasterId": "6aac056b97c0c60aebf17899",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa94",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178a1",
+      "oldMasterId": "6aac056b97c0c60aebf1789e",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaa7",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178a6",
+      "oldMasterId": "6aac056b97c0c60aebf178a3",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaa8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178a9",
+      "oldMasterId": "6aac056b97c0c60aebf178a3",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaa8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178ae",
+      "oldMasterId": "6aac056b97c0c60aebf178ab",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafab1",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178b3",
+      "oldMasterId": "6aac056b97c0c60aebf178b0",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaae",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178b8",
+      "oldMasterId": "6aac056b97c0c60aebf178b5",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb14",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178c0",
+      "oldMasterId": "6aac056b97c0c60aebf178bd",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafabe",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178c5",
+      "oldMasterId": "6aac056b97c0c60aebf178c2",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafabf",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178ca",
+      "oldMasterId": "6aac056b97c0c60aebf178c7",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafac5",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178cf",
+      "oldMasterId": "6aac056b97c0c60aebf178cc",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafac9",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178d4",
+      "oldMasterId": "6aac056c97c0c60aebf178d1",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaca",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1788a",
+      "oldMasterId": "6aac056b97c0c60aebf17884",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa8a",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178d9",
+      "oldMasterId": "6aac056c97c0c60aebf178d6",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafad1",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178de",
+      "oldMasterId": "6aac056c97c0c60aebf178db",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafad5",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178e3",
+      "oldMasterId": "6aac056c97c0c60aebf178e0",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafad8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178e8",
+      "oldMasterId": "6aac056c97c0c60aebf178e5",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafae0",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178ed",
+      "oldMasterId": "6aac056c97c0c60aebf178ea",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafac5",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178f2",
+      "oldMasterId": "6aac056c97c0c60aebf178ef",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafae3",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178f7",
+      "oldMasterId": "6aac056c97c0c60aebf178f4",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafad8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf178fc",
+      "oldMasterId": "6aac056c97c0c60aebf178f9",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafade",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17901",
+      "oldMasterId": "6aac056c97c0c60aebf178fe",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafae2",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1790b",
+      "oldMasterId": "6aac056c97c0c60aebf17908",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafae8",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17910",
+      "oldMasterId": "6aac056c97c0c60aebf1790d",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaeb",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17915",
+      "oldMasterId": "6aac056c97c0c60aebf17912",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafaec",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1791a",
+      "oldMasterId": "6aac056c97c0c60aebf17917",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb03",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1788d",
+      "oldMasterId": "6aac056b97c0c60aebf17884",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa8a",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1791f",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17922",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17925",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17928",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1792b",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1792e",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17931",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17934",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17937",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1793a",
+      "oldMasterId": "6aac056c97c0c60aebf1791c",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1793f",
+      "oldMasterId": "6aac056c97c0c60aebf1793c",
+      "newMasterId": "6ac42707460fb88e14d89628",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17944",
+      "oldMasterId": "6aac056c97c0c60aebf17941",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb0b",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17949",
+      "oldMasterId": "6aac056c97c0c60aebf17946",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa6b",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf17878",
+      "oldMasterId": "6aac056b97c0c60aebf17872",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa73",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf178bb",
+      "oldMasterId": "6aac056b97c0c60aebf178b5",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb14",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1794c",
+      "oldMasterId": "6aac056c97c0c60aebf17946",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa6b",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1794f",
+      "oldMasterId": "6aac056c97c0c60aebf17946",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa6b",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056b97c0c60aebf1786b",
+      "oldMasterId": "6aac056b97c0c60aebf17865",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb1d",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17968",
+      "oldMasterId": "6aac056c97c0c60aebf17965",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb27",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf1796d",
+      "oldMasterId": "6aac056c97c0c60aebf1796a",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17970",
+      "oldMasterId": "6aac056c97c0c60aebf1796a",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056c97c0c60aebf17973",
+      "oldMasterId": "6aac056c97c0c60aebf1796a",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb09",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056d97c0c60aebf17978",
+      "oldMasterId": "6aac056c97c0c60aebf17975",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa3d",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056d97c0c60aebf1797d",
+      "oldMasterId": "6aac056d97c0c60aebf1797a",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafa6f",
+      "matchedBy": "rop3"
+    },
+    {
+      "engagementId": "6aac056d97c0c60aebf17987",
+      "oldMasterId": "6aac056d97c0c60aebf17984",
+      "newMasterId": "6a4a0d71ef09c6e5c0aafb27",
+      "matchedBy": "rop3"
+    }
+  ]
+}

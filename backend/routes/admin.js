@@ -66,6 +66,44 @@ router.get('/users', async (req, res) => {
 });
 
 /**
+ * GET /admin/users/:userId
+ * Get full details for a single user, including login history
+ */
+router.get('/users/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId)
+      .select('-password -verificationToken -resetPasswordToken');
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'User not found'
+      });
+    }
+
+    const userObj = user.toJSON();
+
+    // Return login history most-recent-first, capped to the most recent 50
+    if (Array.isArray(userObj.loginHistory)) {
+      userObj.loginHistory = userObj.loginHistory
+        .slice()
+        .sort((a, b) => new Date(b.at) - new Date(a.at))
+        .slice(0, 50);
+    }
+
+    res.json({ user: userObj });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Failed to fetch user'
+    });
+  }
+});
+
+/**
  * POST /admin/users
  * Create a new user with any role (admin can create admins, supervisors, etc.)
  */
@@ -237,6 +275,58 @@ router.put('/users/:userId/role', async (req, res) => {
     res.status(500).json({
       error: 'Server error',
       message: 'Failed to change user role'
+    });
+  }
+});
+
+/**
+ * PUT /admin/users/:userId/password
+ * Admin sets/resets a user's password
+ */
+router.put('/users/:userId/password', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { password, newPassword } = req.body;
+    const newPass = password || newPassword;
+
+    // Validate password
+    if (!newPass || typeof newPass !== 'string' || newPass.length < 6) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: 'Password must be at least 6 characters'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: 'Not found',
+        message: 'User not found'
+      });
+    }
+
+    // Setting the password triggers the pre('save') hashing hook
+    user.password = newPass;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({
+      message: 'Password updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating user password:', error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: Object.values(error.errors).map(e => e.message).join(', ')
+      });
+    }
+
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Failed to update password'
     });
   }
 });

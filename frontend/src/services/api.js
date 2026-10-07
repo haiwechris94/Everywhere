@@ -893,6 +893,11 @@ export const masterPeopleApi = {
   // status layer population (e.g. 80 for Cameroon), labelled "nom, Village".
   getDmmEngagements: (params) => api.get('/api/master-people/map/dmm-engagements', { params }),
   getPlanterEngagements: (name) => api.get(`/api/master-people/planters/${encodeURIComponent(name)}/engagements`),
+  getDonorEngagements: (name) => api.get(`/api/master-people/donors/${encodeURIComponent(name)}/engagements`),
+  // Edit a DMM engagement's donor / national coordinator / church planter with
+  // change-history tracking (admin/supervisor only).
+  updateAssignments: (engagementId, data) => api.patch(`/api/master-people/engagements/${engagementId}/assignments`, data),
+  updateComment: (engagementId, description) => api.patch(`/api/master-people/engagements/${engagementId}/comment`, { description }),
   addVillage: (id, data) => api.post(`/api/master-people/${id}/villages`, data),
   updateVillage: (id, villageId, data) => api.put(`/api/master-people/${id}/villages/${villageId}`, data),
   deleteVillage: (id, villageId) => api.delete(`/api/master-people/${id}/villages/${villageId}`),

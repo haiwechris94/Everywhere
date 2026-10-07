@@ -31,7 +31,10 @@ import {
   AlertTriangle,
   ChevronLeft,
   ChevronRight,
-  RefreshCw
+  RefreshCw,
+  UserCircle,
+  Clock,
+  KeyRound
 } from 'lucide-react'
 
 // Role badge colors
@@ -112,6 +115,239 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
               {confirmText}
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// User Detail Modal Component (info + login history + change password)
+const UserDetailModal = ({ isOpen, userId, onClose }) => {
+  const { isFrench } = useLanguage()
+  const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState('')
+  const [detail, setDetail] = useState(null)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [savingPassword, setSavingPassword] = useState(false)
+
+  const resetState = () => {
+    setDetail(null)
+    setLoadError('')
+    setNewPassword('')
+    setConfirmPassword('')
+    setSavingPassword(false)
+    setLoading(false)
+  }
+
+  const handleClose = () => {
+    resetState()
+    onClose()
+  }
+
+  useEffect(() => {
+    if (!isOpen || !userId) return
+    let cancelled = false
+    const fetchDetail = async () => {
+      setLoading(true)
+      setLoadError('')
+      try {
+        const response = await api.get(`/api/admin/users/${userId}`)
+        if (!cancelled) setDetail(response.data.user)
+      } catch (err) {
+        if (!cancelled) {
+          const message = err.response?.data?.message || (isFrench ? "Erreur lors du chargement de l'utilisateur" : 'Error while loading the user')
+          setLoadError(message)
+          toast.error(message)
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchDetail()
+    return () => { cancelled = true }
+  }, [isOpen, userId, isFrench])
+
+  const formatDateTime = (value) => {
+    if (!value) return '—'
+    try {
+      return new Date(value).toLocaleString(isFrench ? 'fr-FR' : 'en-US')
+    } catch {
+      return '—'
+    }
+  }
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+    if (!newPassword || newPassword.length < 6) {
+      toast.error(isFrench ? 'Le mot de passe doit contenir au moins 6 caractères' : 'Password must be at least 6 characters')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error(isFrench ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match')
+      return
+    }
+    setSavingPassword(true)
+    try {
+      await api.put(`/api/admin/users/${userId}/password`, { password: newPassword })
+      toast.success(isFrench ? 'Mot de passe mis à jour' : 'Password updated')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err) {
+      toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la mise à jour du mot de passe' : 'Error while updating password'))
+    } finally {
+      setSavingPassword(false)
+    }
+  }
+
+  if (!isOpen) return null
+
+  const loginHistory = Array.isArray(detail?.loginHistory)
+    ? [...detail.loginHistory].sort((a, b) => new Date(b.at) - new Date(a.at))
+    : []
+
+  const InfoRow = ({ label, children }) => (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 py-1">
+      <span className="text-xs font-medium text-gray-500 sm:w-40 flex-shrink-0">{label}</span>
+      <span className="text-sm text-gray-900">{children}</span>
+    </div>
+  )
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
+        <div className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <UserCircle className="text-primary-600" size={22} />
+              {isFrench ? "Détails de l'utilisateur" : 'User Details'}
+            </h3>
+            <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+              <X size={20} />
+            </button>
+          </div>
+
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="animate-spin text-primary-600" size={32} />
+            </div>
+          )}
+
+          {!loading && loadError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {loadError}
+            </div>
+          )}
+
+          {!loading && !loadError && detail && (
+            <div className="space-y-6">
+              {/* INFO SECTION */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">{isFrench ? 'Informations' : 'Information'}</h4>
+                <div className="bg-gray-50 rounded-lg p-4 divide-y divide-gray-100">
+                  <InfoRow label={isFrench ? 'Nom' : 'Name'}>{detail.name || '—'}</InfoRow>
+                  <InfoRow label="Email">{detail.email || '—'}</InfoRow>
+                  <InfoRow label={isFrench ? 'Téléphone' : 'Phone'}>{detail.phone || '—'}</InfoRow>
+                  <InfoRow label={isFrench ? 'Rôle' : 'Role'}><RoleBadge role={detail.role} /></InfoRow>
+                  <InfoRow label={isFrench ? 'Statut' : 'Status'}><StatusBadge isActive={detail.isActive !== false} /></InfoRow>
+                  <InfoRow label={isFrench ? 'Organisation' : 'Organization'}>{detail.organizationName || '—'}</InfoRow>
+                  <InfoRow label={isFrench ? 'Vérifié' : 'Verified'}>{detail.isVerified ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No')}</InfoRow>
+                  <InfoRow label={isFrench ? 'Nombre de connexions' : 'Login count'}>{detail.loginCount ?? 0}</InfoRow>
+                  <InfoRow label={isFrench ? 'Dernière connexion' : 'Last login'}>{formatDateTime(detail.lastLogin)}</InfoRow>
+                  <InfoRow label={isFrench ? 'Créé le' : 'Created'}>{formatDateTime(detail.createdAt)}</InfoRow>
+                </div>
+              </section>
+
+              {/* LOGIN HISTORY SECTION */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <Clock size={16} className="text-gray-500" />
+                  {isFrench ? 'Historique de connexion' : 'Login History'}
+                </h4>
+                {loginHistory.length === 0 ? (
+                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+                    {isFrench ? 'Aucun historique de connexion' : 'No login history'}
+                  </div>
+                ) : (
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="max-h-56 overflow-y-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+                          <tr>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Date' : 'Date'}</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Adresse IP' : 'IP Address'}</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Navigateur' : 'Browser'}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {loginHistory.map((entry, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-3 py-2 whitespace-nowrap text-gray-900">{formatDateTime(entry.at)}</td>
+                              <td className="px-3 py-2 whitespace-nowrap text-gray-700">{entry.ip || '—'}</td>
+                              <td className="px-3 py-2 text-gray-700 max-w-[220px] truncate" title={entry.userAgent || ''}>
+                                {entry.userAgent || '—'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* CHANGE PASSWORD SECTION */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <KeyRound size={16} className="text-gray-500" />
+                  {isFrench ? 'Changer le mot de passe' : 'Change Password'}
+                </h4>
+                <form onSubmit={handleChangePassword} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div>
+                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+                      {isFrench ? 'Nouveau mot de passe' : 'New password'}
+                    </label>
+                    <input
+                      id="new-password"
+                      type="password"
+                      minLength={6}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+                      {isFrench ? 'Confirmer le mot de passe' : 'Confirm password'}
+                    </label>
+                    <input
+                      id="confirm-password"
+                      type="password"
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={savingPassword}
+                      className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {savingPassword && <Loader2 className="animate-spin" size={16} />}
+                      {isFrench ? 'Changer le mot de passe' : 'Change Password'}
+                    </button>
+                  </div>
+                </form>
+              </section>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -277,6 +513,7 @@ const AdminUsers = () => {
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', user: null })
+  const [detailModal, setDetailModal] = useState({ isOpen: false, userId: null })
   const [actionLoading, setActionLoading] = useState(false)
   
   // Check if current user is admin
@@ -495,7 +732,14 @@ const AdminUsers = () => {
                   <tr key={user._id} className="hover:bg-gray-50">
                     <td className="px-4 py-4">
                       <div>
-                        <div className="font-medium text-gray-900">{user.name}</div>
+                        <button
+                          type="button"
+                          onClick={() => setDetailModal({ isOpen: true, userId: user._id })}
+                          className="font-medium text-primary-600 hover:underline cursor-pointer text-left"
+                          title={isFrench ? "Voir les détails de l'utilisateur" : 'View user details'}
+                        >
+                          {user.name}
+                        </button>
                         <div className="text-sm text-gray-500">{user.email}</div>
                         {user.organizationName && (
                           <div className="text-xs text-gray-400">{user.organizationName}</div>
@@ -614,6 +858,13 @@ const AdminUsers = () => {
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSuccess={() => fetchUsers()}
+      />
+      
+      {/* User Detail Modal */}
+      <UserDetailModal
+        isOpen={detailModal.isOpen}
+        userId={detailModal.userId}
+        onClose={() => setDetailModal({ isOpen: false, userId: null })}
       />
       
       {/* Confirm Modal for Toggle Active */}

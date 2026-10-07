@@ -1,13 +1,83 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  Home,
+  MoreVertical,
+  MapPin,
+  BookOpen,
+  MessageSquare,
+  Users,
+  AlertTriangle,
+  Globe,
+  Target,
+  Calendar,
+} from 'lucide-react'
 import { reportingApi, initiativesApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import { jpStageFor, evangelicalRangeFor, bibleStatusLabel } from '../utils/joshuaProjectScales'
+import { getCountryFlag } from '../utils/countryUtils'
 import { DmmStatusDot } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
 import { initiativeDisplayName } from '../utils/initiativeLabel'
+
+// ── Palette de statut canonique ──────────────────────────────────────────────
+// Hex alignés sur STATUS_COLORS / STATUS_COLORS_FILL de UnifiedMapView.jsx.
+// On mappe un statut (JP stage, DMM status, status.global) vers l'un de ces
+// tons de base, puis on en dérive les teintes claires / translucides pour la
+// grande carte extérieure et le dégradé de la carte « Statut ».
+const STATUS_HEX = {
+  movement: '#15803d',      // Movement / reached (vert foncé)
+  reached: '#15803d',
+  tippingpoint: '#22c55e',  // Basculement (vert)
+  midway: '#eab308',        // Mi-parcours (jaune)
+  pioneer: '#f97316',       // Pionnier / frontier (orange)
+  frontier: '#f97316',
+  unreached: '#ef4444',     // Non-atteint (rouge)
+  unknown: '#9ca3af',       // Inconnu / sans info (gris)
+  noinfo: '#9ca3af',
+}
+
+// Normalise un libellé de statut (JP stage, DMM, status.global) vers une clé
+// de STATUS_HEX. Couvre les libellés JP (« Significantly reached », « Unreached
+// (Frontier) », « Partially reached », …) et le vocabulaire DMM.
+function statusKeyFor(status) {
+  const raw = String(status || '').toLowerCase()
+  const norm = raw.replace(/[\s_()-]+/g, '')
+  if (STATUS_HEX[norm]) return norm
+  if (norm.includes('frontier') || norm.includes('pioneer')) return 'pioneer'
+  if (norm.includes('tipping')) return 'tippingpoint'
+  if (norm.includes('midway') || norm.includes('minimallyreached')) return 'midway'
+  if (
+    norm.includes('significantlyreached') ||
+    norm.includes('partiallyreached') ||
+    norm.includes('movement') ||
+    norm.includes('dmm') ||
+    (norm.includes('reached') && !norm.includes('unreached'))
+  ) {
+    return 'movement'
+  }
+  if (norm.includes('unreached') || norm.includes('unengaged')) return 'unreached'
+  return 'unknown'
+}
+
+// Hex de base pour un statut (ajouté car statusColorFor n'exposait que des
+// classes Tailwind, pas de hex). Réutilise la palette canonique ci-dessus.
+function statusHexFor(status) {
+  return STATUS_HEX[statusKeyFor(status)] || STATUS_HEX.unknown
+}
+
+// Convertit un hex #rrggbb en « rgba(r,g,b,alpha) » pour les teintes/translucides.
+function hexToRgba(hex, alpha) {
+  const h = String(hex || '').replace('#', '')
+  if (h.length !== 6) return `rgba(148,163,184,${alpha})`
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 // Libellés lisibles pour les codes de source de population.
 const SOURCE_LABELS = {
@@ -29,6 +99,97 @@ const fmtPoint = (pt) =>
     ? `${Number(pt[1]).toFixed(4)}, ${Number(pt[0]).toFixed(4)}`
     : null
 
+// ── Jauge circulaire (SVG) de la carte « Statut » ───────────────────────────
+// Piste blanche translucide + arc de progression (jpScale / 5) plus clair, avec
+// un disque blanc au centre portant une icône « groupe de personnes » colorée.
+function StatusGauge({ progress, statusHex }) {
+  const size = 92
+  const stroke = 8
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
+  const dash = Math.max(0, Math.min(1, progress || 0)) * c
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      className="shrink-0"
+      role="img"
+      aria-label={`Progression Joshua Project ${Math.round((progress || 0) * 100)}%`}
+    >
+      {/* Piste de fond translucide. */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="rgba(255,255,255,0.3)"
+        strokeWidth={stroke}
+      />
+      {/* Arc de progression (blanc plus clair). */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="rgba(255,255,255,0.9)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${c - dash}`}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+      {/* Disque blanc central + icône groupe. */}
+      <circle cx={size / 2} cy={size / 2} r={r - stroke - 4} fill="#ffffff" />
+      <g transform={`translate(${size / 2 - 9}, ${size / 2 - 9})`} style={{ color: statusHex }}>
+        {/* Icône « group of people » (contour simple, 18x18). */}
+        <path
+          d="M6 8a2.4 2.4 0 1 0 0-4.8A2.4 2.4 0 0 0 6 8Zm6 0a2.4 2.4 0 1 0 0-4.8A2.4 2.4 0 0 0 12 8ZM2 15c0-2.2 1.8-3.6 4-3.6s4 1.4 4 3.6M10 15c0-2.2 1.8-3.6 4-3.6s2 .6 2.6 1.4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  )
+}
+
+// ── Menu d'actions (kebab vertical) de la barre supérieure ──────────────────
+// Réutilise les actions existantes de la fiche (ajouter un engagement).
+function ActionsMenu({ isFrench, onAddEngagement }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={isFrench ? 'Actions' : 'Actions'}
+      >
+        <MoreVertical className="h-5 w-5" aria-hidden="true" />
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+          role="menu"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => { setOpen(false); onAddEngagement && onAddEngagement() }}
+            className="block w-full px-3 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+          >
+            {isFrench ? 'Ajouter un engagement' : 'Add an engagement'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Format d'affichage unifié : « nom du peuple, nom du village ».
 function peopleVillageLabel(peopleName, villageName) {
   const p = (peopleName || '').trim()
@@ -38,7 +199,7 @@ function peopleVillageLabel(peopleName, villageName) {
 }
 
 // Formulaire d'ajout manuel d'un village (engagement DMM) à un peuple.
-function AddVillageForm({ peopleId, peopleName, onAdded }) {
+function AddVillageForm({ peopleId, peopleName, onAdded, openSignal, onConsumeOpen }) {
   const { isFrench } = useLanguage()
   const empty = {
     villageName: '', latitude: '', longitude: '',
@@ -48,6 +209,12 @@ function AddVillageForm({ peopleId, peopleName, onAdded }) {
   const [form, setForm] = useState(empty)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // Ouvre le formulaire quand le menu kebab déclenche « Ajouter un engagement ».
+  if (openSignal && !open) {
+    setOpen(true)
+    onConsumeOpen && onConsumeOpen()
+  }
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
@@ -229,7 +396,12 @@ const PeopleDetailLite = () => {
   const { isFrench } = useLanguage()
   const { regionId, countryCode, peopleId } = useParams()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  // Seuls les administrateurs et superviseurs peuvent modifier le commentaire.
+  const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [editingId, setEditingId] = useState(null)
+  // Déclenche l'ouverture du formulaire d'ajout d'engagement depuis le menu kebab.
+  const [actionsAddVillage, setActionsAddVillage] = useState(false)
 
   // Primary: the master-people profile (nested under `overview`, no DMM rollup).
   const profileQuery = useQuery({
@@ -324,8 +496,27 @@ const PeopleDetailLite = () => {
     'UNKNOWN'
 
   // Valeurs de référence Joshua Project (dérivées de AllProgressLevelsListing.csv).
-  const jpScaleValue = overview.jpScale ?? row?.status?.jpScale ?? null
+  const jpScale = overview.jpScale ?? row?.status?.jpScale ?? null
+  const jpScaleValue = jpScale // alias historique conservé
   const jpStage = jpStageFor(jpScaleValue)
+  // Statut du peuple = statut Joshua Project (JP stage). On n'affiche plus le
+  // statut DMM générique dans l'en-tête : le statut JP devient le statut de la
+  // fiche (hero/carte Statut). Repli sur status.global si le JP stage est absent.
+  const jpStatus = jpStage || statusGlobal
+  // Description lisible du JPScale (« 5 — Significantly reached »), repli dérivé.
+  const jpScaleDescription =
+    overview.jpScaleDescription ||
+    overview.jpStage ||
+    (jpStage ? `${jpScaleValue ?? ''}${jpScaleValue != null ? ' — ' : ''}${jpStage}` : null)
+  // Couleur de base dérivée du statut JP (palette canonique) + teintes.
+  const statusHex = statusHexFor(jpStatus)
+  const statusTintBg = hexToRgba(statusHex, 0.06)       // fond très clair carte extérieure
+  const statusBorder = hexToRgba(statusHex, 0.35)       // bordure fine couleur-statut
+  const statusChipBg = hexToRgba(statusHex, 0.1)        // fond des chips pâles
+  const statusLabelColor = hexToRgba(statusHex, 0.85)   // petits libellés en couleur-statut
+  const statusGradient = `linear-gradient(90deg, ${statusHex} 0%, ${hexToRgba(statusHex, 0.82)} 100%)`
+  // Progression de la jauge (jpScale / 5), bornée [0,1].
+  const gaugeProgress = jpScaleValue != null ? Math.min(1, Math.max(0, Number(jpScaleValue) / 5)) : 0
   // PctEvangelicalRange : la fourchette officielle liée au JPScale sert de repli
   // lorsqu'aucun pourcentage précis n'est disponible sur le peuple.
   const pctEvangelicalRange =
@@ -338,42 +529,6 @@ const PeopleDetailLite = () => {
   const bibleTranslationStatus = bibleStatusLabel(
     overview.bibleStatus ?? row?.status?.bibleStatus
   )
-
-  // Couleur associée au statut du peuple (réutilisée pour le point rond et pour
-  // colorer le texte du statut). Aligné sur la palette de StatusBadge.
-  const statusColorFor = (status) => {
-    const norm = String(status || '').toLowerCase().replace(/[\s_-]+/g, '')
-    const map = {
-      pioneer: { dot: 'bg-amber-500', text: 'text-amber-700' },
-      midway: { dot: 'bg-blue-500', text: 'text-blue-700' },
-      tippingpoint: { dot: 'bg-purple-500', text: 'text-purple-700' },
-      movement: { dot: 'bg-green-500', text: 'text-green-700' },
-      dmm: { dot: 'bg-green-500', text: 'text-green-700' },
-      engaged: { dot: 'bg-blue-500', text: 'text-blue-700' },
-      unreached: { dot: 'bg-red-500', text: 'text-red-700' },
-      reached: { dot: 'bg-green-500', text: 'text-green-700' },
-    }
-    return map[norm] || { dot: 'bg-slate-400', text: 'text-slate-700' }
-  }
-  const statusColors = statusColorFor(statusGlobal)
-
-  const cards = [
-    { label: 'Country', value: overview.country || row?.primaryCountryCode || countryCode },
-    // ROP3 retiré de la fiche des peuples (remplacé par les indicateurs Joshua Project ci-dessous).
-    {
-      label: 'JP Scale',
-      value: jpScaleValue != null ? (jpStage ? `${jpScaleValue} — ${jpStage}` : jpScaleValue) : '—',
-    },
-    { label: 'Least Reached', value: (overview.leastReached ?? row?.status?.leastReached) ? 'Yes' : 'No' },
-    // Population retirée des cartes du haut : elle est désormais présentée
-    // uniquement PAR SOURCE (jamais cumulée) dans la section « Population par source ».
-    // Indicateurs Joshua Project : toujours affichés (repli sur « — » si absent),
-    // pour que les 54 fiches montrent systématiquement ces cases.
-    { label: isFrench ? 'Langue principale' : 'Primary language', value: primaryLanguageName || '—' },
-    { label: isFrench ? '% Évangéliques' : '% Evangelical', value: pctEvangelicalRange || '—' },
-    { label: isFrench ? 'Traduction biblique' : 'Bible translation', value: bibleTranslationStatus || '—' },
-    ...(overview.religion ? [{ label: 'Religion', value: overview.religion }] : []),
-  ]
 
   // Données enrichies du profil master-people.
   const aliases = Array.isArray(profile?.aliases) ? profile.aliases.filter(Boolean) : []
@@ -389,7 +544,26 @@ const PeopleDetailLite = () => {
   const sourcePoints = Array.isArray(localisation?.sourcePoints) ? localisation.sourcePoints : []
   const hasLocalisation = !!representativePoint || sourcePoints.length > 0
   const photoUrl = overview.photoUrl || null
-  const subtitleChips = [overview.region, overview.language, overview.religion].filter(Boolean)
+
+  // Valeurs présentées dans la mise en page façon maquette (repli « — »).
+  const dash = '—'
+  const countryCodeDisplay = overview.country || row?.primaryCountryCode || countryCode || dash
+  const religionDisplay = overview.religion || dash
+  const regionDisplay = overview.region || dash
+  const languageDisplay = primaryLanguageName || dash
+  const descriptionDisplay = overview.description || (dmmDetail && dmmDetail.description) || null
+  const jpScaleDisplay = jpScaleValue != null ? String(jpScaleValue) : dash
+  const evangelicalDisplay = pctEvangelicalRange || dash
+  const bibleTranslationDisplay = bibleTranslationStatus || dash
+  const leastReachedValue = overview.leastReached ?? row?.status?.leastReached
+  const leastReachedDisplay =
+    leastReachedValue == null ? dash : (leastReachedValue ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
+  // ESP 300 / YCS n'ont pas de valeur « simple » exposée sur la fiche peuple :
+  // seules les cases OUI/NON (membership) existent plus bas. On affiche donc le
+  // statut d'appartenance comme valeur de la carte, avec repli « — ».
+  const esp300Display = membership.ESP300 == null ? dash : (membership.ESP300 ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
+  const ycsDisplay = membership.YCS == null ? dash : (membership.YCS ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
+  const countryFlagEmoji = getCountryFlag(countryCodeDisplay)
 
   // ── DMM Rollup = CUMUL des mesures d'engagement sur TOUS les engagements ─────
   // Chaque carte additionne la mesure correspondante sur engagements[] ; repli
@@ -464,49 +638,227 @@ const PeopleDetailLite = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <p className="text-sm text-gray-500">
-        <Link to="/regions" className="hover:text-slate-700">Regions</Link> /{' '}
-        <Link to={`/regions/${regionId}`} className="hover:text-slate-700">{regionId}</Link> /{' '}
-        <Link to={`/regions/${regionId}/countries/${countryCode}`} className="hover:text-slate-700">{countryCode}</Link> / {name}
-      </p>
-      <div className="flex items-start gap-4">
-        {photoUrl && (
-          <img
-            src={photoUrl}
-            alt={name}
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-            className="w-20 h-20 rounded-xl object-cover border border-slate-200 shrink-0"
+      {/* ───────────────────────────────────────────────────────────────────────
+          Carte extérieure façon maquette : grand bloc arrondi, fond blanc teinté
+          très légèrement de la couleur du statut, bordure fine couleur-statut.
+          ─────────────────────────────────────────────────────────────────── */}
+      <div
+        className="rounded-[24px] p-6 shadow-sm border"
+        style={{ backgroundColor: statusTintBg, borderColor: statusBorder }}
+      >
+        {/* TOP BAR : fil d'Ariane (icône maison + liens) à gauche, kebab à droite. */}
+        <div className="flex items-start justify-between gap-3">
+          <nav className="flex items-center flex-wrap gap-1.5 text-sm" aria-label="Breadcrumb">
+            <Home className="h-4 w-4 shrink-0" style={{ color: statusLabelColor }} aria-hidden="true" />
+            <Link to="/regions" className="hover:underline" style={{ color: statusLabelColor }}>
+              {isFrench ? 'Régions' : 'Regions'}
+            </Link>
+            <span style={{ color: statusLabelColor }}>/</span>
+            <Link to={`/regions/${regionId}`} className="hover:underline" style={{ color: statusLabelColor }}>
+              {regionDisplay !== dash ? regionDisplay : regionId}
+            </Link>
+            <span style={{ color: statusLabelColor }}>/</span>
+            <Link
+              to={`/regions/${regionId}/countries/${countryCode}`}
+              className="hover:underline"
+              style={{ color: statusLabelColor }}
+            >
+              {countryCode}
+            </Link>
+            <span style={{ color: statusLabelColor }}>/</span>
+            <span className="font-bold text-slate-900">{name}</span>
+          </nav>
+          <ActionsMenu
+            isFrench={isFrench}
+            onAddEngagement={() => setActionsAddVillage(true)}
           />
-        )}
-        <div className="min-w-0">
-          <h1 className="text-4xl font-bold text-slate-900">{name}</h1>
-          {subtitleChips.length > 0 && (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              {subtitleChips.map((chip, i) => (
-                <span
-                  key={i}
-                  className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-0.5 text-xs font-medium"
-                >
-                  {chip}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
 
-      <div className="flex flex-wrap gap-3">
-        {/* Carte Statut : point rond coloré selon le statut + texte coloré (cas « unreached » en rouge). */}
-        <div className="bg-white rounded-lg border border-neutral-200 border-t border-neutral-200 px-3 py-2 w-36">
-          <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{isFrench ? 'Statut' : 'Status'}</p>
-          <p className="text-xl font-bold mt-0.5 flex items-center gap-1.5">
-            <span className={`inline-block h-2.5 w-2.5 rounded-full shrink-0 ${statusColors.dot}`} />
-            <span className={statusColors.text}>{statusGlobal}</span>
-          </p>
+        {/* DEUX COLONNES : gauche ~35 %, droite ~65 %, séparateur vertical fin. */}
+        <div className="mt-5 flex flex-col lg:flex-row lg:items-stretch gap-6">
+          {/* ── COLONNE GAUCHE ─────────────────────────────────────────────── */}
+          <div className="lg:w-[35%] lg:border-r lg:pr-6" style={{ borderColor: statusBorder }}>
+            {/* 1. Photo paysage ~4:3. */}
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={isFrench ? `Photo du peuple ${name}` : `Photo of the ${name} people group`}
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
+                className="w-full aspect-[4/3] rounded-2xl object-cover border border-slate-200"
+              />
+            ) : (
+              <div
+                className="w-full aspect-[4/3] rounded-2xl border border-slate-200 bg-white flex items-center justify-center"
+                role="img"
+                aria-label={isFrench ? `Aucune photo disponible pour le peuple ${name}` : `No photo available for the ${name} people group`}
+              >
+                <Users className="h-10 w-10 text-slate-300" aria-hidden="true" />
+              </div>
+            )}
+
+            {/* 2. Titre = nom du peuple. */}
+            <h1 className="mt-4 text-[36px] leading-tight font-bold text-slate-900">{name}</h1>
+
+            {/* 3-4. Chips : localisation (épingle) + peuple/langue + religion. */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                style={{ backgroundColor: statusChipBg, color: statusLabelColor }}
+              >
+                <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                {regionDisplay}
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                style={{ backgroundColor: statusChipBg, color: statusLabelColor }}
+              >
+                <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+                {languageDisplay}
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                style={{ backgroundColor: statusChipBg, color: statusLabelColor }}
+              >
+                <Users className="h-3.5 w-3.5" aria-hidden="true" />
+                {religionDisplay}
+              </span>
+            </div>
+
+            {/* 5. Description. */}
+            <p className="mt-4 text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+              {descriptionDisplay || dash}
+            </p>
+
+            {/* 6. Deux petites cartes : drapeau + code pays ; JP Scale. */}
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3 flex items-center gap-2">
+                <span className="text-2xl leading-none" aria-hidden="true">{countryFlagEmoji}</span>
+                <span className="font-bold text-slate-900">{countryCodeDisplay}</span>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3">
+                <p className="text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  {isFrench ? 'Échelle JP' : 'JP Scale'}
+                </p>
+                <p className="mt-0.5 font-bold text-slate-900">{jpScaleDisplay}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── COLONNE DROITE ─────────────────────────────────────────────── */}
+          <div className="lg:w-[65%] space-y-5">
+            {/* A) CARTE HERO « STATUT » : dégradé couleur-statut, jauge, panneau 3 stats. */}
+            <div
+              className="relative rounded-[20px] p-6 pb-24 text-white"
+              style={{ background: statusGradient, boxShadow: `0 10px 30px ${hexToRgba(statusHex, 0.35)}` }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
+                    <Target className="h-3.5 w-3.5" aria-hidden="true" />
+                    {isFrench ? 'Statut' : 'Status'}
+                  </p>
+                  <div className="mt-3 flex items-center gap-3">
+                    <span
+                      className="inline-block h-4 w-4 rounded-full ring-2 ring-white shrink-0"
+                      style={{ backgroundColor: hexToRgba('#ffffff', 0.9) }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-[40px] leading-none font-bold text-white">{jpStatus || dash}</span>
+                  </div>
+                  {jpScaleDescription && (
+                    <p className="mt-2 text-sm font-semibold text-white/90">{jpScaleDescription}</p>
+                  )}
+                </div>
+
+                {/* Jauge circulaire (SVG) : piste translucide + arc de progression. */}
+                <StatusGauge progress={gaugeProgress} statusHex={statusHex} />
+              </div>
+
+              {/* Panneau blanc en bas, chevauchant le dégradé, 3 colonnes. */}
+              <div className="absolute left-6 right-6 -bottom-10 rounded-2xl bg-white border border-slate-200 shadow-md">
+                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center">
+                  <div className="px-3 py-4">
+                    <Users className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                    <p className="mt-1 font-bold text-slate-900">{evangelicalDisplay}</p>
+                    <p className="text-[11px] text-slate-500">{isFrench ? 'Évangéliques' : 'Evangelical'}</p>
+                  </div>
+                  <div className="px-3 py-4">
+                    <Target className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                    <p className="mt-1 font-bold text-slate-900">{jpScaleDisplay}</p>
+                    <p className="text-[11px] text-slate-500">{isFrench ? 'Échelle JP' : 'JP Scale'}</p>
+                  </div>
+                  <div className="px-3 py-4">
+                    <AlertTriangle className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                    <p className="mt-1 font-bold text-slate-900">{leastReachedDisplay}</p>
+                    <p className="text-[11px] text-slate-500">{isFrench ? 'Moins atteint' : 'Least Reached'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Espace pour le panneau chevauchant. */}
+            <div className="h-10" aria-hidden="true" />
+
+            {/* B) PANNEAU « Informations clés ». */}
+            <div className="rounded-2xl p-5" style={{ backgroundColor: statusTintBg }}>
+              <h2 className="flex items-center gap-2 font-bold text-slate-900">
+                <AlertTriangle className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                {isFrench ? 'Informations clés' : 'Key Information'}
+              </h2>
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                  <BookOpen className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                    {isFrench ? 'Traduction de la Bible' : 'Bible Translation'}
+                  </p>
+                  <p className="mt-0.5 font-bold text-slate-900">{bibleTranslationDisplay}</p>
+                </div>
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                  <MessageSquare className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                    {isFrench ? 'Langue principale' : 'Primary Language'}
+                  </p>
+                  <p className="mt-0.5 font-bold text-slate-900">{languageDisplay}</p>
+                </div>
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                  <Users className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                    {isFrench ? 'Religion' : 'Religion'}
+                  </p>
+                  <p className="mt-0.5 font-bold text-slate-900">{religionDisplay}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* C) Rangée de 3 cartes : Pays, ESP 300, YCS. */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <Globe className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  {isFrench ? 'Pays' : 'Country'}
+                </p>
+                <p className="mt-0.5 font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="text-lg leading-none" aria-hidden="true">{countryFlagEmoji}</span>
+                  {countryCodeDisplay}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <Target className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  {initiativeDisplayName('ESP300', { isFrench }, 'ESP 300')}
+                </p>
+                <p className="mt-0.5 font-bold text-slate-900">{esp300Display}</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <Calendar className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
+                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  {initiativeDisplayName('YCS', { isFrench }, 'YCS')}
+                </p>
+                <p className="mt-0.5 font-bold text-slate-900">{ycsDisplay}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        {cards.map((c) => (
-          <StatCard key={c.label} label={c.label} value={c.value} />
-        ))}
       </div>
 
       {/* Cases « Projets » : ESP 300 et YCS.
@@ -515,19 +867,19 @@ const PeopleDetailLite = () => {
           NON (rouge) et NON cliquable sinon. */}
       <div className="flex flex-wrap gap-3">
         {[
-          { key: 'ESP300', label: 'ESP 300' },
-          { key: 'YCS', label: initiativeDisplayName('YCS', { isFrench }, 'YCS') },
-        ].map(({ key, label }) => {
+          { key: 'ESP300', projLabel: 'ESP 300' },
+          { key: 'YCS', projLabel: initiativeDisplayName('YCS', { isFrench }, 'YCS') },
+        ].map(({ key, projLabel }) => {
           const engaged = !!membership[key]
           const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
           return (
             <div key={key} className={base}>
-              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, label)}</p>
+              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, projLabel)}</p>
               {engaged ? (
                 <Link
                   to={`/initiatives/${key}/peoples/${peopleId}`}
                   className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
-                  title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, label)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, label)} detail`}
+                  title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, projLabel)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, projLabel)} detail`}
                 >
                   {isFrench ? 'OUI' : 'YES'}
                 </Link>
@@ -646,7 +998,11 @@ const PeopleDetailLite = () => {
               [isFrench ? 'Urbain / Rural' : 'Urban / Rural', dmmDetail.urbanRural],
               [isFrench ? 'Année de début' : 'Start year', dmmDetail.startYear],
               ['Population', typeof dmmDetail.population === 'number' ? dmmDetail.population.toLocaleString('fr-FR') : dmmDetail.population],
-              [isFrench ? 'Donateur' : 'Donor', dmmDetail.donor],
+              [isFrench ? 'Donateur' : 'Donor', dmmDetail.donor ? (
+                <Link to={`/donors/${encodeURIComponent(dmmDetail.donor)}/engagements`} className="text-blue-600 hover:underline">
+                  {dmmDetail.donor}
+                </Link>
+              ) : dmmDetail.donor],
               [isFrench ? 'Coordinateur national' : 'National coordinator', dmmDetail.nationalCoordinator],
               [isFrench ? "Implanteur d'église" : 'Church planter', dmmDetail.churchPlanter ? (
                 <Link to={`/planters/${encodeURIComponent(dmmDetail.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
@@ -665,9 +1021,13 @@ const PeopleDetailLite = () => {
                 </div>
               ))}
           </div>
-          {dmmDetail.description && (
-            <p className="mt-4 text-sm text-slate-600 whitespace-pre-line leading-relaxed">{dmmDetail.description}</p>
-          )}
+          <PeopleCommentSection
+            engagementId={dmmDetail.engagementId || dmmDetail.id || dmmDetail._id}
+            description={dmmDetail.description}
+            canManage={canManage}
+            isFrench={isFrench}
+            onSaved={refreshPerson}
+          />
         </section>
       )}
 
@@ -683,7 +1043,13 @@ const PeopleDetailLite = () => {
           <h2 className="text-xl font-bold">
             Engagements <span className="text-slate-400 text-base">({villages.length})</span>
           </h2>
-          <AddVillageForm peopleId={peopleId} peopleName={name} onAdded={refreshPerson} />
+          <AddVillageForm
+            peopleId={peopleId}
+            peopleName={name}
+            onAdded={refreshPerson}
+            openSignal={actionsAddVillage}
+            onConsumeOpen={() => setActionsAddVillage(false)}
+          />
         </div>
         {villages.length === 0 ? (
           <p className="text-sm text-slate-400">{isFrench ? 'Aucun engagement enregistré pour ce peuple. Ajoutez-en un avec le bouton ci-dessus.' : 'No engagement recorded for this people group. Add one with the button above.'}</p>
@@ -759,6 +1125,98 @@ const PeopleDetailLite = () => {
           </div>
         )}
       </section>
+    </div>
+  )
+}
+
+/**
+ * Section « Commentaire » éditable (PeopleGroup.description) sous le détail du
+ * peuple. Lecture pour tous ; édition réservée aux admins / superviseurs.
+ */
+function PeopleCommentSection({ engagementId, description, canManage, isFrench, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [value, setValue] = useState(description || '')
+
+  const open = () => {
+    setValue(description || '')
+    setError('')
+    setEditing(true)
+  }
+
+  const save = async () => {
+    if (!engagementId) return
+    setSaving(true)
+    setError('')
+    try {
+      await masterPeopleApi.updateComment(engagementId, value)
+      setEditing(false)
+      onSaved?.()
+    } catch (err) {
+      if (err?.response?.status === 403) {
+        setError(isFrench ? 'Réservé aux administrateurs et superviseurs.' : 'Admins and supervisors only.')
+      } else {
+        setError(err?.response?.data?.message || err?.response?.data?.error || (isFrench ? "Échec de l'enregistrement." : 'Save failed.'))
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? 'Commentaire' : 'Comment'}</p>
+        <textarea
+          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700"
+          rows={4}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setEditing(false); setError('') }}
+            disabled={saving}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            {isFrench ? 'Annuler' : 'Cancel'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-4">
+      {description ? (
+        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{description}</p>
+      ) : (
+        canManage && (
+          <p className="text-sm italic text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
+        )
+      )}
+      {canManage && engagementId && (
+        <button
+          type="button"
+          onClick={open}
+          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        >
+          {description
+            ? (isFrench ? 'Modifier' : 'Edit')
+            : (isFrench ? 'Ajouter un commentaire' : 'Add a comment')}
+        </button>
+      )}
     </div>
   )
 }

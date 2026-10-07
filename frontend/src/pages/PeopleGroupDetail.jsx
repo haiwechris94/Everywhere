@@ -23,6 +23,7 @@ import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
+import StatusHeroCard from '../components/StatusHeroCard'
 
 // Status labels
 const statusLabels = {
@@ -269,6 +270,19 @@ const PeopleGroupDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Shared status hero card — wired to existing people group data (no new API calls). */}
+      {!isEditing && (
+        <div className="mb-10">
+          <StatusHeroCard
+            status={statusLabels[peopleGroup.engagementStatus] || peopleGroup.engagementStatus || null}
+            jpScale={peopleGroup.jpScale ?? null}
+            evangelical={peopleGroup.percentEvangelical ?? null}
+            leastReached={peopleGroup.leastReached ?? null}
+            isFrench={isFrench}
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
@@ -742,7 +756,7 @@ const PeopleGroupDetail = () => {
               {peopleGroup.donor && (
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">{isFrench ? 'Donateur' : 'Donor'}</span>
-                  <span className="font-semibold text-right">{peopleGroup.donor}</span>
+                  <Link to={`/donors/${encodeURIComponent(peopleGroup.donor)}/engagements`} className="text-blue-600 hover:underline">{peopleGroup.donor}</Link>
                 </div>
               )}
               {peopleGroup.nationalCoordinator && (

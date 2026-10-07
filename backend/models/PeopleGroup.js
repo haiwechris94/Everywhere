@@ -23,6 +23,18 @@ const progressHistorySchema = new mongoose.Schema({
   },
 }, { _id: false });
 
+// Assignment-history entry schema. Tracks who held an engagement role
+// (donor / nationalCoordinator / churchPlanter) over a period of time.
+// `to: null` marks the currently-open (active) assignment.
+const assignmentHistorySchema = new mongoose.Schema({
+  value: String,            // the person/donor name for this period
+  from: { type: Date, default: Date.now },  // when this assignment started
+  to: { type: Date, default: null },        // when it ended (null = current)
+  changedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  changedAt: { type: Date, default: Date.now },
+  note: String,
+}, { _id: false });
+
 // Photo schema
 const photoSchema = new mongoose.Schema({
   url: {
@@ -211,6 +223,9 @@ const peopleGroupSchema = new mongoose.Schema({
   // Top-level metric fields mirror the most recent quarter in this array.
   // Legacy docs without this array simply have an empty array.
   quarterlyReports: [quarterlyReportSchema],
+  // NOTE: donorHistory / nationalCoordinatorHistory / churchPlanterHistory are
+  // defined alongside their scalar fields (donor / nationalCoordinator /
+  // churchPlanter) further below in the engagement/reference metadata section.
   // Photos array
   photos: [photoSchema],
   // Organization tags for filtering
@@ -253,6 +268,12 @@ const peopleGroupSchema = new mongoose.Schema({
     trim: true,
     maxlength: [150, 'Church planter cannot exceed 150 characters'],
   },
+  // Change-history for the three assignment roles above. Each array records who
+  // held the role over time (period = from..to; to:null = current). The scalar
+  // fields above always mirror the currently-open (to:null) entry's value.
+  donorHistory: [assignmentHistorySchema],
+  nationalCoordinatorHistory: [assignmentHistorySchema],
+  churchPlanterHistory: [assignmentHistorySchema],
   // Affinity group classification (e.g. Sub-Saharan African Peoples)
   affinityGroup: {
     type: String,

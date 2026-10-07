@@ -59,6 +59,7 @@ const CountryPeoples = lazy(() => import('./pages/CountryPeoples'))
 const PeopleDetailLite = lazy(() => import('./pages/PeopleDetailLite'))
 const EngagementDetail = lazy(() => import('./pages/EngagementDetail'))
 const PlanterEngagements = lazy(() => import('./pages/PlanterEngagements'))
+const DonorEngagements = lazy(() => import('./pages/DonorEngagements'))
 const Activities = lazy(() => import('./pages/Activities'))
 
 const NOTION_ACTIVITE_URL = 'https://reminiscent-acapella-740.notion.site/EVERYWHERE-2a3ec55e01df8007bfc3fc19d481d3fc'
@@ -329,6 +330,13 @@ function App() {
             <ErrorBoundary fallbackMessage="Error loading planter engagements.">
               <Suspense fallback={<CompactLoader />}>
                 <PlanterEngagements />
+              </Suspense>
+            </ErrorBoundary>
+          } />
+          <Route path="donors/:name/engagements" element={
+            <ErrorBoundary fallbackMessage="Error loading donor engagements.">
+              <Suspense fallback={<CompactLoader />}>
+                <DonorEngagements />
               </Suspense>
             </ErrorBoundary>
           } />

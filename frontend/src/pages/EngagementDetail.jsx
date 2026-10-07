@@ -5,12 +5,14 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts'
 import { peopleGroupsApi, masterPeopleApi } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import {
   dmmEngagementDisplay, dmmLevelForEngagement, dmmLevelLabel,
   dmmStageFromChurches, normalizeDmmStage, dmmStageColors, dmmStageLabel, DMM_STAGE,
 } from '../utils/dmmEngagement'
 import { useLanguage } from '../i18n'
+import StatusHeroCard from '../components/StatusHeroCard'
 
 // Rang numérique d'un stade DMM (Pionnier=1 … Mouvement=4) pour tracer la
 // progression d'un engagement sur l'axe Y.
@@ -32,6 +34,13 @@ const quarterOrder = (period) => {
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
 
+// Formate une date (ISO ou Date) en « jj/mm/aaaa », ou '—' si absente/invalide.
+const fmtDate = (d) => {
+  if (!d) return '—'
+  const dt = new Date(d)
+  return Number.isNaN(dt.getTime()) ? '—' : dt.toLocaleDateString('fr-FR')
+}
+
 // Nom d'affichage unifié d'un engagement : « nom du peuple + nom du village ».
 function engagementDisplayName(peopleName, villageName, fallback) {
   const p = (peopleName || '').trim()
@@ -45,6 +54,157 @@ const ENGAGEMENT_STATUSES = ['pioneer', 'midway', 'tipping-point', 'movement']
 
 // Formulaire d'édition en ligne d'un engagement (réutilise la logique de
 // PeopleDetailLite : nom du village, statut, # églises, génération).
+// Section « Affectations » : donateur / coordinateur national / implanteur.
+// Affiche la valeur courante (nom cliquable → liste des engagements), l'historique
+// des périodes (du … au …), et — pour les admins/superviseurs uniquement — un
+// formulaire d'édition en ligne qui enregistre un changement daté via l'API
+// updateAssignments (clôture la période ouverte + ouvre une nouvelle période).
+const ASSIGNMENT_FIELDS = [
+  { key: 'donor', histKey: 'donorHistory', labelFr: 'Donateur', labelEn: 'Donor', linkBase: 'donors' },
+  { key: 'nationalCoordinator', histKey: 'nationalCoordinatorHistory', labelFr: 'Coordinateur national', labelEn: 'National coordinator', linkBase: null },
+  { key: 'churchPlanter', histKey: 'churchPlanterHistory', labelFr: 'Implanteur', labelEn: 'Church planter', linkBase: 'planters' },
+]
+
+function AssignmentsSection({ engagement, canManage, isFrench, onSaved }) {
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [form, setForm] = useState(() => ({
+    donor: engagement.donor || '',
+    nationalCoordinator: engagement.nationalCoordinator || '',
+    churchPlanter: engagement.churchPlanter || '',
+    from: '',
+  }))
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  const hasAny = ASSIGNMENT_FIELDS.some((f) => (engagement[f.key] || '').trim()
+    || (Array.isArray(engagement[f.histKey]) && engagement[f.histKey].length))
+  if (!hasAny && !canManage) return null
+
+  const openEdit = () => {
+    setForm({
+      donor: engagement.donor || '',
+      nationalCoordinator: engagement.nationalCoordinator || '',
+      churchPlanter: engagement.churchPlanter || '',
+      from: '',
+    })
+    setError(''); setSuccess(''); setEditing(true)
+  }
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setSaving(true); setError(''); setSuccess('')
+    try {
+      const payload = {}
+      for (const f of ASSIGNMENT_FIELDS) {
+        const next = (form[f.key] || '').trim()
+        if (next !== (engagement[f.key] || '').trim()) payload[f.key] = next
+      }
+      if (Object.keys(payload).length === 0) {
+        setEditing(false); setSaving(false)
+        return
+      }
+      if (form.from) payload.from = new Date(form.from).toISOString()
+      await masterPeopleApi.updateAssignments(engagement.id || engagement._id, payload)
+      setSuccess(isFrench ? 'Modifications enregistrées.' : 'Changes saved.')
+      setEditing(false)
+      onSaved && onSaved()
+    } catch (err) {
+      if (err?.response?.status === 403) {
+        setError(isFrench ? 'Réservé aux administrateurs et superviseurs.' : 'Admins and supervisors only.')
+      } else {
+        setError(err?.response?.data?.message || err?.response?.data?.error || (isFrench ? "Échec de l'enregistrement." : 'Save failed.'))
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold">{isFrench ? 'Affectations' : 'Assignments'}</h2>
+        {canManage && !editing && (
+          <button
+            onClick={openEdit}
+            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+          >
+            {isFrench ? 'Modifier' : 'Edit'}
+          </button>
+        )}
+      </div>
+
+      {success && <p className="mb-3 text-sm text-green-600">{success}</p>}
+
+      {editing ? (
+        <form onSubmit={submit} className="space-y-3">
+          {ASSIGNMENT_FIELDS.map((f) => (
+            <label key={f.key} className="block text-xs text-slate-500">
+              {isFrench ? f.labelFr : f.labelEn}
+              <input
+                value={form[f.key]}
+                onChange={set(f.key)}
+                className="mt-1 w-full rounded border px-2 py-1 text-sm"
+              />
+            </label>
+          ))}
+          <label className="block text-xs text-slate-500">
+            {isFrench ? 'Date de début du changement (optionnel)' : 'Change start date (optional)'}
+            <input type="date" value={form.from} onChange={set('from')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+          </label>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <div className="flex gap-2">
+            <button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+              {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
+            </button>
+            <button type="button" onClick={() => setEditing(false)} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+              {isFrench ? 'Annuler' : 'Cancel'}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="space-y-5">
+          {ASSIGNMENT_FIELDS.map((f) => {
+            const current = (engagement[f.key] || '').trim()
+            const history = Array.isArray(engagement[f.histKey]) ? engagement[f.histKey] : []
+            if (!current && history.length === 0) return null
+            return (
+              <div key={f.key}>
+                <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? f.labelFr : f.labelEn}</p>
+                {current ? (
+                  f.linkBase ? (
+                    <Link to={`/${f.linkBase}/${encodeURIComponent(current)}/engagements`} className="text-blue-600 hover:underline text-lg font-medium">
+                      {current}
+                    </Link>
+                  ) : (
+                    <span className="text-lg font-medium text-slate-800">{current}</span>
+                  )
+                ) : (
+                  <span className="text-slate-400">—</span>
+                )}
+                {history.length > 0 && (
+                  <ul className="mt-2 space-y-1 border-l-2 border-slate-100 pl-3">
+                    {history.map((h, i) => (
+                      <li key={i} className="text-xs text-slate-500">
+                        <span className="font-medium text-slate-700">{h.value || '—'}</span>
+                        {' — '}
+                        {isFrench
+                          ? `du ${fmtDate(h.from)} au ${h.to ? fmtDate(h.to) : 'présent'}`
+                          : `from ${fmtDate(h.from)} to ${h.to ? fmtDate(h.to) : 'present'}`}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </section>
+  )
+}
+
 function EditEngagementForm({ engagement, onSaved, onCancel }) {
   const { isFrench } = useLanguage()
   const coords = Array.isArray(engagement.location?.coordinates) ? engagement.location.coordinates : []
@@ -169,6 +329,9 @@ export default function EngagementDetail() {
   const { regionId, countryCode, peopleId, engagementId } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  // Seuls les administrateurs et superviseurs peuvent modifier les affectations.
+  const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -182,16 +345,18 @@ export default function EngagementDetail() {
   const eng = data || {}
   const masterId = peopleId || eng.masterPeopleId
 
-  // Nom du peuple parent (pour composer « nom du peuple + nom du village »).
-  const { data: parentName } = useQuery({
+  // Peuple parent complet (nom pour composer « peuple + village », et champs
+  // Joshua Project propres sous overview.* pour la carte HERO Statut).
+  const { data: master } = useQuery({
     queryKey: ['engagement-parent-name', masterId],
     queryFn: async () => {
       const res = await masterPeopleApi.getById(masterId)
-      return res?.data?.canonicalName || res?.data?.name || null
+      return res?.data || null
     },
     enabled: !!masterId,
     retry: false,
   })
+  const parentName = master?.canonicalName || master?.name || null
 
   const refresh = () => {
     // Refresh this page…
@@ -369,6 +534,19 @@ export default function EngagementDetail() {
         />
       )}
 
+      {/* Carte HERO « Statut » (Joshua Project) alimentée par le peuple parent
+          (overview.*). Repli gracieux sur « — » / le stade DMM si masterId est
+          absent ou que le peuple parent n'a pas de données JP. */}
+      <StatusHeroCard
+        status={master?.overview?.status || stageLabel || eng.engagementStatus || null}
+        jpScale={master?.overview?.jpScale ?? null}
+        jpStage={master?.overview?.jpStage}
+        description={master?.overview?.jpScaleDescription}
+        evangelical={master?.overview?.percentEvangelical ?? null}
+        leastReached={master?.overview?.leastReached ?? null}
+        isFrench={isFrench}
+      />
+
       {/* Carte Statut DMM : point + libellé colorés selon la règle du tableau,
           suivi du NIVEAU DMM (I–IV) déduit de la génération max. */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -493,18 +671,14 @@ export default function EngagementDetail() {
         )}
       </section>
 
-      {/* Implanteur — cliquable vers ses engagements, comme ailleurs. */}
-      {eng.churchPlanter && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? 'Implanteur' : 'Church planter'}</p>
-          <Link
-            to={`/planters/${encodeURIComponent(eng.churchPlanter)}/engagements`}
-            className="text-blue-600 hover:underline text-lg font-medium"
-          >
-            {eng.churchPlanter}
-          </Link>
-        </section>
-      )}
+      {/* Affectations — donateur / coordinateur national / implanteur, avec
+          historique des périodes et édition réservée aux admins/superviseurs. */}
+      <AssignmentsSection
+        engagement={eng}
+        canManage={canManage}
+        isFrench={isFrench}
+        onSaved={refresh}
+      />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-xl font-bold mb-4">{isFrench ? "Détails de l'engagement" : 'Engagement details'}</h2>
@@ -516,10 +690,106 @@ export default function EngagementDetail() {
             </div>
           ))}
         </div>
-        {eng.description && (
-          <p className="mt-4 text-sm text-slate-600 whitespace-pre-line leading-relaxed">{eng.description}</p>
-        )}
+        <CommentSection
+          engagement={eng}
+          canManage={canManage}
+          isFrench={isFrench}
+          onSaved={refresh}
+        />
       </section>
+    </div>
+  )
+}
+
+/**
+ * Section « Commentaire » éditable (PeopleGroup.description).
+ * Lecture pour tous ; édition réservée aux admins / superviseurs.
+ */
+function CommentSection({ engagement, canManage, isFrench, onSaved }) {
+  const engId = engagement?.id || engagement?._id
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [value, setValue] = useState(engagement?.description || '')
+
+  const open = () => {
+    setValue(engagement?.description || '')
+    setError('')
+    setEditing(true)
+  }
+
+  const save = async () => {
+    if (!engId) return
+    setSaving(true)
+    setError('')
+    try {
+      await masterPeopleApi.updateComment(engId, value)
+      setEditing(false)
+      onSaved?.()
+    } catch (err) {
+      if (err?.response?.status === 403) {
+        setError(isFrench ? 'Réservé aux administrateurs et superviseurs.' : 'Admins and supervisors only.')
+      } else {
+        setError(err?.response?.data?.message || err?.response?.data?.error || (isFrench ? "Échec de l'enregistrement." : 'Save failed.'))
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? 'Commentaire' : 'Comment'}</p>
+        <textarea
+          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700"
+          rows={4}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+          >
+            {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setEditing(false); setError('') }}
+            disabled={saving}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            {isFrench ? 'Annuler' : 'Cancel'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-4">
+      {engagement?.description ? (
+        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{engagement.description}</p>
+      ) : (
+        canManage && (
+          <p className="text-sm italic text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
+        )
+      )}
+      {canManage && (
+        <button
+          type="button"
+          onClick={open}
+          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+        >
+          {engagement?.description
+            ? (isFrench ? 'Modifier' : 'Edit')
+            : (isFrench ? 'Ajouter un commentaire' : 'Add a comment')}
+        </button>
+      )}
     </div>
   )
 }

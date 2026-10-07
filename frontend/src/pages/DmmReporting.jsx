@@ -749,8 +749,16 @@ function buildPeopleVillageCsv(peoplesRows = [], primaryPair = {}, isFrench = tr
 // status:{ global } }). Tolère des données vides sans planter.
 const RA_COLORS = ['#6366f1', '#22c55e', '#eab308', '#f97316', '#06b6d4', '#ec4899', '#8b5cf6', '#64748b']
 const RA_STATUS_COLORS = {
-  MOVEMENT: '#15803d', 'TIPPING-POINT': '#22c55e', MIDWAY: '#eab308', PIONEER: '#f97316',
-  ENGAGED: '#6366f1', UNREACHED: '#64748b', FRONTIER: '#f97316', UNKNOWN: '#94a3b8',
+  // DMM rollup statuses (uppercased slugs)
+  MOVEMENT: '#15803d', DMM: '#15803d', 'TIPPING-POINT': '#22c55e', MIDWAY: '#eab308', PIONEER: '#f97316', UNREACHED: '#ef4444', UNKNOWN: '#9ca3af',
+  // JP-derived master statuses
+  FRONTIER: '#f97316', MINIMALLY_REACHED: '#eab308', REACHED: '#15803d',
+  // lowercase slug variants
+  dmm: '#15803d', 'tipping-point': '#22c55e', midway: '#eab308', pioneer: '#f97316', unreached: '#ef4444', unknown: '#9ca3af',
+  // FR label variants
+  Mouvement: '#15803d', 'Point de bascule': '#22c55e', 'Mi-parcours': '#eab308', Pionnier: '#f97316', 'Non-atteint': '#ef4444', "Pas d'information": '#9ca3af', Inconnu: '#9ca3af',
+  // EN label variants
+  Movement: '#15803d', 'Tipping point': '#22c55e', Midway: '#eab308', Pioneer: '#f97316', Unreached: '#ef4444', 'No information': '#9ca3af',
 }
 const raNum = (n) => (typeof n === 'number' && isFinite(n) ? n : 0)
 
@@ -765,11 +773,30 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
   // 1) Tendances trimestrielles : églises, nouveaux disciples, baptisés, groupes actifs.
   const trend = (periodReports || []).map((p) => ({
     label: p.label,
+    year: p.year,
     churches: raNum(p.report?.churches?.total),
     disciples: raNum(p.report?.disciples?.newDisciples),
     baptized: raNum(p.report?.disciples?.baptized),
     dbsActive: raNum(p.report?.discoveryGroups?.active),
   }))
+
+  // Granularité du graphique de tendance : par trimestre (défaut) ou agrégée par année.
+  const [trendGranularity, setTrendGranularity] = useState('quarter')
+  const { trendChartData, trendXKey } = useMemo(() => {
+    if (trendGranularity === 'year') {
+      const byYear = {}
+      for (const r of trend) {
+        const y = r.year ?? r.label
+        if (!byYear[y]) byYear[y] = { year: String(y), churches: 0, disciples: 0, baptized: 0, dbsActive: 0 }
+        byYear[y].churches += r.churches || 0
+        byYear[y].disciples += r.disciples || 0
+        byYear[y].baptized += r.baptized || 0
+        byYear[y].dbsActive += r.dbsActive || 0
+      }
+      return { trendChartData: Object.values(byYear).sort((a, b) => String(a.year).localeCompare(String(b.year))), trendXKey: 'year' }
+    }
+    return { trendChartData: trend, trendXKey: 'label' }
+  }, [trend, trendGranularity])
 
   // 1b) Taux de croissance trimestre sur trimestre (QoQ) des églises et des
   // nouveaux disciples. Pour chaque trimestre t>0 : (v[t]-v[t-1]) / v[t-1] * 100.
@@ -910,16 +937,22 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
         {/* Tendance trimestrielle (multi-mesures) */}
         <div className={card} ref={trendRef}>
           <div className="flex items-center justify-between">
-            <p className={titleCls}><TrendingUp size={16} /> {L('Tendance par trimestre', 'Trend by quarter')}</p>
-            <DlBtn onClick={() => downloadCardPng(trendRef, 'tendance')} />
+            <p className={titleCls}><TrendingUp size={16} /> {L('Tendance', 'Trend')}</p>
+            <div className="flex items-center gap-2">
+              <div className="flex overflow-hidden rounded-lg border border-gray-200 text-xs">
+                <button type="button" onClick={() => setTrendGranularity('quarter')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'quarter' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>{L('Trimestre', 'Quarter')}</button>
+                <button type="button" onClick={() => setTrendGranularity('year')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'year' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>{L('Année', 'Year')}</button>
+              </div>
+              <DlBtn onClick={() => downloadCardPng(trendRef, 'tendance')} />
+            </div>
           </div>
           {trend.length === 0 ? (
             <p className="py-10 text-center text-sm text-gray-400">{L('Aucune donnée de période.', 'No period data.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
-              <LineChart data={trend} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+              <LineChart data={trendChartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                <XAxis dataKey={trendXKey} tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
@@ -1313,7 +1346,7 @@ export default function DmmReporting() {
         .map((d, i) => ({ d, data: queryResults[i]?.data }))
         .filter((x) => x.d.year === p.year && x.d.quarter === p.quarter && x.data)
         .map((x) => x.data)
-      return { label: qLabel(p.quarter, p.year, isFrench), report: finalizeReport(aggregateReports(matches)) || {} }
+      return { label: qLabel(p.quarter, p.year, isFrench), year: p.year, report: finalizeReport(aggregateReports(matches)) || {} }
     })
   }, [pairs, queryDescriptors, queryResults])
 

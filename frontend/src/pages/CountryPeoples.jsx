@@ -9,6 +9,7 @@ import { metricCards } from './regions/ngMetrics'
 import { DmmStatusBadge } from '../components/DmmStatusBadge'
 import DmmProgressTable from '../components/Dashboard/DmmProgressTable'
 import { dmmLevelForEngagement, dmmLevelLabel } from '../utils/dmmEngagement'
+import { jpStageFor } from '../utils/joshuaProjectScales'
 import { useLanguage } from '../i18n'
 
 const fmt = (n) => (typeof n === 'number' ? n.toLocaleString('fr-FR') : (n ?? '—'))
@@ -174,7 +175,8 @@ const CountryPeoples = () => {
                       // « DMM » (on ne veut plus afficher le suffixe « (DMM) »).
                       const rawSrc = referenceSource(p.sourceTypes)
                       const src = rawSrc && rawSrc.toUpperCase() !== 'DMM' ? rawSrc : null
-                      const status = p.status?.global || 'UNKNOWN'
+                      const jpScale = p.status?.jpScale ?? p.reference?.jpScale ?? null
+                      const jpStatus = jpStageFor(jpScale) || 'UNKNOWN'
                       return (
                         <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
                           <td className="py-3 pr-4">
@@ -189,7 +191,7 @@ const CountryPeoples = () => {
                           <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.totalChurches ?? 0)}</td>
                           <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.maxGeneration ?? 0)}</td>
                           <td className="py-3 pl-4 text-left text-slate-700">
-                            <StatusBadge status={`${status}${src ? ` (${src})` : ''}`} />
+                            <StatusBadge status={`${jpStatus} (JP)`} />
                           </td>
                         </tr>
                       )

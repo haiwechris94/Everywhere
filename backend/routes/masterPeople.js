@@ -755,6 +755,148 @@ router.get('/planters/:name/engagements', async (req, res) => {
   }
 });
 
+// ── GET /donors/:name/engagements — all engagements supported by a donor ───
+// Read-only. Returns every DMM/Survey/manual PeopleGroup whose donor
+// matches the given name (case-insensitive, exact). No auth (open like the
+// other map endpoints in this file).
+router.get('/donors/:name/engagements', async (req, res) => {
+  try {
+    const escapeRegExp = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const name = decodeURIComponent(req.params.name || '').trim();
+
+    const rows = await PeopleGroup.find({
+      source: { $in: ['DMM', 'Survey', 'manual'] },
+      donor: { $regex: new RegExp('^' + escapeRegExp(name) + '$', 'i') },
+    })
+      .select(
+        'name villageName region admin2 admin3 countryCode engagementStatus engagementLevel numberOfChurches churchGeneration dbs com cat newDisciples newBaptisms leadersInTraining activeCoaches trainingsHeld reportPeriod masterPeopleId location donor'
+      )
+      .sort({ name: 1 })
+      .lean();
+
+    const totalChurches = rows.reduce((sum, r) => sum + (r.numberOfChurches || 0), 0);
+
+    const engagements = rows.map((r) => {
+      let coordinates = null;
+      const coords = r.location && r.location.coordinates;
+      if (
+        Array.isArray(coords) &&
+        coords.length === 2 &&
+        !(coords[0] === 0 && coords[1] === 0)
+      ) {
+        coordinates = coords;
+      }
+      return {
+        id: String(r._id),
+        name: r.name,
+        villageName: r.villageName,
+        region: r.region,
+        countryCode: r.countryCode,
+        engagementStatus: r.engagementStatus,
+        numberOfChurches: r.numberOfChurches,
+        churchGeneration: r.churchGeneration,
+        reportPeriod: r.reportPeriod,
+        masterPeopleId: r.masterPeopleId ? String(r.masterPeopleId) : null,
+        coordinates,
+      };
+    });
+
+    res.json({
+      donor: name,
+      count: rows.length,
+      totalChurches,
+      engagements,
+    });
+  } catch (err) {
+    console.error('GET /donors/:name/engagements failed:', err);
+    res.status(500).json({ error: 'Failed to load donor engagements' });
+  }
+});
+
+// ── PATCH /engagements/:engagementId/assignments — edit donor/coordinator/planter with change history (admin/supervisor) ──
+router.patch('/engagements/:engagementId/assignments', auth, async (req, res, next) => {
+  try {
+    if (!req.user || !['admin', 'supervisor'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Admin ou superviseur requis' });
+    }
+
+    const eng = await PeopleGroup.findById(req.params.engagementId);
+    if (!eng) return res.status(404).json({ error: 'Not found' });
+
+    const changeDate = req.body.from ? new Date(req.body.from) : new Date();
+
+    const fields = [
+      ['donor', 'donorHistory'],
+      ['nationalCoordinator', 'nationalCoordinatorHistory'],
+      ['churchPlanter', 'churchPlanterHistory'],
+    ];
+
+    for (const [field, histField] of fields) {
+      if (req.body[field] === undefined) continue;
+
+      const newVal = String(req.body[field] || '').trim();
+      const curVal = String(eng[field] || '').trim();
+
+      if (newVal === curVal) continue; // no change
+
+      if (!Array.isArray(eng[histField])) eng[histField] = [];
+
+      if (eng[histField].length === 0 && curVal) {
+        // Seed the prior period from the existing scalar value
+        eng[histField].push({
+          value: curVal,
+          from: eng.createdAt || changeDate,
+          to: changeDate,
+          changedBy: req.user._id,
+          changedAt: new Date(),
+          note: 'seed',
+        });
+      } else {
+        // Close the currently-open period
+        const open = eng[histField].find((h) => h.to == null);
+        if (open) open.to = changeDate;
+      }
+
+      // Append the new period
+      eng[histField].push({
+        value: newVal,
+        from: changeDate,
+        to: null,
+        changedBy: req.user._id,
+        changedAt: new Date(),
+        note: req.body.note || '',
+      });
+
+      eng[field] = newVal;
+    }
+
+    await eng.save();
+    res.json(eng);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── PATCH /engagements/:engagementId/comment — edit the free-text "commentaire"
+// (PeopleGroup.description) shown at the bottom of the detail cards. Role-gated
+// to admin/supervisor; everyone else may only read it (via the profile route).
+router.patch('/engagements/:engagementId/comment', auth, async (req, res, next) => {
+  try {
+    if (!req.user || !['admin', 'supervisor'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden', message: 'Admin ou superviseur requis' });
+    }
+
+    const eng = await PeopleGroup.findById(req.params.engagementId);
+    if (!eng) return res.status(404).json({ error: 'Not found' });
+
+    eng.description = String(req.body.description || '');
+    await eng.save();
+    res.json(eng);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ── POST /recompute-rollups — recompute dmmRollup for all DMM peoples ────────
 // Finds all distinct master peoples that have DMM engagements and recomputes
 // each one's dmmRollup. Requires auth.
@@ -1123,6 +1265,8 @@ router.get('/:id/profile', async (req, res, next) => {
       };
 
       dmmDetail = {
+        id: rep._id,
+        _id: rep._id,
         engagementStatus: rep.engagementStatus || null,
         engagementLevel: rep.engagementLevel || null,
         numberOfChurches: dmm.totalChurches,
@@ -1141,6 +1285,7 @@ router.get('/:id/profile', async (req, res, next) => {
         urbanRural: rep.urbanRural || null,
         startYear: rep.startYear || null,
         population: rep.population || null,
+        engagementId: rep._id,
         peopleName: master.canonicalName,
         villages: engagements,
       };
@@ -1239,6 +1384,9 @@ router.get('/:id/profile', async (req, res, next) => {
               ? statusDetail.bibleStatus
               : (master.status ? master.status.bibleStatus : null)
           ),
+        // CPPI / IMB evangelical-engagement classification (null-safe).
+        cppiEvangelicalEngagement:
+          (master.referenceData && master.referenceData.cppiEvangelicalEngagement) || null,
       },
       sources: sourceRows,
       population: {

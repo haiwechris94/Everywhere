@@ -99,6 +99,13 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    loginHistory: [
+      {
+        at: { type: Date, default: Date.now },
+        ip: { type: String },
+        userAgent: { type: String },
+      },
+    ],
   },
   {
     timestamps: true,

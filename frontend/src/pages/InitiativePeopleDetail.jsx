@@ -7,6 +7,7 @@ import { initiativesApi } from '../services/reportingApi'
 import { StateLoading, StateError } from './geography/geoComponents'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../i18n'
+import StatusHeroCard from '../components/StatusHeroCard'
 
 // Recording lifecycle for an ESP300 set, with display labels + colour chips.
 const SET_STATUS_META = {
@@ -98,6 +99,24 @@ const InitiativePeopleDetail = () => {
           {engagement?.countryCode ? ` · ${engagement.countryCode}` : ''}
         </p>
       </div>
+
+      {/* Carte HERO « Statut » — statut = cycle de vie de la participation à l'initiative.
+          Les champs Joshua Project (échelle JP, % évangéliques, moins atteint) ne sont pas
+          exposés par cet endpoint et retombent donc sur « — ». */}
+      <StatusHeroCard
+        status={engagement?.status || status}
+        description={
+          (ENGAGEMENT_STATUS[engagement?.status || status]
+            ? (isFrench
+              ? ENGAGEMENT_STATUS[engagement?.status || status].fr
+              : ENGAGEMENT_STATUS[engagement?.status || status].en)
+            : undefined)
+        }
+        jpScale={null}
+        evangelical={null}
+        leastReached={null}
+        isFrench={isFrench}
+      />
 
       {/* Infos générales de l'engagement */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">

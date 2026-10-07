@@ -78,6 +78,11 @@ const ReferenceDataSchema = new Schema(
     percentChristian: { type: Number, default: null },
     percentEvangelical: { type: Number, default: null },
     bibleStatus: { type: String, default: null },      // JP BibleStatus code (0–5)
+    // CPPI (IMB / PeopleGroups.org) engagement status for the matched people,
+    // copied from the JP↔CPPI cross-reference column "CPPIEvangelicalEngagement"
+    // (e.g. "Engaged" / "Unengaged" / "Minimally Engaged"). Rendered as its own
+    // metrics card on the people fiche.
+    cppiEvangelicalEngagement: { type: String, default: null },
     latitude: { type: Number, default: null },
     longitude: { type: Number, default: null },
     updatedAt: { type: Date, default: null },
