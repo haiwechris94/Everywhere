@@ -89,7 +89,7 @@ const DMM_ENGAGEMENT_COLORS = {
   'tipping-point': '#22c55e',
   dmm: '#15803d',
   unreached: '#ef4444',
-  unknown: '#6366f1',
+  unknown: '#94a3b8',
 }
 const STATUS_COLORS = {
   UNREACHED: '#ef4444',
@@ -466,7 +466,7 @@ const CoverageLayer = ({ visible, countryCode, peoples, levelOverride, onPeopleC
             return `
               <div style="display:flex;align-items:center;gap:6px;font-size:11px;line-height:1.2;">
                 <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${pCfg.fill};flex-shrink:0;"></span>
-                <span class="${canNav ? 'cov-people-link' : ''}" data-pi="${pi}" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${canNav ? 'color:#4f46e5;cursor:pointer;text-decoration:underline;' : 'color:#374151;'}" title="${escAttr(p.name)}">${p.name}</span>
+                <span class="${canNav ? 'cov-people-link' : ''}" data-pi="${pi}" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${canNav ? 'color:#0C6A85;cursor:pointer;text-decoration:underline;' : 'color:#374151;'}" title="${escAttr(p.name)}">${p.name}</span>
               </div>`
           }).join('')
           return `
@@ -754,7 +754,7 @@ const KpiCard = ({ icon: Icon, label, value, color, theme }) => (
 
 const KpiBar = ({ stats, theme }) => (
   <div className="absolute top-16 right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1.5 sm:flex">
-    <KpiCard icon={Users} label="Peuples" value={stats.total.toLocaleString('fr-FR')} color="#6366f1" theme={theme} />
+    <KpiCard icon={Users} label="Peuples" value={stats.total.toLocaleString('fr-FR')} color="#0C6A85" theme={theme} />
     <KpiCard icon={MapPin} label="Non atteints" value={stats.unreached.toLocaleString('fr-FR')} color="#ef4444" theme={theme} />
     <KpiCard icon={Church} label="Atteints" value={stats.reached.toLocaleString('fr-FR')} color="#15803d" theme={theme} />
     <KpiCard icon={BarChart3} label="Population" value={formatCompact(stats.population)} color="#0ea5e9" theme={theme} />
@@ -863,7 +863,7 @@ const MiniViewport = ({ mainMap }) => {
   return (
     <Rectangle
       bounds={bounds}
-      pathOptions={{ color: '#6366f1', weight: 2, fillColor: '#6366f1', fillOpacity: 0.15 }}
+      pathOptions={{ color: '#0C6A85', weight: 2, fillColor: '#0C6A85', fillOpacity: 0.15 }}
     />
   )
 }

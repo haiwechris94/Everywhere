@@ -1,7 +1,7 @@
 /**
  * AnalyticsDashboard.jsx
  * Modern SaaS-style analytics dashboard for the Church Planting Map application.
- * Design system: Inter font, #5B5FEF primary, #FF6B4A secondary, #F5F7FB background
+ * Design system: see design-system/everywhere/MASTER.md (primary #0C6A85, accent #C2410C)
  */
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -60,14 +60,14 @@ const api = (url) => axios.get(url, {
 
 // ─── Design tokens ──────────────────────────────────────────────────────────
 const C = {
-  primary: '#5B5FEF',
-  secondary: '#FF6B4A',
-  bg: '#F5F7FB',
+  primary: '#0C6A85',
+  secondary: '#C2410C',
+  bg: '#F8FAFC',
   card: '#FFFFFF',
-  text: '#1A1A1A',
-  muted: '#6B7280',
-  success: '#10B981',
-  danger: '#EF4444',
+  text: '#1E293B',
+  muted: '#475569',
+  success: '#15803D',
+  danger: '#DC2626',
 }
 
 // ─── Engagement status constants ────────────────────────────────────────────
@@ -93,7 +93,7 @@ const Skeleton = ({ className = '' }) => (
 )
 
 // ─── Avatar circle ───────────────────────────────────────────────────────────
-const avatarColors = ['#5B5FEF','#FF6B4A','#10B981','#F59E0B','#8B5CF6','#EC4899']
+const avatarColors = ['#0C6A85','#C2410C','#15803D','#B45309','#0B566D','#475569']
 const Avatar = ({ letter, index = 0 }) => (
   <div
     className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
@@ -145,36 +145,18 @@ const AIAssistantCard = () => {
 
   return (
     <Card
-      className="relative overflow-hidden col-span-1 md:col-span-2 lg:col-span-1 row-span-1"
-      style={{
-        background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-        border: 'none',
-        minHeight: 220,
-      }}
+      className="relative overflow-hidden col-span-1 md:col-span-2 lg:col-span-1 row-span-1 !bg-primary-900 !border-primary-900 dark:!bg-primary-950 dark:!border-primary-800"
+      style={{ minHeight: 220 }}
     >
-      {/* Mesh / wave background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, #5B5FEF 0%, transparent 70%)' }} />
-        <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full opacity-15"
-          style={{ background: 'radial-gradient(circle, #FF6B4A 0%, transparent 70%)' }} />
-        <svg className="absolute inset-0 w-full h-full opacity-5" viewBox="0 0 400 220" preserveAspectRatio="none">
-          <path d="M0,80 C100,20 200,160 400,60 L400,220 L0,220 Z" fill="white" />
-          <path d="M0,140 C120,80 280,180 400,100 L400,220 L0,220 Z" fill="white" opacity="0.5" />
-        </svg>
-      </div>
-
-      {/* Glassmorphism inner panel */}
-      <div className="relative z-10 h-full flex flex-col justify-between">
+      <div className="h-full flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(91,95,239,0.4)', backdropFilter: 'blur(8px)' }}>
-              <Sparkles size={16} className="text-white" />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-white/10">
+              <Sparkles size={16} className="text-white" aria-hidden="true" />
             </div>
             <span className="text-white font-bold text-lg">AI Assistant</span>
           </div>
-          <p className="text-gray-500 dark:text-slate-400 text-sm leading-relaxed mb-4">
+          <p className="text-primary-100 text-sm leading-relaxed mb-4">
             Analyze mission progress, compare regions, people groups and church planting movements.
           </p>
 
@@ -190,8 +172,8 @@ const AIAssistantCard = () => {
                 <>
                   {(data?.insights || []).slice(0, 3).map((ins, i) => (
                     <div key={i} className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: '#FF6B4A' }} />
-                      <p className="text-gray-200 text-xs">{ins}</p>
+                      <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-accent-400" aria-hidden="true" />
+                      <p className="text-white text-xs">{ins}</p>
                     </div>
                   ))}
                   {(data?.alerts || []).map((alert, i) => (
@@ -215,15 +197,15 @@ const AIAssistantCard = () => {
         <div className="flex items-center justify-between">
           <button
             onClick={() => { setOpen(!open); if (!open) refetch() }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{ background: '#FF6B4A', boxShadow: '0 4px 15px rgba(255,107,74,0.4)' }}
+            aria-expanded={open}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent-600 text-white text-sm font-semibold transition-colors duration-150 hover:bg-accent-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-900"
           >
-            <Zap size={14} />
+            <Zap size={14} aria-hidden="true" />
             {open ? 'Hide insights' : 'Analyze data'}
           </button>
           {data?.aiPowered && (
-            <span className="text-xs text-gray-500 dark:text-slate-400/80 flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-              ✨ Powered by DeepSeek
+            <span className="text-xs text-primary-100 flex items-center gap-1 px-2 py-1 rounded-full bg-white/10">
+              <Sparkles size={12} aria-hidden="true" /> Powered by DeepSeek
             </span>
           )}
         </div>
@@ -426,8 +408,8 @@ const MovementGrowth = () => {
           <h3 className="font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Croissance DMM' : 'DMM Growth'}</h3>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{isFrench ? 'Progression du mouvement' : 'Movement progress'}</p>
         </div>
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-500/10">
-          <TrendingUp size={16} style={{ color: '#8B5CF6' }} />
+        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-50 dark:bg-primary-900/40">
+          <TrendingUp size={16} className="text-primary-700 dark:text-primary-200" aria-hidden="true" />
         </div>
       </div>
 
@@ -1058,8 +1040,8 @@ const JPCoverageWidget = ({ total = 0, engaged = 0, nonEngaged = 0 }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-sm">
-            <Globe size={18} className="text-white" />
+          <div className="w-9 h-9 rounded-xl bg-accent-50 flex items-center justify-center dark:bg-accent-900/40">
+            <Globe size={18} className="text-accent-700 dark:text-accent-300" aria-hidden="true" />
           </div>
           <div>
             <h3 className="font-bold text-gray-800 text-sm dark:text-slate-100">Peuples JP/IMB non-engagés</h3>
@@ -1216,12 +1198,12 @@ const EvolutionChart = () => {
           <AreaChart data={chartData} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradCumulative" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#5B5FEF" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#5B5FEF" stopOpacity={0} />
+                <stop offset="5%" stopColor="#0C6A85" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#0C6A85" stopOpacity={0.15} />
               </linearGradient>
               <linearGradient id="gradNew" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#FF6B4A" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#FF6B4A" stopOpacity={0} />
+                <stop offset="5%" stopColor="#C2410C" stopOpacity={0.1} />
+                <stop offset="95%" stopColor="#C2410C" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <XAxis
@@ -1240,14 +1222,14 @@ const EvolutionChart = () => {
             <Area
               type="monotone"
               dataKey="Total cumulé"
-              stroke="#5B5FEF"
+              stroke="#0C6A85"
               strokeWidth={2}
               fill="url(#gradCumulative)"
             />
             <Area
               type="monotone"
               dataKey="Nouveaux groupes"
-              stroke="#FF6B4A"
+              stroke="#C2410C"
               strokeWidth={2}
               fill="url(#gradNew)"
             />
@@ -1602,7 +1584,7 @@ const AnalyticsDashboard = () => {
   ], [peopleStats, villageStats])
 
   const isDark = useIsDark()
-  const T = isDark ? { primary: '#818cf8', secondary: '#fb7185', bg: '#0b1020', card: 'rgba(17,24,39,0.75)', text: '#e5e7eb', muted: '#94a3b8', success: '#34d399', danger: '#f87171' } : C
+  const T = isDark ? { primary: '#6cc5db', secondary: '#fb923c', bg: '#0f172a', card: '#1e293b', text: '#e5e7eb', muted: '#94a3b8', success: '#4ade80', danger: '#f87171' } : C
 
   return (
     <div className="min-h-screen -m-6 p-6 relative" style={{ background: T.bg }}>

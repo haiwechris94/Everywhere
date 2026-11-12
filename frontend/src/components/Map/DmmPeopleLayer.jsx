@@ -31,7 +31,7 @@ const DMM_STATUS_COLORS = {
   'midway': { fill: '#eab308', label: 'Mi-parcours' },
   'pioneer': { fill: '#f97316', label: 'Pionnier' },
   'unreached': { fill: '#ef4444', label: 'Non-atteint' },
-  'unknown': { fill: '#6366f1', label: 'Inconnu' },
+  'unknown': { fill: '#94a3b8', label: 'Inconnu' },
 }
 
 // PERF: cache one L.divIcon per status so we don't rebuild an icon per marker.

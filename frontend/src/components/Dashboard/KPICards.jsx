@@ -9,14 +9,34 @@ import { useMemo } from 'react'
 import { TrendingUp, Target, Layers, Users, Flag } from 'lucide-react'
 import { useLanguage } from '../../i18n'
 
-// NEW COLOR SYSTEM
+// Status colors are semantic (DMM stage) and always paired with the label.
+// Text uses -700 so small labels keep >= 4.5:1 on white.
 const STATUS_CONFIG = {
-  unreached:       { label: 'Non atteint',   gradient: 'from-red-500 to-rose-600',       light: 'bg-red-50',    text: 'text-red-600',    border: 'border-red-100' },
-  pioneer:         { label: 'Pioneer',        gradient: 'from-orange-400 to-orange-600',   light: 'bg-orange-50',  text: 'text-orange-600',  border: 'border-orange-100' },
-  midway:          { label: 'Midway',         gradient: 'from-yellow-400 to-yellow-600',    light: 'bg-yellow-50',   text: 'text-yellow-600',   border: 'border-yellow-100' },
-  'tipping-point': { label: 'Tipping Point',  gradient: 'from-emerald-400 to-emerald-600', light: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
-  dmm:             { label: 'DMM',            gradient: 'from-green-600 to-green-800',  light: 'bg-green-50',text: 'text-green-700',border: 'border-green-100' },
+  unreached:       { label: 'Non atteint',   bar: 'bg-red-600',    text: 'text-red-700 dark:text-red-300',       border: 'border-red-100 dark:border-red-900/50' },
+  pioneer:         { label: 'Pioneer',       bar: 'bg-orange-500', text: 'text-orange-700 dark:text-orange-300', border: 'border-orange-100 dark:border-orange-900/50' },
+  midway:          { label: 'Midway',        bar: 'bg-yellow-500', text: 'text-yellow-700 dark:text-yellow-300', border: 'border-yellow-100 dark:border-yellow-900/50' },
+  'tipping-point': { label: 'Tipping Point', bar: 'bg-green-500',  text: 'text-green-700 dark:text-green-300',   border: 'border-green-100 dark:border-green-900/50' },
+  dmm:             { label: 'DMM',           bar: 'bg-green-700',  text: 'text-green-800 dark:text-green-300',   border: 'border-green-100 dark:border-green-900/50' },
 }
+
+const TONES = {
+  primary: 'bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200',
+  success: 'bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+}
+
+/** Flat summary tile: white card, thin border, colored icon chip (MASTER.md: calm, no gradients). */
+const SummaryCard = ({ icon: Icon, label, value, hint, tone = 'primary' }) => (
+  <div className="rounded-2xl border border-neutral-200 bg-white p-5 flex items-center gap-4 dark:border-slate-700 dark:bg-slate-800">
+    <div className={`rounded-xl p-2.5 ${TONES[tone]}`}>
+      <Icon className="w-5 h-5" aria-hidden="true" />
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-medium uppercase tracking-wide text-neutral-600 dark:text-slate-400">{label}</p>
+      <p className="text-3xl font-bold text-neutral-900 dark:text-slate-100">{value}</p>
+      {hint && <p className="text-xs text-neutral-600 dark:text-slate-400 mt-0.5">{hint}</p>}
+    </div>
+  </div>
+)
 
 const KPICards = () => {
   const { t } = useLanguage()
@@ -113,10 +133,10 @@ const KPICards = () => {
           return (
             <div
               key={status}
-              className={`relative overflow-hidden rounded-2xl border ${cfg.border} bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-shadow group`}
+              className={`relative overflow-hidden rounded-2xl border ${cfg.border} bg-white dark:bg-slate-800`}
             >
               {/* Colored top bar */}
-              <div className={`h-1.5 w-full bg-gradient-to-r ${cfg.gradient}`} />
+              <div className={`h-1.5 w-full ${cfg.bar}`} aria-hidden="true" />
               <div className="p-4">
                 <p className={`text-xs font-semibold uppercase tracking-wider ${cfg.text} mb-2`}>
                   {cfg.label}
@@ -125,9 +145,9 @@ const KPICards = () => {
                   {count.toLocaleString()}
                 </p>
                 <div className="mt-3 flex items-center justify-between">
-                  <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mr-2">
+                  <div className="flex-1 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mr-2">
                     <div
-                      className={`h-1.5 rounded-full bg-gradient-to-r ${cfg.gradient} transition-all duration-500`}
+                      className={`h-1.5 rounded-full ${cfg.bar} transition-[width] duration-500`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -141,72 +161,36 @@ const KPICards = () => {
 
       {/* Summary row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Total */}
-        <div className="relative overflow-hidden rounded-2xl bg-primary-600 text-white shadow-md p-5 flex items-center gap-4">
-          <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
-            <Layers className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-indigo-200 uppercase tracking-wide">{t('dashboard.totalPeoples') || 'Total peoples'}</p>
-            <p className="text-3xl font-bold">{total.toLocaleString()}</p>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white dark:bg-slate-800/5 rounded-full" />
-        </div>
-
-        {/* Coverage */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-600 text-white shadow-md p-5 flex items-center gap-4">
-          <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
-            <TrendingUp className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-sky-200 uppercase tracking-wide">{t('dashboard.villageCoverage') || 'Village coverage'}</p>
-            <p className="text-3xl font-bold">{coveragePct}%</p>
-            <p className="text-xs text-sky-200 mt-0.5">{villages} / {totalVillages}</p>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white dark:bg-slate-800/5 rounded-full" />
-        </div>
-
-        {/* Saturation */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md p-5 flex items-center gap-4">
-          <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
-            <Target className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-emerald-200 uppercase tracking-wide">{t('dashboard.dmmSaturation') || 'DMM Saturation'}</p>
-            <p className="text-3xl font-bold">{satPct}%</p>
-            <p className="text-xs text-emerald-200 mt-0.5">{dmmCount} DMM / {total} total</p>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white dark:bg-slate-800/5 rounded-full" />
-        </div>
+        <SummaryCard icon={Layers} label={t('dashboard.totalPeoples') || 'Total peoples'} value={total.toLocaleString()} />
+        <SummaryCard
+          icon={TrendingUp}
+          label={t('dashboard.villageCoverage') || 'Village coverage'}
+          value={`${coveragePct}%`}
+          hint={`${villages} / ${totalVillages}`}
+        />
+        <SummaryCard
+          icon={Target}
+          tone="success"
+          label={t('dashboard.dmmSaturation') || 'DMM Saturation'}
+          value={`${satPct}%`}
+          hint={`${dmmCount} DMM / ${total} total`}
+        />
       </div>
 
       {/* Source breakdown row — IMB / PeopleGroups.org & Finishing the Task */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* IMB / PeopleGroups.org */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md p-5 flex items-center gap-4">
-          <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
-            <Users className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-emerald-100 uppercase tracking-wide">IMB / PeopleGroups.org</p>
-            <p className="text-3xl font-bold">{(bySource?.imb ?? 0).toLocaleString()}</p>
-            <p className="text-xs text-emerald-100 mt-0.5">{imbPct}% du total · groupes de personnes</p>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white dark:bg-slate-800/5 rounded-full" />
-        </div>
-
-        {/* Finishing the Task */}
-        <div className="relative overflow-hidden rounded-2xl bg-primary-600 text-white shadow-md p-5 flex items-center gap-4">
-          <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
-            <Flag className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-violet-100 uppercase tracking-wide">Finishing the Task</p>
-            <p className="text-3xl font-bold">{(bySource?.ftt ?? 0).toLocaleString()}</p>
-            <p className="text-xs text-violet-100 mt-0.5">{fttPct}% du total · UUPGs</p>
-          </div>
-          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white dark:bg-slate-800/5 rounded-full" />
-        </div>
+        <SummaryCard
+          icon={Users}
+          label="IMB / PeopleGroups.org"
+          value={(bySource?.imb ?? 0).toLocaleString()}
+          hint={`${imbPct}% du total · groupes de personnes`}
+        />
+        <SummaryCard
+          icon={Flag}
+          label="Finishing the Task"
+          value={(bySource?.ftt ?? 0).toLocaleString()}
+          hint={`${fttPct}% du total · UUPGs`}
+        />
       </div>
     </div>
   )

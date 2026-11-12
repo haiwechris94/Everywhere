@@ -321,7 +321,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000]">
       <div ref={dialogRef} className="bg-white rounded-xl shadow-soft-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-fade-in dark:bg-slate-800">
         {/* Header */}
-        <div className="p-4 border-b flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-xl">
+        <div className="p-4 border-b flex items-center justify-between bg-green-50 rounded-t-xl dark:bg-green-900/20 dark:border-slate-700">
           <div>
             <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 dark:text-slate-100">
               <Plus size={20} className="text-green-600 dark:text-green-300" />
@@ -421,7 +421,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
           </div>
           
           {/* Auto-calculated Status Preview */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200 dark:bg-green-900/20 dark:border-green-800">
             <p className="text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">Statut calculé automatiquement:</p>
             <div className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-full ${ENGAGEMENT_STATUS_COLORS[calculatedStatus.status]}`}></span>

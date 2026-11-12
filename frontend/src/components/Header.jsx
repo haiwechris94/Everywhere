@@ -64,7 +64,7 @@ const Header = ({ onMenuClick = () => {} }) => {
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-neutral-50 dark:hover:bg-slate-700 transition-all duration-150 border border-transparent hover:border-neutral-200 dark:hover:border-slate-600"
               aria-label="User menu"
             >
-              <div className="w-7 h-7 bg-gradient-to-br from-neutral-700 to-neutral-900 rounded-full flex items-center justify-center">
+              <div className="w-7 h-7 bg-neutral-800 rounded-full flex items-center justify-center">
                 <User size={14} className="text-white" />
               </div>
               <ChevronDown

@@ -511,7 +511,7 @@ const PeopleDetailLite = () => {
   const statusBorder = hexToRgba(statusHex, 0.35)       // bordure fine couleur-statut
   const statusChipBg = hexToRgba(statusHex, 0.1)        // fond des chips pâles
   const statusLabelColor = hexToRgba(statusHex, 0.85)   // petits libellés en couleur-statut
-  const statusGradient = `linear-gradient(90deg, ${statusHex} 0%, ${hexToRgba(statusHex, 0.82)} 100%)`
+  // Flat status band (MASTER.md: no gradients, no heavy shadows)
   // Progression de la jauge (jpScale / 5), bornée [0,1].
   const gaugeProgress = jpScaleValue != null ? Math.min(1, Math.max(0, Number(jpScaleValue) / 5)) : 0
   // PctEvangelicalRange : la fourchette officielle liée au JPScale sert de repli
@@ -804,7 +804,7 @@ const PeopleDetailLite = () => {
             {/* A) CARTE HERO « STATUT » : dégradé couleur-statut, jauge, panneau 3 stats. */}
             <div
               className="relative rounded-[20px] p-6 pb-24 text-white"
-              style={{ background: statusGradient, boxShadow: `0 10px 30px ${hexToRgba(statusHex, 0.35)}` }}
+              style={{ background: statusHex }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>

@@ -476,7 +476,7 @@ const Activities = () => {
             >
               <span className="w-2 h-2 rounded-full bg-current opacity-60"></span>
               {t('activities.filters.allTypes')}
-              <span className={`px-1.5 py-0.5 rounded-full text-xs ${typeFilter === '' ? 'bg-white dark:bg-slate-800/20' : 'bg-gray-200'}`}>
+              <span className={`px-1.5 py-0.5 rounded-full text-xs ${typeFilter === '' ? 'bg-white/20' : 'bg-gray-200 dark:bg-slate-700'}`}>
                 {activities.length}
               </span>
             </button>
@@ -499,7 +499,7 @@ const Activities = () => {
                   {type.label}
                   {count > 0 && (
                     <span className={`px-1.5 py-0.5 rounded-full text-xs ${
-                      typeFilter === type.value ? 'bg-white dark:bg-slate-800/50' : 'bg-gray-200'
+                      typeFilter === type.value ? 'bg-white/60' : 'bg-gray-200 dark:bg-slate-700'
                     }`}>
                       {count}
                     </span>
@@ -727,9 +727,9 @@ const Activities = () => {
                 </div>
                 <button aria-label={t('common.close')} 
                   onClick={resetForm} 
-                  className="p-2 hover:bg-white dark:bg-slate-800/20 rounded-lg transition-colors"
+                  className="p-2 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-slate-700"
                 >
-                  <X size={20} className="text-white" />
+                  <X size={20} className="text-neutral-600 dark:text-slate-300" aria-hidden="true" />
                 </button>
               </div>
             </div>

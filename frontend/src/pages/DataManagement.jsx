@@ -75,7 +75,7 @@ const EXPORT_FORMATS = [
     name: 'CSV',
     description: 'Format universel compatible avec tous les tableurs',
     icon: FileText,
-    color: 'from-green-500 to-emerald-600',
+    color: 'bg-green-700',
     bgColor: 'bg-green-50',
     textColor: 'text-green-700',
     borderColor: 'border-green-200',
@@ -85,7 +85,7 @@ const EXPORT_FORMATS = [
     name: 'Excel',
     description: 'Format Microsoft Excel avec mise en forme',
     icon: FileSpreadsheet,
-    color: 'from-blue-500 to-indigo-600',
+    color: 'bg-primary-600',
     bgColor: 'bg-blue-50',
     textColor: 'text-blue-700',
     borderColor: 'border-blue-200',
@@ -95,7 +95,7 @@ const EXPORT_FORMATS = [
     name: 'PDF',
     description: 'Document imprimable avec mise en page professionnelle',
     icon: Printer,
-    color: 'from-red-500 to-rose-600',
+    color: 'bg-red-700',
     bgColor: 'bg-red-50',
     textColor: 'text-red-700',
     borderColor: 'border-red-200',
@@ -460,11 +460,11 @@ const DataManagement = () => {
         <title>Peoples Data Export</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 20px; }
-          h1 { color: #4f46e5; border-bottom: 3px solid #4f46e5; padding-bottom: 10px; }
+          h1 { color: #0C6A85; border-bottom: 3px solid #0C6A85; padding-bottom: 10px; }
           .meta { color: #666; margin-bottom: 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 12px; }
-          th { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; }
+          th { background: #0C6A85; color: white; }
           tr:nth-child(even) { background-color: #f9fafb; }
           tr:hover { background-color: #f3f4f6; }
           .status-pioneer { color: #f97316; font-weight: bold; }
@@ -928,7 +928,7 @@ const DataManagement = () => {
                         disabled={isLoadingPeoples || !peoplesData?.length}
                         className={`group relative p-6 rounded-2xl border-2 ${format.borderColor} ${format.bgColor} hover:shadow-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
-                        <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${format.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                        <div className={`w-14 h-14 rounded-xl ${format.color} flex items-center justify-center mb-4`}>
                           <Icon size={28} className="text-white" />
                         </div>
                         <h4 className={`text-xl font-bold ${format.textColor} mb-2`}>{format.name}</h4>
@@ -968,7 +968,7 @@ const DataManagement = () => {
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                       <p className="text-sm text-gray-500 dark:text-slate-400">Régions uniques</p>
-                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+                      <p className="text-2xl font-bold text-primary-700 dark:text-primary-200">
                         {new Set(peoplesData.map(p => p.region).filter(Boolean)).size}
                       </p>
                     </div>
@@ -1045,8 +1045,8 @@ const DataManagement = () => {
                     {[
                       { label: 'Récupérés', value: jpStatus.progress.totalFetched, color: 'text-blue-700' },
                       { label: '✅ Créés', value: jpStatus.progress.created, color: 'text-green-700' },
-                      { label: '🔄 Mis à jour', value: jpStatus.progress.updated, color: 'text-purple-700' },
-                      { label: '❌ Erreurs', value: jpStatus.progress.errors, color: 'text-red-600' },
+                      { label: '🔄 Mis à jour', value: jpStatus.progress.updated, color: 'text-accent-700' },
+                      { label: '❌ Erreurs', value: jpStatus.progress.errors, color: 'text-red-700' },
                     ].map((s, i) => (
                       <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-3 text-center border border-blue-100 dark:border-blue-800">
                         <p className={`text-2xl font-bold ${s.color}`}>{s.value || 0}</p>

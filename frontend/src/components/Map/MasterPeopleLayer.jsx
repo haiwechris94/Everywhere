@@ -88,7 +88,7 @@ function MasterPeopleLayer({ markers = [], activeSources, onSelect }) {
                 if (!layer._ttBound) {
                   const sources = (m.sourceTypes || []).join(' + ') || '—'
                   layer.bindTooltip(
-                    `<div style="font-size:12px;line-height:1.4"><strong>${escapeHtml(m.name)}</strong><br/><span style="color:#6366f1">${escapeHtml(sources)}</span></div>`,
+                    `<div style="font-size:12px;line-height:1.4"><strong>${escapeHtml(m.name)}</strong><br/><span style="color:#0C6A85">${escapeHtml(sources)}</span></div>`,
                     { direction: 'top', offset: [0, -6], opacity: 0.95 }
                   )
                   layer._ttBound = true

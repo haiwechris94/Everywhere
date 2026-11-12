@@ -50,7 +50,6 @@ const ANALYSIS_CRITERIA = {
     title: 'Fondation DMM',
     titleEn: 'DMM FOUNDATION',
     icon: Target,
-    color: 'from-blue-500 to-indigo-600',
     criteria: [
       { id: 'prayer', label: 'Prière', labelEn: 'Prayer', weight: 2, description: 'Prière régulière pour le groupe de peuples et le travail' },
       { id: 'compassion', label: 'Compassion', labelEn: 'Compassion', weight: 2, description: 'Démonstration de l\'amour du Christ par des actes de service' },
@@ -61,7 +60,6 @@ const ANALYSIS_CRITERIA = {
     title: 'Formation de Disciples',
     titleEn: 'DISCIPLESHIP',
     icon: Users,
-    color: 'from-emerald-500 to-teal-600',
     criteria: [
       { id: 'dbs', label: 'EBD (Étude Biblique de Découverte)', labelEn: 'DBS (Discovery Bible Study)', weight: 3, description: 'Études bibliques de découverte régulières' },
       { id: 'obedience', label: 'Obéissance', labelEn: 'Obedience', weight: 2, description: 'Les croyants pratiquent l\'obéissance immédiate aux Écritures' },
@@ -72,7 +70,6 @@ const ANALYSIS_CRITERIA = {
     title: 'Multiplication',
     titleEn: 'MULTIPLICATION',
     icon: Zap,
-    color: 'from-purple-500 to-pink-600',
     criteria: [
       { id: 'church_gathering', label: 'Rassemblement d\'église', labelEn: 'Church Gathering', weight: 2, description: 'Rassemblements réguliers de croyants' },
       { id: 'leader_development', label: 'Développement de leaders', labelEn: 'Leader Development', weight: 3, description: 'Formation et autonomisation des leaders locaux' },
@@ -88,19 +85,11 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
   if (!analysis) return null
 
   const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-blue-600'
-    if (score >= 40) return 'text-yellow-600'
-    if (score >= 20) return 'text-orange-600'
-    return 'text-red-600'
-  }
-
-  const getScoreBgColor = (score) => {
-    if (score >= 80) return 'from-green-500 to-emerald-600'
-    if (score >= 60) return 'from-blue-500 to-indigo-600'
-    if (score >= 40) return 'from-yellow-500 to-orange-600'
-    if (score >= 20) return 'from-orange-500 to-red-600'
-    return 'from-red-500 to-rose-600'
+    if (score >= 80) return 'text-green-700 dark:text-green-300'
+    if (score >= 60) return 'text-primary-700 dark:text-primary-200'
+    if (score >= 40) return 'text-yellow-700 dark:text-yellow-300'
+    if (score >= 20) return 'text-orange-700 dark:text-orange-300'
+    return 'text-red-700 dark:text-red-300'
   }
 
   return (
@@ -426,11 +415,11 @@ const AnalyseQualitative = () => {
 
   // Get score color
   const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600 bg-green-100'
-    if (score >= 60) return 'text-blue-600 bg-blue-100'
-    if (score >= 40) return 'text-yellow-600 bg-yellow-100'
-    if (score >= 20) return 'text-orange-600 bg-orange-100'
-    return 'text-red-600 bg-red-100'
+    if (score >= 80) return 'text-green-800 bg-green-100'
+    if (score >= 60) return 'text-primary-800 bg-primary-100'
+    if (score >= 40) return 'text-yellow-800 bg-yellow-100'
+    if (score >= 20) return 'text-orange-800 bg-orange-100'
+    return 'text-red-800 bg-red-100'
   }
 
   // Get priority level
@@ -858,8 +847,8 @@ const AnalyseQualitative = () => {
           ) : (
             /* Results Tab - Expandable Country Groups */
             <div className="space-y-4">
-              <div className="bg-primary-50 rounded-xl p-5 border border-purple-200 mb-6 dark:bg-primary-900/30 dark:border-purple-800">
-                <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2 dark:text-purple-300">
+              <div className="bg-primary-50 rounded-xl p-5 border border-primary-100 mb-6 dark:bg-primary-900/30 dark:border-primary-800">
+                <h3 className="font-bold text-primary-800 mb-2 flex items-center gap-2 dark:text-primary-200">
                   <Award size={20} />
                   {language === 'fr' ? 'Résultats d\'Analyse par Pays' : 'Analysis Results by Country'}
                 </h3>

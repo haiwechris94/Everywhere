@@ -23,6 +23,12 @@ export default {
         // Les anciennes teintes d'interface (blue / indigo) sont unifiées sur la primaire
         blue: PRIMARY,
         indigo: PRIMARY,
+        // Idem pour les bleus-verts dispersés (sky / cyan / teal) : une seule teinte d'interface
+        sky: PRIMARY,
+        cyan: PRIMARY,
+        teal: PRIMARY,
+        // Un seul vert : emerald suit green (succès = green-700, voir MASTER.md)
+        emerald: colors.green,
         // Une seule famille de gris dans toute l'appli (slate)
         gray: colors.slate,
         neutral: colors.slate,

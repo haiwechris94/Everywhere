@@ -358,7 +358,7 @@ const PeopleDetail = () => {
                     className="h-[260px] w-full object-cover sm:h-[290px]"
                   />
                 ) : (
-                  <div className="flex h-[260px] w-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-500 dark:text-slate-400 sm:h-[290px]">
+                  <div className="flex h-[260px] w-full items-center justify-center bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 sm:h-[290px]">
                     <Users size={48} />
                   </div>
                 )}

@@ -181,8 +181,8 @@ const openPeopleSheet = (pg, { isFrench, shareUrl }) => {
   .sec{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;margin:0 0 8px}
   .foot{padding:16px 24px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:#6b7280}
   .btns{margin:18px auto 0;max-width:640px;display:flex;gap:10px;justify-content:center}
-  .btn{appearance:none;border:1px solid #c7d2fe;background:#4f46e5;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
-  a{color:#4f46e5}
+  .btn{appearance:none;border:1px solid #0C6A85;background:#0C6A85;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+  a{color:#0C6A85}
   @media print{ body{background:#fff} .btns{display:none} .sheet{border:none;margin:0} }
 </style></head>
 <body>
@@ -355,7 +355,7 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
           {getCountryFlag(pg.countryCode)}
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-semibold text-neutral-900 group-hover:text-indigo-700 dark:text-slate-100">
+          <h3 className="truncate font-semibold text-neutral-900 group-hover:text-primary-700 dark:text-slate-100">
             {pg.name || (isFrench ? 'Sans nom' : 'Unnamed')}
           </h3>
           {location && <p className="truncate text-xs text-neutral-500">{location}</p>}
@@ -728,7 +728,7 @@ const PeopleGroupsList = () => {
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Flag size={14} /> {isFrench ? 'Engagés' : 'Engaged'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-indigo-600 dark:text-indigo-300">{kpis.engaged}</div>
+            <div className="mt-1 text-2xl font-bold text-primary-600 dark:text-primary-300">{kpis.engaged}</div>
             <div className="text-xs text-neutral-500">{kpis.engagedPct}% {isFrench ? 'du total' : 'of total'}</div>
           </div>
 

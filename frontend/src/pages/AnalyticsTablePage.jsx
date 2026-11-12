@@ -69,16 +69,16 @@ const AnalyticsTablePage = () => {
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[560px]">
               {[
-                { label: 'Rows', value: stats.total, icon: MapPin, tone: 'from-sky-500 to-cyan-500' },
-                { label: 'With data', value: stats.withData, icon: Filter, tone: 'from-emerald-500 to-green-500' },
-                { label: 'Reached', value: stats.reached, icon: Users, tone: 'from-violet-500 to-indigo-500' },
-                { label: 'In progress', value: stats.inProgress, icon: Loader2, tone: 'from-orange-500 to-amber-500' },
+                { label: 'Rows', value: stats.total, icon: MapPin, tone: 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200' },
+                { label: 'With data', value: stats.withData, icon: Filter, tone: 'bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200' },
+                { label: 'Reached', value: stats.reached, icon: Users, tone: 'bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-300' },
+                { label: 'In progress', value: stats.inProgress, icon: Loader2, tone: 'bg-accent-50 text-accent-700 dark:bg-accent-900/40 dark:text-accent-300' },
               ].map((card) => (
                 <div key={card.label} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-4">
                   <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     <span>{card.label}</span>
-                    <span className={`rounded-full bg-gradient-to-r ${card.tone} p-2 text-white`}>
-                      <card.icon className="h-3.5 w-3.5" />
+                    <span className={`rounded-full ${card.tone} p-2`}>
+                      <card.icon className="h-3.5 w-3.5" aria-hidden="true" />
                     </span>
                   </div>
                   <div className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">{card.value}</div>

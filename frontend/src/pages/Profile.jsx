@@ -434,7 +434,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl hover:from-red-700 hover:to-orange-700 transition-all font-medium disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium disabled:opacity-50"
                 >
                   {isChangingPassword ? t('profile.changingPassword') : t('profile.changePassword')}
                 </button>
@@ -448,8 +448,8 @@ const Profile = () => {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
-              <Settings size={20} className="text-purple-600 dark:text-purple-400" />
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/50 rounded-xl">
+              <Settings size={20} className="text-primary-700 dark:text-primary-200" aria-hidden="true" />
             </div>
             {t('profile.preferences')}
           </h2>

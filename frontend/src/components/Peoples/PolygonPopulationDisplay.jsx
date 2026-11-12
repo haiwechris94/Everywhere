@@ -163,7 +163,7 @@ const PolygonPopulationDisplay = ({
           <div className="text-xs text-gray-500 uppercase tracking-wide">Households</div>
         </div>
         <div className="bg-gray-50 rounded-lg p-3 text-center dark:bg-slate-900">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-300">
+          <div className="text-2xl font-bold text-primary-700 dark:text-primary-200">
             {totals.totalBelievers?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-gray-500 uppercase tracking-wide">Believers</div>

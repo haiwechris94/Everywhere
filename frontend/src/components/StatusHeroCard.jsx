@@ -105,7 +105,7 @@ export default function StatusHeroCard({
   // Carte Joshua Project : on colore sur l'échelle JP (reached-status), pas sur
   // le vocabulaire DMM. Un appelant « engagement » peut forcer via statusHexOverride.
   const statusHex = statusHexOverride || jpReachedHexFor(displayStatus)
-  const statusGradient = `linear-gradient(90deg, ${statusHex} 0%, ${hexToRgba(statusHex, 0.82)} 100%)`
+  // Flat status band (MASTER.md: no gradients, no heavy shadows)
 
   // Progression de la jauge (jpScale / 5), bornée [0,1].
   const gaugeProgress = gaugeProgressOverride != null ? Math.min(1, Math.max(0, Number(gaugeProgressOverride))) : (jpScale != null ? Math.min(1, Math.max(0, Number(jpScale) / 5)) : 0)
@@ -137,7 +137,7 @@ export default function StatusHeroCard({
   return (
     <div
       className={`relative rounded-[20px] p-6 pb-24 text-white ${className}`}
-      style={{ background: statusGradient, boxShadow: `0 10px 30px ${hexToRgba(statusHex, 0.35)}` }}
+      style={{ background: statusHex }}
     >
       <div className="flex items-start justify-between gap-4">
         <div>

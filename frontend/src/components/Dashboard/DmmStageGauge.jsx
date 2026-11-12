@@ -131,7 +131,7 @@ const DmmStageGauge = ({ engagements = [], isFrench = true, title }) => {
 
   // Valeur et couleur retenues selon le mode de la bascule.
   const displayProgress = centerMode === 'weighted' ? progress : dominantProgress
-  const displayColor = centerMode === 'weighted' ? '#6366f1' : dominantColor
+  const displayColor = centerMode === 'weighted' ? '#0C6A85' : dominantColor
   const centerSubLabel =
     centerMode === 'weighted'
       ? (isFrench ? 'Moyenne pondérée' : 'Weighted average')
