@@ -36,7 +36,7 @@ export default function DonorEngagements() {
       </button>
 
       <div className="mb-4">
-        <h1 className="text-xl font-bold">{isFrench ? `Engagements soutenus par ${displayName}` : `Engagements supported by ${displayName}`}</h1>
+        <h1 className="page-title">{isFrench ? `Engagements soutenus par ${displayName}` : `Engagements supported by ${displayName}`}</h1>
         {!isLoading && !error && (
           <p className="text-sm text-gray-500">
             {data?.count ?? 0} engagement{(data?.count ?? 0) > 1 ? 's' : ''}
@@ -52,7 +52,7 @@ export default function DonorEngagements() {
       )}
 
       {error && (
-        <p className="py-10 text-red-600">{isFrench ? 'Erreur de chargement des engagements.' : 'Error loading engagements.'}</p>
+        <p className="py-10 text-red-600 dark:text-red-300">{isFrench ? 'Erreur de chargement des engagements.' : 'Error loading engagements.'}</p>
       )}
 
       {!isLoading && !error && engagements.length === 0 && (
@@ -60,9 +60,9 @@ export default function DonorEngagements() {
       )}
 
       {!isLoading && !error && engagements.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500">
+            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500 dark:bg-slate-900">
               <tr>
                 <th className="px-3 py-2">Engagement</th>
                 <th className="px-3 py-2">Village</th>
@@ -73,31 +73,31 @@ export default function DonorEngagements() {
                 <th className="px-3 py-2">{isFrench ? 'Période' : 'Period'}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
               {engagements.map((e) => (
-                <tr key={e.id} className="hover:bg-gray-50">
+                <tr key={e.id} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                   <td className="px-3 py-2 font-medium">
                     {/* Le nom de l'engagement mène à SA fiche (fiche Engagement). */}
-                    <Link to={`/engagements/${e.id}`} className="text-blue-600 hover:underline">
+                    <Link to={`/engagements/${e.id}`} className="text-blue-600 hover:underline dark:text-blue-300">
                       {e.villageName || e.name}
                     </Link>
                   </td>
-                  <td className="px-3 py-2 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600 dark:text-slate-300">
                     {e.villageName ? (
                       <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-gray-400" /> {e.villageName}
+                        <MapPin className="h-3 w-3 text-gray-500 dark:text-slate-400" /> {e.villageName}
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="px-3 py-2 text-gray-600">{e.region || '—'}</td>
+                  <td className="px-3 py-2 text-gray-600 dark:text-slate-300">{e.region || '—'}</td>
                   <td className="px-3 py-2"><DmmStatusDot engagement={e} /></td>
                   <td className="px-3 py-2 text-right">
                     <span className="inline-flex items-center gap-1">
-                      <Church className="h-3 w-3 text-gray-400" /> {e.numberOfChurches ?? 0}
+                      <Church className="h-3 w-3 text-gray-500 dark:text-slate-400" /> {e.numberOfChurches ?? 0}
                     </span>
                   </td>
                   <td className="px-3 py-2 text-right">{e.churchGeneration ?? 0}</td>
-                  <td className="px-3 py-2 text-gray-600">{e.reportPeriod || '—'}</td>
+                  <td className="px-3 py-2 text-gray-600 dark:text-slate-300">{e.reportPeriod || '—'}</td>
                 </tr>
               ))}
             </tbody>

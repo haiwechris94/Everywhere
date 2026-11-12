@@ -102,7 +102,7 @@ const CountryPeoples = () => {
         <Link to={`/regions/${region?.id}`} className="hover:text-slate-700">{region?.name}</Link> / {country.name || country.nameEn}
       </p>
       <div>
-        <h1 className="text-4xl font-bold text-slate-900">{country.name || country.nameEn}</h1>
+        <h1 className="page-title">{country.name || country.nameEn}</h1>
       </div>
 
       {/* Cartes de métriques : une seule grille fluide. Les groupes bleu (ligne 1)
@@ -120,7 +120,7 @@ const CountryPeoples = () => {
           type="button"
           onClick={() => setShowAllMetrics((v) => !v)}
           aria-expanded={showAllMetrics}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-800"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-800 dark:text-slate-300"
         >
           {showAllMetrics ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           {showAllMetrics ? (isFrench ? 'Voir moins de métriques' : 'View fewer metrics') : (isFrench ? 'Voir plus de métriques' : 'View more metrics')}
@@ -129,10 +129,10 @@ const CountryPeoples = () => {
 
       {/* Tableau DMM coloré (étape × niveau) — mêmes couleurs/structure que le
           Global Dashboard, mais avec les chiffres des engagements DE CE PAYS. */}
-      <div className="border-t border-slate-200 mb-4" />
+      <div className="border-t border-slate-200 mb-4 dark:border-slate-700" />
       {editingPerson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto dark:bg-slate-800">
             <PeopleForm
               mode="edit"
               isFrench={isFrench}
@@ -151,7 +151,7 @@ const CountryPeoples = () => {
         </div>
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
           <DmmProgressTable
             engagements={dmmEngagementsQuery.data || []}
             isFrench={isFrench}
@@ -177,12 +177,12 @@ const CountryPeoples = () => {
             className="flex w-full items-center gap-2 text-left"
           >
             {peoplesOpen ? (
-              <ChevronDown size={20} className="text-blue-600" />
+              <ChevronDown size={20} className="text-blue-600 dark:text-blue-300" />
             ) : (
-              <ChevronRight size={20} className="text-blue-600" />
+              <ChevronRight size={20} className="text-blue-600 dark:text-blue-300" />
             )}
-            <span className="text-base font-semibold text-black uppercase">{isFrench ? 'Peuples' : 'People groups'}</span>
-            <span className="text-slate-400 text-sm">
+            <span className="text-base font-semibold text-black uppercase dark:text-slate-100">{isFrench ? 'Peuples' : 'People groups'}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : dmmPeoples.length})
             </span>
           </button>
@@ -198,7 +198,7 @@ const CountryPeoples = () => {
               <div className="mt-4 overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200">
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
                       <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
                       <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'engagements" : '# engagements'}</th>
                       <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
@@ -216,19 +216,19 @@ const CountryPeoples = () => {
                       const jpScale = p.status?.jpScale ?? p.reference?.jpScale ?? null
                       const jpStatus = jpStageFor(jpScale) || 'UNKNOWN'
                       return (
-                        <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                        <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors dark:border-slate-700 dark:hover:bg-slate-700">
                           <td className="py-3 pr-4">
                             <Link
                               to={`/regions/${regionId}/countries/${countryCode}/peoples/${p.masterPeopleId}`}
-                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                             >
                               {p.canonicalName}
                             </Link>
                           </td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.engagementCount ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.totalChurches ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.dmm?.maxGeneration ?? 0)}</td>
-                          <td className="py-3 pl-4 text-left text-slate-700">
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(p.dmm?.engagementCount ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(p.dmm?.totalChurches ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(p.dmm?.maxGeneration ?? 0)}</td>
+                          <td className="py-3 pl-4 text-left text-slate-700 dark:text-slate-300">
                             <StatusBadge status={`${jpStatus} (JP)`} />
                           </td>
                           {canManage && (
@@ -236,7 +236,7 @@ const CountryPeoples = () => {
                               <button
                                 type="button"
                                 onClick={() => setEditingPerson(p)}
-                                className="mr-2 rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                className="btn-secondary btn-sm mr-2"
                               >
                                 {isFrench ? 'Modifier' : 'Edit'}
                               </button>
@@ -251,7 +251,7 @@ const CountryPeoples = () => {
                                     alert(e?.response?.data?.message || (isFrench ? 'Suppression impossible' : 'Delete failed'))
                                   }
                                 }}
-                                className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                                className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-300"
                               >
                                 {isFrench ? 'Supprimer' : 'Delete'}
                               </button>
@@ -276,12 +276,12 @@ const CountryPeoples = () => {
             className="flex w-full items-center gap-2 text-left"
           >
             {engagementsOpen ? (
-              <ChevronDown size={20} className="text-blue-600" />
+              <ChevronDown size={20} className="text-blue-600 dark:text-blue-300" />
             ) : (
-              <ChevronRight size={20} className="text-blue-600" />
+              <ChevronRight size={20} className="text-blue-600 dark:text-blue-300" />
             )}
-            <span className="text-base font-semibold text-black uppercase">Engagements</span>
-            <span className="text-slate-400 text-sm">
+            <span className="text-base font-semibold text-black uppercase dark:text-slate-100">Engagements</span>
+            <span className="text-slate-500 dark:text-slate-400 text-sm">
               ({peoplesQuery.isLoading ? '…' : engagements.length})
             </span>
           </button>
@@ -297,7 +297,7 @@ const CountryPeoples = () => {
               <div className="mt-4 overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200">
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
                       <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "Nom de l'engagement" : 'Engagement name'}</th>
                       <th className="py-2 px-6 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[7rem]">{isFrench ? "# d'églises" : '# churches'}</th>
                       <th className="py-2 px-6 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 min-w-[6rem]">Max Gen</th>
@@ -311,25 +311,25 @@ const CountryPeoples = () => {
                       const engName = [e.peopleName, e.villageName].filter(Boolean).join(', ') || e.name
                       const level = dmmLevelForEngagement(e)
                       return (
-                      <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                      <tr key={e.peopleGroupId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors dark:border-slate-700 dark:hover:bg-slate-700">
                         <td className="py-3 pr-4">
                           {/* Le nom d'un engagement mène désormais vers la FICHE
                               DE L'ENGAGEMENT (et non plus vers celle du peuple). */}
                           {e.peopleGroupId ? (
                             <Link
                               to={`/regions/${regionId}/countries/${countryCode}/peoples/${e.masterPeopleId}/engagements/${e.peopleGroupId}`}
-                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                             >
                               {engName}
                             </Link>
                           ) : (
-                            <span className="font-medium text-slate-700">{engName}</span>
+                            <span className="font-medium text-slate-700 dark:text-slate-300">{engName}</span>
                           )}
                         </td>
-                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700">{fmt(e.numberOfChurches ?? 0)}</td>
-                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700">{fmt(e.churchGeneration ?? 0)}</td>
-                        <td className="py-3 px-6 text-left text-slate-700">{level ? dmmLevelLabel(level, isFrench) : '—'}</td>
-                        <td className="py-3 pl-6 text-left text-slate-700"><DmmStatusBadge engagement={e} /></td>
+                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(e.numberOfChurches ?? 0)}</td>
+                        <td className="py-3 px-6 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(e.churchGeneration ?? 0)}</td>
+                        <td className="py-3 px-6 text-left text-slate-700 dark:text-slate-300">{level ? dmmLevelLabel(level, isFrench) : '—'}</td>
+                        <td className="py-3 pl-6 text-left text-slate-700 dark:text-slate-300"><DmmStatusBadge engagement={e} /></td>
                       </tr>
                       )
                     })}

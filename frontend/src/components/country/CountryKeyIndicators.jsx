@@ -44,7 +44,7 @@ function IndicatorCard({ card }) {
   const Icon = iconFor(card.label)
   const accent = ACCENTS[card.accent] || ACCENTS.slate
   return (
-    <div className="flex items-center gap-3 rounded-[16px] border border-[#DCE6F5] bg-white p-4 shadow-[0_2px_10px_rgba(30,60,120,0.05)]">
+    <div className="flex items-center gap-3 rounded-[16px] border border-[#DCE6F5] bg-white p-4 shadow-[0_2px_10px_rgba(30,60,120,0.05)] dark:bg-slate-800">
       <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${accent}`}>
         <Icon size={20} />
       </span>
@@ -75,7 +75,7 @@ export default function CountryKeyIndicators({ country = null, primaryCards = []
   const shown = showMore ? [...base, ...extra] : base
 
   return (
-    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-6 shadow-[0_4px_20px_rgba(30,60,120,0.06)]">
+    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-6 shadow-[0_4px_20px_rgba(30,60,120,0.06)] dark:bg-slate-800">
       <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-[#0F2A5C]">
         {isFrench ? 'Indicateurs clés' : 'Key indicators'}
       </h3>

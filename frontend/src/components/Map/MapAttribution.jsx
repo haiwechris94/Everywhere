@@ -19,7 +19,7 @@ const AttributionLink = ({ href, children }) => (
     href={href}
     target="_blank"
     rel="noopener noreferrer"
-    className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+    className="text-blue-600 hover:text-blue-800 hover:underline transition-colors dark:text-blue-300"
   >
     {children}
   </a>
@@ -70,7 +70,7 @@ const MapAttribution = ({
             <AttributionLink href="https://joshuaproject.net">
               Joshua Project
             </AttributionLink>
-            <span className="text-gray-400">|</span>
+            <span className="text-gray-500 dark:text-slate-400">|</span>
           </span>
         )}
         
@@ -110,7 +110,7 @@ export const MapAttributionCompact = ({ className = '' }) => (
       bg-white/80
       px-2 py-0.5
       rounded
-      text-[10px] text-gray-500
+      text-xs text-gray-500
       ${className}
     `}
   >
@@ -130,13 +130,13 @@ MapAttributionCompact.propTypes = {
  */
 export const MapAttributionFull = ({ className = '' }) => (
   <div className={`bg-gray-50 rounded-lg p-4 text-sm ${className}`}>
-    <h4 className="font-semibold text-gray-800 mb-2">Data Sources & Attribution</h4>
+    <h4 className="font-semibold text-gray-800 mb-2 dark:text-slate-100">Data Sources & Attribution</h4>
     
     <div className="space-y-3">
       {/* Joshua Project */}
       <div className="border-l-2 border-blue-500 pl-3">
-        <h5 className="font-medium text-gray-700">People Groups Data</h5>
-        <p className="text-gray-600 text-xs mt-1">
+        <h5 className="font-medium text-gray-700 dark:text-slate-300">People Groups Data</h5>
+        <p className="text-gray-600 text-xs mt-1 dark:text-slate-300">
           Unreached people groups data is provided by{' '}
           <AttributionLink href="https://joshuaproject.net">
             Joshua Project
@@ -151,8 +151,8 @@ export const MapAttributionFull = ({ className = '' }) => (
       
       {/* OpenStreetMap */}
       <div className="border-l-2 border-green-500 pl-3">
-        <h5 className="font-medium text-gray-700">Map Tiles</h5>
-        <p className="text-gray-600 text-xs mt-1">
+        <h5 className="font-medium text-gray-700 dark:text-slate-300">Map Tiles</h5>
+        <p className="text-gray-600 text-xs mt-1 dark:text-slate-300">
           Map data ©{' '}
           <AttributionLink href="https://www.openstreetmap.org/copyright">
             OpenStreetMap

@@ -172,7 +172,7 @@ const VillageDetail = () => {
         <div className="text-red-500 mb-4">
           <X size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">{isFrench ? 'Village non trouvé' : 'Village not found'}</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{isFrench ? 'Village non trouvé' : 'Village not found'}</h3>
         <p className="text-gray-500 mt-2">{isFrench ? "Ce village n'existe pas ou a été supprimé" : 'This village does not exist or has been deleted'}</p>
         <Link to="/villages" className="btn-primary mt-4 inline-block">
           Retour aux villages
@@ -188,12 +188,12 @@ const VillageDetail = () => {
         <div className="flex items-center gap-4">
           <button aria-label={t('common.back')}
             onClick={() => navigate('/villages')}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 hover:bg-gray-100 rounded-lg dark:hover:bg-slate-700"
           >
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="page-title">
               {isEditing ? (
                 <input
                   type="text"
@@ -234,7 +234,7 @@ const VillageDetail = () => {
               </button>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="btn-secondary text-red-600 hover:bg-red-50 flex items-center gap-2"
+                className="btn-secondary text-red-600 hover:bg-red-50 flex items-center gap-2 dark:text-red-300"
               >
                 <Trash2 size={18} />
                 Supprimer
@@ -247,8 +247,8 @@ const VillageDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">{isFrench ? 'Informations générales' : 'General information'}</h3>
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Informations générales' : 'General information'}</h3>
             
             {isEditing ? (
               <div className="space-y-4">
@@ -337,15 +337,15 @@ const VillageDetail = () => {
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Users size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Users size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">Population</p>
                       <p className="text-lg font-semibold">{village.population?.toLocaleString() || 'N/A'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Home size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Home size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">{isFrench ? 'Statut' : 'Status'}</p>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusBgColors[village.status]}`}>
@@ -356,8 +356,8 @@ const VillageDetail = () => {
                   </div>
                 </div>
                 {village.location && (
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <MapPin size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <MapPin size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">{isFrench ? 'Coordonnées' : 'Coordinates'}</p>
                       <p className="font-medium">
@@ -367,9 +367,9 @@ const VillageDetail = () => {
                   </div>
                 )}
                 {village.description && (
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
                     <p className="text-sm text-gray-500 mb-2">Description</p>
-                    <p className="text-gray-700">{village.description}</p>
+                    <p className="text-gray-700 dark:text-slate-300">{village.description}</p>
                   </div>
                 )}
               </div>
@@ -377,24 +377,24 @@ const VillageDetail = () => {
           </div>
 
           {/* Activities */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Activités récentes' : 'Recent activities'}</h3>
-              <Link to={`/activities?village=${id}`} className="text-primary-600 text-sm hover:underline">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{isFrench ? 'Activités récentes' : 'Recent activities'}</h3>
+              <Link to={`/activities?village=${id}`} className="text-primary-600 text-sm hover:underline dark:text-primary-300">
                 Voir tout
               </Link>
             </div>
             {activities && activities.length > 0 ? (
               <div className="space-y-3">
                 {activities.map((activity) => (
-                  <div key={activity._id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="p-2 bg-primary-100 rounded-lg">
-                      <Activity size={16} className="text-primary-600" />
+                  <div key={activity._id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <div className="p-2 bg-primary-100 rounded-lg dark:bg-primary-900/40">
+                      <Activity size={16} className="text-primary-600 dark:text-primary-300" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800">{activity.type}</p>
+                      <p className="font-medium text-gray-800 dark:text-slate-100">{activity.type}</p>
                       <p className="text-sm text-gray-500">{activity.description}</p>
-                      <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                         <Calendar size={12} />
                         {format(new Date(activity.date), 'dd MMMM yyyy', { locale: fr })}
                       </p>
@@ -414,10 +414,10 @@ const VillageDetail = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Churches */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Églises' : 'Churches'}</h3>
-              <span className="bg-primary-100 text-primary-600 px-2 py-1 rounded-full text-sm font-medium">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{isFrench ? 'Églises' : 'Churches'}</h3>
+              <span className="bg-primary-100 text-primary-600 px-2 py-1 rounded-full text-sm font-medium dark:bg-primary-900/40 dark:text-primary-300">
                 {churches?.length || 0}
               </span>
             </div>
@@ -427,11 +427,11 @@ const VillageDetail = () => {
                   <Link
                     key={church._id}
                     to={`/churches/${church._id}`}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors dark:bg-slate-900 dark:hover:bg-slate-700"
                   >
-                    <Church size={20} className="text-green-600" />
+                    <Church size={20} className="text-green-600 dark:text-green-300" />
                     <div>
-                      <p className="font-medium text-gray-800">{church.name}</p>
+                      <p className="font-medium text-gray-800 dark:text-slate-100">{church.name}</p>
                       {church.pastor && (
                         <p className="text-sm text-gray-500">Pasteur: {church.pastor}</p>
                       )}
@@ -448,8 +448,8 @@ const VillageDetail = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">{isFrench ? 'Statistiques' : 'Statistics'}</h3>
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Statistiques' : 'Statistics'}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-gray-500">{isFrench ? 'Églises' : 'Churches'}</span>
@@ -475,9 +475,9 @@ const VillageDetail = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le village' : 'Delete village'}</h3>
-            <p className="text-gray-600 mb-6">
+          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-soft-xl w-full max-w-md p-6 animate-fade-in dark:bg-slate-800">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Supprimer le village' : 'Delete village'}</h3>
+            <p className="text-gray-600 mb-6 dark:text-slate-300">
               {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{village.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}
             </p>
             <div className="flex gap-3">
@@ -490,7 +490,7 @@ const VillageDetail = () => {
               <button
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                className="btn-danger btn-sm flex-1"
               >
                 {deleteMutation.isPending ? (isFrench ? 'Suppression...' : 'Deleting...') : (isFrench ? 'Supprimer' : 'Delete')}
               </button>

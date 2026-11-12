@@ -51,7 +51,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
       />
       
       {/* Modal */}
-      <div ref={dialogRef} className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
+      <div ref={dialogRef} className="relative bg-white dark:bg-slate-800 rounded-xl shadow-soft-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div 
           className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between"
@@ -73,7 +73,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
           </div>
           <button aria-label={isFrench ? "Fermer" : "Close"}
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-full transition-colors dark:hover:bg-slate-700"
           >
             <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           </button>
@@ -83,10 +83,10 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-primary-600 dark:text-primary-300" />
             </div>
           ) : error ? (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300">
               Erreur: {error.message}
             </div>
           ) : data ? (
@@ -121,7 +121,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                 <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin className="w-4 h-4 text-gray-500 dark:text-slate-400" />
-                    <span className="text-sm font-medium text-gray-700">{isFrench ? 'Localisation' : 'Location'}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{isFrench ? 'Localisation' : 'Location'}</span>
                   </div>
                   <div className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                     {data.region && <p>Région: <span className="font-medium">{data.region}</span></p>}
@@ -133,7 +133,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
 
               {/* Status Breakdown */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2 dark:text-slate-300">
                   <TrendingUp className="w-4 h-4" />
                   Répartition par statut
                 </h3>
@@ -170,7 +170,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
               {/* People Groups List */}
               {data.peopleGroups && data.peopleGroups.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3 dark:text-slate-300">
                     {isFrench ? 'Groupes de peuples' : 'People groups'} ({data.peopleGroups.length})
                   </h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">

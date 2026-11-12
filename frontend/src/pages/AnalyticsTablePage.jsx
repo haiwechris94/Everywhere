@@ -60,10 +60,10 @@ const AnalyticsTablePage = () => {
         <div className="mb-6 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700">
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:bg-indigo-900/30 dark:border-indigo-800 dark:text-indigo-300">
                 <SlidersHorizontal className="h-3.5 w-3.5" /> Analytics Table
               </div>
-              <h1 className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">Village and People Analytics</h1>
+              <h1 className="page-title">Village and People Analytics</h1>
               <p className="mt-2 max-w-3xl text-sm text-slate-500 dark:text-slate-400">A dedicated table view for monitoring village and people engagement with status-colored columns, search, and quick filters.</p>
             </div>
 
@@ -91,16 +91,16 @@ const AnalyticsTablePage = () => {
         <div className="mb-4 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
           <div className="grid gap-3 lg:grid-cols-[1.4fr_repeat(2,minmax(180px,240px))]">
             <label className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3">
-              <Search className="h-4 w-4 text-slate-400" />
+              <Search className="h-4 w-4 text-slate-500 dark:text-slate-400" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search villages, regions, countries..." className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400" />
             </label>
 
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-sm text-slate-700 outline-none">
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-sm text-slate-700 outline-none dark:text-slate-300">
               <option value="all">All status</option>
               {Object.entries(STATUS_META).map(([key, meta]) => <option key={key} value={key}>{meta.label}</option>)}
             </select>
 
-            <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-sm text-slate-700 outline-none">
+            <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 text-sm text-slate-700 outline-none dark:text-slate-300">
               <option value="all">All sources</option>
               <option value="dmm">DMM</option>
               <option value="joshua-project">Joshua Project</option>
@@ -114,35 +114,35 @@ const AnalyticsTablePage = () => {
               <thead className="bg-slate-900 text-white">
                 <tr>
                   {['Village', 'Country', 'Region', 'People Group', 'Status', 'Population', 'Churches', 'Coverage', 'Saturation'].map((head) => (
-                    <th key={head} className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{head}</th>
+                    <th key={head} className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{head}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100 bg-white dark:bg-slate-800 dark:divide-slate-700">
                 {isLoading ? Array.from({ length: 8 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {Array.from({ length: 9 }).map((__, j) => <td key={j} className="px-4 py-4"><div className="h-4 rounded bg-slate-200" /></td>)}
                   </tr>
                 )) : error ? (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-sm text-red-600">Failed to load analytics table.</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-sm text-red-600 dark:text-red-300">Failed to load analytics table.</td></tr>
                 ) : rows.length === 0 ? (
                   <tr><td colSpan={9} className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">No rows match the current filters.</td></tr>
                 ) : rows.map((row, idx) => {
                   const meta = STATUS_META[row.status] || { label: row.status || 'Unknown', chip: 'bg-slate-100 dark:bg-slate-800 text-slate-700 border-slate-200 dark:border-slate-700', cell: 'text-slate-700 bg-slate-50 dark:bg-slate-900' }
                   return (
-                    <tr key={`${row.name}-${idx}`} className="transition-colors hover:bg-slate-50 dark:bg-slate-900">
+                    <tr key={`${row.name}-${idx}`} className="transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-700">
                       <td className="px-4 py-4">
                         <div className="font-semibold text-slate-900 dark:text-slate-100">{row.name}</div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">{row.parentName || row.district || row.department || '-'}</div>
                       </td>
                       <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">{row.country || '-'}</td>
                       <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-400">{row.region || row.department || '-'}</td>
-                      <td className="px-4 py-4 text-sm text-slate-700">{row.peopleGroup || row.peopleGroupName || '-'}</td>
+                      <td className="px-4 py-4 text-sm text-slate-700 dark:text-slate-300">{row.peopleGroup || row.peopleGroupName || '-'}</td>
                       <td className="px-4 py-4"><span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${meta.chip}`}><span className={`inline-block h-2 w-2 shrink-0 rounded-full ${meta.dot}`} aria-hidden="true" />{meta.label}</span></td>
                       <td className="px-4 py-4 text-right text-sm font-medium text-slate-800 dark:text-slate-100">{Number(row.population || 0).toLocaleString()}</td>
                       <td className="px-4 py-4 text-right text-sm font-medium text-slate-800 dark:text-slate-100">{Number(row.churches || 0).toLocaleString()}</td>
                       <td className="px-4 py-4 text-right"><span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${meta.cell}`}>{formatPercent(row.withDataPercentage)}</span></td>
-                      <td className="px-4 py-4 text-right"><span className="inline-flex rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-700">{formatPercent(row.saturationPercentage)}</span></td>
+                      <td className="px-4 py-4 text-right"><span className="inline-flex rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-slate-300">{formatPercent(row.saturationPercentage)}</span></td>
                     </tr>
                   )
                 })}

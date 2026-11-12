@@ -323,15 +323,15 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div ref={dialogRef} className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div ref={dialogRef} className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto dark:bg-slate-800">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-800">
+          <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between dark:bg-slate-800">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-slate-100">
               Add Population Data
             </h2>
             <button aria-label={t('common.close')}
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 p-1"
+              className="text-gray-500 dark:text-slate-400 hover:text-gray-600 p-1"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -343,7 +343,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Data Type Selection */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Type de données
               </h3>
               
@@ -399,7 +399,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               </div>
               
               {/* Source indicator */}
-              <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-md">
+              <p className="text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-md dark:bg-slate-900">
                 <span className="font-medium">Source:</span>{' '}
                 {dataType === 'survey' ? 'Survey' : (user?.organization || 'DMM')}
               </p>
@@ -407,14 +407,14 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Basic Information
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Name */}
                 <div>
-                  <label htmlFor="add-people-modal-name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -435,10 +435,10 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Village Name - Dropdown filtered by country */}
                 <div>
-                  <label htmlFor="add-people-modal-village-name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-village-name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Village Name
                     {loadingVillages && (
-                      <span className="ml-2 text-xs text-gray-400">(Loading...)</span>
+                      <span className="ml-2 text-xs text-gray-500 dark:text-slate-400">(Loading...)</span>
                     )}
                   </label>
                   <div className="relative">
@@ -452,11 +452,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                         // Also update formData for manual entry
                         setFormData(prev => ({ ...prev, villageName: e.target.value }))
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     />
                     {/* Dropdown list */}
                     {villageSearchTerm && filteredVillages.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
                         {filteredVillages.map((village) => (
                           <button
                             key={village._id}
@@ -483,7 +483,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     )}
                     {/* No results message */}
                     {villageSearchTerm && filteredVillages.length === 0 && villages.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-sm text-gray-500">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-sm text-gray-500 dark:bg-slate-800 dark:border-slate-700">
                         No villages found matching "{villageSearchTerm}"
                       </div>
                     )}
@@ -497,7 +497,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Status */}
                 <div>
-                  <label htmlFor="add-people-modal-status" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-status" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Status
                   </label>
                   <select
@@ -505,7 +505,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                   >
                     {STATUS_OPTIONS.map(option => (
                       <option key={option.value} value={option.value}>
@@ -517,7 +517,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Polygon ID */}
                 <div>
-                  <label htmlFor="add-people-modal-polygon-id" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-polygon-id" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Polygon ID
                   </label>
                   <input
@@ -526,7 +526,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="polygonId"
                     value={formData.polygonId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'ID du polygone associé' : 'Associated polygon ID'}
                   />
                 </div>
@@ -535,13 +535,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Population Data */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Population Data
               </h3>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label htmlFor="add-people-modal-population" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-population" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Population
                   </label>
                   <input
@@ -562,7 +562,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-households" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-households" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Households
                   </label>
                   <input
@@ -572,13 +572,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.households}
                     onChange={handleChange}
                     min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder="0"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-believers" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-believers" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Believers
                   </label>
                   <input
@@ -588,13 +588,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.believersCount}
                     onChange={handleChange}
                     min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder="0"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-churches" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-churches" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Churches
                   </label>
                   <input
@@ -604,7 +604,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     value={formData.churchesCount}
                     onChange={handleChange}
                     min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder="0"
                   />
                 </div>
@@ -615,7 +615,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 <button
                   type="button"
                   onClick={() => setShowDemographics(!showDemographics)}
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 dark:text-blue-300"
                 >
                   <svg 
                     className={`w-4 h-4 transition-transform ${showDemographics ? 'rotate-90' : ''}`} 
@@ -631,9 +631,9 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
               {/* Demographics Fields */}
               {showDemographics && (
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
                   <div>
-                    <label htmlFor="add-people-modal-male" className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-male" className="block text-xs font-medium text-gray-600 mb-1 dark:text-slate-300">
                       Male
                     </label>
                     <input
@@ -643,12 +643,12 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                       value={formData.demographics.maleCount}
                       onChange={handleChange}
                       min="0"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label htmlFor="add-people-modal-female" className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-female" className="block text-xs font-medium text-gray-600 mb-1 dark:text-slate-300">
                       Female
                     </label>
                     <input
@@ -658,12 +658,12 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                       value={formData.demographics.femaleCount}
                       onChange={handleChange}
                       min="0"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label htmlFor="add-people-modal-children" className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-children" className="block text-xs font-medium text-gray-600 mb-1 dark:text-slate-300">
                       Children
                     </label>
                     <input
@@ -673,12 +673,12 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                       value={formData.demographics.childrenCount}
                       onChange={handleChange}
                       min="0"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label htmlFor="add-people-modal-adults" className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-adults" className="block text-xs font-medium text-gray-600 mb-1 dark:text-slate-300">
                       Adults
                     </label>
                     <input
@@ -688,12 +688,12 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                       value={formData.demographics.adultsCount}
                       onChange={handleChange}
                       min="0"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label htmlFor="add-people-modal-elderly" className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-elderly" className="block text-xs font-medium text-gray-600 mb-1 dark:text-slate-300">
                       Elderly
                     </label>
                     <input
@@ -703,7 +703,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                       value={formData.demographics.elderlyCount}
                       onChange={handleChange}
                       min="0"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
                       placeholder="0"
                     />
                   </div>
@@ -713,13 +713,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Cultural Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Cultural Information
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label htmlFor="add-people-modal-language" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-language" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Language
                   </label>
                   <input
@@ -728,13 +728,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="language"
                     value={formData.language}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Langue principale' : 'Primary language'}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-religion" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-religion" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Religion
                   </label>
                   <input
@@ -743,13 +743,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="religion"
                     value={formData.religion}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Religion principale' : 'Primary religion'}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-ethnicity" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-ethnicity" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Ethnicity
                   </label>
                   <input
@@ -758,7 +758,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="ethnicity"
                     value={formData.ethnicity}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Groupe ethnique' : 'Ethnic group'}
                   />
                 </div>
@@ -767,13 +767,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Location Information */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Location
               </h3>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label htmlFor="add-people-modal-country" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-country" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Country
                   </label>
                   <select
@@ -781,7 +781,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                   >
                     <option value="">Select country...</option>
                     {COUNTRY_OPTIONS.map(country => (
@@ -793,7 +793,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-region" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-region" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Region
                   </label>
                   <input
@@ -802,13 +802,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="region"
                     value={formData.region}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Région' : 'Region'}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-departement" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-departement" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Departement
                   </label>
                   <input
@@ -817,13 +817,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="departement"
                     value={formData.departement}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Département' : 'Departement'}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-arrondissement" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-arrondissement" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Arrondissement
                   </label>
                   <input
@@ -832,7 +832,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="arrondissement"
                     value={formData.arrondissement}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Arrondissement' : 'Arrondissement'}
                   />
                 </div>
@@ -841,7 +841,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               {/* Coordinates */}
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <label htmlFor="add-people-modal-latitude" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-latitude" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Latitude
                   </label>
                   <input
@@ -850,7 +850,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     step="any"
                     value={latitude}
                     onChange={(e) => setLatitude(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder="e.g., 5.9631"
                   />
                   <p className="mt-1 text-xs text-gray-500">
@@ -859,7 +859,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
                 
                 <div>
-                  <label htmlFor="add-people-modal-longitude" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-longitude" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Longitude
                   </label>
                   <input
@@ -868,7 +868,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     step="any"
                     value={longitude}
                     onChange={(e) => setLongitude(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder="e.g., 10.1591"
                   />
                   <p className="mt-1 text-xs text-gray-500">
@@ -878,7 +878,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               </div>
               
               {latitude && longitude && (
-                <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-md flex items-center gap-2">
+                <p className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded-md flex items-center gap-2 dark:bg-green-900/30 dark:text-green-300">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -890,13 +890,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Data Source */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">
+              <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide dark:text-slate-300">
                 Data Source
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="add-people-modal-source" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-source" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Source
                   </label>
                   <input
@@ -905,13 +905,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     name="dataSource"
                     value={formData.dataSource}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Source des données (ex. Recensement 2020)' : 'Data source (e.g., Census 2020)'}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="add-people-modal-year" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-year" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                     Year
                   </label>
                   <input
@@ -922,7 +922,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     onChange={handleChange}
                     min="1900"
                     max="2100"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                     placeholder={isFrench ? 'Année' : 'Year'}
                   />
                 </div>
@@ -931,7 +931,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Description */}
             <div>
-              <label htmlFor="add-people-modal-description-notes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-people-modal-description-notes" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                 Description / Notes
               </label>
               <textarea
@@ -940,7 +940,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
                 placeholder={isFrench ? 'Notes ou description supplémentaires...' : 'Additional notes or description...'}
               />
             </div>
@@ -950,14 +950,14 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                className="btn-secondary btn-sm"
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="btn-primary btn-sm gap-2"
                 disabled={loading}
               >
                 {loading && (

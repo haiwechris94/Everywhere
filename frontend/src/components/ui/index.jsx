@@ -234,7 +234,7 @@ export const ToggleSwitch = ({
       >
         <span className={`toggle-switch-handle ${checked ? 'toggle-switch-handle-on' : 'toggle-switch-handle-off'}`} />
       </button>
-      {label && <span className="text-sm font-medium text-neutral-700">{label}</span>}
+      {label && <span className="text-sm font-medium text-neutral-700 dark:text-slate-300">{label}</span>}
     </label>
   );
 };
@@ -268,7 +268,7 @@ export const Input = React.forwardRef(({
       {label && <label htmlFor={id} className="form-label">{label}</label>}
       <div className="relative">
         {leftIcon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400">
             {leftIcon}
           </div>
         )}
@@ -281,7 +281,7 @@ export const Input = React.forwardRef(({
           {...props}
         />
         {rightIcon && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400">
             {rightIcon}
           </div>
         )}

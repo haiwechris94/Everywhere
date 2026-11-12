@@ -147,12 +147,12 @@ const DmmStageGauge = ({ engagements = [], isFrench = true, title }) => {
   const dash = Math.max(0, Math.min(1, displayProgress)) * c
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col dark:bg-slate-800 dark:border-slate-700">
       <div className="flex items-center justify-between gap-3 mb-2">
         <h3 className="text-base font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-100">
           {heading}
         </h3>
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {countWithStage} {isFrench ? 'engagements' : 'engagements'}
         </span>
       </div>
@@ -214,7 +214,7 @@ const DmmStageGauge = ({ engagements = [], isFrench = true, title }) => {
             <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">
               {Math.round(displayProgress * 100)}%
             </span>
-            <span className="mt-1 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+            <span className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
               {centerSubLabel}
             </span>
           </div>
@@ -225,7 +225,7 @@ const DmmStageGauge = ({ engagements = [], isFrench = true, title }) => {
           <div className="text-2xl font-bold" style={{ color: dominantColor }}>
             {dominantLabel}
           </div>
-          <div className="text-sm text-slate-400 mt-1">
+          <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {isFrench ? 'Stade DMM dominant' : 'Dominant DMM stage'}
           </div>
         </div>
@@ -251,7 +251,7 @@ const DmmStageGauge = ({ engagements = [], isFrench = true, title }) => {
 
       {/* Comparaison : valeur de l'AUTRE mode (non sélectionné), en petit. */}
       {countWithStage > 0 && (
-        <div className="mt-3 text-center text-xs text-slate-400">
+        <div className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
           {centerMode === 'weighted'
             ? (isFrench
                 ? `Stade dominant : ${Math.round(dominantProgress * 100)}% (${dominantLabel})`

@@ -77,15 +77,15 @@ const TileLayerSwitcher = ({ value = 'positron', onChange, t }) => {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="bg-white rounded-lg shadow-md border border-neutral-100 p-2.5 hover:bg-neutral-50 transition-all flex items-center gap-1.5"
+        className="bg-white rounded-lg shadow-md border border-neutral-100 p-2.5 hover:bg-neutral-50 transition-all flex items-center gap-1.5 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700"
         title={t ? t('map.controls.layers') || 'Layers' : 'Layers'}
         aria-label="Tile layer switcher"
       >
-        <Layers size={18} className="text-neutral-600" />
+        <Layers size={18} className="text-neutral-600 dark:text-slate-300" />
         <CurrentIcon size={14} className="text-neutral-500 hidden sm:block" />
       </button>
       {open && (
-        <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl shadow-xl border border-neutral-100 overflow-hidden z-[1003]">
+        <div className="absolute right-0 mt-1.5 w-40 bg-white rounded-xl shadow-xl border border-neutral-100 overflow-hidden z-[1003] dark:bg-slate-800 dark:border-slate-700">
           {Object.values(TILE_PROVIDERS).map((p) => {
             const Icon = p.icon
             const active = p.key === value
@@ -102,7 +102,7 @@ const TileLayerSwitcher = ({ value = 'positron', onChange, t }) => {
                     : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
-                <Icon size={14} className={active ? 'text-primary-600' : 'text-neutral-400'} />
+                <Icon size={14} className={active ? 'text-primary-600' : 'text-neutral-500 dark:text-slate-400'} />
                 <span className="flex-1">{label(p)}</span>
                 {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-600" />}
               </button>

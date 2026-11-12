@@ -157,20 +157,8 @@ const Profile = () => {
     return name.substring(0, 2).toUpperCase()
   }
 
-  // Generate avatar color based on name
-  const getAvatarColor = (name) => {
-    if (!name) return 'from-gray-400 to-gray-500'
-    const colors = [
-      'from-indigo-500 to-purple-600',
-      'from-blue-500 to-cyan-600',
-      'from-emerald-500 to-teal-600',
-      'from-orange-500 to-red-600',
-      'from-pink-500 to-rose-600',
-      'from-violet-500 to-purple-600',
-    ]
-    const index = name.charCodeAt(0) % colors.length
-    return colors[index]
-  }
+  // Avatar : aplat de la couleur primaire (design system : pas de dégradés)
+  const getAvatarColor = () => 'bg-primary-600'
 
   if (!user) {
     return (
@@ -185,7 +173,7 @@ const Profile = () => {
       {/* Profile Header Card */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
         {/* Gradient Banner */}
-        <div className="h-32 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 relative">
+        <div className="h-32 bg-primary-600 relative">
           <div className="absolute inset-0 bg-black/10"></div>
           {/* Edit Button */}
           {!isEditing && (
@@ -202,15 +190,15 @@ const Profile = () => {
         {/* Profile Info */}
         <div className="px-6 pb-6">
           {/* Avatar */}
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-16 relative z-10">
-            <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${getAvatarColor(user.name)} flex items-center justify-center text-white text-3xl font-bold shadow-xl border-4 border-white dark:border-gray-800`}>
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 -mt-16 relative z-10">
+            <div className={`w-28 h-28 rounded-2xl ${getAvatarColor(user.name)} flex items-center justify-center text-white text-3xl font-bold shadow-xl border-4 border-white dark:border-gray-800`}>
               {getInitials(user.name)}
             </div>
-            <div className="flex-1 pb-2">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
+            <div className="flex-1 pb-2 sm:pt-[4.5rem]">
+              <h1 className="page-title">{user.name}</h1>
               <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
             </div>
-            <div className="pb-2">
+            <div className="pb-2 sm:pt-[4.5rem]">
               <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${roleColors[user.role] || roleColors.viewer}`}>
                 <Shield size={16} />
                 {roleLabels[user.role] || user.role}
@@ -237,7 +225,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-fullname" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.fullName')}</label>
                 <div className="relative">
-                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-fullname"
                     type="text"
@@ -251,7 +239,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.email')}</label>
                 <div className="relative">
-                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-email"
                     type="email"
@@ -265,7 +253,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-organization" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.organization')}</label>
                 <div className="relative">
-                  <Building size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Building size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-organization"
                     type="text"
@@ -279,7 +267,7 @@ const Profile = () => {
               <div className="flex gap-3 pt-4">
                 <button 
                   onClick={handleCancel} 
-                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium flex items-center justify-center gap-2"
+                  className="btn-secondary py-3 flex-1 gap-2"
                 >
                   <X size={18} />
                   {t('common.cancel')}
@@ -287,7 +275,7 @@ const Profile = () => {
                 <button
                   onClick={handleSave}
                   disabled={isUpdating}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Save size={18} />
                   {isUpdating ? t('common.saving') : t('common.save')}
@@ -304,7 +292,7 @@ const Profile = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.fullName')}</p>
                   <p className="font-semibold text-gray-900 dark:text-white">{user.name}</p>
                 </div>
-                <ChevronRight size={18} className="text-gray-300 dark:text-gray-600" />
+                <ChevronRight size={18} className="text-gray-500 dark:text-gray-600" />
               </div>
 
               <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group">
@@ -315,7 +303,7 @@ const Profile = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.email')}</p>
                   <p className="font-semibold text-gray-900 dark:text-white">{user.email}</p>
                 </div>
-                <ChevronRight size={18} className="text-gray-300 dark:text-gray-600" />
+                <ChevronRight size={18} className="text-gray-500 dark:text-gray-600" />
               </div>
 
               {user.organization && (
@@ -327,7 +315,7 @@ const Profile = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.organization')}</p>
                     <p className="font-semibold text-gray-900 dark:text-white">{user.organization}</p>
                   </div>
-                  <ChevronRight size={18} className="text-gray-300 dark:text-gray-600" />
+                  <ChevronRight size={18} className="text-gray-500 dark:text-gray-600" />
                 </div>
               )}
             </div>
@@ -370,7 +358,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-currentpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.currentPassword')}</label>
                 <div className="relative">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-currentpassword"
                     type={showCurrentPassword ? 'text' : 'password'}
@@ -382,7 +370,7 @@ const Profile = () => {
                   <button aria-label={showCurrentPassword ? t('common.hidePassword') : t('common.showPassword')}
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
                     {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -392,7 +380,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-newpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.newPassword')}</label>
                 <div className="relative">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-newpassword"
                     type={showNewPassword ? 'text' : 'password'}
@@ -405,7 +393,7 @@ const Profile = () => {
                   <button aria-label={showNewPassword ? t('common.hidePassword') : t('common.showPassword')}
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
                     {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -416,7 +404,7 @@ const Profile = () => {
               <div>
                 <label htmlFor="profile-confirmpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.confirmPassword')}</label>
                 <div className="relative">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     id="profile-confirmpassword"
                     type="password"
@@ -439,7 +427,7 @@ const Profile = () => {
                       confirmPassword: '',
                     })
                   }}
-                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                  className="btn-secondary py-3 flex-1"
                 >
                   {t('common.cancel')}
                 </button>
@@ -499,7 +487,7 @@ const Profile = () => {
                 }`}
               >
                 {isDarkMode ? (
-                  <Moon size={14} className="text-indigo-600" />
+                  <Moon size={14} className="text-indigo-600 dark:text-indigo-300" />
                 ) : (
                   <Sun size={14} className="text-yellow-500" />
                 )}
@@ -524,7 +512,7 @@ const Profile = () => {
           {user.createdAt && (
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
               <div className="flex items-center gap-3">
-                <Calendar size={18} className="text-gray-400" />
+                <Calendar size={18} className="text-gray-500 dark:text-slate-400" />
                 <span className="text-gray-600 dark:text-gray-400">{t('profile.accountCreated')}</span>
               </div>
               <span className="font-semibold text-gray-900 dark:text-white">
@@ -539,7 +527,7 @@ const Profile = () => {
           {user.lastLogin && (
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
               <div className="flex items-center gap-3">
-                <Clock size={18} className="text-gray-400" />
+                <Clock size={18} className="text-gray-500 dark:text-slate-400" />
                 <span className="text-gray-600 dark:text-gray-400">{t('profile.lastLogin')}</span>
               </div>
               <span className="font-semibold text-gray-900 dark:text-white">

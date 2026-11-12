@@ -1,5 +1,21 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import translations from './translations'
+import extraTranslations from './translationsExtra'
+
+// Fusion profonde : translations.js garde la priorité, translationsExtra.js
+// comble les clés manquantes (sinon l'écran affiche la clé brute).
+const deepMerge = (base, over) => {
+  const out = { ...base }
+  for (const key of Object.keys(over || {})) {
+    const a = out[key]
+    const b = over[key]
+    out[key] = a && b && typeof a === 'object' && typeof b === 'object' ? deepMerge(a, b) : b
+  }
+  return out
+}
+const MERGED = Object.fromEntries(
+  Object.keys(translations).map((lang) => [lang, deepMerge(extraTranslations[lang] || {}, translations[lang])])
+)
 
 const LanguageContext = createContext(null)
 
@@ -35,7 +51,7 @@ export const LanguageProvider = ({ children }) => {
   })
 
   // Get current translations based on selected language
-  const currentTranslations = translations[language]
+  const currentTranslations = MERGED[language]
 
   // Function to change language
   const setLanguage = useCallback((newLanguage) => {

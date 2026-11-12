@@ -85,7 +85,7 @@ const SourceDonutChart = ({ peopleGroups = [] }) => {
     <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 relative z-10 dark:bg-slate-900/60 dark:border dark:border-white/10 dark:shadow-[0_0_25px_-5px_rgba(99,102,241,0.45)] dark:ring-1 dark:ring-indigo-500/20">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
-          <Database size={18} className="text-primary-600" />
+          <Database size={18} className="text-primary-600 dark:text-primary-300" />
           {t('dashboard.bySource') || 'Répartition par source'}
         </h3>
         <span className="text-xs text-slate-500 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 dark:text-slate-300 dark:bg-white/5 dark:border-white/10">
@@ -94,7 +94,7 @@ const SourceDonutChart = ({ peopleGroups = [] }) => {
       </div>
 
       {chartData.length === 0 ? (
-        <div className="h-56 flex items-center justify-center text-sm text-slate-400 dark:text-slate-500">
+        <div className="h-56 flex items-center justify-center text-sm text-slate-500 dark:text-slate-500">
           {t('dashboard.noData') || 'Aucune donnée'}
         </div>
       ) : (
@@ -128,7 +128,7 @@ const SourceDonutChart = ({ peopleGroups = [] }) => {
                 <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} />
                 <span className="text-xs text-slate-600 dark:text-slate-300 truncate">{item.label}</span>
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 ml-auto">
-                  {item.value} <span className="text-slate-400 dark:text-slate-500 font-normal">· {item.pct}%</span>
+                  {item.value} <span className="text-slate-500 dark:text-slate-500 font-normal">· {item.pct}%</span>
                 </span>
               </div>
             ))}

@@ -20,6 +20,9 @@ import {
   BarChart3,
   Database,
   Flag,
+  Users,
+  HeartHandshake,
+  Map as MapIcon,
   PanelLeftClose,
   PanelLeftOpen,
   ChevronDown,
@@ -30,7 +33,7 @@ const COLLAPSE_KEY = 'sidebar.collapsed'
 
 const TopNavbar = () => {
   const { user, logout } = useAuth()
-  const { t } = useLanguage()
+  const { t, isFrench } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -39,38 +42,38 @@ const TopNavbar = () => {
     try { return localStorage.getItem(COLLAPSE_KEY) === 'true' } catch { return false }
   })
   const [mainOpen, setMainOpen] = useState(true)
-  const [reportingOpen, setReportingOpen] = useState(false)
-  const [managementOpen, setManagementOpen] = useState(false)
+  const [reportingOpen, setReportingOpen] = useState(true)
+  const [managementOpen, setManagementOpen] = useState(true)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef(null)
 
   const navGroups = [
     {
-      title: 'MAIN',
+      title: isFrench ? 'Explorer' : 'Explore',
       open: mainOpen,
       setOpen: setMainOpen,
       items: [
-        { path: '/regions', label: 'Regions', icon: Globe },
+        { path: '/regions', label: isFrench ? 'Régions' : 'Regions', icon: Globe },
         { path: '/countries', label: t('nav.countries') || 'Countries', icon: Flag },
-        { path: '/people-groups', label: t('nav.peopleGroups') || 'Peuples', icon: Globe },
-        { path: '/engagements', label: t('nav.engagements') || 'Engagements', icon: FolderKanban },
+        { path: '/people-groups', label: t('nav.peopleGroups') || 'Peuples', icon: Users },
+        { path: '/engagements', label: t('nav.engagements') || 'Engagements', icon: HeartHandshake },
         { path: '/persons', label: t('nav.persons') || 'Personnes', icon: User },
         { path: '/initiatives', label: 'Initiatives', icon: FolderKanban },
-        { path: '/unified-map', label: t('nav.unifiedMap') || 'Mapping', icon: MapPin },
+        { path: '/unified-map', label: isFrench ? 'Carte' : 'Map', icon: MapIcon },
       ],
     },
     {
-      title: 'REPORTING',
+      title: isFrench ? 'Rapports' : 'Reports',
       open: reportingOpen,
       setOpen: setReportingOpen,
       items: [
         { path: '/dmm-reporting', label: t('nav.dmmReporting') || 'Data Reporting', icon: BarChart3 },
         { path: '/activities', label: t('nav.activities') || 'Activities', icon: Activity },
-        { path: '/dashboard', label: 'Global Dashboard', icon: LayoutDashboard, exact: true },
+        { path: '/dashboard', label: isFrench ? 'Tableau de bord' : 'Dashboard', icon: LayoutDashboard, exact: true },
       ],
     },
     {
-      title: 'MANAGEMENT',
+      title: isFrench ? 'Gestion' : 'Manage',
       open: managementOpen,
       setOpen: setManagementOpen,
       items: [
@@ -134,16 +137,19 @@ const TopNavbar = () => {
         to={item.path}
         onClick={() => setMobileOpen(false)}
         title={collapsed ? item.label : undefined}
+        aria-label={collapsed ? item.label : undefined}
+        aria-current={active ? 'page' : undefined}
         className={
-          `flex items-center gap-3 rounded-lg text-[15px] font-medium transition-all duration-150 font-[Arial] ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2.5 ${
+          `relative flex items-center gap-3 rounded-lg text-base min-h-[2.75rem] transition-colors duration-150 ${collapsed ? 'lg:justify-center lg:px-0 px-3' : 'px-3'} py-2 ${
             active
-              ? 'bg-neutral-900 text-white dark:bg-slate-100 dark:text-slate-900'
-              : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-700'
-          }${item.admin ? (active ? '' : ' bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 dark:bg-red-900/40 dark:text-red-300 dark:hover:bg-red-900/60 dark:hover:text-red-200') : ''}`
+              ? 'bg-primary-50 text-primary-800 font-semibold dark:bg-primary-900/50 dark:text-primary-100'
+              : 'text-neutral-700 font-medium hover:text-neutral-900 hover:bg-neutral-100 dark:text-slate-300 dark:hover:text-slate-100 dark:hover:bg-slate-700'
+          }`
         }
       >
-        {Icon && <Icon size={18} className="flex-shrink-0" />}
-        <span className={`whitespace-nowrap font-normal font-[Arial] ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
+        {active && <span aria-hidden="true" className="absolute left-0 top-2 bottom-2 w-1 rounded-full bg-primary-600 dark:bg-primary-300" />}
+        {Icon && <Icon size={20} className="flex-shrink-0" aria-hidden="true" />}
+        <span className={`whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>{item.label}</span>
       </NavLink>
     )
   }
@@ -157,14 +163,14 @@ const TopNavbar = () => {
         <div className="flex items-center justify-between h-14 px-4">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 transition-colors text-neutral-600 dark:text-slate-300"
-            aria-label="Open menu"
+            className="inline-flex items-center justify-center h-11 w-11 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 transition-colors text-neutral-700 dark:text-slate-200"
+            aria-label={isFrench ? 'Ouvrir le menu' : 'Open menu'}
           >
             <Menu size={22} />
           </button>
-          <NavLink to="/dashboard" className="flex items-center gap-2">
+          <NavLink to="/regions" className="flex items-center gap-2">
             <img src="/data/Everywhere_Logo_Mark_Black.png" alt="EVERYWHERE" className="h-7 w-7 dark:invert" />
-            <span className="text-sm font-bold text-neutral-800 dark:text-slate-100 uppercase tracking-widest">EVERYWHERE</span>
+            <span className="font-display text-base font-semibold text-neutral-900 dark:text-slate-100">Everywhere</span>
           </NavLink>
           <LanguageSwitcher variant="compact" />
         </div>
@@ -189,27 +195,27 @@ const TopNavbar = () => {
         `}
       >
         {/* Header: logo + collapse toggle */}
-        <div className={`flex items-center h-14 flex-shrink-0 border-b border-neutral-200 dark:border-slate-700 ${collapsed ? 'lg:justify-center px-2' : 'justify-between px-4'}`}>
-          <NavLink to="/dashboard" className="flex items-center gap-2.5 overflow-hidden">
+        <div className={`flex items-center h-16 flex-shrink-0 border-b border-neutral-200 dark:border-slate-700 ${collapsed ? 'lg:justify-center px-2' : 'justify-between px-4'}`}>
+          <NavLink to="/regions" className="flex items-center gap-2.5 overflow-hidden">
             <img src="/data/Everywhere_Logo_Mark_Black.png" alt="EVERYWHERE" className="h-8 w-8 flex-shrink-0 dark:invert" />
-            <span className={`text-base font-bold text-neutral-800 dark:text-slate-100 uppercase tracking-widest whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>
-              EVERYWHERE
+            <span className={`font-display text-lg font-semibold text-neutral-900 dark:text-slate-100 whitespace-nowrap ${collapsed ? 'lg:hidden' : ''}`}>
+              Everywhere
             </span>
           </NavLink>
           {/* Close on mobile */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-600 dark:text-slate-300"
-            aria-label="Close menu"
+            className="lg:hidden inline-flex items-center justify-center h-11 w-11 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-700 dark:text-slate-200"
+            aria-label={isFrench ? 'Fermer le menu' : 'Close menu'}
           >
             <X size={20} />
           </button>
           {/* Collapse toggle on desktop */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className={`hidden lg:inline-flex p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-500 dark:text-slate-400 hover:text-neutral-800 dark:hover:text-slate-100 ${collapsed ? 'lg:hidden' : ''}`}
-            aria-label="Collapse sidebar"
-            title="Réduire"
+            className={`hidden lg:inline-flex items-center justify-center h-10 w-10 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-600 dark:text-slate-300 hover:text-neutral-800 dark:hover:text-slate-100 ${collapsed ? 'lg:hidden' : ''}`}
+            aria-label={isFrench ? 'Réduire le menu' : 'Collapse menu'}
+            title={isFrench ? 'Réduire le menu' : 'Collapse menu'}
           >
             <PanelLeftClose size={18} />
           </button>
@@ -219,28 +225,28 @@ const TopNavbar = () => {
         {collapsed && (
           <button
             onClick={() => setCollapsed(false)}
-            className="hidden lg:flex items-center justify-center h-9 mx-2 mt-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-500 dark:text-slate-400 hover:text-neutral-800 dark:hover:text-slate-100"
-            aria-label="Expand sidebar"
-            title="Développer"
+            className="hidden lg:flex items-center justify-center h-11 mx-2 mt-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-600 dark:text-slate-300 hover:text-neutral-800 dark:hover:text-slate-100"
+            aria-label={isFrench ? 'Agrandir le menu' : 'Expand menu'}
+            title={isFrench ? 'Agrandir le menu' : 'Expand menu'}
           >
             <PanelLeftOpen size={18} />
           </button>
         )}
 
         {/* Nav items */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-2 dark:bg-slate-800">
+        <nav aria-label={isFrench ? 'Navigation principale' : 'Main navigation'} className="flex-1 overflow-y-auto py-3 px-2 space-y-3 dark:bg-slate-800">
           {navGroups.map((group) => (
             <div key={group.title} className="space-y-1">
               <button
                 type="button"
                 onClick={() => group.setOpen((v) => !v)}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm tracking-widest text-neutral-400 dark:text-slate-500 ${collapsed ? 'lg:justify-center' : ''}`}
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-1.5 text-left text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 dark:text-slate-400 dark:hover:text-slate-100 ${collapsed ? 'lg:hidden' : ''}`}
                 aria-expanded={group.open}
               >
-                <span className={`font-normal ${collapsed ? 'lg:hidden' : ''}`}>{group.title}</span>
-                {!collapsed && (group.open ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                <span>{group.title}</span>
+                {group.open ? <ChevronDown size={16} aria-hidden="true" /> : <ChevronRight size={16} aria-hidden="true" />}
               </button>
-              {group.open && (
+              {(group.open || collapsed) && (
                 <div className="space-y-0.5">
                   {group.items.map(renderNavItem)}
                 </div>
@@ -258,29 +264,30 @@ const TopNavbar = () => {
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className={`flex items-center gap-2.5 w-full rounded-xl hover:bg-neutral-50 dark:hover:bg-slate-700 transition-all duration-150 border border-transparent hover:border-neutral-200 dark:hover:border-slate-600 ${collapsed ? 'lg:justify-center px-2' : 'px-2.5'} py-2`}
-              aria-label="User menu"
+              aria-label={isFrench ? 'Mon compte' : 'My account'}
+              aria-expanded={userMenuOpen}
               title={collapsed ? user?.name : undefined}
             >
-              <div className="w-8 h-8 flex-shrink-0 bg-gradient-to-br from-neutral-700 to-neutral-900 dark:from-slate-600 dark:to-slate-800 rounded-full flex items-center justify-center">
-                <User size={15} className="text-white dark:text-slate-100" />
+              <div className="w-9 h-9 flex-shrink-0 bg-primary-600 rounded-full flex items-center justify-center">
+                <User size={17} className="text-white" aria-hidden="true" />
               </div>
               <div className={`flex-1 min-w-0 text-left ${collapsed ? 'lg:hidden' : ''}`}>
                 <p className="text-sm font-semibold text-neutral-800 dark:text-slate-100 truncate">{user?.name}</p>
-                <p className="text-xs text-neutral-400 dark:text-slate-500 truncate">{user?.email}</p>
+                <p className="text-xs text-neutral-600 dark:text-slate-400 truncate">{user?.email}</p>
               </div>
             </button>
 
             {userMenuOpen && (
-              <div className="absolute bottom-full left-0 mb-2 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-neutral-200 dark:border-slate-700 py-2 overflow-hidden z-50">
+              <div className="absolute bottom-full left-0 mb-2 w-60 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-neutral-200 dark:border-slate-700 py-2 overflow-hidden z-50">
                 <div className="px-4 py-2.5 border-b border-neutral-100 dark:border-slate-700">
                   <p className="text-sm font-semibold text-neutral-800 dark:text-slate-100">{user?.name}</p>
-                  <p className="text-xs text-neutral-400 dark:text-slate-500 truncate">{user?.email}</p>
+                  <p className="text-xs text-neutral-600 dark:text-slate-400 truncate">{user?.email}</p>
                 </div>
                 <div className="py-1">
                   <NavLink
                     to="/profile"
                     onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-slate-300 hover:bg-neutral-50 dark:hover:bg-slate-700 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-800 dark:text-slate-200 hover:bg-neutral-100 dark:hover:bg-slate-700 transition-colors"
                   >
                     <User size={15} />
                     <span>{t('nav.profile') || 'Profil'}</span>
@@ -289,7 +296,7 @@ const TopNavbar = () => {
                 <div className="border-t border-neutral-100 dark:border-slate-700 pt-1">
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 w-full transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 w-full transition-colors"
                   >
                     <LogOut size={15} />
                     <span>{t('auth.logout') || 'Déconnexion'}</span>

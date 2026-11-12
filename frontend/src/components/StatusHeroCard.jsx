@@ -163,22 +163,22 @@ export default function StatusHeroCard({
       </div>
 
       {/* Panneau blanc en bas, chevauchant le dégradé, 3 colonnes. */}
-      <div className="absolute left-6 right-6 -bottom-10 rounded-2xl bg-white border border-slate-200 shadow-md">
-        <div className="grid grid-cols-3 divide-x divide-slate-100 text-center">
+      <div className="absolute left-6 right-6 -bottom-10 rounded-2xl bg-white border border-slate-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
+        <div className="grid grid-cols-3 divide-x divide-slate-100 text-center dark:divide-slate-700">
           <div className="px-3 py-4">
             <Users className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-            <p className="mt-1 font-bold text-slate-900">{evangelicalDisplay}</p>
-            <p className="text-[11px] text-slate-500">{evangelicalLabel || (isFrench ? 'Évangéliques' : 'Evangelical')}</p>
+            <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{evangelicalDisplay}</p>
+            <p className="text-xs text-slate-500">{evangelicalLabel || (isFrench ? 'Évangéliques' : 'Evangelical')}</p>
           </div>
           <div className="px-3 py-4">
             <Target className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-            <p className="mt-1 font-bold text-slate-900">{jpScaleDisplay}</p>
-            <p className="text-[11px] text-slate-500">{jpScaleLabel || (isFrench ? 'Échelle JP' : 'JP Scale')}</p>
+            <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{jpScaleDisplay}</p>
+            <p className="text-xs text-slate-500">{jpScaleLabel || (isFrench ? 'Échelle JP' : 'JP Scale')}</p>
           </div>
           <div className="px-3 py-4">
             <AlertTriangle className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-            <p className="mt-1 font-bold text-slate-900">{leastReachedDisplay}</p>
-            <p className="text-[11px] text-slate-500">{leastReachedLabel || (isFrench ? 'Moins atteint' : 'Least Reached')}</p>
+            <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{leastReachedDisplay}</p>
+            <p className="text-xs text-slate-500">{leastReachedLabel || (isFrench ? 'Moins atteint' : 'Least Reached')}</p>
           </div>
         </div>
       </div>

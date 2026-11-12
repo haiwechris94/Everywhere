@@ -26,27 +26,27 @@ const SetCard = ({ set }) => {
   const total = passages.length || groups.reduce((n, g) => n + (g.passages?.length || 0), 0)
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white">
+    <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-3 px-4 py-3 text-left"
       >
-        {open ? <ChevronDown size={18} className="text-blue-600 shrink-0" /> : <ChevronRight size={18} className="text-blue-600 shrink-0" />}
+        {open ? <ChevronDown size={18} className="text-blue-600 shrink-0 dark:text-blue-300" /> : <ChevronRight size={18} className="text-blue-600 shrink-0 dark:text-blue-300" />}
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
           {set.setNumber}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-semibold text-slate-900">{set.title}</span>
+          <span className="block font-semibold text-slate-900 dark:text-slate-100">{set.title}</span>
           {set.subtitle && <span className="block text-xs text-slate-500">{set.subtitle}</span>}
         </span>
-        <span className="shrink-0 text-xs text-slate-400">{total}</span>
+        <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">{total}</span>
       </button>
       {open && (
-        <div className="border-t border-slate-100 px-4 py-3 space-y-3">
+        <div className="border-t border-slate-100 px-4 py-3 space-y-3 dark:border-slate-700">
           {set.note && <p className="text-xs italic text-slate-500">{set.note}</p>}
           {passages.length > 0 && (
-            <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-700 marker:text-slate-400">
+            <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-700 marker:text-slate-400 dark:text-slate-300">
               {passages.map((p, i) => (
                 <li key={i}>{p}</li>
               ))}
@@ -55,7 +55,7 @@ const SetCard = ({ set }) => {
           {groups.map((g) => (
             <div key={g.theme} className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{g.theme}</p>
-              <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700 marker:text-slate-300">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700 marker:text-slate-300 dark:text-slate-300">
                 {(g.passages || []).map((p, i) => (
                   <li key={i}>{p}</li>
                 ))}
@@ -101,30 +101,30 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div ref={dialogRef} className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl dark:bg-slate-800" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             {isFrench ? 'Ajouter un peuple' : 'Add a people group'}
           </h3>
-          <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="rounded p-1 text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="rounded p-1 text-slate-500 dark:text-slate-400 hover:text-slate-600"><X size={18} /></button>
         </div>
 
         <div className="relative mb-3">
-          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
           <input
             autoFocus
             value={term}
             onChange={(e) => setTerm(e.target.value)}
             placeholder={isFrench ? 'Rechercher un peuple par nom…' : 'Search a people group by name…'}
-            className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
           />
         </div>
 
-        <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-100">
+        <div className="max-h-56 overflow-y-auto rounded-lg border border-slate-100 dark:border-slate-700">
           {isFetching ? (
-            <div className="flex items-center justify-center py-6 text-slate-400"><Loader2 className="animate-spin" size={18} /></div>
+            <div className="flex items-center justify-center py-6 text-slate-500 dark:text-slate-400"><Loader2 className="animate-spin" size={18} /></div>
           ) : results.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-400">{isFrench ? 'Aucun résultat' : 'No result'}</p>
+            <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">{isFrench ? 'Aucun résultat' : 'No result'}</p>
           ) : (
             results.map((p) => (
               <button
@@ -134,8 +134,8 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
                   selected?._id === p._id ? 'bg-blue-50' : ''
                 }`}
               >
-                <span className="font-medium text-slate-700">{p.canonicalName}</span>
-                <span className="text-xs text-slate-400">{p.primaryCountryCode || ''}</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">{p.canonicalName}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{p.primaryCountryCode || ''}</span>
               </button>
             ))
           )}
@@ -146,18 +146,18 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
           <input
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700"
           />
         </label>
 
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <button onClick={onClose} className="btn-secondary btn-sm">
             {isFrench ? 'Annuler' : 'Cancel'}
           </button>
           <button
             disabled={!selected || addMutation.isPending}
             onClick={() => addMutation.mutate()}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            className="btn-primary btn-sm gap-2"
           >
             {addMutation.isPending && <Loader2 className="animate-spin" size={14} />}
             {isFrench ? 'Ajouter' : 'Add'}
@@ -205,7 +205,7 @@ const InitiativeDetail = () => {
           <BookOpenText size={28} />
         </div>
         <div className="min-w-0">
-          <h1 className="text-4xl font-bold text-slate-900">{initiativeDisplayName(key || data.name, { isFrench }, data.name)}</h1>
+          <h1 className="page-title">{initiativeDisplayName(key || data.name, { isFrench }, data.name)}</h1>
           {data.fullName && data.fullName !== data.name && key !== 'YCS' && (
             <p className="mt-1 text-sm text-slate-500">{data.fullName}</p>
           )}
@@ -213,15 +213,15 @@ const InitiativeDetail = () => {
       </div>
 
       {data.summary && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-slate-600 whitespace-pre-line">{data.summary}</p>
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
+          <p className="text-slate-600 whitespace-pre-line dark:text-slate-300">{data.summary}</p>
         </section>
       )}
 
       {/* Curriculum (séries ESP 300) */}
       {sets.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold text-slate-900">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
+          <h2 className="mb-4 text-xl font-bold text-slate-900 dark:text-slate-100">
             {isFrench ? `Séries de passages (${sets.length})` : `Scripture Sets (${sets.length})`}
           </h2>
           <div className="space-y-3">
@@ -237,7 +237,7 @@ const InitiativeDetail = () => {
           AnalyseQualitative, désormais rendue ici (ne s'affiche pas pour
           ESP300 ni les autres initiatives). */}
       {key === 'YCS' && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
           <AnalyseQualitative />
         </section>
       )}

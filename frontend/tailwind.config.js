@@ -1,3 +1,11 @@
+import colors from 'tailwindcss/colors'
+
+// Échelle primaire partagée (primary / blue / indigo)
+const PRIMARY = {
+  50: '#eef9fc', 100: '#d5f0f6', 200: '#a9deeb', 300: '#6cc5db', 400: '#2ba6c4',
+  500: '#0f7f9c', 600: '#0c6a85', 700: '#0b566d', 800: '#0d4759', 900: '#0f3b4a', 950: '#07252f',
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -8,113 +16,53 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand color - Teal/Cyan from logo
-        primary: {
-          50: '#e8f7fb',
-          100: '#c7edf5',
-          200: '#a3e2ef',
-          300: '#7dd7e9',
-          400: '#5dcee4',
-          500: '#0d9fc1', // Main teal from logo
-          600: '#0b8aa9',
-          700: '#097591',
-          800: '#076079',
-          900: '#054b61',
-          950: '#033649',
-        },
-        // Secondary brand color - Green from logo
+        // ── Design system « Everywhere » ─────────────────────────────────
+        // Style : minimalisme suisse, contraste élevé. Voir design-system/MASTER.md
+        // Primaire : bleu sarcelle profond (confiance). 500+ passe 4.5:1 sur blanc.
+        primary: PRIMARY,
+        // Les anciennes teintes d'interface (blue / indigo) sont unifiées sur la primaire
+        blue: PRIMARY,
+        indigo: PRIMARY,
+        // Une seule famille de gris dans toute l'appli (slate)
+        gray: colors.slate,
+        neutral: colors.slate,
         secondary: {
-          50: '#e6f7f0',
-          100: '#c2ead9',
-          200: '#9dddc2',
-          300: '#78d0ab',
-          400: '#53c394',
-          500: '#00853e', // Main green from logo
-          600: '#007336',
-          700: '#00612e',
-          800: '#004f26',
-          900: '#003d1e',
+          50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80',
+          500: '#15803d', 600: '#166534', 700: '#14532d', 800: '#0f4425', 900: '#0a331b',
         },
-        // Accent color - Orange from logo
+        // Accent : orange chaleureux, réservé à l'action principale et aux alertes douces
         accent: {
-          50: '#fef4e8',
-          100: '#fde4c2',
-          200: '#fcd49c',
-          300: '#fbc476',
-          400: '#fab450',
-          500: '#f58021', // Main orange from logo
-          600: '#d96f1c',
-          700: '#bd5e17',
-          800: '#a14d12',
-          900: '#853c0d',
+          50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c',
+          500: '#ea580c', 600: '#c2410c', 700: '#9a3412', 800: '#7c2d12', 900: '#5f230e',
         },
-        // Alert/Danger color - Red from logo
         danger: {
-          50: '#fce8e9',
-          100: '#f7c2c4',
-          200: '#f29c9f',
-          300: '#ed767a',
-          400: '#e85055',
-          500: '#de1c24', // Main red from logo
-          600: '#c2181f',
-          700: '#a6141a',
-          800: '#8a1015',
-          900: '#6e0c10',
+          50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171',
+          500: '#dc2626', 600: '#b91c1c', 700: '#991b1b', 800: '#7f1d1d', 900: '#651818',
         },
-        // Success color - Enhanced green
         success: {
-          50: '#e6f7f0',
-          100: '#c2ead9',
-          200: '#9dddc2',
-          300: '#78d0ab',
-          400: '#53c394',
-          500: '#00853e',
-          600: '#007336',
-          700: '#00612e',
-          800: '#004f26',
-          900: '#003d1e',
+          50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80',
+          500: '#15803d', 600: '#166534', 700: '#14532d', 800: '#0f4425', 900: '#0a331b',
         },
-        // Warning color - Amber/Orange
         warning: {
-          50: '#fef4e8',
-          100: '#fde4c2',
-          200: '#fcd49c',
-          300: '#fbc476',
-          400: '#fab450',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-        },
-        // Neutral grays - Soft and modern
-        neutral: {
-          50: '#fafbfc',
-          100: '#f4f6f8',
-          200: '#e8ecf0',
-          300: '#d1d8e0',
-          400: '#a8b4c0',
-          500: '#7e8c9a',
-          600: '#5f6d7a',
-          700: '#44505c',
-          800: '#2d3843',
-          900: '#1a2229',
-          950: '#0f1419',
+          50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24',
+          500: '#f59e0b', 600: '#b45309', 700: '#92400e', 800: '#78350f', 900: '#5f2a0c',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        // Corps : Source Sans 3 (très lisible). Titres : Lexend (conçue pour la lisibilité).
+        sans: ['"Source Sans 3"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['Lexend', '"Source Sans 3"', 'system-ui', 'sans-serif'],
       },
+      // Échelle légèrement agrandie : meilleure lisibilité pour les utilisateurs peu à l'aise
       fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        'xs': ['0.8125rem', { lineHeight: '1.125rem' }],
+        'sm': ['0.9375rem', { lineHeight: '1.375rem' }],
+        'base': ['1.0625rem', { lineHeight: '1.625rem' }],
+        'lg': ['1.1875rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.3125rem', { lineHeight: '1.875rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
         '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '4xl': ['2.125rem', { lineHeight: '2.5rem' }],
       },
       spacing: {
         '18': '4.5rem',

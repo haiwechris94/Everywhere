@@ -57,7 +57,7 @@ const DmmReviewQueue = () => {
   if (!authorized) {
     return (
       <div className="p-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3 text-gray-700">
+        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3 text-gray-700 dark:bg-slate-800 dark:text-slate-300">
           <AlertTriangle className="text-amber-500" />
           <span>{t('dmmReview.accessDenied')}</span>
         </div>
@@ -66,9 +66,9 @@ const DmmReviewQueue = () => {
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-xl font-semibold text-gray-900">{t('dmmReview.title')}</h1>
+        <h1 className="page-title">{t('dmmReview.title')}</h1>
         <Badge variant="warning">{`${totalPending} ${t('dmmReview.pending')}`}</Badge>
       </div>
 
@@ -90,11 +90,11 @@ const DmmReviewQueue = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
         </div>
       ) : queueQuery.isError ? (
-        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3 text-red-600">
+        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3 text-red-600 dark:bg-slate-800 dark:text-red-300">
           <AlertTriangle /> <span>{t('dmmReview.error')}</span>
         </div>
       ) : rows.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-6 text-gray-600">{t('dmmReview.empty')}</div>
+        <div className="bg-white rounded-xl shadow-sm p-6 text-gray-600 dark:bg-slate-800 dark:text-slate-300">{t('dmmReview.empty')}</div>
       ) : (
         <div className="space-y-4">
           {rows.map((m) => {
@@ -102,7 +102,7 @@ const DmmReviewQueue = () => {
             const cand = m.candidateMaster || {};
             const loc = [eng.region, eng.admin2, eng.admin3].filter(Boolean).join(' · ');
             return (
-              <div key={m.matchId} className="bg-white rounded-xl shadow-sm p-4">
+              <div key={m.matchId} className="bg-white rounded-xl shadow-sm p-4 dark:bg-slate-800">
                 <div className="flex items-center gap-3 mb-3 text-sm">
                   <Badge variant="primary">{m.matchType}</Badge>
                   <span className="text-gray-500">{t('dmmReview.tier')} {m.matchTier}</span>
@@ -110,18 +110,18 @@ const DmmReviewQueue = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="border rounded-lg p-3">
-                    <div className="text-xs uppercase text-gray-400 mb-1">{t('dmmReview.engagementPanel')}</div>
-                    <div className="font-semibold text-gray-900">{eng.name || '—'}</div>
-                    {eng.villageName && <div className="text-sm text-gray-600">{eng.villageName}</div>}
+                    <div className="text-xs uppercase text-gray-500 dark:text-slate-400 mb-1">{t('dmmReview.engagementPanel')}</div>
+                    <div className="font-semibold text-gray-900 dark:text-slate-100">{eng.name || '—'}</div>
+                    {eng.villageName && <div className="text-sm text-gray-600 dark:text-slate-300">{eng.villageName}</div>}
                     {loc && <div className="text-sm text-gray-500">{loc}</div>}
                     {eng.country && <div className="text-sm text-gray-500">{eng.country}</div>}
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-gray-600 mt-1 dark:text-slate-300">
                       {t('dmmReview.churches')}: {eng.numberOfChurches ?? 0} · {t('dmmReview.generation')}: {eng.churchGeneration ?? 0} · {t('dmmReview.status')}: {eng.engagementStatus || '—'}
                     </div>
                   </div>
                   <div className="border rounded-lg p-3">
-                    <div className="text-xs uppercase text-gray-400 mb-1">{t('dmmReview.candidatePanel')}</div>
-                    <div className="font-semibold text-gray-900">{cand.canonicalName || '—'}</div>
+                    <div className="text-xs uppercase text-gray-500 dark:text-slate-400 mb-1">{t('dmmReview.candidatePanel')}</div>
+                    <div className="font-semibold text-gray-900 dark:text-slate-100">{cand.canonicalName || '—'}</div>
                     {cand.primaryCountryCode && <div className="text-sm text-gray-500">{cand.primaryCountryCode}</div>}
                     <div className="flex flex-wrap gap-1 mt-1">
                       {(cand.sourceTypes || []).map((s) => <Badge key={s} variant="neutral">{s}</Badge>)}
@@ -159,7 +159,7 @@ const DmmReviewQueue = () => {
       {meta?.pagination && meta.pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 pt-2">
           <Button variant="secondary" disabled={page <= 1} onClick={() => setPage(page - 1)} leftIcon={<ChevronLeft size={16} />}>{t('common.previous') || 'Précédent'}</Button>
-          <span className="text-sm text-gray-600">Page {meta.pagination.page} / {meta.pagination.totalPages}</span>
+          <span className="text-sm text-gray-600 dark:text-slate-300">Page {meta.pagination.page} / {meta.pagination.totalPages}</span>
           <Button variant="secondary" disabled={page >= meta.pagination.totalPages} onClick={() => setPage(page + 1)} rightIcon={<ChevronRight size={16} />}>{t('common.next') || 'Suivant'}</Button>
         </div>
       )}

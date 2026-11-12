@@ -38,19 +38,19 @@ const asArray = (v) => (Array.isArray(v) ? v : [])
 
 /** Small state helpers */
 export const StateLoading = ({ label }) => (
-  <div className="flex items-center justify-center gap-2 py-10 text-neutral-500 text-sm">
-    <Loader2 size={18} className="animate-spin" />
+  <div role="status" className="flex items-center justify-center gap-2 py-12 text-neutral-600 dark:text-slate-300 text-base">
+    <Loader2 size={20} className="animate-spin" aria-hidden="true" />
     {label || 'Chargement…'}
   </div>
 )
 export const StateError = ({ label }) => (
-  <div className="flex items-center justify-center gap-2 py-10 text-red-600 text-sm">
-    <AlertCircle size={18} />
-    {label || (isFrench ? 'Erreur de chargement.' : 'Loading error.')}
+  <div role="alert" className="flex items-center justify-center gap-2 py-12 text-red-700 dark:text-red-300 text-base">
+    <AlertCircle size={20} aria-hidden="true" />
+    {label || 'Erreur de chargement.'}
   </div>
 )
 export const StateEmpty = ({ label }) => (
-  <div className="flex flex-col items-center justify-center gap-2 py-10 text-neutral-400 text-sm">
+  <div className="flex flex-col items-center justify-center gap-2 py-10 text-neutral-500 dark:text-slate-400 text-sm">
     <Inbox size={22} />
     {label || 'Aucune donnée.'}
   </div>
@@ -66,7 +66,7 @@ export const StatCard = ({ label, value, accent = 'neutral' }) => {
     amber: 'border-t-4 border-t-amber-500',
   }
   const labelColor = {
-    neutral: 'text-neutral-400',
+    neutral: 'text-neutral-500 dark:text-slate-400',
     blue: 'text-blue-600',
     green: 'text-green-600',
     amber: 'text-amber-600',
@@ -78,10 +78,10 @@ export const StatCard = ({ label, value, accent = 'neutral' }) => {
     <div
       className={`bg-white dark:bg-slate-800 rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3.5 py-2.5 w-[9.75rem]`}
     >
-      <p className={`text-[15px] font-normal leading-tight font-[Arial] ${labelColor[accent] || labelColor.neutral}`}>
+      <p className={`text-[15px] font-normal leading-tight ${labelColor[accent] || labelColor.neutral}`}>
         {label}
       </p>
-      <p className="text-xl font-bold mt-0.5 text-neutral-900">
+      <p className="text-xl font-bold mt-0.5 text-neutral-900 dark:text-slate-100">
         {value ?? '—'}
       </p>
     </div>
@@ -98,7 +98,7 @@ export const StatCard = ({ label, value, accent = 'neutral' }) => {
  * as a muted suffix so nothing is lost from the original text.
  */
 export const StatusBadge = ({ status }) => {
-  if (status == null || status === '' || status === '—') return <span className="text-neutral-400">—</span>
+  if (status == null || status === '' || status === '—') return <span className="text-neutral-500 dark:text-slate-400">—</span>
 
   const raw = String(status).trim()
   // Split an optional "(SOURCE)" suffix, e.g. "MOVEMENT (JP)".
@@ -143,15 +143,16 @@ export const StatusBadge = ({ status }) => {
         <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${dotCls}`} aria-hidden="true" />
         {main}
       </span>
-      {source && <span className="text-xs text-slate-400">({source})</span>}
+      {source && <span className="text-xs text-slate-500 dark:text-slate-400">({source})</span>}
     </span>
   )
 }
 
 export const PageHeader = ({ breadcrumb = [], title, subtitle, stats = [] }) => (
   <div className="mb-6">
-    {breadcrumb.length > 0 && (
-      <nav className="flex items-center gap-1 text-sm text-neutral-400 mb-2 flex-wrap">
+    {/* Un fil d'Ariane d'un seul élément répète juste le titre : on ne l'affiche pas. */}
+    {breadcrumb.length > 1 && (
+      <nav aria-label="Fil d'Ariane" className="flex items-center gap-1 text-sm text-neutral-500 dark:text-slate-400 mb-2 flex-wrap">
         {breadcrumb.map((b, i) => (
           <span key={i} className="flex items-center gap-1">
             {i > 0 && <ChevronRight size={14} />}
@@ -160,14 +161,14 @@ export const PageHeader = ({ breadcrumb = [], title, subtitle, stats = [] }) => 
                 {b.label}
               </Link>
             ) : (
-              <span className="text-neutral-700 font-medium">{b.label}</span>
+              <span className="text-neutral-700 font-medium dark:text-slate-300">{b.label}</span>
             )}
           </span>
         ))}
       </nav>
     )}
-    <h1 className="text-2xl font-bold text-neutral-900">{title}</h1>
-    {subtitle && <p className="text-neutral-500 mt-1">{subtitle}</p>}
+    <h1 className="page-title">{title}</h1>
+    {subtitle && <p className="page-subtitle">{subtitle}</p>}
     {stats.length > 0 && (
       <div className="flex flex-wrap gap-3 mt-4">
         {stats.map((s, i) => (
@@ -183,8 +184,8 @@ export const ChildrenGrid = ({ title, items, toPath, emptyLabel }) => {
   return (
     <div className="mb-8">
       {title && (
-        <h2 className="text-sm font-bold text-neutral-700 uppercase tracking-wide mb-3">
-          {title} <span className="text-neutral-400">({list.length})</span>
+        <h2 className="text-sm font-bold text-neutral-700 uppercase tracking-wide mb-3 dark:text-slate-300">
+          {title} <span className="text-neutral-500 dark:text-slate-400">({list.length})</span>
         </h2>
       )}
       {list.length === 0 ? (
@@ -195,11 +196,11 @@ export const ChildrenGrid = ({ title, items, toPath, emptyLabel }) => {
             const name = nameOf(item)
             const to = toPath(name)
             const card = (
-              <div className="flex items-center justify-between bg-white dark:bg-slate-800 border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-400 hover:bg-neutral-50 dark:bg-slate-900 transition-colors">
-                <span className="text-sm font-bold text-neutral-800 truncate">
+              <div className="flex items-center justify-between bg-white dark:bg-slate-800 border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-400 hover:bg-neutral-50 dark:bg-slate-900 transition-colors dark:border-slate-700 dark:hover:bg-slate-700">
+                <span className="text-sm font-bold text-neutral-800 truncate dark:text-slate-100">
                   {name || '—'}
                 </span>
-                {to && <ChevronRight size={16} className="text-neutral-400 flex-shrink-0" />}
+                {to && <ChevronRight size={16} className="text-neutral-500 dark:text-slate-400 flex-shrink-0" />}
               </div>
             )
             return to ? (
@@ -237,7 +238,7 @@ function PeoplesTab({ filter }) {
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm">
         <thead>
-          <tr className="text-left text-neutral-400 border-b border-neutral-200">
+          <tr className="text-left text-neutral-500 dark:text-slate-400 border-b border-neutral-200 dark:border-slate-700">
             <th className="py-2 pr-4 font-medium">Peuple</th>
             <th className="py-2 pr-4 font-medium">Statut</th>
             <th className="py-2 pr-4 font-medium">Population</th>
@@ -245,12 +246,12 @@ function PeoplesTab({ filter }) {
         </thead>
         <tbody>
           {list.map((pg, i) => (
-            <tr key={pg._id || i} className="border-b border-neutral-100 hover:bg-neutral-50 dark:bg-slate-900">
-              <td className="py-2 pr-4 font-medium text-neutral-800">
+            <tr key={pg._id || i} className="border-b border-neutral-100 hover:bg-neutral-50 dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-700">
+              <td className="py-2 pr-4 font-medium text-neutral-800 dark:text-slate-100">
                 {pg.name || pg.peopleName || pg.NAME || '—'}
               </td>
-              <td className="py-2 pr-4 text-neutral-600">{pg.status || pg.dmmStatus || '—'}</td>
-              <td className="py-2 pr-4 text-neutral-600">
+              <td className="py-2 pr-4 text-neutral-600 dark:text-slate-300">{pg.status || pg.dmmStatus || '—'}</td>
+              <td className="py-2 pr-4 text-neutral-600 dark:text-slate-300">
                 {(pg.population ?? pg.populationTotal ?? '—').toLocaleString?.() ??
                   (pg.population ?? '—')}
               </td>
@@ -282,7 +283,7 @@ function CoverageTab() {
 
   return (
     <div>
-      <div className="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 mb-4">
+      <div className="rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 mb-4 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300">
         Indicateurs de couverture agrégés (village/statut). Le filtrage fin par zone
         administrative sera affiné ultérieurement.
       </div>
@@ -360,7 +361,7 @@ function ReportingTab({ filter }) {
 
   return (
     <div>
-      <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs px-3 py-2 mb-4">
+      <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs px-3 py-2 mb-4 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300">
         Reporting trimestriel filtré sur les {pgIds.length} peuple(s) de cette zone.
       </div>
       {stats.length === 0 ? (
@@ -392,8 +393,8 @@ export const GeoTabs = ({ filter = {} }) => {
   ]
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-neutral-200 overflow-hidden">
-      <div className="flex border-b border-neutral-200">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-neutral-200 overflow-hidden dark:border-slate-700">
+      <div className="flex border-b border-neutral-200 dark:border-slate-700">
         {tabs.map((tb) => {
           const Icon = tb.icon
           const active = tab === tb.key

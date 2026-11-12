@@ -131,7 +131,7 @@ const KPICards = () => {
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="text-xs text-slate-400 font-medium">{percentage}%</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{percentage}%</span>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ const KPICards = () => {
       {/* Summary row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Total */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-md p-5 flex items-center gap-4">
+        <div className="relative overflow-hidden rounded-2xl bg-primary-600 text-white shadow-md p-5 flex items-center gap-4">
           <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
             <Layers className="w-5 h-5 text-white" />
           </div>
@@ -196,7 +196,7 @@ const KPICards = () => {
         </div>
 
         {/* Finishing the Task */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md p-5 flex items-center gap-4">
+        <div className="relative overflow-hidden rounded-2xl bg-primary-600 text-white shadow-md p-5 flex items-center gap-4">
           <div className="bg-white dark:bg-slate-800/20 rounded-xl p-2.5">
             <Flag className="w-5 h-5 text-white" />
           </div>

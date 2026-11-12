@@ -124,20 +124,20 @@ function AssignmentsSection({ engagement, canManage, isFrench, onSaved }) {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold">{isFrench ? 'Affectations' : 'Assignments'}</h2>
         {canManage && !editing && (
           <button
             onClick={openEdit}
-            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm"
           >
             {isFrench ? 'Modifier' : 'Edit'}
           </button>
         )}
       </div>
 
-      {success && <p className="mb-3 text-sm text-green-600">{success}</p>}
+      {success && <p className="mb-3 text-sm text-green-600 dark:text-green-300">{success}</p>}
 
       {editing ? (
         <form onSubmit={submit} className="space-y-3">
@@ -155,12 +155,12 @@ function AssignmentsSection({ engagement, canManage, isFrench, onSaved }) {
             {isFrench ? 'Date de début du changement (optionnel)' : 'Change start date (optional)'}
             <input type="date" value={form.from} onChange={set('from')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-300">{error}</p>}
           <div className="flex gap-2">
-            <button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+            <button type="submit" disabled={saving} className="btn-primary btn-sm">
               {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
             </button>
-            <button type="button" onClick={() => setEditing(false)} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+            <button type="button" onClick={() => setEditing(false)} className="btn-secondary btn-sm">
               {isFrench ? 'Annuler' : 'Cancel'}
             </button>
           </div>
@@ -176,20 +176,20 @@ function AssignmentsSection({ engagement, canManage, isFrench, onSaved }) {
                 <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? f.labelFr : f.labelEn}</p>
                 {current ? (
                   f.linkBase ? (
-                    <Link to={`/${f.linkBase}/${encodeURIComponent(current)}/engagements`} className="text-blue-600 hover:underline text-lg font-medium">
+                    <Link to={`/${f.linkBase}/${encodeURIComponent(current)}/engagements`} className="text-blue-600 hover:underline text-lg font-medium dark:text-blue-300">
                       {current}
                     </Link>
                   ) : (
-                    <span className="text-lg font-medium text-slate-800">{current}</span>
+                    <span className="text-lg font-medium text-slate-800 dark:text-slate-100">{current}</span>
                   )
                 ) : (
-                  <span className="text-slate-400">—</span>
+                  <span className="text-slate-500 dark:text-slate-400">—</span>
                 )}
                 {history.length > 0 && (
-                  <ul className="mt-2 space-y-1 border-l-2 border-slate-100 pl-3">
+                  <ul className="mt-2 space-y-1 border-l-2 border-slate-100 pl-3 dark:border-slate-700">
                     {history.map((h, i) => (
                       <li key={i} className="text-xs text-slate-500">
-                        <span className="font-medium text-slate-700">{h.value || '—'}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{h.value || '—'}</span>
                         {' — '}
                         {isFrench
                           ? `du ${fmtDate(h.from)} au ${h.to ? fmtDate(h.to) : 'présent'}`
@@ -283,7 +283,7 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50">
+    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="text-xs text-slate-500">
           {isFrench ? 'Nom du village' : 'Village name'}
@@ -325,12 +325,12 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
         {isFrench ? 'Commentaire' : 'Comment'}
         <textarea rows={3} value={form.description} onChange={set('description')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
       </label>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-300">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+        <button type="submit" disabled={saving} className="btn-primary btn-sm">
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
         </button>
-        <button type="button" onClick={onCancel} className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+        <button type="button" onClick={onCancel} className="btn-secondary btn-sm">
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
       </div>
@@ -590,13 +590,13 @@ export default function EngagementDetail() {
       </p>
 
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-4xl font-bold text-slate-900">{engagementName}</h1>
+        <h1 className="page-title">{engagementName}</h1>
         {/* Boutons Modifier / Supprimer (logique reprise de PeopleDetailLite). */}
         <div className="flex shrink-0 gap-2">
           <button
             type="button"
             onClick={() => setEditing((v) => !v)}
-            className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="btn-secondary btn-sm"
           >
             {editing ? (isFrench ? 'Fermer' : 'Close') : (isFrench ? 'Modifier' : 'Edit')}
           </button>
@@ -604,7 +604,7 @@ export default function EngagementDetail() {
             type="button"
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded border border-red-200 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+            className="btn-danger-outline btn-sm"
           >
             {deleting ? (isFrench ? 'Suppression…' : 'Deleting…') : (isFrench ? 'Supprimer' : 'Delete')}
           </button>
@@ -657,17 +657,17 @@ export default function EngagementDetail() {
           const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
           return (
             <div key={key} className={base}>
-              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, projLabel)}</p>
+              <p className="text-[10.5px] font-bold leading-tight text-neutral-500 dark:text-slate-400">{initiativeDisplayName(key, { isFrench }, projLabel)}</p>
               {engaged && masterId ? (
                 <Link
                   to={`/initiatives/${key}/peoples/${masterId}`}
-                  className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
+                  className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline dark:text-emerald-300"
                   title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, projLabel)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, projLabel)} detail`}
                 >
                   {isFrench ? 'OUI' : 'YES'}
                 </Link>
               ) : (
-                <p className="mt-0.5 text-xl font-bold text-red-600">{isFrench ? 'NON' : 'NO'}</p>
+                <p className="mt-0.5 text-xl font-bold text-red-600 dark:text-red-300">{isFrench ? 'NON' : 'NO'}</p>
               )}
             </div>
           )
@@ -676,7 +676,7 @@ export default function EngagementDetail() {
 
       {/* Carte Statut DMM : point + libellé colorés selon la règle du tableau,
           suivi du NIVEAU DMM (I–IV) déduit de la génération max. */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
         <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
           <div>
             <p className="text-sm font-semibold text-slate-500 mb-2">{isFrench ? 'Statut DMM' : 'DMM status'}</p>
@@ -687,10 +687,10 @@ export default function EngagementDetail() {
           </div>
           <div>
             <p className="text-sm font-semibold text-slate-500 mb-2">{isFrench ? "Niveau d'engagement" : 'Engagement level'}</p>
-            <span className="text-xl font-bold text-slate-800">{levelText}</span>
+            <span className="text-xl font-bold text-slate-800 dark:text-slate-100">{levelText}</span>
           </div>
         </div>
-        <p className="mt-3 text-sm text-slate-400">
+        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
           {isFrench
             ? `Statut déterminé par le nombre d'églises (${fmt(eng.numberOfChurches ?? 0)}) et niveau par la génération max (${fmt(eng.churchGeneration ?? 0)}), selon le tableau DMM.`
             : `Status determined by the number of churches (${fmt(eng.numberOfChurches ?? 0)}) and level by max generation (${fmt(eng.churchGeneration ?? 0)}), per the DMM table.`}
@@ -698,7 +698,7 @@ export default function EngagementDetail() {
       </section>
 
       {/* Mesures de l'engagement — toutes en cases « # », état cumulé. */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
         <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
           {isFrench ? 'Mesures (cumul des trimestres)' : 'Measures (cumulative across quarters)'}
         </h2>
@@ -715,20 +715,20 @@ export default function EngagementDetail() {
           nombre d'églises (axe droit). Une bascule permet d'agréger par année
           (dernier trimestre connu de chaque année). Le tableau en-dessous
           indique le passage d'un niveau/stade à l'autre (▲ / ▼). */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="mb-1 text-xl font-bold">
               {isFrench ? "Progression de l'engagement" : 'Engagement progression'}
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {isFrench
                 ? 'Passage d’un stade (Pionnier → Mouvement) et d’un niveau (I → IV) au fil du temps, avec le nombre d’églises.'
                 : 'Stage (Pioneer → Movement) and level (I → IV) transitions over time, alongside the number of churches.'}
             </p>
           </div>
           {/* Bascule Trimestre / Année (segmented control). */}
-          <div className="inline-flex shrink-0 rounded-lg border border-slate-200 p-0.5">
+          <div className="inline-flex shrink-0 rounded-lg border border-slate-200 p-0.5 dark:border-slate-700">
             <button
               type="button"
               onClick={() => setProgView('quarter')}
@@ -746,7 +746,7 @@ export default function EngagementDetail() {
           </div>
         </div>
         {progression.length === 0 ? (
-          <p className="py-8 text-center text-sm text-slate-400">
+          <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
             {isFrench
               ? 'Aucun historique trimestriel. Importez des données trimestrielles (colonne « Report period », ex. 1Q26, 2Q26) pour voir la progression.'
               : 'No quarterly history yet. Import quarterly data (the "Report period" column, e.g. 1Q26, 2Q26) to see progression.'}
@@ -791,16 +791,16 @@ export default function EngagementDetail() {
                   const p = payload[0].payload
                   const col = dmmStageColors(p.stage)
                   return (
-                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow">
-                      <p className="mb-1 font-semibold text-slate-700">{p.label}</p>
-                      <p className="text-slate-600">{isFrench ? "# d'églises" : '# churches'} : <span className="font-semibold tabular-nums">{fmt(p.churches)}</span></p>
-                      <p className="text-slate-600">{isFrench ? 'Génération' : 'Generation'} : <span className="font-semibold tabular-nums">{fmt(p.generation)}</span></p>
-                      <p className="flex items-center gap-1.5 text-slate-600">
+                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow dark:bg-slate-800 dark:border-slate-700">
+                      <p className="mb-1 font-semibold text-slate-700 dark:text-slate-300">{p.label}</p>
+                      <p className="text-slate-600 dark:text-slate-300">{isFrench ? "# d'églises" : '# churches'} : <span className="font-semibold tabular-nums">{fmt(p.churches)}</span></p>
+                      <p className="text-slate-600 dark:text-slate-300">{isFrench ? 'Génération' : 'Generation'} : <span className="font-semibold tabular-nums">{fmt(p.generation)}</span></p>
+                      <p className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                         {isFrench ? 'Stade' : 'Stage'} :
                         <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: col.hex }} />
                         <span className="font-semibold" style={{ color: col.hex }}>{p.stageLabel}</span>
                       </p>
-                      <p className="text-slate-600">{isFrench ? 'Niveau' : 'Level'} : <span className="font-semibold">{p.levelLabel}</span></p>
+                      <p className="text-slate-600 dark:text-slate-300">{isFrench ? 'Niveau' : 'Level'} : <span className="font-semibold">{p.levelLabel}</span></p>
                     </div>
                   )
                 }}
@@ -847,7 +847,7 @@ export default function EngagementDetail() {
           <div className="mt-5 overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-slate-200 dark:border-slate-700">
                   <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{progView === 'year' ? (isFrench ? 'Année' : 'Year') : (isFrench ? 'Trimestre' : 'Quarter')}</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# églises" : '# churches'}</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Génération' : 'Generation'}</th>
@@ -864,15 +864,15 @@ export default function EngagementDetail() {
                   const stageDelta = prev ? p.stageRank - prev.stageRank : 0
                   const levelDelta = prev ? p.level - prev.level : 0
                   const arrow = (delta) => {
-                    if (delta > 0) return <span className="font-bold text-green-600" title={isFrench ? 'En hausse' : 'Increased'}>▲</span>
-                    if (delta < 0) return <span className="font-bold text-red-600" title={isFrench ? 'En baisse' : 'Decreased'}>▼</span>
+                    if (delta > 0) return <span className="font-bold text-green-600 dark:text-green-300" title={isFrench ? 'En hausse' : 'Increased'}>▲</span>
+                    if (delta < 0) return <span className="font-bold text-red-600 dark:text-red-300" title={isFrench ? 'En baisse' : 'Decreased'}>▼</span>
                     return null
                   }
                   return (
-                    <tr key={p.label} className="border-b border-slate-100 last:border-0">
-                      <td className="py-2 pr-4 font-medium text-slate-700">{p.label}</td>
-                      <td className="py-2 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.churches)}</td>
-                      <td className="py-2 px-4 text-right tabular-nums text-slate-600">{fmt(p.generation)}</td>
+                    <tr key={p.label} className="border-b border-slate-100 last:border-0 dark:border-slate-700">
+                      <td className="py-2 pr-4 font-medium text-slate-700 dark:text-slate-300">{p.label}</td>
+                      <td className="py-2 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(p.churches)}</td>
+                      <td className="py-2 px-4 text-right tabular-nums text-slate-600 dark:text-slate-300">{fmt(p.generation)}</td>
                       <td className="py-2 px-4">
                         <span className="inline-flex items-center gap-1.5">
                           <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-bold ${p.level ? levelBadge : 'bg-slate-100 text-slate-500'}`}>
@@ -906,13 +906,13 @@ export default function EngagementDetail() {
         onSaved={refresh}
       />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
         <h2 className="text-xl font-bold mb-4">{isFrench ? "Détails de l'engagement" : 'Engagement details'}</h2>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 dark:divide-slate-700">
           {detailRows.map(([label, value]) => (
             <div key={label} className="flex justify-between py-1.5">
-              <span className="text-slate-400 text-sm">{label}</span>
-              <span className="text-slate-800 text-sm font-medium text-right">{value}</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">{label}</span>
+              <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{value}</span>
             </div>
           ))}
         </div>
@@ -968,18 +968,18 @@ function CommentSection({ engagement, canManage, isFrench, onSaved }) {
       <div className="mt-4">
         <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? 'Commentaire' : 'Comment'}</p>
         <textarea
-          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700"
+          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700 dark:border-slate-700 dark:text-slate-300"
           rows={4}
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-sm text-red-600 dark:text-red-300">{error}</p>}
         <div className="mt-2 flex gap-2">
           <button
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="btn-primary btn-sm"
           >
             {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
           </button>
@@ -987,7 +987,7 @@ function CommentSection({ engagement, canManage, isFrench, onSaved }) {
             type="button"
             onClick={() => { setEditing(false); setError('') }}
             disabled={saving}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="btn-secondary btn-sm"
           >
             {isFrench ? 'Annuler' : 'Cancel'}
           </button>
@@ -999,17 +999,17 @@ function CommentSection({ engagement, canManage, isFrench, onSaved }) {
   return (
     <div className="mt-4">
       {engagement?.description ? (
-        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{engagement.description}</p>
+        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed dark:text-slate-300">{engagement.description}</p>
       ) : (
         canManage && (
-          <p className="text-sm italic text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
+          <p className="text-sm italic text-slate-500 dark:text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
         )
       )}
       {canManage && (
         <button
           type="button"
           onClick={open}
-          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-300"
         >
           {engagement?.description
             ? (isFrench ? 'Modifier' : 'Edit')

@@ -332,7 +332,7 @@ const Activities = () => {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 max-w-md">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 dark:bg-red-900/40">
             <X size={40} className="text-red-500" />
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-2">{t('activities.messages.loadError')}</h3>
@@ -347,7 +347,7 @@ const Activities = () => {
       {/* Header — titre noir en haut, actions neutres à droite, sans grand cadre */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('activities.title')}</h1>
+          <h1 className="page-title">{t('activities.title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1">
             {t('activities.totalCount').replace('{count}', activities.length)}
           </p>
@@ -359,7 +359,7 @@ const Activities = () => {
             <>
               <button
                 onClick={() => navigate('/pending-validations')}
-                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+                className="btn-secondary btn-sm relative gap-2"
               >
                 <ClipboardCheck size={18} />
                 <span className="text-sm font-medium">{t('validation.pendingValidations')}</span>
@@ -371,7 +371,7 @@ const Activities = () => {
               </button>
               <button
                 onClick={() => navigate('/rejected-people-groups')}
-                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+                className="btn-secondary btn-sm relative gap-2"
               >
                 <AlertCircle size={18} />
                 <span className="text-sm font-medium">{t('rejected.rejectedPeopleGroups')}</span>
@@ -385,7 +385,7 @@ const Activities = () => {
           )}
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-5 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold"
+            className="btn-primary btn-sm gap-2"
           >
             <Plus size={18} />
             {t('activities.newActivity')}
@@ -399,7 +399,7 @@ const Activities = () => {
           href="https://goeverywhere.org"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+          className="btn-secondary btn-sm gap-2"
         >
           goeverywhere.org ↗
         </a>
@@ -407,7 +407,7 @@ const Activities = () => {
           href="https://reminiscent-acapella-740.notion.site/EVERYWHERE-2a3ec55e01df8007bfc3fc19d481d3fc"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+          className="btn-secondary btn-sm gap-2"
         >
           Calendrier détaillé (Notion) ↗
         </a>
@@ -419,7 +419,7 @@ const Activities = () => {
         <div className="p-4 border-b border-gray-100 dark:border-slate-700">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
               <input
                 type="text"
                 placeholder={t('activities.searchPlaceholder')}
@@ -515,7 +515,7 @@ const Activities = () => {
           <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-slate-700 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label htmlFor="activities-village" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.village')}</label>
+                <label htmlFor="activities-village" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">{t('activities.labels.village')}</label>
                 <select
                   id="activities-village"
                   value={villageFilter}
@@ -529,7 +529,7 @@ const Activities = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="activities-church" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.church')}</label>
+                <label htmlFor="activities-church" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">{t('activities.labels.church')}</label>
                 <select
                   id="activities-church"
                   value={churchFilter}
@@ -543,7 +543,7 @@ const Activities = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="activities-datefrom" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateFrom')}</label>
+                <label htmlFor="activities-datefrom" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">{t('activities.filters.dateFrom')}</label>
                 <input
                   id="activities-datefrom"
                   type="date"
@@ -553,7 +553,7 @@ const Activities = () => {
                 />
               </div>
               <div>
-                <label htmlFor="activities-dateto" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateTo')}</label>
+                <label htmlFor="activities-dateto" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">{t('activities.filters.dateTo')}</label>
                 <input
                   id="activities-dateto"
                   type="date"
@@ -566,7 +566,7 @@ const Activities = () => {
             {hasActiveFilters && (
               <button 
                 onClick={clearFilters}
-                className="mt-4 flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
+                className="mt-4 flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium dark:text-red-300"
               >
                 <X size={16} />
                 {t('common.clearFilters') || 'Effacer les filtres'}
@@ -619,7 +619,7 @@ const Activities = () => {
                         <div className="flex items-center gap-2 mb-3">
                           <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg">
                             <Calendar size={16} className="text-gray-500 dark:text-slate-400" />
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
                               {format(new Date(activity.date), 'EEEE dd MMMM yyyy', { locale: dateLocale })}
                             </span>
                           </div>
@@ -629,19 +629,19 @@ const Activities = () => {
                       {/* Location Tags */}
                       <div className="flex flex-wrap items-center gap-3 text-sm">
                         {activity.village && (
-                          <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full dark:bg-blue-900/30 dark:text-blue-300">
                             <MapPin size={14} />
                             {activity.village.name || activity.village}
                           </span>
                         )}
                         {activity.church && (
-                          <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 rounded-full">
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 rounded-full dark:bg-purple-900/30 dark:text-purple-300">
                             <Church size={14} />
                             {activity.church.name || activity.church}
                           </span>
                         )}
                         {activity.participants > 0 && (
-                          <span className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full">
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-300">
                             <Users size={14} />
                             {activity.participants} {t('common.participants').toLowerCase()}
                           </span>
@@ -649,7 +649,7 @@ const Activities = () => {
                       </div>
 
                       {activity.notes && (
-                        <p className="mt-3 text-sm text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border-l-2 border-gray-300">
+                        <p className="mt-3 text-sm text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border-l-2 border-gray-300 dark:border-slate-700">
                           {activity.notes}
                         </p>
                       )}
@@ -658,7 +658,7 @@ const Activities = () => {
                     {/* Actions */}
                     <div className="flex flex-col items-end gap-2">
                       {activity.createdAt && (
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <span className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1">
                           <Clock size={12} />
                           {format(new Date(activity.createdAt), 'HH:mm')}
                         </span>
@@ -669,7 +669,7 @@ const Activities = () => {
                         className={`p-2 rounded-lg transition-all ${
                           activity.archived 
                             ? 'text-green-600 hover:bg-green-50 hover:scale-110' 
-                            : 'text-gray-400 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400 hover:scale-110'
+                            : 'text-gray-500 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400 hover:scale-110'
                         }`}
                         title={activity.archived ? t('activities.unarchive') : t('activities.archive')}
                       >
@@ -686,7 +686,7 @@ const Activities = () => {
         /* Empty State */
         <div className="p-12 text-center">
           <div className="w-32 h-32 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Calendar size={56} className="text-gray-400" />
+            <Calendar size={56} className="text-gray-500 dark:text-slate-400" />
           </div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">{t('activities.empty.title')}</h3>
           <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-6">
@@ -697,7 +697,7 @@ const Activities = () => {
           {!hasActiveFilters && (
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+              className="btn-primary py-3 gap-2"
             >
               <Plus size={20} />
               {t('activities.addActivity')}
@@ -709,7 +709,7 @@ const Activities = () => {
       {/* Floating Add Button (Mobile) */}
       <button aria-label={t('activities.newActivity')}
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-gray-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:scale-110 transition-all"
+        className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-gray-900 text-white rounded-full shadow-soft-xl flex items-center justify-center z-40 hover:scale-110 transition-all"
       >
         <Plus size={24} />
       </button>
@@ -717,7 +717,7 @@ const Activities = () => {
       {/* Add Activity Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div ref={addDialogRef} className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
+          <div ref={addDialogRef} className="bg-white dark:bg-slate-800 rounded-2xl shadow-soft-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
             {/* Modal Header */}
             <div className="border-b border-gray-200 dark:border-slate-700 px-6 py-5 rounded-t-2xl">
               <div className="flex items-center justify-between">
@@ -737,7 +737,7 @@ const Activities = () => {
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label htmlFor="activities-activitytype" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-activitytype" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                   {t('activities.labels.activityType')} <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -754,7 +754,7 @@ const Activities = () => {
               </div>
 
               <div>
-                <label htmlFor="activities-description" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-description" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                   {t('activities.labels.description')} <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -770,7 +770,7 @@ const Activities = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="activities-date" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="activities-date" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                     {t('activities.labels.date')} <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -783,7 +783,7 @@ const Activities = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="activities-participants" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="activities-participants" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                     {t('activities.labels.participants')}
                   </label>
                   <input
@@ -799,7 +799,7 @@ const Activities = () => {
               </div>
 
               <div>
-                <label htmlFor="activities-village-2" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-village-2" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                   {t('activities.labels.village')}
                 </label>
                 <select
@@ -816,7 +816,7 @@ const Activities = () => {
               </div>
 
               <div>
-                <label htmlFor="activities-church-2" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-church-2" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                   {t('activities.labels.church')}
                 </label>
                 <select
@@ -833,7 +833,7 @@ const Activities = () => {
               </div>
 
               <div>
-                <label htmlFor="activities-notes" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-notes" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                   {t('activities.labels.notes')}
                 </label>
                 <textarea
@@ -849,12 +849,12 @@ const Activities = () => {
               {/* Coaching iGROW specific fields */}
               {newActivity.type === 'coaching-igrow' && (
                 <div className="space-y-4 p-4 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700">
-                  <h4 className="font-semibold text-teal-800 flex items-center gap-2">
+                  <h4 className="font-semibold text-teal-800 flex items-center gap-2 dark:text-teal-300">
                     <MessageCircle size={18} />
                     {t('activities.coaching.title') || 'Détails du coaching iGROW'}
                   </h4>
                   <div>
-                    <label htmlFor="activities-conversationwith" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-conversationwith" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
                       {t('activities.coaching.conversationWith') || 'Conversation avec'}
                     </label>
                     <select
@@ -873,7 +873,7 @@ const Activities = () => {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="activities-theme" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-theme" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
                       {t('activities.coaching.theme') || 'Thème de la conversation'}
                     </label>
                     <input
@@ -889,7 +889,7 @@ const Activities = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="activities-duration" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-duration" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
                       {t('activities.coaching.duration') || 'Durée (minutes)'}
                     </label>
                     <input
@@ -912,14 +912,14 @@ const Activities = () => {
                 <button 
                   type="button" 
                   onClick={resetForm} 
-                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                  className="btn-secondary py-3 flex-1"
                 >
                   {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isLoading}
-                  className="flex-1 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50"
+                  className="btn-primary py-3 flex-1"
                 >
                   {createMutation.isLoading ? (
                     <span className="flex items-center justify-center gap-2">

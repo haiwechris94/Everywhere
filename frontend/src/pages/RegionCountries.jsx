@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDialog } from '../components/ui/useDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus } from 'lucide-react'
 import { reportingApi, regionAdminApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
 import { StateLoading, StateError, StateEmpty, StatCard } from './geography/geoComponents'
@@ -77,13 +77,13 @@ const RegionCountries = () => {
           <p className="text-sm text-gray-500 dark:text-slate-400">
             <Link to="/regions" className="font-bold hover:text-slate-700">Regions</Link> / {data.name}
           </p>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">{data.fullName}</h1>
+          <h1 className="page-title">{data.fullName}</h1>
         </div>
         {canManage && (
           <button
             type="button"
             onClick={() => setEditingRegion(true)}
-            className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="btn-secondary btn-sm"
           >
             {isFrench ? 'Modifier la région' : 'Edit region'}
           </button>
@@ -91,15 +91,15 @@ const RegionCountries = () => {
       </div>
 
       {(data.responsibleName || data.leaders?.length) && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {isFrench ? 'Responsables' : 'Leaders'}
           </p>
           {data.responsibleName && (
-            <p className="mt-1 text-sm font-medium text-slate-700">{data.responsibleName}</p>
+            <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-300">{data.responsibleName}</p>
           )}
           {Array.isArray(data.leaders) && data.leaders.length > 0 && (
-            <ul className="mt-1 space-y-0.5 text-sm text-slate-600">
+            <ul className="mt-1 space-y-0.5 text-sm text-slate-600 dark:text-slate-300">
               {data.leaders.map((l, i) => (
                 <li key={i}>{[l.role, l.name].filter(Boolean).join(' — ')}</li>
               ))}
@@ -110,7 +110,7 @@ const RegionCountries = () => {
 
       {editingRegion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={regionDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={regionDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto dark:bg-slate-800">
             <RegionForm
               mode="edit"
               initial={{
@@ -166,7 +166,7 @@ const RegionCountries = () => {
         {/* Tableau DMM coloré (étape × niveau) — engagements AGRÉGÉS de la région
             (somme des pays), même composant/couleurs que le Dashboard et les pays. */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
             <DmmProgressTable
               engagements={regionDmmEngagements}
               isFrench={isFrench}
@@ -190,22 +190,23 @@ const RegionCountries = () => {
               className="flex items-center gap-2 text-left"
             >
               {countriesOpen ? (
-                <ChevronDown size={20} className="text-blue-600" />
+                <ChevronDown size={20} className="text-blue-600 dark:text-blue-300" />
               ) : (
-                <ChevronRight size={20} className="text-blue-600" />
+                <ChevronRight size={20} className="text-blue-600 dark:text-blue-300" />
               )}
-              <span className="text-sm font-semibold text-black uppercase">
+              <span className="text-sm font-semibold text-black uppercase dark:text-slate-100">
                 countries
               </span>
-              <span className="text-slate-400 text-sm">({countries.length})</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">({countries.length})</span>
             </button>
             {canManage && !creatingCountry && (
               <button
                 type="button"
                 onClick={() => setCreatingCountry(true)}
-                className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+                className="btn-primary btn-sm"
               >
-                {isFrench ? '＋ Créer un pays' : '＋ New country'}
+                <Plus size={16} aria-hidden="true" />
+                {isFrench ? 'Créer un pays' : 'New country'}
               </button>
             )}
           </div>
@@ -264,26 +265,26 @@ const RegionCountries = () => {
                       return (
                         <tr
                           key={country.code}
-                          className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors"
+                          className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
                         >
                           <td className="py-3 pr-4">
                             <Link
                               to={`/regions/${data.id}/countries/${country.code}`}
-                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                              className="font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                             >
                               {country.name || country.nameEn}
                             </Link>
                           </td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.engagements ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.churches ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.maxGeneration ?? 0)}</td>
-                          <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.totalBelievers ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.engagements ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.churches ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.maxGeneration ?? 0)}</td>
+                          <td className="py-3 pl-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.totalBelievers ?? 0)}</td>
                           {canManage && (
                             <td className="py-3 pl-4 text-right">
                               <button
                                 type="button"
                                 onClick={() => setEditCountry(country)}
-                                className="rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                className="btn-secondary btn-sm"
                               >
                                 {isFrench ? 'Modifier' : 'Edit'}
                               </button>
@@ -302,7 +303,7 @@ const RegionCountries = () => {
 
       {editCountry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={countryDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={countryDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto dark:bg-slate-800">
             <CountryForm
               mode="edit"
               regionId={regionId}
@@ -316,7 +317,7 @@ const RegionCountries = () => {
               isFrench={isFrench}
             />
             {editCountry.isCustom && (
-              <div className="mt-3 border-t border-slate-200 pt-3">
+              <div className="mt-3 border-t border-slate-200 pt-3 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={async () => {
@@ -328,7 +329,7 @@ const RegionCountries = () => {
                     await queryClient.invalidateQueries({ queryKey: ['ng-region', regionId] })
                     setEditCountry(null)
                   }}
-                  className="rounded border border-red-300 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50"
+                  className="btn-danger-outline btn-sm"
                 >
                   {isFrench ? 'Supprimer le pays' : 'Delete country'}
                 </button>

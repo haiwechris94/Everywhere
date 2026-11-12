@@ -51,8 +51,8 @@ const ArcGauge = ({ value, max = 100, color, label, sublabel }) => {
           <span className="text-2xl font-bold" style={{ color }}>{value}%</span>
         </div>
       </div>
-      <p className="text-xs font-semibold text-slate-700 mt-1">{label}</p>
-      {sublabel && <p className="text-xs text-slate-400 mt-0.5">{sublabel}</p>}
+      <p className="text-xs font-semibold text-slate-700 mt-1 dark:text-slate-300">{label}</p>
+      {sublabel && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sublabel}</p>}
     </div>
   )
 }
@@ -98,7 +98,7 @@ const CoverageGauge = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-80 flex items-center justify-center">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-80 flex items-center justify-center dark:bg-slate-800 dark:border-slate-700">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent" />
       </div>
     )
@@ -109,9 +109,9 @@ const CoverageGauge = () => {
   const totalVillages = gaugeData?.totalVillages ?? 0
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full dark:bg-slate-800 dark:border-slate-700">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-base font-semibold text-slate-800">Indicateurs</h3>
+        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">Indicateurs</h3>
       </div>
 
       <div className="flex flex-col gap-8 items-center justify-center h-[calc(100%-3rem)]">
@@ -129,7 +129,7 @@ const CoverageGauge = () => {
         />
       </div>
 
-      <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs text-slate-500">
+      <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs text-slate-500 dark:border-slate-700">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-blue-500" />
           Couverture

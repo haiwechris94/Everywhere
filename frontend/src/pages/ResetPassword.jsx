@@ -12,7 +12,7 @@ const ResetPassword = () => {
   const navigate = useNavigate()
   const { login } = useAuth()
   const { t } = useLanguage()
-  
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -46,8 +46,8 @@ const ResetPassword = () => {
       } catch (err) {
         setIsTokenValid(false)
         setError(
-          err.response?.data?.message || 
-          t('resetPassword.invalidToken') || 
+          err.response?.data?.message ||
+          t('resetPassword.invalidToken') ||
           'Invalid or expired reset link'
         )
       } finally {
@@ -76,7 +76,7 @@ const ResetPassword = () => {
 
       if (response.data.success) {
         setIsSuccess(true)
-        
+
         // Auto-login with the returned token
         if (response.data.token) {
           localStorage.setItem('token', response.data.token)
@@ -88,8 +88,8 @@ const ResetPassword = () => {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || 
-        t('resetPassword.resetError') || 
+        err.response?.data?.message ||
+        t('resetPassword.resetError') ||
         'Failed to reset password. Please try again.'
       )
     } finally {
@@ -100,10 +100,10 @@ const ResetPassword = () => {
   // Loading state while verifying token
   if (isVerifying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
-          <Loader2 size={48} className="animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-gray-600">{t('resetPassword.verifying') || 'Verifying reset link...'}</p>
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 dark:bg-slate-900">
+        <div className="bg-white rounded-2xl border border-neutral-200 shadow-soft-lg w-full max-w-md p-8 text-center dark:bg-slate-800 dark:border-slate-700">
+          <Loader2 size={48} className="animate-spin text-primary-600 mx-auto mb-4 dark:text-primary-300" />
+          <p className="text-gray-600 dark:text-slate-300">{t('resetPassword.verifying') || 'Verifying reset link...'}</p>
         </div>
       </div>
     )
@@ -112,19 +112,19 @@ const ResetPassword = () => {
   // Invalid token state
   if (!isTokenValid && !isVerifying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4 relative">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 relative dark:bg-slate-900">
         <div className="absolute top-4 right-4">
-          <LanguageSwitcher variant="dropdown" className="bg-white/90 backdrop-blur-sm rounded-lg" />
+          <LanguageSwitcher variant="dropdown" className="bg-white rounded-lg border border-neutral-200 dark:bg-slate-800 dark:border-slate-700" />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6">
-            <AlertCircle size={32} className="text-red-600" />
+        <div className="bg-white rounded-2xl border border-neutral-200 shadow-soft-lg w-full max-w-md p-8 text-center animate-fade-in dark:bg-slate-800 dark:border-slate-700">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-6 dark:bg-red-900/40">
+            <AlertCircle size={32} className="text-red-600 dark:text-red-300" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+          <h2 className="font-display text-2xl font-semibold text-neutral-900 mb-3 dark:text-slate-100">
             {t('resetPassword.invalidLinkTitle') || 'Invalid Reset Link'}
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 dark:text-slate-300">
             {error || t('resetPassword.invalidLinkMessage') || 'This password reset link is invalid or has expired. Please request a new one.'}
           </p>
           <Link
@@ -141,22 +141,22 @@ const ResetPassword = () => {
   // Success state
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4 relative">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 relative dark:bg-slate-900">
         <div className="absolute top-4 right-4">
-          <LanguageSwitcher variant="dropdown" className="bg-white/90 backdrop-blur-sm rounded-lg" />
+          <LanguageSwitcher variant="dropdown" className="bg-white rounded-lg border border-neutral-200 dark:bg-slate-800 dark:border-slate-700" />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-            <CheckCircle size={32} className="text-green-600" />
+        <div className="bg-white rounded-2xl border border-neutral-200 shadow-soft-lg w-full max-w-md p-8 text-center animate-fade-in dark:bg-slate-800 dark:border-slate-700">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6 dark:bg-green-900/40">
+            <CheckCircle size={32} className="text-green-600 dark:text-green-300" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-3">
+          <h2 className="font-display text-2xl font-semibold text-neutral-900 mb-3 dark:text-slate-100">
             {t('resetPassword.successTitle') || 'Password Reset Successfully!'}
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 dark:text-slate-300">
             {t('resetPassword.successMessage') || 'Your password has been updated. You will be redirected to the dashboard shortly.'}
           </p>
-          <div className="flex items-center justify-center gap-2 text-primary-600">
+          <div className="flex items-center justify-center gap-2 text-primary-600 dark:text-primary-300">
             <Loader2 size={20} className="animate-spin" />
             <span>{t('resetPassword.redirecting') || 'Redirecting...'}</span>
           </div>
@@ -167,26 +167,26 @@ const ResetPassword = () => {
 
   // Reset password form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 relative dark:bg-slate-900">
       {/* Language Switcher */}
       <div className="absolute top-4 right-4">
-        <LanguageSwitcher variant="dropdown" className="bg-white/90 backdrop-blur-sm rounded-lg" />
+        <LanguageSwitcher variant="dropdown" className="bg-white rounded-lg border border-neutral-200 dark:bg-slate-800 dark:border-slate-700" />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in">
+      <div className="bg-white rounded-2xl border border-neutral-200 shadow-soft-lg w-full max-w-md p-8 animate-fade-in dark:bg-slate-800 dark:border-slate-700">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-            <MapPin size={32} className="text-primary-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4 dark:bg-primary-900/40">
+            <MapPin size={32} className="text-primary-600 dark:text-primary-300" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="page-title">
             {t('resetPassword.title') || 'Reset Your Password'}
           </h1>
           <p className="text-gray-500 mt-2">
             {t('resetPassword.subtitle') || 'Enter your new password below'}
           </p>
           {maskedEmail && (
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               {t('resetPassword.forAccount') || 'For account'}: {maskedEmail}
             </p>
           )}
@@ -194,9 +194,9 @@ const ResetPassword = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 dark:bg-red-900/30 dark:border-red-800">
             <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
+            <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
           </div>
         )}
 
@@ -210,7 +210,7 @@ const ResetPassword = () => {
             <div className="relative">
               <Lock
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400"
               />
               <input
                 id="reset-password-newpassword"
@@ -228,13 +228,13 @@ const ResetPassword = () => {
               <button aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p role="alert" className="form-error">{errors.password.message}</p>
             )}
           </div>
 
@@ -246,7 +246,7 @@ const ResetPassword = () => {
             <div className="relative">
               <Lock
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400"
               />
               <input
                 id="reset-password-confirmpassword"
@@ -254,8 +254,8 @@ const ResetPassword = () => {
                 {...register('confirmPassword', {
                   required: t('validation.confirmRequired') || 'Please confirm your password',
                   validate: (value) =>
-                    value === password || 
-                    t('validation.passwordMismatch') || 
+                    value === password ||
+                    t('validation.passwordMismatch') ||
                     'Passwords do not match',
                 })}
                 className="form-input pl-10 pr-10"
@@ -264,18 +264,18 @@ const ResetPassword = () => {
               <button aria-label={showConfirmPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400 hover:text-gray-600"
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+              <p role="alert" className="form-error">{errors.confirmPassword.message}</p>
             )}
           </div>
 
           {/* Password Requirements */}
-          <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+          <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg dark:bg-slate-900">
             <p className="font-medium mb-1">
               {t('resetPassword.requirements') || 'Password requirements:'}
             </p>
@@ -288,7 +288,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-primary py-3 flex items-center justify-center gap-2"
+            className="w-full btn-primary py-3 text-base"
           >
             {isLoading ? (
               <>
@@ -302,8 +302,8 @@ const ResetPassword = () => {
         </form>
 
         {/* Back to Login */}
-        <p className="text-center mt-6 text-gray-600">
-          <Link to="/login" className="text-primary-600 hover:underline font-medium">
+        <p className="text-center mt-6 text-gray-600 dark:text-slate-300">
+          <Link to="/login" className="text-primary-600 hover:underline font-medium dark:text-primary-300">
             {t('resetPassword.backToLogin') || 'Back to Login'}
           </Link>
         </p>

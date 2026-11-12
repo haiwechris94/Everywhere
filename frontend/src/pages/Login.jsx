@@ -31,53 +31,33 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Logo Watermark */}
-      <div 
-        className="absolute inset-0 z-0 opacity-5"
-        style={{
-          backgroundImage: 'url(/data/newgenerationslogoblack.svg)',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: '60%',
-          filter: 'blur(3px)',
-        }}
-      />
-      
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4 relative overflow-hidden dark:bg-slate-900">
       {/* Language Switcher - Top Right */}
       <div className="absolute top-4 right-4 z-10">
-        <LanguageSwitcher variant="dropdown" className="bg-white/90 backdrop-blur-sm rounded-lg" />
+        <LanguageSwitcher variant="dropdown" className="bg-white rounded-lg border border-neutral-200 dark:bg-slate-800 dark:border-slate-700" />
       </div>
 
-      <div className="w-full max-w-md p-8 animate-fade-in relative z-10">
+      <div className="w-full max-w-md bg-white rounded-2xl border border-neutral-200 shadow-soft-lg p-6 sm:p-8 animate-fade-in relative z-10 dark:bg-slate-800 dark:border-slate-700">
         {/* EVERYWHERE Logo */}
         <div className="text-center mb-8">
-          <div className="mb-4">
-            <h1 className="text-4xl font-black text-black tracking-widest drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">
-              EVERYWHERE
-            </h1>
-            <div className="w-24 h-1 bg-black mx-auto mt-2 drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"></div>
-          </div>
-          {/* Logo Image */}
-          <div className="mb-4">
-            <img 
-              src="/data/Everywhere_Logo_Mark_Black.png" 
-              alt="Everywhere Logo" 
-              className="h-20 w-auto mx-auto drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]"
-            />
-          </div>
-          <p className="text-gray-700 font-medium drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.loginSubtitle')}</p>
+          <img
+            src="/data/Everywhere_Logo_Mark_Black.png"
+            alt=""
+            className="h-16 w-auto mx-auto mb-4"
+          />
+          <h1 className="font-display text-3xl font-semibold text-neutral-900 dark:text-slate-100">Everywhere</h1>
+          <p className="mt-2 text-base text-neutral-600 dark:text-slate-300">{t('auth.loginSubtitle')}</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email */}
           <div>
-            <label htmlFor="login-email" className="form-label text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.email')}</label>
+            <label htmlFor="login-email" className="form-label">{t('auth.email')}</label>
             <div className="relative">
               <Mail
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400"
               />
               <input
                 id="login-email"
@@ -89,23 +69,23 @@ const Login = () => {
                     message: t('validation.emailInvalid'),
                   },
                 })}
-                className="form-input pl-10 bg-white/80 backdrop-blur-sm shadow-lg"
+                className="form-input pl-10"
                 placeholder={t('passwordRecovery.emailPlaceholder')}
               />
             </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              <p role="alert" className="form-error">{errors.email.message}</p>
             )}
           </div>
 
           {/* Password */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="login-password" className="form-label mb-0 text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.password')}</label>
+              <label htmlFor="login-password" className="form-label mb-0">{t('auth.password')}</label>
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-sm text-primary-600 hover:text-primary-700 hover:underline font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]"
+                className="text-sm text-primary-700 hover:text-primary-800 underline underline-offset-2 font-semibold dark:text-primary-300"
               >
                 {t('auth.forgotPassword')}
               </button>
@@ -113,7 +93,7 @@ const Login = () => {
             <div className="relative">
               <Lock
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400"
               />
               <input
                 id="login-password"
@@ -125,19 +105,19 @@ const Login = () => {
                     message: t('validation.passwordMinLength'),
                   },
                 })}
-                className="form-input pl-10 pr-10 bg-white/80 backdrop-blur-sm shadow-lg"
+                className="form-input pl-10 pr-12"
                 placeholder="••••••••"
               />
               <button aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-1 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 dark:text-slate-300 dark:hover:bg-slate-700"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p role="alert" className="form-error">{errors.password.message}</p>
             )}
           </div>
 
@@ -145,7 +125,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full btn-primary py-3 flex items-center justify-center gap-2 shadow-xl"
+            className="w-full btn-primary py-3 text-base"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

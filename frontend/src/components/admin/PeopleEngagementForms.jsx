@@ -73,8 +73,8 @@ export function PeopleForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
   const lbl = 'text-xs text-slate-500'
 
   return (
-    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50">
-      <h3 className="text-sm font-semibold text-slate-700">
+    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
+      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
         {mode === 'create'
           ? (isFrench ? 'Nouveau peuple' : 'New people')
           : (isFrench ? 'Modifier le peuple' : 'Edit people')}
@@ -106,7 +106,7 @@ export function PeopleForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
         </label>
       </div>
 
-      <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {isFrench ? 'Informations de référence' : 'Reference information'}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -136,12 +136,12 @@ export function PeopleForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
         </label>
       </div>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-300">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+        <button type="submit" disabled={saving} className="btn-primary btn-sm">
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
         </button>
-        <button type="button" onClick={onCancel} className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+        <button type="button" onClick={onCancel} className="btn-secondary btn-sm">
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
       </div>
@@ -205,8 +205,8 @@ export function EngagementForm({ mode = 'create', initial = {}, onSubmit, onCanc
   const lbl = 'text-xs text-slate-500'
 
   return (
-    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50">
-      <h3 className="text-sm font-semibold text-slate-700">
+    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
+      <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
         {mode === 'create'
           ? (isFrench ? 'Nouvel engagement' : 'New engagement')
           : (isFrench ? "Modifier l'engagement" : 'Edit engagement')}
@@ -249,17 +249,17 @@ export function EngagementForm({ mode = 'create', initial = {}, onSubmit, onCanc
         {isFrench ? 'Commentaire' : 'Comment'}
         <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className={field} />
       </label>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-500 dark:text-slate-400">
         {isFrench
           ? 'Le statut DMM est calculé automatiquement à partir du nombre d’églises et de la génération.'
           : 'DMM status is derived automatically from the number of churches and generation.'}
       </p>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-300">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+        <button type="submit" disabled={saving} className="btn-primary btn-sm">
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
         </button>
-        <button type="button" onClick={onCancel} className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+        <button type="button" onClick={onCancel} className="btn-secondary btn-sm">
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
       </div>

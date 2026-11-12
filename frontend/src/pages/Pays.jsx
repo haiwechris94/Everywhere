@@ -134,26 +134,30 @@ const Pays = () => {
       {/* En-tête : même mise en forme que la page Regions (petit libellé gris en
           gras au-dessus, grand titre slate-900 en dessous). */}
       <div>
-        <p className="text-sm font-bold text-gray-500">{isFrench ? 'Pays' : 'Countries'}</p>
-        <h1 className="text-4xl font-bold text-slate-900">{isFrench ? 'Pays' : 'Countries'}</h1>
+        <h1 className="page-title">{isFrench ? 'Pays' : 'Countries'}</h1>
+        <p className="page-subtitle">
+          {isFrench
+            ? 'Tous les pays suivis. Touchez un pays pour voir ses peuples.'
+            : 'All tracked countries. Tap a country to see its peoples.'}
+        </p>
       </div>
 
       {/* Barre de recherche : filtre la liste par nom de pays. */}
       <div className="relative max-w-sm">
-        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={isFrench ? 'Rechercher un pays…' : 'Search a country…'}
-          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
         />
         {search && (
           <button
             type="button"
             onClick={() => setSearch('')}
             aria-label={isFrench ? 'Effacer la recherche' : 'Clear search'}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-600"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 dark:text-slate-400 hover:text-slate-600"
           >
             <X size={14} />
           </button>
@@ -172,7 +176,7 @@ const Pays = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-slate-200">
+              <tr className="border-b border-slate-200 dark:border-slate-700">
                 <th className="py-2 pr-4 text-right text-xs font-semibold tracking-wide text-slate-500 w-12">
                   #
                 </th>
@@ -196,35 +200,35 @@ const Pays = () => {
                 return (
                   <tr
                     key={country.code}
-                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                    className="border-b border-slate-100 hover:bg-slate-50 transition-colors dark:border-slate-700 dark:hover:bg-slate-700"
                   >
                     {/* Numéro de ligne : 1, 2, 3 … jusqu'au dernier pays affiché. */}
-                    <td className="py-3 pr-4 text-right tabular-nums text-slate-400">{index + 1}</td>
+                    <td className="py-3 pr-4 text-right tabular-nums text-slate-500 dark:text-slate-400">{index + 1}</td>
                     <td className="py-3 px-4">
                       <Link
                         to={`/regions/${country.regionId}/countries/${country.code}`}
-                        className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                        className="font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                       >
                         {country.name || country.nameEn}
                       </Link>
                     </td>
-                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.engagements ?? 0)}</td>
-                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(s.totalPGs ?? 0)}</td>
-                    <td className="py-3 pl-4 text-right tabular-nums font-medium text-red-600">{fmt(s.unreachedPGs ?? 0)}</td>
+                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.engagements ?? 0)}</td>
+                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{fmt(s.totalPGs ?? 0)}</td>
+                    <td className="py-3 pl-4 text-right tabular-nums font-medium text-red-600 dark:text-red-300">{fmt(s.unreachedPGs ?? 0)}</td>
                   </tr>
                 )
               })}
             </tbody>
             {/* Ligne de total : additionne les 3 colonnes numériques des pays affichés. */}
             <tfoot>
-              <tr className="border-t-2 border-slate-300">
+              <tr className="border-t-2 border-slate-300 dark:border-slate-700">
                 <td className="py-3 pr-4"></td>
                 <td className="py-3 px-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {isFrench ? 'Total' : 'Total'}
                 </td>
-                <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900">{fmt(totals.engagements)}</td>
-                <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900">{fmt(totals.totalPGs)}</td>
-                <td className="py-3 pl-4 text-right tabular-nums font-bold text-red-600">{fmt(totals.unreachedPGs)}</td>
+                <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900 dark:text-slate-100">{fmt(totals.engagements)}</td>
+                <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-900 dark:text-slate-100">{fmt(totals.totalPGs)}</td>
+                <td className="py-3 pl-4 text-right tabular-nums font-bold text-red-600 dark:text-red-300">{fmt(totals.unreachedPGs)}</td>
               </tr>
             </tfoot>
           </table>

@@ -28,7 +28,9 @@ export const AuthProvider = ({ children }) => {
       try {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`
         const response = await api.get('/api/auth/me')
-        setUser(response.data.user)
+        // /api/auth/me renvoie l'utilisateur directement (pas { user }) :
+        // sans ce repli, la session était perdue à chaque rechargement.
+        setUser(response.data.user || response.data)
       } catch (error) {
         localStorage.removeItem('token')
         delete api.defaults.headers.common['Authorization']

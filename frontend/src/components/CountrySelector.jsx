@@ -166,15 +166,15 @@ const CountrySelector = ({
       <div className={`relative ${className}`} ref={dropdownRef}>
         <button
           onClick={toggleDropdown}
-          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors"
+          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors dark:hover:bg-slate-700"
           title={t('country.select') || 'Select country'}
         >
           {showFlag && <span className="text-lg">{getCountryFlag(selectedCountry)}</span>}
-          <span className="text-xs font-medium text-gray-700">{selectedCountry}</span>
+          <span className="text-xs font-medium text-gray-700 dark:text-slate-300">{selectedCountry}</span>
         </button>
         
         {isOpen && (
-          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 animate-fade-in max-h-64 overflow-y-auto">
+          <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 animate-fade-in max-h-64 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
             {filteredCountries.map((country, index) => (
               <button
                 key={country.code}
@@ -200,32 +200,32 @@ const CountrySelector = ({
       <div className={`relative ${className}`} ref={dropdownRef}>
         <button
           onClick={toggleDropdown}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 dark:border-slate-700 dark:hover:bg-slate-700"
           title={t('country.select') || 'Select country'}
         >
           {showFlag && <span className="text-lg">{getCountryFlag(selectedCountry)}</span>}
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
             {currentCountryConfig?.name || selectedCountry}
           </span>
           <ChevronDown
             size={16}
-            className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`text-gray-500 dark:text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </button>
         
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 animate-fade-in">
+          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 animate-fade-in dark:bg-slate-800 dark:border-slate-700">
             {showSearch && (
-              <div className="px-3 pb-2 border-b border-gray-100">
+              <div className="px-3 pb-2 border-b border-gray-100 dark:border-slate-700">
                 <div className="relative">
-                  <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                   <input
                     ref={searchInputRef}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t('country.search') || 'Search...'}
-                    className="w-full pl-7 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full pl-7 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:border-slate-700"
                   />
                 </div>
               </div>
@@ -247,7 +247,7 @@ const CountrySelector = ({
                   >
                     {showFlag && <span className="text-lg">{getCountryFlag(country.code)}</span>}
                     <span className="flex-1 text-left truncate">{getDisplayName(country)}</span>
-                    {selectedCountry === country.code && <Check size={16} className="text-primary-600" />}
+                    {selectedCountry === country.code && <Check size={16} className="text-primary-600 dark:text-primary-300" />}
                   </button>
                 ))
               )}
@@ -263,48 +263,48 @@ const CountrySelector = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-all border border-gray-200 bg-white shadow-sm"
+        className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-all border border-gray-200 bg-white shadow-sm dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700"
         title={t('country.select') || 'Select country'}
       >
         <div className="flex items-center gap-2">
           {showFlag && <span className="text-xl">{getCountryFlag(selectedCountry)}</span>}
-          <MapPin size={16} className="text-gray-400" />
+          <MapPin size={16} className="text-gray-500 dark:text-slate-400" />
         </div>
         <div className="flex flex-col items-start">
-          <span className="text-xs text-gray-400 uppercase tracking-wide">
+          <span className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wide">
             {t('country.label') || 'Country'}
           </span>
-          <span className="text-sm font-semibold text-gray-800">
+          <span className="text-sm font-semibold text-gray-800 dark:text-slate-100">
             {currentCountryConfig?.name || selectedCountry}
           </span>
         </div>
         <ChevronDown
           size={18}
-          className={`text-gray-400 transition-transform ml-2 ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-gray-500 dark:text-slate-400 transition-transform ml-2 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50 animate-scale-in">
+        <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-soft-xl border border-gray-200 py-2 z-50 animate-scale-in dark:bg-slate-800 dark:border-slate-700">
           {/* Header */}
-          <div className="px-4 py-2 border-b border-gray-100">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-700">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide">
               {t('country.selectCountry') || 'Select Country'}
             </h3>
           </div>
           
           {/* Search */}
           {showSearch && (
-            <div className="px-3 py-2 border-b border-gray-100">
+            <div className="px-3 py-2 border-b border-gray-100 dark:border-slate-700">
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('country.searchPlaceholder') || 'Search countries...'}
-                  className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:border-slate-700"
                 />
               </div>
             </div>
@@ -314,7 +314,7 @@ const CountrySelector = ({
           <div className="max-h-72 overflow-y-auto py-1">
             {filteredCountries.length === 0 ? (
               <div className="px-4 py-6 text-center">
-                <Globe size={32} className="mx-auto text-gray-300 mb-2" />
+                <Globe size={32} className="mx-auto text-gray-500 dark:text-slate-400 mb-2" />
                 <p className="text-sm text-gray-500">
                   {t('country.noResults') || 'No countries found'}
                 </p>
@@ -339,12 +339,12 @@ const CountrySelector = ({
                     }`}>
                       {getDisplayName(country)}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500 dark:text-slate-400">
                       {country.code} • {country.capital || country.code3}
                     </div>
                   </div>
                   {selectedCountry === country.code && (
-                    <Check size={18} className="text-primary-600" />
+                    <Check size={18} className="text-primary-600 dark:text-primary-300" />
                   )}
                 </button>
               ))

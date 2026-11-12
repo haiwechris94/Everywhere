@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDialog } from '../components/ui/useDialog'
 import { Link } from 'react-router-dom'
+import { Plus, Pencil, ChevronRight } from 'lucide-react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { reportingApi, regionAdminApi } from '../services/reportingApi'
 import { StateLoading, StateError, StateEmpty } from './geography/geoComponents'
@@ -28,19 +29,24 @@ const Regions = () => {
   const regions = data || []
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-bold text-gray-500 dark:text-slate-400">Regions</p>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Regions</h1>
+          <h1 className="page-title">{isFrench ? 'Régions' : 'Regions'}</h1>
+          <p className="page-subtitle">
+            {isFrench
+              ? 'Choisissez une région pour voir ses pays et ses peuples.'
+              : 'Pick a region to see its countries and peoples.'}
+          </p>
         </div>
         {canManage && !creating && (
           <button
             type="button"
             onClick={() => setCreating(true)}
-            className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="btn-primary btn-sm whitespace-nowrap"
           >
-            {isFrench ? '＋ Créer une région' : '＋ New region'}
+            <Plus size={18} aria-hidden="true" />
+            {isFrench ? 'Créer une région' : 'New region'}
           </button>
         )}
       </div>
@@ -65,12 +71,12 @@ const Regions = () => {
       ) : regions.length === 0 ? (
         <StateEmpty label={isFrench ? 'Aucune région disponible.' : 'No region available.'} />
       ) : (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {regions.map((region) => (
             <Link
               key={region.id}
               to={`/regions/${region.id}`}
-              className="relative flex flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              className="group relative flex min-h-[9rem] flex-col items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 text-center transition-colors hover:border-primary-500 hover:bg-primary-50/40 dark:hover:bg-slate-700"
             >
               {canManage && (
                 <button
@@ -80,17 +86,22 @@ const Regions = () => {
                     e.stopPropagation()
                     setEditRegion(region)
                   }}
-                  className="absolute right-2 top-2 rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
-                  {isFrench ? '✎ Modifier' : '✎ Edit'}
+                  <Pencil size={14} aria-hidden="true" />
+                  {isFrench ? 'Modifier' : 'Edit'}
                 </button>
               )}
               {/* Sigle mis en avant, nom complet juste en dessous.
                   Ex. « FCA » puis « Francophone Central Africa ». */}
               <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{region.name}</h2>
               {region.fullName && (
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{region.fullName}</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{region.fullName}</p>
               )}
+              <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-700 dark:text-primary-300">
+                {isFrench ? 'Ouvrir' : 'Open'}
+                <ChevronRight size={16} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5" />
+              </span>
             </Link>
           ))}
         </div>
@@ -98,7 +109,7 @@ const Regions = () => {
 
       {editRegion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={editDialogRef} className="max-w-lg w-full bg-white dark:bg-slate-800 rounded-xl p-5 max-h-[85vh] overflow-y-auto">
             <RegionForm
               mode="edit"
               initial={editRegion}
@@ -111,7 +122,7 @@ const Regions = () => {
               isFrench={isFrench}
             />
             {editRegion.isCustom && (
-              <div className="mt-3 border-t border-slate-200 pt-3">
+              <div className="mt-3 border-t border-slate-200 pt-3 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={async () => {
@@ -123,7 +134,7 @@ const Regions = () => {
                     await queryClient.invalidateQueries({ queryKey: ['ng-regions'] })
                     setEditRegion(null)
                   }}
-                  className="rounded border border-red-300 px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50"
+                  className="btn-danger-outline btn-sm"
                 >
                   {isFrench ? 'Supprimer la région' : 'Delete region'}
                 </button>

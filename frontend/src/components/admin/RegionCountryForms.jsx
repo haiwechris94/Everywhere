@@ -56,7 +56,7 @@ export function LeadersEditor({ leaders = [], onChange, isFrench }) {
             type="button"
             onClick={() => remove(idx)}
             aria-label={isFrench ? 'Supprimer' : 'Remove'}
-            className="rounded border px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            className="btn-secondary btn-sm"
           >
             ×
           </button>
@@ -65,9 +65,9 @@ export function LeadersEditor({ leaders = [], onChange, isFrench }) {
       <button
         type="button"
         onClick={add}
-        className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+        className="btn-secondary btn-sm"
       >
-        {isFrench ? '＋ Ajouter un responsable' : '＋ Add a leader'}
+        {isFrench ? '+ Ajouter un responsable' : '+ Add a leader'}
       </button>
     </div>
   )
@@ -125,8 +125,8 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-      <h3 className="text-lg font-bold text-slate-900">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3 dark:bg-slate-800 dark:border-slate-700">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
         {mode === 'edit'
           ? isFrench ? 'Modifier la région' : 'Edit region'
           : isFrench ? 'Créer une région' : 'New region'}
@@ -197,24 +197,24 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
             onChange={(e) => setCountryCodesText(e.target.value)}
             placeholder="CM, TD, GA"
           />
-          <p className="mt-1 text-xs text-slate-400">{isFrench ? 'séparés par des virgules' : 'comma separated'}</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{isFrench ? 'séparés par des virgules' : 'comma separated'}</p>
         </div>
       )}
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-red-600 dark:text-red-300">{error}</p>}
 
       <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={saving}
-          className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+          className="btn-primary btn-sm"
         >
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : isFrench ? 'Enregistrer' : 'Save'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+          className="btn-secondary btn-sm"
         >
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
@@ -282,8 +282,8 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-      <h3 className="text-lg font-bold text-slate-900">
+    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-white p-4 space-y-3 dark:bg-slate-800 dark:border-slate-700">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
         {mode === 'edit'
           ? isFrench ? 'Modifier le pays' : 'Edit country'
           : isFrench ? 'Créer un pays' : 'New country'}
@@ -392,20 +392,20 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
 
       <LeadersEditor leaders={leaders} onChange={setLeaders} isFrench={isFrench} />
 
-      {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
+      {error && <p className="text-sm font-semibold text-red-600 dark:text-red-300">{error}</p>}
 
       <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={saving}
-          className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60"
+          className="btn-primary btn-sm"
         >
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : isFrench ? 'Enregistrer' : 'Save'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded border px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+          className="btn-secondary btn-sm"
         >
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>

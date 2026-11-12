@@ -178,10 +178,10 @@ const MiniMap = ({
       <div className={positionStyles}>
         <button aria-label="Show mini-map"
           onClick={() => setIsCollapsed(false)}
-          className="bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors border border-gray-200"
+          className="bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors border border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700"
           title="Show mini-map"
         >
-          <MapIcon size={20} className="text-gray-600" />
+          <MapIcon size={20} className="text-gray-600 dark:text-slate-300" />
         </button>
       </div>
     )
@@ -193,14 +193,14 @@ const MiniMap = ({
       style={{ width, height: height + 28 }} // +28 for header
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-2 py-1 bg-gray-50 border-b border-gray-200">
-        <span className="text-xs font-medium text-gray-600">
+      <div className="flex items-center justify-between px-2 py-1 bg-gray-50 border-b border-gray-200 dark:bg-slate-900 dark:border-slate-700">
+        <span className="text-xs font-medium text-gray-600 dark:text-slate-300">
           {selectedCountry} Overview
         </span>
         {collapsible && (
           <button aria-label="Collapse mini-map"
             onClick={() => setIsCollapsed(true)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
+            className="p-1 hover:bg-gray-200 rounded transition-colors dark:hover:bg-slate-700"
             title="Collapse mini-map"
           >
             <Minimize2 size={14} className="text-gray-500" />

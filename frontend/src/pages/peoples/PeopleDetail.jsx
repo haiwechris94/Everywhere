@@ -83,13 +83,13 @@ function ProfilTab({ pg }) {
     [isFrench ? 'Urbain / Rural' : 'Urban / Rural', pg.urbanRural],
     [isFrench ? 'Année de début' : 'Start year', pg.startYear],
     [isFrench ? 'Donateur' : 'Donor', pg.donor ? (
-      <Link to={`/donors/${encodeURIComponent(pg.donor)}/engagements`} className="text-blue-600 hover:underline">
+      <Link to={`/donors/${encodeURIComponent(pg.donor)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">
         {pg.donor}
       </Link>
     ) : pg.donor],
     [isFrench ? 'Coordinateur national' : 'National coordinator', pg.nationalCoordinator],
     [isFrench ? "Implanteur d'église" : 'Church planter', pg.churchPlanter ? (
-      <Link to={`/planters/${encodeURIComponent(pg.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
+      <Link to={`/planters/${encodeURIComponent(pg.churchPlanter)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">
         {pg.churchPlanter}
       </Link>
     ) : pg.churchPlanter],
@@ -99,14 +99,14 @@ function ProfilTab({ pg }) {
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
         {rows.map(([label, value]) => (
-          <div key={label} className="flex justify-between border-b border-neutral-100 py-1.5">
-            <span className="text-neutral-400 text-sm">{label}</span>
-            <span className="text-neutral-800 text-sm font-medium text-right">{value}</span>
+          <div key={label} className="flex justify-between border-b border-neutral-100 py-1.5 dark:border-slate-700">
+            <span className="text-neutral-500 dark:text-slate-400 text-sm">{label}</span>
+            <span className="text-neutral-800 text-sm font-medium text-right dark:text-slate-100">{value}</span>
           </div>
         ))}
       </div>
       {pg.description && (
-        <p className="mt-4 text-sm text-neutral-600 leading-relaxed">{pg.description}</p>
+        <p className="mt-4 text-sm text-neutral-600 leading-relaxed dark:text-slate-300">{pg.description}</p>
       )}
     </div>
   )
@@ -141,8 +141,8 @@ function SourcesTab({ pg }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
               {s.key}
             </p>
-            <p className="text-sm font-medium text-neutral-800 mt-0.5">{s.label}</p>
-            <p className={`text-xs mt-1 ${s.present ? 'text-green-700' : 'text-neutral-400'}`}>
+            <p className="text-sm font-medium text-neutral-800 mt-0.5 dark:text-slate-100">{s.label}</p>
+            <p className={`text-xs mt-1 ${s.present ? 'text-green-700' : 'text-neutral-500 dark:text-slate-400'}`}>
               {s.present ? (isFrench ? 'Présent' : 'Present') : (isFrench ? 'Absent' : 'Absent')}
             </p>
           </div>
@@ -178,7 +178,7 @@ function MultiplicationTab({ id }) {
 
   return (
     <div>
-      <div className="rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-600 text-xs px-3 py-2 mb-4">
+      <div className="rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-600 text-xs px-3 py-2 mb-4 dark:bg-slate-700 dark:border-slate-700 dark:text-slate-300">
         {isFrench ? <>Indicateurs de multiplication filtrés sur ce peuple (paramètre <code>peopleGroup</code>).</> : <>Multiplication indicators filtered on this people group (<code>peopleGroup</code> parameter).</>}
       </div>
       <div className="flex flex-wrap gap-3">
@@ -235,7 +235,7 @@ function ReportingTab({ id }) {
 
   return (
     <div>
-      <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs px-3 py-2 mb-4">
+      <div className="rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs px-3 py-2 mb-4 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300">
         {isFrench ? <>Reporting trimestriel filtré sur ce peuple (paramètre <code>peopleGroup</code>) + analyse qualitative DMM.</> : <>Quarterly reporting filtered on this people group (<code>peopleGroup</code> parameter) + DMM qualitative analysis.</>}
       </div>
       {stats.length > 0 ? (
@@ -248,9 +248,9 @@ function ReportingTab({ id }) {
         <StateEmpty label={isFrench ? 'Aucune donnée de reporting pour ce peuple.' : 'No reporting data for this people group.'} />
       )}
       {qualData && (
-        <div className="mt-4 bg-white border border-neutral-200 rounded-xl p-4">
-          <h3 className="text-sm font-bold text-neutral-700 mb-2">{isFrench ? 'Analyse qualitative' : 'Qualitative analysis'}</h3>
-          <pre className="text-xs text-neutral-600 whitespace-pre-wrap break-words max-h-64 overflow-auto">
+        <div className="mt-4 bg-white border border-neutral-200 rounded-xl p-4 dark:bg-slate-800 dark:border-slate-700">
+          <h3 className="text-sm font-bold text-neutral-700 mb-2 dark:text-slate-300">{isFrench ? 'Analyse qualitative' : 'Qualitative analysis'}</h3>
+          <pre className="text-xs text-neutral-600 whitespace-pre-wrap break-words max-h-64 overflow-auto dark:text-slate-300">
             {JSON.stringify(qualData, null, 2)}
           </pre>
         </div>
@@ -333,7 +333,7 @@ const PeopleDetail = () => {
 
   return (
     <div>
-      <div className="mb-6 rounded-[32px] border border-slate-200/80 bg-white shadow-[0_24px_80px_-50px_rgba(15,23,42,0.25)] overflow-hidden">
+      <div className="mb-6 rounded-[32px] border border-slate-200/80 bg-white shadow-[0_24px_80px_-50px_rgba(15,23,42,0.25)] overflow-hidden dark:bg-slate-800">
         <div className="p-4 sm:p-5 lg:p-6">
           <div className="mb-4 flex items-center gap-2 text-sm text-slate-500">
             <Link to="/regions" className="inline-flex items-center gap-2 font-medium text-slate-500 hover:text-slate-800">
@@ -345,12 +345,12 @@ const PeopleDetail = () => {
             <span>/</span>
             <span className="font-medium text-slate-500">{pg?.country || pg?.countryCode || 'CM'}</span>
             <span>/</span>
-            <span className="font-semibold text-slate-900">{pg?.name || '…'}</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">{pg?.name || '…'}</span>
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[380px_1fr]">
-            <div className="rounded-[28px] border border-slate-200 bg-white p-4 sm:p-5 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.35)]">
-              <div className="overflow-hidden rounded-[22px] bg-slate-100">
+            <div className="rounded-[28px] border border-slate-200 bg-white p-4 sm:p-5 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.35)] dark:bg-slate-800 dark:border-slate-700">
+              <div className="overflow-hidden rounded-[22px] bg-slate-100 dark:bg-slate-700">
                 {pg?.imageUrl ? (
                   <img
                     src={pg.imageUrl}
@@ -358,7 +358,7 @@ const PeopleDetail = () => {
                     className="h-[260px] w-full object-cover sm:h-[290px]"
                   />
                 ) : (
-                  <div className="flex h-[260px] w-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-400 sm:h-[290px]">
+                  <div className="flex h-[260px] w-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-500 dark:text-slate-400 sm:h-[290px]">
                     <Users size={48} />
                   </div>
                 )}
@@ -370,30 +370,30 @@ const PeopleDetail = () => {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {[pg?.region, pg?.country || pg?.countryCode || pg?.primaryCountryCode, pg?.religion].filter(Boolean).map((chip) => (
-                  <span key={chip} className="inline-flex items-center rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+                  <span key={chip} className="inline-flex items-center rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-300">
                     {chip}
                   </span>
                 ))}
               </div>
 
-              <p className="mt-5 max-w-md text-sm leading-7 text-slate-600 sm:text-base">
+              <p className="mt-5 max-w-md text-sm leading-7 text-slate-600 sm:text-base dark:text-slate-300">
                 {pg?.description || mainSubtitle || (isFrench ? 'Aucune description n’est disponible pour ce peuple.' : 'No description is available for this people group yet.')}
               </p>
 
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:bg-slate-900 dark:border-slate-700">
                   <div className="text-sm font-medium text-slate-500">{isFrench ? 'Pays' : 'Country'}</div>
-                  <div className="mt-2 text-2xl font-bold tracking-tight text-slate-900">{pg?.country || pg?.countryCode || pg?.primaryCountryCode || '—'}</div>
+                  <div className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{pg?.country || pg?.countryCode || pg?.primaryCountryCode || '—'}</div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:bg-slate-900 dark:border-slate-700">
                   <div className="text-sm font-medium text-slate-500">JP Scale</div>
-                  <div className="mt-2 text-2xl font-bold tracking-tight text-slate-900">{formatValue(pg?.jpScale || pg?.scale || pg?.joshuaProjectScale)}</div>
+                  <div className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{formatValue(pg?.jpScale || pg?.scale || pg?.joshuaProjectScale)}</div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[28px] border border-slate-200 bg-gradient-to-br from-blue-500 via-blue-600 to-sky-500 p-5 text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.65)]">
+              <div className="rounded-[28px] border border-slate-200 bg-primary-600 p-5 text-white shadow-[0_24px_70px_-30px_rgba(37,99,235,0.65)] dark:border-slate-700">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-100/90">
@@ -408,13 +408,13 @@ const PeopleDetail = () => {
                   </div>
 
                   <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full border-[10px] border-white/20 bg-white/10 shadow-inner backdrop-blur">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-blue-600">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-blue-600 dark:text-blue-300">
                       <Users size={28} />
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 grid grid-cols-3 gap-3 rounded-[22px] bg-white/92 p-3 text-slate-900 shadow-inner">
+                <div className="mt-5 grid grid-cols-3 gap-3 rounded-[22px] bg-white/92 p-3 text-slate-900 shadow-inner dark:text-slate-100">
                   {[
                     { label: isFrench ? 'Évangélique' : 'Evangelical', value: formatValue(pg?.evangelicalPercent ?? pg?.evangelical), icon: HeartHandshake },
                     { label: 'JP Scale', value: formatValue(pg?.jpScale || pg?.scale || pg?.joshuaProjectScale), icon: BarChart3 },
@@ -423,18 +423,18 @@ const PeopleDetail = () => {
                     const Icon = item.icon
                     return (
                       <div key={item.label} className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-center">
-                        <Icon size={20} className="text-blue-600" />
+                        <Icon size={20} className="text-blue-600 dark:text-blue-300" />
                         <div className="text-2xl font-extrabold tracking-tight">{item.value}</div>
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</div>
+                        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</div>
                       </div>
                     )
                   })}
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-slate-200 bg-[#f8fbff] p-5 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.28)]">
-                <div className="flex items-center gap-3 text-slate-900">
-                  <MapPin size={22} className="text-slate-700" />
+              <div className="rounded-[28px] border border-slate-200 bg-[#f8fbff] p-5 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.28)] dark:border-slate-700">
+                <div className="flex items-center gap-3 text-slate-900 dark:text-slate-100">
+                  <MapPin size={22} className="text-slate-700 dark:text-slate-300" />
                   <h3 className="text-2xl font-bold tracking-tight">{isFrench ? 'Key Information' : 'Key Information'}</h3>
                 </div>
 
@@ -442,8 +442,8 @@ const PeopleDetail = () => {
                   {secondaryCards.map((card) => {
                     const Icon = card.icon
                     return (
-                      <div key={card.label} className="min-h-[132px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-30px_rgba(15,23,42,0.25)]">
-                        <Icon size={28} className="text-slate-700" />
+                      <div key={card.label} className="min-h-[132px] rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-30px_rgba(15,23,42,0.25)] dark:bg-slate-800 dark:border-slate-700">
+                        <Icon size={28} className="text-slate-700 dark:text-slate-300" />
                         <div className="mt-4 text-sm font-medium text-slate-500">{card.label}</div>
                         <div className={`mt-2 text-[22px] font-extrabold tracking-tight ${card.valueClass || 'text-slate-950'}`}>
                           {card.value}
@@ -457,7 +457,7 @@ const PeopleDetail = () => {
                   {tertiaryCards.map((card) => {
                     const Icon = card.icon
                     return (
-                      <div key={card.label} className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-30px_rgba(15,23,42,0.25)]">
+                      <div key={card.label} className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-[0_14px_35px_-30px_rgba(15,23,42,0.25)] dark:bg-slate-800 dark:border-slate-700">
                         <div className="flex items-center gap-3 text-slate-500">
                           <Icon size={18} />
                           <div className="text-sm font-medium">{card.label}</div>
@@ -472,7 +472,7 @@ const PeopleDetail = () => {
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   {[pg?.language, pg?.urbanRural, pg?.affinityGroup, pg?.startYear].filter(Boolean).map((chip) => (
-                    <span key={chip} className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
+                    <span key={chip} className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
                       {chip}
                     </span>
                   ))}
@@ -498,8 +498,8 @@ const PeopleDetail = () => {
       ) : isError ? (
         <StateError label={isFrench ? 'Impossible de charger ce peuple.' : 'Unable to load this people group.'} />
       ) : (
-        <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
-          <div className="flex border-b border-neutral-200 overflow-x-auto">
+        <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden dark:bg-slate-800 dark:border-slate-700">
+          <div className="flex border-b border-neutral-200 overflow-x-auto dark:border-slate-700">
             {tabs.map((tb) => {
               const Icon = tb.icon
               const active = tab === tb.key

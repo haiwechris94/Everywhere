@@ -128,12 +128,12 @@ const PendingValidations = () => {
         <div className="flex items-center gap-4">
           <button aria-label={t('common.back')}
             onClick={() => navigate('/activities')}
-            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-lg transition-colors dark:hover:bg-slate-700"
           >
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">{t('validation.title')}</h1>
+            <h1 className="page-title">{t('validation.title')}</h1>
             <p className="text-gray-500 dark:text-slate-400 mt-1">
               {t('validation.totalPending').replace('{count}', total)}
             </p>
@@ -166,18 +166,18 @@ const PendingValidations = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-slate-400">
                     {/* Village */}
                     <div className="flex items-center gap-2">
-                      <MapPin size={16} className="text-gray-400" />
+                      <MapPin size={16} className="text-gray-500 dark:text-slate-400" />
                       <span>
-                        <span className="text-gray-400">{t('validation.village')}:</span>{' '}
+                        <span className="text-gray-500 dark:text-slate-400">{t('validation.village')}:</span>{' '}
                         {item.villageName || item.village?.name || t('validation.notSpecified')}
                       </span>
                     </div>
 
                     {/* Date Added */}
                     <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-gray-400" />
+                      <Calendar size={16} className="text-gray-500 dark:text-slate-400" />
                       <span>
-                        <span className="text-gray-400">{t('validation.dateAdded')}:</span>{' '}
+                        <span className="text-gray-500 dark:text-slate-400">{t('validation.dateAdded')}:</span>{' '}
                         {item.createdAt
                           ? format(new Date(item.createdAt), 'dd MMM yyyy, HH:mm', { locale: dateLocale })
                           : t('validation.notSpecified')}
@@ -186,9 +186,9 @@ const PendingValidations = () => {
 
                     {/* Added By */}
                     <div className="flex items-center gap-2">
-                      <User size={16} className="text-gray-400" />
+                      <User size={16} className="text-gray-500 dark:text-slate-400" />
                       <span>
-                        <span className="text-gray-400">{t('validation.addedBy')}:</span>{' '}
+                        <span className="text-gray-500 dark:text-slate-400">{t('validation.addedBy')}:</span>{' '}
                         {item.createdBy?.name || item.createdBy?.email || t('validation.unknown')}
                       </span>
                     </div>
@@ -196,9 +196,9 @@ const PendingValidations = () => {
                     {/* Churches */}
                     {item.numberOfChurches > 0 && (
                       <div className="flex items-center gap-2">
-                        <Users size={16} className="text-gray-400" />
+                        <Users size={16} className="text-gray-500 dark:text-slate-400" />
                         <span>
-                          <span className="text-gray-400">{t('validation.churches')}:</span>{' '}
+                          <span className="text-gray-500 dark:text-slate-400">{t('validation.churches')}:</span>{' '}
                           {item.numberOfChurches}
                         </span>
                       </div>
@@ -270,7 +270,7 @@ const PendingValidations = () => {
                       </button>
                       <button
                         onClick={() => setRejectingId(item._id)}
-                        className="btn-secondary flex items-center justify-center gap-2 text-sm text-red-600 hover:bg-red-50"
+                        className="btn-secondary flex items-center justify-center gap-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-300"
                       >
                         <XCircle size={16} />
                         {t('validation.reject')}

@@ -47,11 +47,11 @@ const ModernPopup = ({ people = {}, onDetailsClick }) => {
     <div className="modern-popup-content min-w-[230px] max-w-[280px] font-sans">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="font-bold text-sm text-neutral-900 leading-tight flex-1">
+        <h3 className="font-bold text-sm text-neutral-900 leading-tight flex-1 dark:text-slate-100">
           {people.name || tx('peopleMap.unnamed', 'Unnamed people')}
         </h3>
         <span
-          className={`text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded ${sourceBadge.color}`}
+          className={`text-xs font-bold tracking-wider uppercase px-1.5 py-0.5 rounded ${sourceBadge.color}`}
         >
           {sourceBadge.label}
         </span>
@@ -60,7 +60,7 @@ const ModernPopup = ({ people = {}, onDetailsClick }) => {
       {/* Status badge */}
       <div className="mb-2.5">
         <span
-          className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${badge.color}`}
+          className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border ${badge.color}`}
         >
           <span
             className="w-1.5 h-1.5 rounded-full"
@@ -72,8 +72,8 @@ const ModernPopup = ({ people = {}, onDetailsClick }) => {
 
       {/* Location */}
       {(country || region) && (
-        <div className="text-[11px] text-neutral-600 mb-2 flex items-center gap-1.5">
-          <Globe size={11} className="text-neutral-400 flex-shrink-0" />
+        <div className="text-xs text-neutral-600 mb-2 flex items-center gap-1.5 dark:text-slate-300">
+          <Globe size={11} className="text-neutral-500 dark:text-slate-400 flex-shrink-0" />
           <span>
             {[region, country].filter(Boolean).join(', ')}
           </span>
@@ -83,34 +83,34 @@ const ModernPopup = ({ people = {}, onDetailsClick }) => {
       {/* Stats grid */}
       <div className="space-y-1.5 mb-3">
         {population != null && (
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <Users size={11} className="text-neutral-400 flex-shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <Users size={11} className="text-neutral-500 dark:text-slate-400 flex-shrink-0" />
             <span className="text-neutral-500">
               {tx('peopleMap.population', 'Population')}:
             </span>
-            <span className="font-semibold text-neutral-800 tabular-nums">
+            <span className="font-semibold text-neutral-800 tabular-nums dark:text-slate-100">
               {Number(population).toLocaleString()}
             </span>
           </div>
         )}
         {language && (
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <BookOpen size={11} className="text-neutral-400 flex-shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs">
+            <BookOpen size={11} className="text-neutral-500 dark:text-slate-400 flex-shrink-0" />
             <span className="text-neutral-500">
               {tx('peopleMap.language', 'Language')}:
             </span>
-            <span className="font-medium text-neutral-700 truncate">{language}</span>
+            <span className="font-medium text-neutral-700 truncate dark:text-slate-300">{language}</span>
           </div>
         )}
         {religion && (
-          <div className="flex items-center gap-1.5 text-[11px]">
-            <span className="w-[11px] h-[11px] flex items-center justify-center text-neutral-400 flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-xs">
+            <span className="w-[11px] h-[11px] flex items-center justify-center text-neutral-500 dark:text-slate-400 flex-shrink-0">
               ☪
             </span>
             <span className="text-neutral-500">
               {tx('peopleMap.religion', 'Religion')}:
             </span>
-            <span className="font-medium text-neutral-700 truncate">{religion}</span>
+            <span className="font-medium text-neutral-700 truncate dark:text-slate-300">{religion}</span>
           </div>
         )}
       </div>
@@ -119,7 +119,7 @@ const ModernPopup = ({ people = {}, onDetailsClick }) => {
       {(people._id || people.id) && onDetailsClick && (
         <button
           onClick={() => onDetailsClick(people)}
-          className="w-full inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 py-1.5 rounded-lg transition-colors"
+          className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-primary-700 bg-primary-50 hover:bg-primary-100 border border-primary-100 py-1.5 rounded-lg transition-colors dark:bg-primary-900/30 dark:border-primary-800 dark:text-primary-300"
         >
           {tx('peopleMap.viewDetails', 'Voir les détails')}
           <ExternalLink size={11} />

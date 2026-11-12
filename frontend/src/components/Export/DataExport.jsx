@@ -169,15 +169,15 @@ const DataExport = () => {
   const isExporting = exportAllMutation.isPending || exportSelectedMutation.isPending || exportPeopleGroupsMutation.isPending
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+    <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+      <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
         <Download size={24} />
         Export Data
       </h2>
 
       {/* Export Type Selection */}
       <div className="mb-6" role="radiogroup" aria-labelledby="data-export-type-label">
-        <span id="data-export-type-label" className="block text-sm font-medium text-gray-700 mb-2">
+        <span id="data-export-type-label" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
           Export Type
         </span>
         <div className="flex gap-4">
@@ -188,7 +188,7 @@ const DataExport = () => {
               value="all"
               checked={exportType === 'all'}
               onChange={(e) => setExportType(e.target.value)}
-              className="text-primary-600"
+              className="text-primary-600 dark:text-primary-300"
             />
             <span>{isFrench ? 'Toutes les données' : 'All Data'}</span>
           </label>
@@ -199,7 +199,7 @@ const DataExport = () => {
               value="selected"
               checked={exportType === 'selected'}
               onChange={(e) => setExportType(e.target.value)}
-              className="text-primary-600"
+              className="text-primary-600 dark:text-primary-300"
             />
             <span>{isFrench ? 'Villages sélectionnés' : 'Selected Villages'}</span>
           </label>
@@ -208,7 +208,7 @@ const DataExport = () => {
 
       {/* Format Selection */}
       <div className="mb-6">
-        <span id="data-export-format-label" className="block text-sm font-medium text-gray-700 mb-2">
+        <span id="data-export-format-label" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
           Format
         </span>
         <div className="flex gap-4" role="group" aria-labelledby="data-export-format-label">
@@ -245,12 +245,12 @@ const DataExport = () => {
       {exportType === 'selected' && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span id="data-export-villages-label" className="block text-sm font-medium text-gray-700">
+            <span id="data-export-villages-label" className="block text-sm font-medium text-gray-700 dark:text-slate-300">
               Select Villages ({selectedVillages.length} selected)
             </span>
             <button
               onClick={handleSelectAll}
-              className="text-sm text-primary-600 hover:underline"
+              className="text-sm text-primary-600 hover:underline dark:text-primary-300"
             >
               {selectedVillages.length === villagesData?.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -258,7 +258,7 @@ const DataExport = () => {
           
           {villagesLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="animate-spin text-primary-600" size={24} />
+              <Loader2 className="animate-spin text-primary-600 dark:text-primary-300" size={24} />
             </div>
           ) : (
             <div className="max-h-64 overflow-y-auto border rounded-lg p-2 space-y-1">
@@ -266,7 +266,7 @@ const DataExport = () => {
                 villagesData.map((village) => (
                   <label
                     key={village._id}
-                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer dark:hover:bg-slate-700"
                   >
                     <button
                       type="button"
@@ -277,7 +277,7 @@ const DataExport = () => {
                       className="text-gray-500 hover:text-primary-600"
                     >
                       {selectedVillages.includes(village._id) ? (
-                        <CheckSquare size={20} className="text-primary-600" />
+                        <CheckSquare size={20} className="text-primary-600 dark:text-primary-300" />
                       ) : (
                         <Square size={20} />
                       )}
@@ -298,8 +298,8 @@ const DataExport = () => {
 
       {/* Source Filter (applies to "Export People Groups Only") */}
       <div className="mb-6">
-        <span id="data-export-source-label" className="block text-sm font-medium text-gray-700 mb-2">
-          Filter People Groups by Source <span className="text-gray-400 font-normal">(optional — empty = all sources)</span>
+        <span id="data-export-source-label" className="block text-sm font-medium text-gray-700 mb-2 dark:text-slate-300">
+          Filter People Groups by Source <span className="text-gray-500 dark:text-slate-400 font-normal">(optional — empty = all sources)</span>
         </span>
         <div className="flex flex-wrap gap-2" role="group" aria-labelledby="data-export-source-label">
           {SOURCE_OPTIONS.map((src) => (
@@ -315,7 +315,7 @@ const DataExport = () => {
               }`}
             >
               {selectedSources.includes(src.value) ? (
-                <CheckSquare size={16} className="text-primary-600" />
+                <CheckSquare size={16} className="text-primary-600 dark:text-primary-300" />
               ) : (
                 <Square size={16} />
               )}
@@ -355,9 +355,9 @@ const DataExport = () => {
       </div>
 
       {/* Info */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-medium text-gray-800 mb-2">{isFrench ? "Informations sur l'export" : 'Export Information'}</h4>
-        <ul className="text-sm text-gray-600 space-y-1">
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+        <h4 className="font-medium text-gray-800 mb-2 dark:text-slate-100">{isFrench ? "Informations sur l'export" : 'Export Information'}</h4>
+        <ul className="text-sm text-gray-600 space-y-1 dark:text-slate-300">
           <li>• <strong>All Data:</strong> Exports villages, people groups, and activities</li>
           <li>• <strong>Selected Villages:</strong> Exports selected villages with their related people groups and activities</li>
           <li>• <strong>JSON format:</strong> Best for data backup and programmatic use</li>

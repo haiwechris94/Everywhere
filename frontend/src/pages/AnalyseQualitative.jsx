@@ -105,9 +105,9 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div ref={dialogRef} className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
+      <div ref={dialogRef} className="bg-white rounded-2xl shadow-soft-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in dark:bg-slate-800">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5 rounded-t-2xl">
+        <div className="sticky top-0 bg-primary-600 px-6 py-5 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-bold text-white">
@@ -126,7 +126,7 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
         
         <div className="p-6 space-y-6">
           {/* Score Ring Display */}
-          <div className="flex flex-col md:flex-row items-center gap-6 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+          <div className="flex flex-col md:flex-row items-center gap-6 p-6 bg-gray-50 rounded-2xl dark:bg-slate-900">
             {/* Circular Score */}
             <div className="relative w-40 h-40">
               <svg className="w-full h-full transform -rotate-90">
@@ -165,23 +165,23 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
             
             {/* Info Grid */}
             <div className="flex-1 grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-xl shadow-sm">
+              <div className="bg-white p-4 rounded-xl shadow-sm dark:bg-slate-800">
                 <p className="text-sm text-gray-500">Village</p>
-                <p className="font-semibold text-gray-800">{safeText(analysis.villageName)}</p>
+                <p className="font-semibold text-gray-800 dark:text-slate-100">{safeText(analysis.villageName)}</p>
               </div>
-              <div className="bg-white p-4 rounded-xl shadow-sm">
+              <div className="bg-white p-4 rounded-xl shadow-sm dark:bg-slate-800">
                 <p className="text-sm text-gray-500">{language === 'fr' ? 'Pays' : 'Country'}</p>
-                <p className="font-semibold text-gray-800">{safeText(analysis.country)}</p>
+                <p className="font-semibold text-gray-800 dark:text-slate-100">{safeText(analysis.country)}</p>
               </div>
-              <div className="bg-white p-4 rounded-xl shadow-sm">
+              <div className="bg-white p-4 rounded-xl shadow-sm dark:bg-slate-800">
                 <p className="text-sm text-gray-500">{language === 'fr' ? 'Priorité' : 'Priority'}</p>
-                <p className="font-semibold capitalize text-gray-700">
+                <p className="font-semibold capitalize text-gray-700 dark:text-slate-300">
                   {normalizePriorityLevel(analysis?.priorityLevel, language)}
                 </p>
               </div>
-              <div className="bg-white p-4 rounded-xl shadow-sm">
+              <div className="bg-white p-4 rounded-xl shadow-sm dark:bg-slate-800">
                 <p className="text-sm text-gray-500">{language === 'fr' ? "Date d'analyse" : 'Analysis date'}</p>
-                <p className="font-semibold text-gray-800">
+                <p className="font-semibold text-gray-800 dark:text-slate-100">
                   {new Date(analysis.analyzedAt).toLocaleDateString()}
                 </p>
               </div>
@@ -189,15 +189,15 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
           </div>
 
           {/* Criteria Scores */}
-          <div className="bg-gray-50 rounded-2xl p-6">
-            <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <BarChart3 size={20} className="text-indigo-600" />
+          <div className="bg-gray-50 rounded-2xl p-6 dark:bg-slate-900">
+            <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
+              <BarChart3 size={20} className="text-indigo-600 dark:text-indigo-300" />
               {language === 'fr' ? 'Scores par critère' : 'Criteria Scores'}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {analysis.criteriaScores?.map((cs, idx) => (
-                <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
-                  <span className="text-sm text-gray-700 font-medium">{cs.criterionName}</span>
+                <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm dark:bg-slate-800">
+                  <span className="text-sm text-gray-700 font-medium dark:text-slate-300">{cs.criterionName}</span>
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map(n => (
@@ -213,7 +213,7 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
                         />
                       ))}
                     </div>
-                    <span className="font-bold text-gray-800 w-10 text-right">{cs.score}/5</span>
+                    <span className="font-bold text-gray-800 w-10 text-right dark:text-slate-100">{cs.score}/5</span>
                   </div>
                 </div>
               ))}
@@ -224,28 +224,28 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
           {(analysis.remarks || analysis.recommendations) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analysis.remarks && (
-                <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                <div className="bg-blue-50 rounded-xl p-5 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2 dark:text-blue-300">
                     <FileText size={18} />
                     {language === 'fr' ? 'Remarques' : 'Remarks'}
                   </h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{analysis.remarks}</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap dark:text-slate-300">{analysis.remarks}</p>
                 </div>
               )}
               {analysis.recommendations && (
-                <div className="bg-green-50 rounded-xl p-5 border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                <div className="bg-green-50 rounded-xl p-5 border border-green-200 dark:bg-green-900/30 dark:border-green-800">
+                  <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2 dark:text-green-300">
                     <CheckCircle size={18} />
                     {language === 'fr' ? 'Recommandations' : 'Recommendations'}
                   </h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{analysis.recommendations}</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap dark:text-slate-300">{analysis.recommendations}</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Metadata */}
-          <div className="text-xs text-gray-400 text-right pt-4 border-t">
+          <div className="text-xs text-gray-500 dark:text-slate-400 text-right pt-4 border-t">
             {language === 'fr' ? 'Analysé le' : 'Analyzed on'}: {new Date(analysis.analyzedAt).toLocaleDateString()}
             {analysis.analyzedBy?.name && ` ${language === 'fr' ? 'par' : 'by'} ${analysis.analyzedBy.name}`}
           </div>
@@ -515,24 +515,24 @@ const AnalyseQualitative = () => {
     <div className="space-y-6 animate-fade-in">
       {/* Header — titre noir en haut, infos clés en ligne légère dessous */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <h1 className="page-title">
           {language === 'fr' ? 'Analyse Qualitative' : 'Qualitative Analysis'}
         </h1>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-[80%] mx-auto">
-          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-yellow-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full">
-            <p className="text-base leading-tight font-medium text-yellow-700 break-words">
+          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-yellow-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full dark:bg-slate-800 dark:border-slate-700">
+            <p className="text-base leading-tight font-medium text-yellow-700 break-words dark:text-yellow-300">
               {language === 'fr' ? '# Groupes de peuples disponibles' : '# People groups available'}
             </p>
             <div>
-              <span className="text-2xl font-semibold leading-none text-gray-900">{peopleGroups.length}</span>
+              <span className="text-2xl font-semibold leading-none text-gray-900 dark:text-slate-100">{peopleGroups.length}</span>
             </div>
           </div>
-          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-green-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full">
-            <p className="text-base leading-tight font-medium text-green-700 break-words">
+          <div className="rounded-[20px] border border-gray-200 bg-white px-4 py-3 shadow-[0_2px_10px_rgba(15,23,42,0.06)] border-t-[6px] border-t-green-500 min-h-[80px] flex flex-col items-center justify-center text-center gap-2 w-full dark:bg-slate-800 dark:border-slate-700">
+            <p className="text-base leading-tight font-medium text-green-700 break-words dark:text-green-300">
               {language === 'fr' ? '# Analyses sauvegardées' : '# Saved analysis'}
             </p>
             <div>
-              <span className="text-2xl font-semibold leading-none text-gray-900">{savedAnalyses.reduce((acc, c) => acc + c.count, 0)}</span>
+              <span className="text-2xl font-semibold leading-none text-gray-900 dark:text-slate-100">{savedAnalyses.reduce((acc, c) => acc + c.count, 0)}</span>
             </div>
           </div>
         </div>
@@ -540,7 +540,7 @@ const AnalyseQualitative = () => {
 
       {/* Tabs — accent neutre, sans grand cadre */}
       <div>
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-slate-700">
           <nav className="flex gap-6">
             <button
               onClick={() => setActiveTab('analyser')}
@@ -572,21 +572,21 @@ const AnalyseQualitative = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - People Selector */}
               <div className="lg:col-span-1 space-y-4">
-                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 dark:bg-slate-900 dark:border-slate-700">
+                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
                     <Users size={20} className="text-gray-500" />
                     {language === 'fr' ? 'Sélectionner un peuple' : 'Select a People Group'}
                   </h3>
                   
                   {/* Search */}
                   <div className="relative mb-4">
-                    <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" />
                     <input
                       type="text"
                       placeholder={language === 'fr' ? 'Rechercher...' : 'Search...'}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent dark:bg-slate-800 dark:border-slate-700"
                     />
                   </div>
 
@@ -594,7 +594,7 @@ const AnalyseQualitative = () => {
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent mb-4"
+                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent mb-4 dark:bg-slate-800 dark:border-slate-700"
                   >
                     <option value="">{language === 'fr' ? 'Tous les pays' : 'All Countries'}</option>
                     {CENTRAL_AFRICAN_COUNTRIES.map(country => (
@@ -605,7 +605,7 @@ const AnalyseQualitative = () => {
                   </select>
 
                   {/* People List */}
-                  <div className="max-h-[400px] overflow-y-auto border border-gray-200 rounded-xl bg-white">
+                  <div className="max-h-[400px] overflow-y-auto border border-gray-200 rounded-xl bg-white dark:bg-slate-800 dark:border-slate-700">
                     {isLoading ? (
                       <div className="p-6 text-center">
                         <Loader2 className="animate-spin mx-auto mb-2 text-gray-500" size={24} />
@@ -638,7 +638,7 @@ const AnalyseQualitative = () => {
                               : 'hover:bg-gray-50'
                           }`}
                         >
-                          <div className="font-medium text-gray-800">{pg.name}</div>
+                          <div className="font-medium text-gray-800 dark:text-slate-100">{pg.name}</div>
                           {null}
                         </button>
                       ))
@@ -652,8 +652,8 @@ const AnalyseQualitative = () => {
                 {selectedPeople ? (
                   <>
                     {/* Selected People Info */}
-                    <div className="rounded-lg p-5 border border-gray-200 bg-gray-50">
-                      <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-3">
+                    <div className="rounded-lg p-5 border border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-slate-700">
+                      <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-3 dark:text-slate-100">
                         <Info size={18} className="text-gray-500" />
                         {selectedPeople.name}
                       </h4>
@@ -682,10 +682,10 @@ const AnalyseQualitative = () => {
                       const CategoryIcon = category.icon
                       return (
                         <div key={key}>
-                          <div className="px-1 pb-2 mb-3 border-b border-gray-200">
-                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                          <div className="px-1 pb-2 mb-3 border-b border-gray-200 dark:border-slate-700">
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2 dark:text-slate-100">
                               <CategoryIcon size={18} className="text-gray-500" />
-                              <span className="text-orange-600">
+                              <span className="text-orange-600 dark:text-orange-300">
                                 {language === 'fr' ? category.title : category.titleEn}
                               </span>
                             </h4>
@@ -694,7 +694,7 @@ const AnalyseQualitative = () => {
                             {category.criteria.map(criterion => (
                               <div key={criterion.id} className="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <div className="flex-1">
-                                  <span id={`criterion-${criterion.id}-label`} className="text-sm font-medium text-gray-700">
+                                  <span id={`criterion-${criterion.id}-label`} className="text-sm font-medium text-gray-700 dark:text-slate-300">
                                     {language === 'fr' ? criterion.label : criterion.labelEn}
                                   </span>
                                 </div>
@@ -728,34 +728,34 @@ const AnalyseQualitative = () => {
                     {/* Remarks and Recommendations */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="analyse-qualitative-remarks" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="analyse-qualitative-remarks" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                           {language === 'fr' ? 'Remarques' : 'Remarks'}
                         </label>
                         <textarea
                           id="analyse-qualitative-remarks"
                           value={remarks}
                           onChange={(e) => setRemarks(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32 dark:bg-slate-900 dark:border-slate-700"
                           placeholder={language === 'fr' ? 'Ajoutez vos remarques...' : 'Add your remarks...'}
                         />
                       </div>
                       <div>
-                        <label htmlFor="analyse-qualitative-recommendations" className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="analyse-qualitative-recommendations" className="block text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">
                           {language === 'fr' ? 'Recommandations' : 'Recommendations'}
                         </label>
                         <textarea
                           id="analyse-qualitative-recommendations"
                           value={recommendations}
                           onChange={(e) => setRecommendations(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32 dark:bg-slate-900 dark:border-slate-700"
                           placeholder={language === 'fr' ? 'Ajoutez vos recommandations...' : 'Add your recommendations...'}
                         />
                       </div>
                     </div>
 
                     {/* Score Summary with Ring Progress */}
-                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-                      <h4 className="font-bold text-gray-800 mb-6 text-center">
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 dark:bg-slate-900 dark:border-slate-700">
+                      <h4 className="font-bold text-gray-800 mb-6 text-center dark:text-slate-100">
                         {language === 'fr' ? 'Résumé de l\'analyse' : 'Analysis Summary'}
                       </h4>
                       <div className="flex flex-col md:flex-row items-center justify-center gap-8">
@@ -798,14 +798,14 @@ const AnalyseQualitative = () => {
                         
                         {/* Stats */}
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
+                          <div className="bg-white p-4 rounded-xl shadow-sm text-center dark:bg-slate-800">
                             <p className={`text-xl font-bold ${priority.color}`}>
                               {priorityLabel}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">{language === 'fr' ? 'Priorité' : 'Priority'}</p>
                           </div>
-                          <div className="bg-white p-4 rounded-xl shadow-sm text-center">
-                            <p className="text-xl font-bold text-gray-700">
+                          <div className="bg-white p-4 rounded-xl shadow-sm text-center dark:bg-slate-800">
+                            <p className="text-xl font-bold text-gray-700 dark:text-slate-300">
                               {evaluatedCriteria}/{totalCriteria}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">{language === 'fr' ? 'Critères' : 'Criteria'}</p>
@@ -819,12 +819,12 @@ const AnalyseQualitative = () => {
                     <div className="flex justify-end gap-4">
                       <button
                         onClick={resetAnalysis}
-                        className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                        className="btn-secondary py-3"
                       >
                         {language === 'fr' ? 'Réinitialiser' : 'Reset'}
                       </button>
                       <button
-                        className="px-8 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-semibold shadow-lg flex items-center gap-2 disabled:opacity-50"
+                        className="btn-primary py-3 gap-2"
                         onClick={handleSaveAnalysis}
                         disabled={saveAnalysisMutation.isLoading}
                       >
@@ -840,10 +840,10 @@ const AnalyseQualitative = () => {
                 ) : (
                   /* Empty State */
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                      <Users size={48} className="text-gray-400" />
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 dark:bg-slate-700">
+                      <Users size={48} className="text-gray-500 dark:text-slate-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2 dark:text-slate-100">
                       {language === 'fr' ? 'Sélectionnez un peuple' : 'Select a People Group'}
                     </h3>
                     <p className="text-gray-500 max-w-md">
@@ -858,12 +858,12 @@ const AnalyseQualitative = () => {
           ) : (
             /* Results Tab - Expandable Country Groups */
             <div className="space-y-4">
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-5 border border-purple-200 mb-6">
-                <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2">
+              <div className="bg-primary-50 rounded-xl p-5 border border-purple-200 mb-6 dark:bg-primary-900/30 dark:border-purple-800">
+                <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2 dark:text-purple-300">
                   <Award size={20} />
                   {language === 'fr' ? 'Résultats d\'Analyse par Pays' : 'Analysis Results by Country'}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-slate-300">
                   {language === 'fr' 
                     ? 'Consultez les analyses qualitatives enregistrées, organisées par pays.'
                     : 'View saved qualitative analyses organized by country.'}
@@ -876,11 +876,11 @@ const AnalyseQualitative = () => {
                   <p className="text-gray-500">{language === 'fr' ? 'Chargement des analyses...' : 'Loading analyses...'}</p>
                 </div>
               ) : savedAnalyses.length === 0 ? (
-                <div className="text-center py-16 bg-gray-50 rounded-xl">
+                <div className="text-center py-16 bg-gray-50 rounded-xl dark:bg-slate-900">
                   <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText size={40} className="text-gray-400" />
+                    <FileText size={40} className="text-gray-500 dark:text-slate-400" />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-700 mb-2">
+                  <h4 className="text-xl font-bold text-gray-700 mb-2 dark:text-slate-300">
                     {language === 'fr' ? 'Aucune analyse enregistrée' : 'No analyses saved'}
                   </h4>
                   <p className="text-gray-500 mb-6">
@@ -890,7 +890,7 @@ const AnalyseQualitative = () => {
                   </p>
                   <button
                     onClick={() => setActiveTab('analyser')}
-                    className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors font-semibold"
+                    className="btn-primary py-3"
                   >
                     {language === 'fr' ? 'Analyser un peuple' : 'Analyze a People Group'}
                   </button>
@@ -901,15 +901,15 @@ const AnalyseQualitative = () => {
                   const isExpanded = expandedCountries[countryGroup.country]
 
                   return (
-                    <div key={countryGroup.country} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <div key={countryGroup.country} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm dark:border-slate-700">
                       <button
                         onClick={() => toggleCountry(countryGroup.country)}
-                        className="w-full flex items-center justify-between p-5 bg-white hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center justify-between p-5 bg-white hover:bg-gray-50 transition-colors dark:bg-slate-800 dark:hover:bg-slate-700"
                       >
                         <div className="flex items-center gap-4">
                           <span className="text-2xl">{countryInfo?.flag || '🌍'}</span>
                           <div className="text-left">
-                            <span className="font-bold text-gray-800 block">
+                            <span className="font-bold text-gray-800 block dark:text-slate-100">
                               {countryInfo ? (language === 'fr' ? countryInfo.nameFr : countryInfo.name) : countryGroup.country}
                             </span>
                             <span className="text-sm text-gray-500">
@@ -920,23 +920,23 @@ const AnalyseQualitative = () => {
                         <div className="flex items-center gap-4">
                           <div className="text-right">
                             <span className="text-sm text-gray-500 block">{language === 'fr' ? 'Score moyen' : 'Average score'}</span>
-                            <span className="font-bold text-gray-900">{countryGroup.avgScore}%</span>
+                            <span className="font-bold text-gray-900 dark:text-slate-100">{countryGroup.avgScore}%</span>
                           </div>
                           {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                         </div>
                       </button>
 
                       {isExpanded && (
-                        <div className="border-t bg-gray-50 divide-y divide-gray-200">
+                        <div className="border-t bg-gray-50 divide-y divide-gray-200 dark:bg-slate-900 dark:divide-slate-700">
                           {countryGroup.analyses.map(analysis => (
                             <div 
                               key={analysis._id} 
-                              className="p-4 bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                              className="p-4 bg-white hover:bg-gray-50 cursor-pointer transition-colors dark:bg-slate-800 dark:hover:bg-slate-700"
                               onClick={() => setSelectedAnalysis(analysis)}
                             >
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <h4 className="font-semibold text-gray-800">{analysis.peopleGroupName}</h4>
+                                  <h4 className="font-semibold text-gray-800 dark:text-slate-100">{analysis.peopleGroupName}</h4>
                                   <div className="text-sm text-gray-500 mt-1 flex items-center gap-4">
                                     <span className="flex items-center gap-1">
                                       <MapPin size={12} />
@@ -949,7 +949,7 @@ const AnalyseQualitative = () => {
                                   <div className={`px-3 py-1.5 rounded-full text-sm font-bold ${getScoreColor(analysis.overallScore)}`}>
                                     {analysis.overallScore}%
                                   </div>
-                                  <Eye size={18} className="text-gray-400" />
+                                  <Eye size={18} className="text-gray-500 dark:text-slate-400" />
                                 </div>
                               </div>
                             </div>

@@ -191,7 +191,7 @@ const PersonsList = () => {
       <select
         value={value}
         onChange={onChange}
-        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
       >
         <option value="">{placeholder}</option>
         {options.map((o) => (
@@ -220,23 +220,23 @@ const PersonsList = () => {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm gap-1.5"
           >
             <Plus size={16} /> {isFrench ? 'Ajouter une personne' : 'Add person'}
           </button>
         )}
-        <label className="inline-flex items-center gap-2 text-sm text-neutral-600">
+        <label className="inline-flex items-center gap-2 text-sm text-neutral-600 dark:text-slate-300">
           <input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
           {isFrench ? 'Afficher les archivés' : 'Show archived'}
         </label>
         <div className="relative ml-auto w-full max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isFrench ? 'Rechercher…' : 'Search…'}
-            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700"
           />
         </div>
       </div>
@@ -245,7 +245,7 @@ const PersonsList = () => {
         <select
           value={fRole}
           onChange={(e) => setFRole(e.target.value)}
-          className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
         >
           <option value="">{isFrench ? 'Tous les rôles' : 'All roles'}</option>
           {ROLE_VALUES.map((r) => (
@@ -294,9 +294,9 @@ const PersonsList = () => {
       ) : filtered.length === 0 ? (
         <StateEmpty label={isFrench ? 'Aucune personne enregistrée.' : 'No people recorded.'} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-          <table className="min-w-full divide-y divide-neutral-200 text-sm">
-            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white dark:bg-slate-800 dark:border-slate-700">
+          <table className="min-w-full divide-y divide-neutral-200 text-sm dark:divide-slate-700">
+            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500 dark:bg-slate-900">
               <tr>
                 <th className="px-4 py-3">{isFrench ? 'Nom' : 'Name'}</th>
                 <th className="px-4 py-3">{isFrench ? 'Rôle' : 'Role'}</th>
@@ -307,7 +307,7 @@ const PersonsList = () => {
                 {canManage && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-neutral-100 dark:divide-slate-700">
               {filtered.map((p) => {
                 const isRegistry = p.origin === 'registry' && !!p._id
                 const sourceHint =
@@ -321,20 +321,20 @@ const PersonsList = () => {
                       : 'region/country leader'
                     : ''
                 return (
-                <tr key={p._id || p.id} className="hover:bg-neutral-50">
-                  <td className="px-4 py-3 font-medium text-neutral-900">
+                <tr key={p._id || p.id} className="hover:bg-neutral-50 dark:hover:bg-slate-700">
+                  <td className="px-4 py-3 font-medium text-neutral-900 dark:text-slate-100">
                     {p.name}
                     {!isRegistry && sourceHint ? (
-                      <span className="ml-2 text-xs font-normal italic text-neutral-400">{sourceHint}</span>
+                      <span className="ml-2 text-xs font-normal italic text-neutral-500 dark:text-slate-400">{sourceHint}</span>
                     ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${roleClass(p.role)}`}>{roleLabel(p.role, isFrench)}</span>
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{p.organization || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{countryOf(p) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{p.region || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{p.organization || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{countryOf(p) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{p.region || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">
                     {p.email || p.phone ? (
                       <span>
                         {p.email || ''}
@@ -352,7 +352,7 @@ const PersonsList = () => {
                           <button
                             type="button"
                             onClick={() => openEdit(p)}
-                            className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                            className="btn-secondary btn-sm gap-1"
                           >
                             <Pencil size={14} /> {isFrench ? 'Modifier' : 'Edit'}
                           </button>
@@ -365,7 +365,7 @@ const PersonsList = () => {
                                 archiveMutation.mutate({ id: p._id, archived: isArch })
                               }
                             }}
-                            className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                            className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
                           >
                             {p.isArchived ? (
                               <>
@@ -380,7 +380,7 @@ const PersonsList = () => {
                         </div>
                       ) : (
                         <div className="flex items-center justify-end">
-                          <span className="text-xs text-neutral-300">—</span>
+                          <span className="text-xs text-neutral-500 dark:text-slate-400">—</span>
                         </div>
                       )}
                     </td>
@@ -395,12 +395,12 @@ const PersonsList = () => {
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-slate-800">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-neutral-900">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-slate-100">
                 {editing ? (isFrench ? 'Modifier la personne' : 'Edit person') : isFrench ? 'Ajouter une personne' : 'Add person'}
               </h2>
-              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-500 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-700">
                 <X size={18} />
               </button>
             </div>
@@ -417,8 +417,8 @@ const PersonsList = () => {
             >
               <Field label={isFrench ? 'Nom *' : 'Name *'} value={form.name} onChange={onField('name')} />
               <div>
-                <label htmlFor="persons-list-role" className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Rôle *' : 'Role *'}</label>
-                <select id="persons-list-role" value={form.role} onChange={onField('role')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
+                <label htmlFor="persons-list-role" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{isFrench ? 'Rôle *' : 'Role *'}</label>
+                <select id="persons-list-role" value={form.role} onChange={onField('role')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700">
                   {ROLE_VALUES.map((r) => (
                     <option key={r} value={r}>
                       {roleLabel(r, isFrench)}
@@ -435,14 +435,14 @@ const PersonsList = () => {
               <Field label="Admin 2" value={form.admin2} onChange={onField('admin2')} />
               <Field label="Admin 3" value={form.admin3} onChange={onField('admin3')} />
               <div className="sm:col-span-2">
-                <label htmlFor="persons-list-notes" className="mb-1 block text-xs font-medium text-neutral-600">Notes</label>
-                <textarea id="persons-list-notes" value={form.notes} onChange={onField('notes')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+                <label htmlFor="persons-list-notes" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">Notes</label>
+                <textarea id="persons-list-notes" value={form.notes} onChange={onField('notes')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700" />
               </div>
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-                <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100">
+                <button type="button" onClick={closeForm} className="btn-secondary btn-sm">
                   {isFrench ? 'Annuler' : 'Cancel'}
                 </button>
-                <button type="submit" disabled={saveMutation.isPending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+                <button type="submit" disabled={saveMutation.isPending} className="btn-primary btn-sm">
                   {saveMutation.isPending ? (isFrench ? 'Enregistrement…' : 'Saving…') : isFrench ? 'Enregistrer' : 'Save'}
                 </button>
               </div>
@@ -458,8 +458,8 @@ const Field = ({ label, value, onChange, type = 'text' }) => {
   const id = useId()
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
-      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{label}</label>
+      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700" />
     </div>
   )
 }

@@ -31,9 +31,9 @@ const MapLegend = ({ items = [], className = '' }) => {
       {/* Clickable Header */}
       <button
         onClick={handleToggle}
-        className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-200"
+        className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-slate-700"
       >
-        <h4 className="text-sm font-semibold text-gray-800">
+        <h4 className="text-sm font-semibold text-gray-800 dark:text-slate-100">
           {t('map.legend.title')}
         </h4>
         <svg
@@ -68,7 +68,7 @@ const MapLegend = ({ items = [], className = '' }) => {
             {legendItems.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <span className={`w-3 h-3 rounded-full ${item.color}`}></span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-slate-300">
                   {item.label || t(`map.legend.${item.labelKey}`)}
                 </span>
               </div>
@@ -76,14 +76,14 @@ const MapLegend = ({ items = [], className = '' }) => {
           </div>
 
           {/* Data Sources */}
-          <div className="space-y-2 pt-2 border-t border-gray-200">
+          <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-slate-700">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
               {t('map.legend.dataSources') || 'Data Sources'}
             </div>
             {dataSourceItems.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <span className="text-base">{item.icon}</span>
-                <span className="text-sm text-gray-600">{item.label}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-300">{item.label}</span>
               </div>
             ))}
           </div>

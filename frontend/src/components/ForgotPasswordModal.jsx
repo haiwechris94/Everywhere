@@ -56,16 +56,16 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-900/60"
         onClick={handleClose}
       />
 
       {/* Modal */}
-      <div ref={dialogRef} className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 animate-fade-in">
+      <div ref={dialogRef} className="relative bg-white rounded-2xl border border-neutral-200 shadow-soft-lg w-full max-w-md mx-4 p-8 animate-fade-in dark:bg-slate-800 dark:border-slate-700">
         {/* Close button */}
         <button aria-label={t('common.close')}
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors dark:hover:bg-slate-700"
         >
           <X size={20} className="text-gray-500" />
         </button>
@@ -73,13 +73,13 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
         {isSuccess ? (
           // Success State
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-              <CheckCircle size={32} className="text-green-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6 dark:bg-green-900/40">
+              <CheckCircle size={32} className="text-green-600 dark:text-green-300" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            <h2 className="font-display text-2xl font-semibold text-neutral-900 mb-3 dark:text-slate-100">
               {t('passwordRecovery.successTitle')}
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 dark:text-slate-300">
               {t('passwordRecovery.successMessage')}
             </p>
             <p className="text-sm text-gray-500 mb-6">
@@ -94,7 +94,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={handleTryAgain}
-                className="w-full py-3 text-gray-600 hover:text-gray-800 transition-colors"
+                className="w-full py-3 text-gray-600 hover:text-gray-800 transition-colors dark:text-slate-300"
               >
                 {t('passwordRecovery.tryAgain')}
               </button>
@@ -104,10 +104,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
           // Form State
           <>
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-                <Mail size={32} className="text-primary-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4 dark:bg-primary-900/40">
+                <Mail size={32} className="text-primary-600 dark:text-primary-300" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="font-display text-2xl font-semibold text-neutral-900 dark:text-slate-100">
                 {t('passwordRecovery.title')}
               </h2>
               <p className="text-gray-500 mt-2">
@@ -116,9 +116,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
             </div>
 
             {error && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 dark:bg-red-900/30 dark:border-red-800">
                 <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-                <p className="text-red-700 text-sm">{error}</p>
+                <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
               </div>
             )}
 
@@ -128,7 +128,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <Mail
                     size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400"
                   />
                   <input
                     id="forgot-password-modal-email"
@@ -146,14 +146,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  <p role="alert" className="form-error">{errors.email.message}</p>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full btn-primary py-3 flex items-center justify-center gap-2"
+                className="w-full btn-primary py-3 text-base"
               >
                 {isLoading ? (
                   <>
@@ -168,7 +168,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
             <button
               onClick={handleClose}
-              className="w-full mt-4 py-3 flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="w-full mt-4 py-3 flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800 transition-colors dark:text-slate-300"
             >
               <ArrowLeft size={18} />
               {t('passwordRecovery.backToLogin')}

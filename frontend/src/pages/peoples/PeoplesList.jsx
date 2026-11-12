@@ -72,7 +72,7 @@ const PeoplesList = () => {
           <button
             type="button"
             onClick={() => setCreating((v) => !v)}
-            className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm"
           >
             {creating ? (isFrench ? 'Fermer' : 'Close') : (isFrench ? '\uFF0B Créer un peuple' : '\uFF0B New people')}
           </button>
@@ -94,13 +94,13 @@ const PeoplesList = () => {
       )}
 
       <div className="relative mb-4 max-w-md">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('common.search') || 'Rechercher un peuple…'}
-          className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-300"
+          className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-300 dark:border-slate-700"
         />
       </div>
 
@@ -111,10 +111,10 @@ const PeoplesList = () => {
       ) : filtered.length === 0 ? (
         <StateEmpty label={isFrench ? 'Aucun peuple trouvé.' : 'No people group found.'} />
       ) : (
-        <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden dark:bg-slate-800 dark:border-slate-700">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="text-left text-neutral-400 border-b border-neutral-200 bg-neutral-50">
+              <tr className="text-left text-neutral-500 dark:text-slate-400 border-b border-neutral-200 bg-neutral-50 dark:bg-slate-900 dark:border-slate-700">
                 <th className="py-2.5 px-4 font-medium">{isFrench ? 'Peuple' : 'People group'}</th>
                 <th className="py-2.5 px-4 font-medium">{isFrench ? 'Région' : 'Region'}</th>
                 <th className="py-2.5 px-4 font-medium">{isFrench ? 'Statut' : 'Status'}</th>
@@ -126,18 +126,18 @@ const PeoplesList = () => {
               {filtered.map((pg, i) => (
                 <tr
                   key={pg._id || i}
-                  className="border-b border-neutral-100 hover:bg-neutral-50"
+                  className="border-b border-neutral-100 hover:bg-neutral-50 dark:border-slate-700 dark:hover:bg-slate-700"
                 >
                   <td className="py-2.5 px-4">
                     <Link
                       to={`/peoples/${pg._id}`}
-                      className="font-medium text-neutral-800 hover:text-neutral-900 flex items-center gap-2"
+                      className="font-medium text-neutral-800 hover:text-neutral-900 flex items-center gap-2 dark:text-slate-100"
                     >
-                      <Users size={15} className="text-neutral-400" />
+                      <Users size={15} className="text-neutral-500 dark:text-slate-400" />
                       {pg.name || '—'}
                     </Link>
                   </td>
-                  <td className="py-2.5 px-4 text-neutral-600">{pg.region || '—'}</td>
+                  <td className="py-2.5 px-4 text-neutral-600 dark:text-slate-300">{pg.region || '—'}</td>
                   <td className="py-2.5 px-4">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(
@@ -147,14 +147,14 @@ const PeoplesList = () => {
                       {pg.status || '—'}
                     </span>
                   </td>
-                  <td className="py-2.5 px-4 text-neutral-600">
+                  <td className="py-2.5 px-4 text-neutral-600 dark:text-slate-300">
                     {typeof pg.population === 'number'
                       ? pg.population.toLocaleString('fr-FR')
                       : pg.population || '—'}
                   </td>
                   <td className="py-2.5 px-4 text-right">
                     <Link to={`/peoples/${pg._id}`}>
-                      <ChevronRight size={16} className="text-neutral-400 inline" />
+                      <ChevronRight size={16} className="text-neutral-500 dark:text-slate-400 inline" />
                     </Link>
                   </td>
                 </tr>

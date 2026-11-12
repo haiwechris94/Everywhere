@@ -33,12 +33,12 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
       onWheel={stop}
     >
       {/* Zoom group */}
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 overflow-hidden flex flex-col">
+      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 overflow-hidden flex flex-col dark:border-slate-700">
         <button aria-label={tx('map.controls.zoomIn', 'Zoom in')}
           type="button"
           onClick={() => map.zoomIn()}
           title={tx('map.controls.zoomIn', 'Zoom in')}
-          className="w-9 h-9 flex items-center justify-center text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors border-b border-neutral-100"
+          className="w-9 h-9 flex items-center justify-center text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors border-b border-neutral-100 dark:border-slate-700 dark:text-slate-300"
         >
           <Plus size={16} />
         </button>
@@ -46,7 +46,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
           type="button"
           onClick={() => map.zoomOut()}
           title={tx('map.controls.zoomOut', 'Zoom out')}
-          className="w-9 h-9 flex items-center justify-center text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+          className="w-9 h-9 flex items-center justify-center text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors dark:text-slate-300"
         >
           <Minus size={16} />
         </button>
@@ -58,7 +58,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
           type="button"
           onClick={onFitData}
           title={tx('map.modernControls.fitToData', 'Fit to data')}
-          className="w-9 h-9 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+          className="w-9 h-9 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors dark:border-slate-700 dark:text-slate-300"
         >
           <Maximize2 size={15} />
         </button>
@@ -70,7 +70,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
           type="button"
           onClick={onLocateMe}
           title={tx('map.modernControls.locateMe', 'Locate me')}
-          className="w-9 h-9 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+          className="w-9 h-9 flex items-center justify-center bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors dark:border-slate-700 dark:text-slate-300"
         >
           <Locate size={15} />
         </button>

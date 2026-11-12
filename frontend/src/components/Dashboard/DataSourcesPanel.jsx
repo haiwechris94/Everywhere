@@ -94,11 +94,11 @@ const SourceCard = ({
           </div>
           <div>
             <p className={`text-sm font-bold ${c.title} leading-tight`}>{title}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{subtitle}</p>
           </div>
         </div>
         {isLoading ? (
-          <Loader2 className="w-4 h-4 text-gray-300 animate-spin mt-1 shrink-0" />
+          <Loader2 className="w-4 h-4 text-gray-500 dark:text-slate-400 animate-spin mt-1 shrink-0" />
         ) : isError ? (
           <AlertCircle className="w-4 h-4 text-red-400 mt-1 shrink-0" />
         ) : null}
@@ -114,7 +114,7 @@ const SourceCard = ({
               (count ?? 0).toLocaleString()
             )}
           </p>
-          <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+          <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-1">
             <Users className="w-3 h-3" /> groupes importés
           </p>
         </div>
@@ -125,7 +125,7 @@ const SourceCard = ({
               {syncDate}
             </p>
           ) : (
-            <p className="text-xs text-gray-400 italic">{isFrench ? 'Jamais synchronisé' : 'Never synced'}</p>
+            <p className="text-xs text-gray-500 dark:text-slate-400 italic">{isFrench ? 'Jamais synchronisé' : 'Never synced'}</p>
           )}
         </div>
       </div>
@@ -349,9 +349,9 @@ const DataSourcesPanel = () => {
     <div className="bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 relative z-10">
       {/* Panel header */}
       <div className="flex items-center gap-2 mb-5">
-        <Globe className="w-5 h-5 text-primary-600" />
+        <Globe className="w-5 h-5 text-primary-600 dark:text-primary-300" />
         <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{isFrench ? 'Sources de données' : 'Data sources'}</h3>
-        <span className="ml-auto text-xs text-gray-400">3 sources actives</span>
+        <span className="ml-auto text-xs text-gray-500 dark:text-slate-400">3 sources actives</span>
       </div>
 
       {/* Cards grid */}

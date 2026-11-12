@@ -228,7 +228,7 @@ const EngagementsList = () => {
       <select
         value={value}
         onChange={onChange}
-        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
       >
         <option value="">{placeholder}</option>
         {options.map((o) => (
@@ -257,23 +257,23 @@ const EngagementsList = () => {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm gap-1.5"
           >
             <Plus size={16} /> {isFrench ? 'Ajouter un engagement' : 'Add engagement'}
           </button>
         )}
-        <label className="inline-flex items-center gap-2 text-sm text-neutral-600">
+        <label className="inline-flex items-center gap-2 text-sm text-neutral-600 dark:text-slate-300">
           <input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
           {isFrench ? 'Afficher les archivés' : 'Show archived'}
         </label>
         <div className="relative ml-auto w-full max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isFrench ? 'Rechercher…' : 'Search…'}
-            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700"
           />
         </div>
       </div>
@@ -320,9 +320,9 @@ const EngagementsList = () => {
       ) : filtered.length === 0 ? (
         <StateEmpty label={isFrench ? 'Aucun engagement.' : 'No engagements.'} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-          <table className="min-w-full divide-y divide-neutral-200 text-sm">
-            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white dark:bg-slate-800 dark:border-slate-700">
+          <table className="min-w-full divide-y divide-neutral-200 text-sm dark:divide-slate-700">
+            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500 dark:bg-slate-900">
               <tr>
                 <th className="px-4 py-3">{isFrench ? 'Nom' : 'Name'}</th>
                 <th className="px-4 py-3">{isFrench ? 'Pays' : 'Country'}</th>
@@ -336,14 +336,14 @@ const EngagementsList = () => {
                 {canManage && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-neutral-100 dark:divide-slate-700">
               {filtered.map((pg) => (
-                <tr key={pg._id} className="hover:bg-neutral-50">
-                  <td className="px-4 py-3 font-medium"><Link to={`/engagements/${pg._id}`} className="text-blue-600 hover:underline">{pg.name}</Link></td>
-                  <td className="px-4 py-3 text-neutral-600">{countryOf(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin1Of(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin2Of(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin3Of(pg) || '—'}</td>
+                <tr key={pg._id} className="hover:bg-neutral-50 dark:hover:bg-slate-700">
+                  <td className="px-4 py-3 font-medium"><Link to={`/engagements/${pg._id}`} className="text-blue-600 hover:underline dark:text-blue-300">{pg.name}</Link></td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{countryOf(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin1Of(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin2Of(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin3Of(pg) || '—'}</td>
                   <td className="px-4 py-3">
                     {pg.status ? (
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass(pg.status)}`}>{pg.status}</span>
@@ -351,16 +351,16 @@ const EngagementsList = () => {
                       '—'
                     )}
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{pg.churchPlanter || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{pg.nationalCoordinator || '—'}</td>
-                  <td className="px-4 py-3 text-right text-neutral-600">{pg.numberOfChurches ?? 0}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{pg.churchPlanter || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{pg.nationalCoordinator || '—'}</td>
+                  <td className="px-4 py-3 text-right text-neutral-600 dark:text-slate-300">{pg.numberOfChurches ?? 0}</td>
                   {canManage && (
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
                           onClick={() => openEdit(pg)}
-                          className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                          className="btn-secondary btn-sm gap-1"
                         >
                           <Pencil size={14} /> {isFrench ? 'Modifier' : 'Edit'}
                         </button>
@@ -373,7 +373,7 @@ const EngagementsList = () => {
                               archiveMutation.mutate({ id: pg._id, archived: isArch })
                             }
                           }}
-                          className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                          className="btn-secondary btn-sm gap-1"
                         >
                           {pg.isArchived ? (
                             <>
@@ -397,12 +397,12 @@ const EngagementsList = () => {
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-slate-800">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-neutral-900">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-slate-100">
                 {editing ? (isFrench ? 'Modifier l’engagement' : 'Edit engagement') : isFrench ? 'Ajouter un engagement' : 'Add engagement'}
               </h2>
-              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-500 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-700">
                 <X size={18} />
               </button>
             </div>
@@ -425,8 +425,8 @@ const EngagementsList = () => {
               <Field label="Admin 2" value={form.admin2} onChange={onField('admin2')} />
               <Field label="Admin 3" value={form.admin3} onChange={onField('admin3')} />
               <div>
-                <label htmlFor="engagements-list-status" className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Statut' : 'Status'}</label>
-                <select id="engagements-list-status" value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
+                <label htmlFor="engagements-list-status" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{isFrench ? 'Statut' : 'Status'}</label>
+                <select id="engagements-list-status" value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700">
                   <option value="">—</option>
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -441,14 +441,14 @@ const EngagementsList = () => {
               <Field label={isFrench ? 'Nombre d’églises' : 'Number of churches'} type="number" value={form.numberOfChurches} onChange={onField('numberOfChurches')} />
               <Field label={isFrench ? 'Génération d’église' : 'Church generation'} type="number" value={form.churchGeneration} onChange={onField('churchGeneration')} />
               <div className="sm:col-span-2">
-                <label htmlFor="engagements-list-description" className="mb-1 block text-xs font-medium text-neutral-600">Description</label>
-                <textarea id="engagements-list-description" value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+                <label htmlFor="engagements-list-description" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">Description</label>
+                <textarea id="engagements-list-description" value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700" />
               </div>
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-                <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100">
+                <button type="button" onClick={closeForm} className="btn-secondary btn-sm">
                   {isFrench ? 'Annuler' : 'Cancel'}
                 </button>
-                <button type="submit" disabled={saveMutation.isPending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+                <button type="submit" disabled={saveMutation.isPending} className="btn-primary btn-sm">
                   {saveMutation.isPending ? (isFrench ? 'Enregistrement…' : 'Saving…') : isFrench ? 'Enregistrer' : 'Save'}
                 </button>
               </div>
@@ -464,8 +464,8 @@ const Field = ({ label, value, onChange, type = 'text' }) => {
   const id = useId()
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
-      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{label}</label>
+      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700" />
     </div>
   )
 }

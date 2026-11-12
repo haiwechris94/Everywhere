@@ -89,14 +89,14 @@ const HierarchicalTable = () => {
 
   const SortIcon = ({ field }) => (
     <ArrowUpDown 
-      className={`w-4 h-4 inline ml-1 ${sortBy === field ? 'text-primary-600' : 'text-gray-400'}`}
+      className={`w-4 h-4 inline ml-1 ${sortBy === field ? 'text-primary-600' : 'text-gray-500 dark:text-slate-400'}`}
     />
   )
 
   if (error) {
     return (
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300">
           Erreur: {error.message}
         </div>
       </div>
@@ -115,7 +115,7 @@ const HierarchicalTable = () => {
         <div className="flex items-center gap-2 text-sm flex-wrap">
           <button
             onClick={() => handleBreadcrumbClick(-1)}
-            className="flex items-center gap-1 text-primary-600 hover:text-primary-800"
+            className="flex items-center gap-1 text-primary-600 hover:text-primary-800 dark:text-primary-300"
           >
             <Home className="w-4 h-4" />
             <span>{isFrench ? 'Accueil' : 'Home'}</span>
@@ -123,10 +123,10 @@ const HierarchicalTable = () => {
           
           {breadcrumbs.map((crumb, index) => (
             <div key={index} className="flex items-center gap-2">
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-500 dark:text-slate-400" />
               <button
                 onClick={() => handleBreadcrumbClick(index)}
-                className="text-primary-600 hover:text-primary-800"
+                className="text-primary-600 hover:text-primary-800 dark:text-primary-300"
               >
                 {crumb.name}
               </button>
@@ -135,7 +135,7 @@ const HierarchicalTable = () => {
           
           {parent && (
             <div className="flex items-center gap-2">
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-500 dark:text-slate-400" />
               <span className="text-gray-800 dark:text-slate-100 font-medium">{parent}</span>
             </div>
           )}
@@ -145,7 +145,7 @@ const HierarchicalTable = () => {
           </span>
           
           {isFetching && (
-            <Loader2 className="w-4 h-4 animate-spin text-primary-600 ml-2" />
+            <Loader2 className="w-4 h-4 animate-spin text-primary-600 ml-2 dark:text-primary-300" />
           )}
         </div>
       </div>
@@ -156,13 +156,13 @@ const HierarchicalTable = () => {
           <thead className="bg-gray-50 dark:bg-slate-900">
             <tr>
               <th 
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800"
+                className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
                 onClick={() => handleSort('name')}
               >
                 Nom <SortIcon field="name" />
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800"
+                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
                 onClick={() => handleSort('total')}
               >
                 Total <SortIcon field="total" />
@@ -191,20 +191,20 @@ const HierarchicalTable = () => {
                   T.P.
                 </div>
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider">
+              <th className="px-4 py-3 text-center text-xs font-medium text-green-700 uppercase tracking-wider dark:text-green-300">
                 <div className="flex items-center justify-center gap-1">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: STATUS_COLORS.dmm }}></div>
                   DMM
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800"
+                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
                 onClick={() => handleSort('withDataPercentage')}
               >
                 Couv. % <SortIcon field="withDataPercentage" />
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800"
+                className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700"
                 onClick={() => handleSort('saturationPercentage')}
               >
                 Sat. % <SortIcon field="saturationPercentage" />
@@ -242,7 +242,7 @@ const HierarchicalTable = () => {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       {item.hasChildren ? (
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                        <ChevronRight className="w-4 h-4 text-gray-500 dark:text-slate-400" />
                       ) : (
                         <div className="w-4"></div>
                       )}
@@ -252,19 +252,19 @@ const HierarchicalTable = () => {
                   <td className="px-4 py-3 text-center font-medium text-gray-800 dark:text-slate-100">
                     {item.total}
                   </td>
-                  <td className="px-4 py-3 text-center text-red-600">
+                  <td className="px-4 py-3 text-center text-red-600 dark:text-red-300">
                     {item.unreached}
                   </td>
-                  <td className="px-4 py-3 text-center text-orange-600">
+                  <td className="px-4 py-3 text-center text-orange-600 dark:text-orange-300">
                     {item.pioneer}
                   </td>
-                  <td className="px-4 py-3 text-center text-yellow-600">
+                  <td className="px-4 py-3 text-center text-yellow-600 dark:text-yellow-300">
                     {item.midway}
                   </td>
                   <td className="px-4 py-3 text-center text-green-500">
                     {item.tippingPoint}
                   </td>
-                  <td className="px-4 py-3 text-center text-green-700">
+                  <td className="px-4 py-3 text-center text-green-700 dark:text-green-300">
                     {item.dmm}
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -304,14 +304,14 @@ const HierarchicalTable = () => {
             <button aria-label={isFrench ? "Précédent" : "Previous"}
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900"
+              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-700"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button aria-label={isFrench ? "Suivant" : "Next"}
               onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
               disabled={page >= data.pagination.totalPages}
-              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900"
+              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-700"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

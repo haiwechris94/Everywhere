@@ -72,7 +72,7 @@ export default function CountryMiniMap({ country = null, region = null, code = n
   }, [dims, iso2, country])
 
   return (
-    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-4 shadow-[0_4px_20px_rgba(30,60,120,0.06)]">
+    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-4 shadow-[0_4px_20px_rgba(30,60,120,0.06)] dark:bg-slate-800">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <MapPin size={18} className="text-[#2563EB]" />
@@ -121,7 +121,7 @@ export default function CountryMiniMap({ country = null, region = null, code = n
                 pathOptions={{ color: '#ea580c', weight: 2, fillColor: '#f97316', fillOpacity: 0.95 }}
               >
                 <Tooltip permanent direction="top" offset={[0, -8]} className="!border-0 !bg-transparent !p-0 !shadow-none">
-                  <span className="rounded bg-[#0F2A5C] px-1.5 py-0.5 text-[10px] font-semibold text-white">{name}</span>
+                  <span className="rounded bg-[#0F2A5C] px-1.5 py-0.5 text-xs font-semibold text-white">{name}</span>
                 </Tooltip>
               </CircleMarker>
             )}
@@ -133,7 +133,7 @@ export default function CountryMiniMap({ country = null, region = null, code = n
       </div>
 
       {!markerPos && (
-        <p className="mt-2 text-[11px] text-[#6B7A99]">
+        <p className="mt-2 text-xs text-[#6B7A99]">
           {isFrench
             ? 'Localisation approximative indisponible pour ce pays.'
             : 'Approximate location unavailable for this country.'}

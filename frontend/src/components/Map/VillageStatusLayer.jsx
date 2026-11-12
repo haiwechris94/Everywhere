@@ -1323,11 +1323,11 @@ export const VillageStatusLegend = ({ visible }) => {
   const statusOrder = ['dmm', 'tipping-point', 'midway', 'pioneer', 'unreached', 'pas-d-information']
 
   return (
-    <div className="mt-2 pt-2 border-t border-gray-200">
+    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700">
       {/* Clickable Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between text-xs font-semibold text-gray-600 hover:text-gray-800 transition-colors"
+        className="w-full flex items-center justify-between text-xs font-semibold text-gray-600 hover:text-gray-800 transition-colors dark:text-slate-300"
       >
         <span>Statut des villages (seuils)</span>
         <svg
@@ -1427,7 +1427,7 @@ export const VillageStatusStats = ({
     <div className="p-3 text-xs max-w-[280px]">
       {/* Filter indicator */}
       {filterLabel && (
-        <div className="mb-2 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+        <div className="mb-2 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium dark:bg-primary-900/30 dark:text-primary-300">
           📍 {filterLabel}
         </div>
       )}
@@ -1439,8 +1439,8 @@ export const VillageStatusStats = ({
       </div>
       
       {/* Villages by status */}
-      <div className="pt-2 border-t border-gray-200">
-        <p className="font-medium mb-1 text-gray-700">Villages par statut:</p>
+      <div className="pt-2 border-t border-gray-200 dark:border-slate-700">
+        <p className="font-medium mb-1 text-gray-700 dark:text-slate-300">Villages par statut:</p>
         <div className="space-y-1">
           {statusOrder.map((status) => {
             const count = statistics.byStatus?.[status] || 0
@@ -1462,8 +1462,8 @@ export const VillageStatusStats = ({
       </div>
       
       {/* People groups by status */}
-      <div className="mt-2 pt-2 border-t border-gray-200">
-        <p className="font-medium mb-1 text-gray-700">Peuples par statut:</p>
+      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-slate-700">
+        <p className="font-medium mb-1 text-gray-700 dark:text-slate-300">Peuples par statut:</p>
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1">

@@ -45,7 +45,7 @@ export default function DmmByStageSection({ engagements = [], isFrench = true })
   const labels = isFrench ? DMM_STAGE_LABEL_FR : DMM_STAGE_LABEL_EN
 
   return (
-    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-6 shadow-[0_4px_20px_rgba(30,60,120,0.06)]">
+    <section className="rounded-[20px] border border-[#DCE6F5] bg-white p-6 shadow-[0_4px_20px_rgba(30,60,120,0.06)] dark:bg-slate-800">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="text-base font-semibold uppercase tracking-wide text-[#0F2A5C]">
           {isFrench ? 'DMM par étape' : 'DMM by stage'}

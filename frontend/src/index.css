@@ -13,12 +13,98 @@
   box-sizing: border-box;
 }
 
+/* ----------------------------------------------------------------------------
+ * DESIGN TOKENS — « Everywhere » (voir design-system/MASTER.md)
+ * Style : minimalisme suisse, contraste élevé, grandes zones tactiles.
+ * ------------------------------------------------------------------------- */
+:root {
+  --color-primary: #0c6a85;
+  --color-primary-strong: #0b566d;
+  --color-accent: #c2410c;
+  --color-background: #f8fafc;
+  --color-foreground: #1e293b;
+  --color-card: #ffffff;
+  --color-muted-foreground: #475569;
+  --color-border: #e2e8f0;
+  --color-destructive: #dc2626;
+  --color-ring: #0c6a85;
+  --font-body: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Lexend', 'Source Sans 3', system-ui, sans-serif;
+}
+
+html.dark {
+  --color-ring: #6cc5db;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: linear-gradient(135deg, #fafbfc 0%, #f4f6f8 100%);
-  color: #2d3843;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  background: var(--color-background);
+  color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Titres : Lexend, serrés et nets. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Focus clavier toujours visible (WCAG 2.4.7) */
+:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Tout ce qui se clique montre la main */
+button:not(:disabled),
+[role='button'],
+summary,
+select,
+label[for] {
+  cursor: pointer;
+}
+
+/* Écrans tactiles : zones d'appui confortables (>= 44px) hors carte */
+@media (pointer: coarse) {
+  :where(button, [role='button'], select, a.btn, input:not([type='checkbox']):not([type='radio']):not([type='range'])):not(.leaflet-container *) {
+    min-height: 44px;
+  }
+  :where(button, [role='button']):not(.leaflet-container *) {
+    min-width: 44px;
+  }
+}
+
+/* Respect du réglage « réduire les animations » */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lien d'évitement pour le clavier / lecteurs d'écran */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 100;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  top: 0.75rem;
 }
 
 /* ============================================================================
@@ -36,6 +122,19 @@ html.dark body {
 
 html.dark #root {
   background-color: #0f172a; /* slate-900 */
+}
+
+/* Champs de formulaire lisibles en mode sombre, même sans variante dark: explicite */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #94a3b8;
 }
 
 /* Dark scrollbar to match the dark surfaces */
@@ -121,7 +220,7 @@ textarea {
 }
 
 .marker-cluster {
-  background-color: rgba(14, 165, 233, 0.6);
+  background-color: rgba(12, 106, 133, 0.7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -208,20 +307,24 @@ textarea {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* Les classes de composants vivent dans @layer components pour que les
+   utilitaires Tailwind (pl-10, py-3…) puissent toujours les surcharger. */
+@layer components {
 /* ============================================
    Modern Form Styles
    ============================================ */
 .form-input {
-  @apply w-full px-4 py-2.5 border border-neutral-300 rounded-lg 
-         focus:ring-2 focus:ring-primary-400 focus:border-primary-500 
-         outline-none transition-all duration-200
-         bg-white shadow-soft
-         placeholder:text-neutral-400
-         hover:border-neutral-400;
+  @apply w-full px-4 py-2.5 min-h-[2.75rem] border border-neutral-400 rounded-lg
+         focus:ring-2 focus:ring-primary-500 focus:border-primary-600
+         outline-none transition-colors duration-200
+         bg-white text-neutral-900
+         placeholder:text-neutral-500
+         hover:border-neutral-500
+         dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:placeholder:text-slate-400;
 }
 
 .form-label {
-  @apply block text-sm font-semibold text-neutral-700 mb-2;
+  @apply block text-sm font-semibold text-neutral-800 mb-1.5 dark:text-slate-200;
 }
 
 .form-error {
@@ -229,7 +332,7 @@ textarea {
 }
 
 .form-helper {
-  @apply text-xs text-neutral-500 mt-1;
+  @apply text-sm text-neutral-600 mt-1 dark:text-slate-400;
 }
 
 /* ============================================
@@ -238,60 +341,68 @@ textarea {
 
 /* Base button styles */
 .btn {
-  @apply inline-flex items-center justify-center gap-2 
-         px-4 py-2.5 rounded-lg font-medium
-         transition-all duration-200
-         focus:outline-none focus:ring-2 focus:ring-offset-2
-         disabled:opacity-50 disabled:cursor-not-allowed
-         shadow-soft hover:shadow-soft-lg;
+  @apply inline-flex items-center justify-center gap-2
+         px-4 py-2.5 min-h-[2.75rem] rounded-lg font-semibold
+         transition-colors duration-200
+         focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+         disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 /* Primary button - Teal */
 .btn-primary {
-  @apply btn bg-primary-500 text-white 
-         hover:bg-primary-600 active:bg-primary-700
+  @apply btn bg-primary-600 text-white
+         hover:bg-primary-700 active:bg-primary-800
          focus:ring-primary-400;
 }
 
 /* Secondary button - Green */
 .btn-secondary {
-  @apply btn bg-neutral-100 text-neutral-700 
-         hover:bg-neutral-200 active:bg-neutral-300
+  @apply btn bg-white text-neutral-800
+         hover:bg-neutral-100 active:bg-neutral-200
          focus:ring-neutral-400
-         border border-neutral-300;
+         border border-neutral-300
+         dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:bg-slate-700;
 }
 
 /* Success button - Green */
 .btn-success {
-  @apply btn bg-success-500 text-white 
+  @apply btn bg-success-500 text-white
          hover:bg-success-600 active:bg-success-700
          focus:ring-success-400;
 }
 
 /* Warning button - Orange */
 .btn-warning {
-  @apply btn bg-warning-500 text-white 
+  @apply btn bg-warning-500 text-neutral-900
          hover:bg-warning-600 active:bg-warning-700
          focus:ring-warning-400;
 }
 
 /* Danger button - Red */
 .btn-danger {
-  @apply btn bg-danger-500 text-white 
+  @apply btn bg-danger-500 text-white
          hover:bg-danger-600 active:bg-danger-700
          focus:ring-danger-400;
 }
 
 /* Accent button - Orange */
 .btn-accent {
-  @apply btn bg-accent-500 text-white 
-         hover:bg-accent-600 active:bg-accent-700
+  @apply btn bg-accent-600 text-white
+         hover:bg-accent-700 active:bg-accent-800
          focus:ring-accent-400;
+}
+
+/* Danger discret : supprimer, rejeter (action secondaire mais risquée) */
+.btn-danger-outline {
+  @apply btn bg-white text-danger-600 border border-danger-300
+         hover:bg-danger-50 active:bg-danger-100
+         focus:ring-danger-400
+         dark:bg-slate-800 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900/30;
 }
 
 /* Outline variants */
 .btn-outline-primary {
-  @apply btn bg-transparent text-primary-600 border-2 border-primary-500
+  @apply btn bg-transparent text-primary-700 border-2 border-primary-600
          hover:bg-primary-50 active:bg-primary-100
          focus:ring-primary-400;
 }
@@ -317,7 +428,7 @@ textarea {
 
 /* Size variants */
 .btn-sm {
-  @apply px-3 py-1.5 text-sm;
+  @apply px-3 py-1.5 min-h-[2.25rem] text-sm;
 }
 
 .btn-lg {
@@ -325,7 +436,7 @@ textarea {
 }
 
 .btn-icon {
-  @apply p-2.5 rounded-lg;
+  @apply p-2.5 min-w-[2.75rem] rounded-lg;
 }
 
 /* ============================================
@@ -343,7 +454,7 @@ textarea {
 }
 
 .tab-active {
-  @apply bg-white text-primary-600 shadow-soft;
+  @apply bg-white text-primary-700 shadow-soft;
 }
 
 /* Underline tab variant */
@@ -360,15 +471,46 @@ textarea {
 }
 
 .tab-underline-active {
-  @apply text-primary-600 border-primary-500;
+  @apply text-primary-700 border-primary-600;
 }
 
 /* ============================================
    Modern Card System
    ============================================ */
 .card {
-  @apply bg-white rounded-xl shadow-soft p-6
-         border border-neutral-200/50;
+  @apply bg-white rounded-xl p-5 sm:p-6
+         border border-neutral-200
+         dark:bg-slate-800 dark:border-slate-700;
+}
+
+/* ============================================
+   Page scaffolding (en-tête de page commun)
+   ============================================ */
+.page-title {
+  @apply font-display text-2xl sm:text-3xl font-semibold text-neutral-900 dark:text-slate-100;
+}
+
+.page-subtitle {
+  @apply mt-1 text-base text-neutral-600 max-w-3xl dark:text-slate-400;
+}
+
+.section-title {
+  @apply font-display text-lg font-semibold text-neutral-900 dark:text-slate-100;
+}
+
+/* Tableaux de données lisibles */
+.data-table {
+  @apply w-full text-sm text-left;
+}
+.data-table thead th {
+  @apply px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-600 bg-neutral-50 border-b border-neutral-200
+         dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700;
+}
+.data-table tbody td {
+  @apply px-4 py-3 border-b border-neutral-100 dark:border-slate-700;
+}
+.data-table tbody tr:hover {
+  @apply bg-neutral-50 dark:bg-slate-700/40;
 }
 
 .card-hover {
@@ -386,7 +528,7 @@ textarea {
 }
 
 .card-title {
-  @apply text-lg font-semibold text-neutral-800;
+  @apply font-display text-lg font-semibold text-neutral-900 dark:text-slate-100;
 }
 
 .card-body {
@@ -512,6 +654,8 @@ textarea {
 .toggle-switch-handle-on {
   @apply translate-x-6;
 }
+
+} /* fin @layer components */
 
 /* ============================================
    Voronoi Layer Styles

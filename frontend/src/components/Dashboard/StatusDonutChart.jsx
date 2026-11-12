@@ -20,13 +20,13 @@ const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div className="bg-white shadow-xl rounded-xl p-3 border border-slate-100 text-sm">
+    <div className="bg-white shadow-xl rounded-xl p-3 border border-slate-100 text-sm dark:bg-slate-800 dark:border-slate-700">
       <div className="flex items-center gap-2 mb-1">
         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.fill }} />
-        <span className="font-semibold text-slate-800">{d.label}</span>
+        <span className="font-semibold text-slate-800 dark:text-slate-100">{d.label}</span>
       </div>
-      <p className="text-slate-500">Nombre : <span className="font-medium text-slate-700">{d.value}</span></p>
-      <p className="text-slate-500">Part : <span className="font-medium text-slate-700">{d.pct}%</span></p>
+      <p className="text-slate-500">Nombre : <span className="font-medium text-slate-700 dark:text-slate-300">{d.value}</span></p>
+      <p className="text-slate-500">Part : <span className="font-medium text-slate-700 dark:text-slate-300">{d.pct}%</span></p>
     </div>
   )
 }
@@ -78,17 +78,17 @@ const StatusDonutChart = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-80 flex items-center justify-center">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-80 flex items-center justify-center dark:bg-slate-800 dark:border-slate-700">
         <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent" />
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 dark:bg-slate-800 dark:border-slate-700">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-base font-semibold text-slate-800">Distribution par Statut</h3>
-        <span className="text-xs text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">
+        <h3 className="text-base font-semibold text-slate-800 dark:text-slate-100">Distribution par Statut</h3>
+        <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100 dark:bg-slate-900 dark:border-slate-700">
           {total} peuples
         </span>
       </div>
@@ -116,12 +116,12 @@ const StatusDonutChart = () => {
       </div>
 
       {/* Legend */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-4 border-t border-slate-100">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
         {chartData.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} aria-hidden="true" />
-            <span className="text-xs text-slate-600 truncate">{item.label}</span>
-            <span className="text-xs font-semibold text-slate-800 ml-auto">{item.value}</span>
+            <span className="text-xs text-slate-600 truncate dark:text-slate-300">{item.label}</span>
+            <span className="text-xs font-semibold text-slate-800 ml-auto dark:text-slate-100">{item.value}</span>
           </div>
         ))}
       </div>

@@ -190,7 +190,7 @@ function GrowthCard({ label, first, last, isFrench }) {
         <Icon size={20} />
         {first === 0 && last > 0 ? '—' : `${pct > 0 ? '+' : ''}${pct.toFixed(0)}%`}
       </div>
-      <p className="mt-0.5 text-xs text-gray-400">
+      <p className="mt-0.5 text-xs text-gray-500 dark:text-slate-400">
         {first} → {last}
       </p>
     </div>
@@ -253,7 +253,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
             onClick={onExport}
             disabled={exporting}
             title={isFrench ? 'Exporter en image PNG' : 'Export as PNG image'}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:bg-slate-900 disabled:opacity-50"
+            className="btn-secondary btn-sm gap-1.5"
           >
             {exporting ? <Loader2 size={14} className="animate-spin" /> : <ImageDown size={14} />}
             {isFrench ? 'Image' : 'Image'}
@@ -281,7 +281,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
               <select
                 value={areaMetric}
                 onChange={(e) => setAreaMetric(e.target.value)}
-                className="rounded border border-gray-300 px-2 py-1 text-xs"
+                className="rounded border border-gray-300 px-2 py-1 text-xs dark:border-slate-700"
               >
                 {METRICS.map((m) => (
                   <option key={m.key} value={m.key}>{isFrench ? m.labelFr : m.labelEn}</option>
@@ -329,7 +329,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
           </LineChart>
         </ResponsiveContainer>
         {effectiveMode === 'area' && (
-          <p className="mt-1 px-2 text-center text-xs text-gray-400">
+          <p className="mt-1 px-2 text-center text-xs text-gray-500 dark:text-slate-400">
             {isFrench ? 'Comparaison : ' : 'Comparing: '}
             {METRICS.find((m) => m.key === areaMetric) && (isFrench ? METRICS.find((m) => m.key === areaMetric).labelFr : METRICS.find((m) => m.key === areaMetric).labelEn)}
           </p>
@@ -369,10 +369,10 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex min-w-[140px] items-center justify-between gap-1 rounded border border-gray-300 bg-white dark:bg-slate-800 px-2 py-1.5 text-sm shadow-sm hover:border-indigo-400 focus:outline-none"
+        className="flex min-w-[140px] items-center justify-between gap-1 rounded border border-gray-300 bg-white dark:bg-slate-800 px-2 py-1.5 text-sm shadow-sm hover:border-indigo-400 focus:outline-none dark:border-slate-700"
       >
         <span className="max-w-[160px] truncate">{displayLabel}</span>
-        <svg className={`h-4 w-4 flex-shrink-0 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+        <svg className={`h-4 w-4 flex-shrink-0 text-gray-500 dark:text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
         </svg>
       </button>
@@ -381,12 +381,12 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute left-0 top-full z-20 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg">
-            <label className="flex cursor-pointer items-center gap-2 border-b border-gray-100 dark:border-slate-700 px-3 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
+            <label className="flex cursor-pointer items-center gap-2 border-b border-gray-100 dark:border-slate-700 px-3 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-300">
               <input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-indigo-600" />
               {allLabel}
             </label>
             {options.map((opt) => (
-              <label key={opt.id} className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm hover:bg-gray-50 dark:bg-slate-900">
+              <label key={opt.id} className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm hover:bg-gray-50 dark:bg-slate-900 dark:hover:bg-slate-700">
                 <input type="checkbox" checked={selected.includes(opt.id)} onChange={() => toggle(opt.id)} className="accent-indigo-600" />
                 {opt.label}
               </label>
@@ -873,7 +873,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
 
   // Formatage d'une variation QoQ en texte signé (ex. +12.5 %, −4 %, —).
   const fmtGrowth = (g) => (g === null || g === undefined ? '—' : `${g > 0 ? '+' : ''}${g}%`)
-  const growthAccent = (g) => (g === null || g === undefined ? 'text-gray-400' : g > 0 ? 'text-emerald-600' : g < 0 ? 'text-red-600' : 'text-gray-500 dark:text-slate-400')
+  const growthAccent = (g) => (g === null || g === undefined ? 'text-gray-500' : g > 0 ? 'text-emerald-600' : g < 0 ? 'text-red-600' : 'text-gray-500 dark:text-slate-400')
 
   const kpis = [
     { label: L("Engagements DMM", 'DMM engagements'), value: peoplesFmt(totalEng), accent: 'text-indigo-600' },
@@ -910,7 +910,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
     <button aria-label={L('Télécharger', 'Download')}
       type="button"
       onClick={onClick}
-      className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400"
+      className="rounded p-1 text-gray-500 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400 dark:hover:bg-slate-700"
       title={L('Télécharger', 'Download')}
     >
       <Download size={14} />
@@ -919,8 +919,8 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
 
   return (
     <div className="mt-6 space-y-4">
-      <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase">
-        <BarChart3 size={18} className="text-indigo-600" /> {L('Analyses & tendances DMM', 'DMM analytics & trends')}
+      <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase dark:text-slate-100">
+        <BarChart3 size={18} className="text-indigo-600 dark:text-indigo-300" /> {L('Analyses & tendances DMM', 'DMM analytics & trends')}
       </h2>
 
       {/* Bandeau d'indicateurs (taux & mesures) */}
@@ -947,7 +947,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
             </div>
           </div>
           {trend.length === 0 ? (
-            <p className="py-10 text-center text-sm text-gray-400">{L('Aucune donnée de période.', 'No period data.')}</p>
+            <p className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">{L('Aucune donnée de période.', 'No period data.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={trendChartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
@@ -972,7 +972,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
             <DlBtn onClick={() => downloadCardPng(statusRef, 'statut')} />
           </div>
           {statusData.length === 0 ? (
-            <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
+            <p className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">{L('Aucun engagement.', 'No engagements.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
@@ -1006,7 +1006,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
             <DlBtn onClick={() => downloadCardPng(topRef, 'top-peuples')} />
           </div>
           {topChurches.length === 0 ? (
-            <p className="py-10 text-center text-sm text-gray-400">{L('Aucun engagement.', 'No engagements.')}</p>
+            <p className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">{L('Aucun engagement.', 'No engagements.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart layout="vertical" data={topChurches} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
@@ -1027,7 +1027,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
             <DlBtn onClick={() => downloadCardPng(growthRef, 'croissance-qoq')} />
           </div>
           {growth.filter((g) => g.churchesGrowth !== null || g.disciplesGrowth !== null).length === 0 ? (
-            <p className="py-10 text-center text-sm text-gray-400">{L('Au moins deux trimestres requis.', 'At least two quarters required.')}</p>
+            <p className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">{L('Au moins deux trimestres requis.', 'At least two quarters required.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={growth} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
@@ -1063,7 +1063,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
             <DlBtn onClick={() => downloadCardPng(areaRef, 'comparaison-zones')} />
           </div>
           {!hasAreaCompare ? (
-            <p className="py-10 text-center text-sm text-gray-400">{L('Sélectionnez au moins 2 Zones NG pour comparer.', 'Select at least 2 NG areas to compare.')}</p>
+            <p className="py-10 text-center text-sm text-gray-500 dark:text-slate-400">{L('Sélectionnez au moins 2 Zones NG pour comparer.', 'Select at least 2 NG areas to compare.')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={areaCompare} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
@@ -1464,8 +1464,8 @@ export default function DmmReporting() {
       {/* ── Header ── */}
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <BarChart3 className="text-indigo-600" />
+          <h1 className="page-title flex items-center gap-2">
+            <BarChart3 className="text-primary-600 dark:text-primary-300" aria-hidden="true" />
             {t('dmmReporting.title')}
           </h1>
         </div>
@@ -1486,7 +1486,7 @@ export default function DmmReporting() {
               allLabel={isFrench ? 'Tous les engagements DMM' : 'All DMM engagements'}
             />
           )}
-          <button onClick={downloadCsv} disabled={downloadingCsv || (areaIds.length === 0 && countryIds.length === 0)} className="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50">
+          <button onClick={downloadCsv} disabled={downloadingCsv || (areaIds.length === 0 && countryIds.length === 0)} className="btn-primary btn-sm gap-2">
             {downloadingCsv ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} {t('dmmReporting.exportCsv')}
           </button>
         </div>
@@ -1499,13 +1499,13 @@ export default function DmmReporting() {
       {/* ── Data ── */}
       {isLoading ? (
         <div className="flex flex-col items-center gap-2 py-16">
-          <Loader2 className="animate-spin text-indigo-600" />
+          <Loader2 className="animate-spin text-indigo-600 dark:text-indigo-300" />
           {pairs.length > 1 && (
             <p className="text-sm text-gray-500 dark:text-slate-400">{isFrench ? `Chargement de ${pairs.length} périodes…` : `Loading ${pairs.length} periods…`}</p>
           )}
         </div>
       ) : hasError ? (
-        <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700">Erreur de chargement du rapport.</p>
+        <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-300">Erreur de chargement du rapport.</p>
       ) : report ? (
         <>
           {/* ── Trend chart (multi-period only) ── */}
@@ -1567,7 +1567,7 @@ export default function DmmReporting() {
                   <span className="w-8 text-right text-sm font-bold">{gen[k] || 0}</span>
                 </div>
               ))}
-              <p className="mt-1 text-xs text-gray-400">Un mouvement (DMM) = 100+ églises sur 4 générations.</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">Un mouvement (DMM) = 100+ églises sur 4 générations.</p>
             </div>
           </div>
 
@@ -1597,7 +1597,7 @@ export default function DmmReporting() {
           {false && (
           <div className="mt-6">
             <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-black uppercase dark:text-slate-100">
                 <Users size={16} /> {isFrench ? 'Peuples engagés par zone / pays' : 'People groups engaged by area / country'}
               </h2>
               <div className="flex items-center gap-2">
@@ -1615,9 +1615,9 @@ export default function DmmReporting() {
             {(areaIds.length === 0 && countryIds.length === 0) ? (
               <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4 text-sm text-gray-500 dark:text-slate-400">{isFrench ? 'Sélectionnez une zone NG ou un pays pour voir les peuples.' : 'Select an NG area or a country to see the people groups.'}</div>
             ) : peoplesQuery.isLoading ? (
-              <div className="flex justify-center py-8"><Loader2 className="animate-spin text-gray-400" /></div>
+              <div className="flex justify-center py-8"><Loader2 className="animate-spin text-gray-500 dark:text-slate-400" /></div>
             ) : peoplesQuery.isError ? (
-              <div className="bg-red-50 text-red-600 rounded-xl p-4 text-sm">{isFrench ? 'Erreur lors du chargement des peuples.' : 'Failed to load people groups.'}</div>
+              <div className="bg-red-50 text-red-600 rounded-xl p-4 text-sm dark:bg-red-900/30 dark:text-red-300">{isFrench ? 'Erreur lors du chargement des peuples.' : 'Failed to load people groups.'}</div>
             ) : peoplesRows.length === 0 ? (
               <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4 text-sm text-gray-500 dark:text-slate-400">{isFrench ? 'Aucun peuple pour cette sélection.' : 'No people groups for this selection.'}</div>
             ) : (
@@ -1643,14 +1643,14 @@ export default function DmmReporting() {
                       const src = rawSrc && rawSrc.toUpperCase() !== 'DMM' ? rawSrc : null
                       const status = p.status?.global || 'UNKNOWN'
                       return (
-                        <tr key={p.masterPeopleId} className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors">
+                        <tr key={p.masterPeopleId} className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700">
                           <td className="py-3 pr-4">
-                            <span className="font-medium text-blue-600">{p.canonicalName}</span>
+                            <span className="font-medium text-blue-600 dark:text-blue-300">{p.canonicalName}</span>
                           </td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.engagementCount ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.totalChurches ?? 0)}</td>
-                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">{peoplesFmt(p.dmm?.maxGeneration ?? 0)}</td>
-                          <td className="py-3 pl-4 text-left text-slate-700">
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{peoplesFmt(p.dmm?.engagementCount ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{peoplesFmt(p.dmm?.totalChurches ?? 0)}</td>
+                          <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">{peoplesFmt(p.dmm?.maxGeneration ?? 0)}</td>
+                          <td className="py-3 pl-4 text-left text-slate-700 dark:text-slate-300">
                             <StatusBadge status={`${status}${src ? ` (${src})` : ''}`} />
                           </td>
                         </tr>

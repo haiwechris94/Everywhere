@@ -266,9 +266,9 @@ export const ChurchPopulationRatioLegend = ({ visible, className = '' }) => {
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-200"
+        className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors duration-200 dark:hover:bg-slate-700"
       >
-        <h4 className="text-sm font-semibold text-gray-800">
+        <h4 className="text-sm font-semibold text-gray-800 dark:text-slate-100">
           Ratio Églises/Population
         </h4>
         <svg
@@ -298,11 +298,11 @@ export const ChurchPopulationRatioLegend = ({ visible, className = '' }) => {
           {legendItems.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               <span 
-                className="w-4 h-4 rounded border border-gray-300 flex-shrink-0"
+                className="w-4 h-4 rounded border border-gray-300 flex-shrink-0 dark:border-slate-700"
                 style={{ backgroundColor: item.color }}
               ></span>
               <div className="flex-1 min-w-0">
-                <span className="text-sm text-gray-700 font-medium">{item.label}</span>
+                <span className="text-sm text-gray-700 font-medium dark:text-slate-300">{item.label}</span>
                 <span className="text-xs text-gray-500 ml-1">({item.description})</span>
               </div>
             </div>
@@ -327,8 +327,8 @@ export const ChurchPopulationRatioStats = ({ data, visible }) => {
   const { summary } = data
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-3 space-y-2">
-      <h4 className="text-sm font-semibold text-gray-800 border-b pb-2">
+    <div className="bg-white rounded-lg shadow-lg p-3 space-y-2 dark:bg-slate-800">
+      <h4 className="text-sm font-semibold text-gray-800 border-b pb-2 dark:text-slate-100">
         Statistiques Globales
       </h4>
       <div className="grid grid-cols-2 gap-2 text-sm">

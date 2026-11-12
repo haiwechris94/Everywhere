@@ -126,7 +126,7 @@ const GeoJSONVillagesLayer = ({
         <div class="village-popup">
           <h3 class="font-bold text-lg">${name}</h3>
           ${altName ? `<p class="text-sm text-gray-500">${altName}</p>` : ''}
-          <p class="text-xs text-gray-400 mt-1">
+          <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">
             ${feature.geometry.coordinates[1].toFixed(4)}, ${feature.geometry.coordinates[0].toFixed(4)}
           </p>
         </div>
@@ -186,7 +186,7 @@ const GeoJSONVillagesLayer = ({
                 <Popup>
                   <div className="village-popup">
                     <h3 className="font-bold text-lg">{name}</h3>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
                       {lat.toFixed(4)}, {lng.toFixed(4)}
                     </p>
                   </div>

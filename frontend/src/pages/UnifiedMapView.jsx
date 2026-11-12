@@ -557,8 +557,8 @@ const CoverageLayer = ({ visible, countryCode, peoples, levelOverride, onPeopleC
   return (
     <>
       {loading && createPortal(
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[1002] bg-white rounded-full shadow-lg px-4 py-2 text-xs font-medium text-gray-600 flex items-center gap-2 pointer-events-none">
-          <Loader2 size={14} className="animate-spin text-teal-600" />
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[1002] bg-white rounded-full shadow-lg px-4 py-2 text-xs font-medium text-gray-600 flex items-center gap-2 pointer-events-none dark:bg-slate-800 dark:text-slate-300">
+          <Loader2 size={14} className="animate-spin text-teal-600 dark:text-teal-300" />
           Chargement des zones de couverture…
         </div>,
         document.body,
@@ -610,7 +610,7 @@ const CoverageLegend = ({ visible, theme }) => {
   if (!visible) return null
   return (
     <details className={`absolute bottom-20 right-4 z-[1001] rounded-xl shadow-lg p-3 ${panelCls(theme)}`} open>
-      <summary className={`cursor-pointer list-none text-[10px] font-bold uppercase tracking-wide mb-2 ${subtleText(theme)}`}>
+      <summary className={`cursor-pointer list-none text-xs font-bold uppercase tracking-wide mb-2 ${subtleText(theme)}`}>
         Couverture DMM
       </summary>
       {Object.entries(STATUS_COLORS_FILL)
@@ -679,7 +679,7 @@ const panelCls = (theme) =>
   theme === 'dark'
     ? 'bg-neutral-900/95 text-neutral-100 border border-neutral-700 backdrop-blur'
     : 'bg-white/95 text-gray-800 border border-neutral-100 backdrop-blur'
-const subtleText = (theme) => (theme === 'dark' ? 'text-neutral-400' : 'text-gray-500')
+const subtleText = (theme) => (theme === 'dark' ? 'text-neutral-500 dark:text-slate-400' : 'text-gray-500')
 const inputCls = (theme) =>
   theme === 'dark'
     ? 'bg-neutral-800 border-neutral-700 text-neutral-100'
@@ -730,7 +730,7 @@ const SearchBox = ({ markers, onPick, onClear, theme }) => {
                 style={{ background: STATUS_COLORS[m.status] || STATUS_COLORS.UNKNOWN }}
               />
               <span className="flex-1 truncate">{m.name}</span>
-              <span className={`text-[10px] ${subtleText(theme)}`}>{m.country || ''}</span>
+              <span className={`text-xs ${subtleText(theme)}`}>{m.country || ''}</span>
             </button>
           ))}
         </div>
@@ -747,7 +747,7 @@ const KpiCard = ({ icon: Icon, label, value, color, theme }) => (
     </div>
     <div className="min-w-0 leading-tight">
       <div className="text-xs font-bold">{value}</div>
-      <div className={`text-[9px] uppercase tracking-wide ${subtleText(theme)}`}>{label}</div>
+      <div className={`text-xs uppercase tracking-wide ${subtleText(theme)}`}>{label}</div>
     </div>
   </div>
 )
@@ -787,7 +787,7 @@ const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilters, onTogg
     style={style}
     className={`absolute right-4 z-[1000] hidden w-[7.5rem] flex-col gap-1 rounded-lg px-2.5 py-2 shadow-sm sm:flex ${panelCls(theme)}`}
   >
-    <div className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>
+    <div className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${subtleText(theme)}`}>
       Engagements DMM
     </div>
     {DMM_STAGE_META.map(({ key, label, color }) => {
@@ -804,14 +804,14 @@ const DmmIndicatorsPanel = ({ counts, total, theme, style, activeFilters, onTogg
           } ${activeFilters.size > 0 && !active ? 'opacity-50' : ''}`}
         >
           <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: color }} />
-          <span className="min-w-0 flex-1 truncate text-[10px]">{label}</span>
+          <span className="min-w-0 flex-1 truncate text-xs">{label}</span>
           <span className="text-xs font-bold">{(counts[key] || 0).toLocaleString('fr-FR')}</span>
         </button>
       )
     })}
     <div className={`mt-1 flex items-center gap-1.5 border-t pt-1 leading-tight ${theme === 'dark' ? 'border-neutral-700' : 'border-black/10'}`}>
       <span className="h-2.5 w-2.5 flex-shrink-0" />
-      <span className={`min-w-0 flex-1 truncate text-[10px] font-semibold ${subtleText(theme)}`}>Total</span>
+      <span className={`min-w-0 flex-1 truncate text-xs font-semibold ${subtleText(theme)}`}>Total</span>
       <span className="text-xs font-bold">{(total || 0).toLocaleString('fr-FR')}</span>
     </div>
   </div>
@@ -822,7 +822,7 @@ const StatusChart = ({ data, theme }) => {
   if (!data || !data.length) return null
   return (
     <div className="mt-3 border-t pt-2" style={{ borderColor: theme === 'dark' ? '#404040' : '#e5e7eb' }}>
-      <p className={`mb-1 text-xs font-semibold ${theme === 'dark' ? 'text-neutral-300' : 'text-gray-600'}`}>
+      <p className={`mb-1 text-xs font-semibold ${theme === 'dark' ? 'text-neutral-500 dark:text-slate-400' : 'text-gray-600'}`}>
         Répartition par statut
       </p>
       <ResponsiveContainer width="100%" height={140}>
@@ -835,7 +835,7 @@ const StatusChart = ({ data, theme }) => {
       </ResponsiveContainer>
       <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1">
         {data.map((d) => (
-          <div key={d.key} className="flex items-center gap-1.5 text-[11px]">
+          <div key={d.key} className="flex items-center gap-1.5 text-xs">
             <span className="h-2.5 w-2.5 flex-shrink-0 rounded-sm" style={{ background: d.color }} />
             <span className="truncate">{d.name}</span>
             <span className={`ml-auto ${subtleText(theme)}`}>{d.value}</span>
@@ -885,7 +885,7 @@ const OverviewMiniMap = ({ mainMap, theme, collapsed, onToggle }) => {
       className={`absolute bottom-6 right-4 z-[1000] overflow-hidden rounded-xl shadow-xl ${panelCls(theme)}`}
       style={{ width: 200 }}
     >
-      <div className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold">
+      <div className="flex items-center justify-between px-2 py-1 text-xs font-semibold">
         <span>Vue d'ensemble</span>
         <button aria-label="Réduire" onClick={onToggle} title="Réduire"><Minimize2 size={13} /></button>
       </div>
@@ -1009,12 +1009,12 @@ const TopCountries = ({ data, theme }) => {
   const max = data[0].count || 1
   return (
     <div className="mt-3 border-t pt-2" style={{ borderColor: theme === 'dark' ? '#404040' : '#e5e7eb' }}>
-      <p className={`mb-1.5 text-xs font-semibold ${theme === 'dark' ? 'text-neutral-300' : 'text-gray-600'}`}>
+      <p className={`mb-1.5 text-xs font-semibold ${theme === 'dark' ? 'text-neutral-500 dark:text-slate-400' : 'text-gray-600'}`}>
         Top 5 pays · peuples non atteints
       </p>
       <div className="flex flex-col gap-1.5">
         {data.map((d, i) => (
-          <div key={d.code} className="flex items-center gap-2 text-[11px]">
+          <div key={d.code} className="flex items-center gap-2 text-xs">
             <span className="w-4 text-right tabular-nums opacity-60">{i + 1}</span>
             <div className="flex-1">
               <div className="mb-0.5 flex items-center justify-between">
@@ -1712,7 +1712,7 @@ export default function UnifiedMapView() {
             showKpis
               ? 'bg-indigo-600 text-white hover:bg-indigo-700'
               : theme === 'dark'
-                ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                ? 'bg-neutral-800 text-neutral-500 dark:text-slate-400 hover:bg-neutral-700'
                 : 'bg-white text-neutral-600 hover:bg-neutral-100'
           }`}
         >
@@ -1726,7 +1726,7 @@ export default function UnifiedMapView() {
             showDmmIndicators
               ? 'bg-indigo-600 text-white hover:bg-indigo-700'
               : theme === 'dark'
-                ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                ? 'bg-neutral-800 text-neutral-500 dark:text-slate-400 hover:bg-neutral-700'
                 : 'bg-white text-neutral-600 hover:bg-neutral-100'
           }`}
         >
@@ -1748,7 +1748,7 @@ export default function UnifiedMapView() {
       )}
       {/* Bandeau « peuple ciblé » — visible dans tous les modes quand une recherche cible un peuple */}
       {focusedPeople && (
-        <div className={`absolute ${mapMode === 'coverage' ? 'top-24' : 'top-14'} left-1/2 -translate-x-1/2 z-[1002] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md ${panelCls(theme)}`}>
+        <div className={`absolute ${mapMode === 'coverage' ? 'top-24' : 'top-14'} left-1/2 -translate-x-1/2 z-[1002] flex max-w-md items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium shadow-md ${panelCls(theme)}`}>
           <MapPin size={13} className="flex-shrink-0 text-indigo-500" />
           <span
             className="h-2.5 w-2.5 flex-shrink-0 rounded-full"
@@ -1772,7 +1772,7 @@ export default function UnifiedMapView() {
           </span>
           <button
             onClick={clearFocus}
-            className="ml-1 flex-shrink-0 rounded-full bg-indigo-600 px-2.5 py-1 text-[10px] font-semibold text-white transition-colors hover:bg-indigo-700"
+            className="ml-1 flex-shrink-0 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
           >
             Afficher tous les peuples
           </button>
@@ -1789,39 +1789,39 @@ export default function UnifiedMapView() {
             className="flex w-full items-center justify-between gap-2 text-left"
             title={legendOpen ? 'Réduire la légende' : 'Afficher la légende'}
           >
-            <span className={`text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>Légende</span>
+            <span className={`text-xs font-bold uppercase tracking-wide ${subtleText(theme)}`}>Légende</span>
             <ChevronDown size={14} className={`transition-transform ${legendOpen ? '' : '-rotate-90'}`} />
           </button>
           {legendOpen && (
             <div className="mt-2 flex flex-col gap-1">
               {/* ÉCHELLE 1 — PEUPLES : statut d'avancement Joshua Project. */}
-              <span className={`text-[9px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+              <span className={`text-xs font-bold uppercase tracking-wide ${subtleText(theme)}`}>
                 {isFrench ? 'Peuples · Joshua Project' : 'Peoples · Joshua Project'}
               </span>
               {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                <span key={k} className="flex items-center gap-1.5 text-[11px]">
+                <span key={k} className="flex items-center gap-1.5 text-xs">
                   <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: STATUS_COLORS[k] }} />
                   {v}
                 </span>
               ))}
 
               {/* ÉCHELLE 2 — ENGAGEMENTS : étapes DMM (palette canonique). */}
-              <span className={`mt-1.5 border-t border-black/10 pt-1.5 text-[9px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+              <span className={`mt-1.5 border-t border-black/10 pt-1.5 text-xs font-bold uppercase tracking-wide ${subtleText(theme)}`}>
                 {isFrench ? 'Engagements · DMM' : 'Engagements · DMM'}
               </span>
               {LEGEND_DMM_STAGES.map(({ key, hex }) => (
-                <span key={key} className="flex items-center gap-1.5 text-[11px]">
+                <span key={key} className="flex items-center gap-1.5 text-xs">
                   <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: hex }} />
                   {dmmStageLabel(key, isFrench)}
                 </span>
               ))}
 
               {/* Formes des marqueurs (indépendantes des deux échelles ci-dessus). */}
-              <span className="mt-1.5 flex items-center gap-1.5 border-t border-black/10 pt-1.5 text-[11px]">
+              <span className="mt-1.5 flex items-center gap-1.5 border-t border-black/10 pt-1.5 text-xs">
                 <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: '#6b7280' }} />
                 master people
               </span>
-              <span className="flex items-center gap-1.5 text-[11px]">
+              <span className="flex items-center gap-1.5 text-xs">
                 <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: 'transparent', border: '2px solid #6b7280' }} />
                 village
               </span>
@@ -1858,14 +1858,14 @@ export default function UnifiedMapView() {
             Groupe des calques superposables : Limites administratives (couverture),
             Sources actifs, et Lieux (points des peuples/engagements). */}
         <div className="mb-3 rounded-lg border border-neutral-200/50 p-2">
-          <p className={`mb-1.5 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+          <p className={`mb-1.5 flex items-center gap-1 text-xs font-bold uppercase tracking-wide ${subtleText(theme)}`}>
             <Layers size={12} /> {uiLabel('layers', isEnglish)}
           </p>
 
           {/* Calque « Limites administratives » (ex-« Niveau »). Pilote le niveau
               administratif affiché par la couche de couverture. */}
           <div className="mb-2">
-            <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('adminBoundaries', isEnglish)}</p>
+            <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{uiLabel('adminBoundaries', isEnglish)}</p>
             <select
               value={levelOverride || ''}
               onChange={(e) => setLevelOverride(e.target.value || null)}
@@ -1881,7 +1881,7 @@ export default function UnifiedMapView() {
 
           {/* Calque « Sources actifs » (ex-« Sources »). */}
           <div className="mb-2">
-            <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('activeSources', isEnglish)}</p>
+            <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{uiLabel('activeSources', isEnglish)}</p>
             {ALL_SOURCES.map((s) => (
               <label key={s} className="flex cursor-pointer items-center gap-2 py-0.5 text-sm">
                 <input type="checkbox" checked={activeSources.has(s)} onChange={() => toggleSource(s)} />
@@ -1894,7 +1894,7 @@ export default function UnifiedMapView() {
               engagements (comme en mode terrain). Peut être actif EN MÊME TEMPS
               que la couverture → voir couverture + points simultanément. */}
           <div>
-            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600">
+            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600 dark:text-slate-300">
               <input type="checkbox" checked={showLocations} onChange={() => setShowLocations((v) => !v)} />
               <MapPin size={12} /> <span>{uiLabel('locations', isEnglish)}</span>
             </label>
@@ -1904,7 +1904,7 @@ export default function UnifiedMapView() {
               administratives (polygones de couverture). Comme pour le mode
               terrain où les tracés sont masqués, décocher cache les frontières. */}
           <div>
-            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600">
+            <label className="flex cursor-pointer items-center gap-2 py-0.5 text-sm font-semibold text-gray-600 dark:text-slate-300">
               <input type="checkbox" checked={showBoundaries} onChange={() => setShowBoundaries((v) => !v)} />
               <MapIcon size={12} /> <span>{uiLabel('boundaries', isEnglish)}</span>
             </label>
@@ -1913,7 +1913,7 @@ export default function UnifiedMapView() {
 
         {/* Pays, puis le Statut — ordre demandé pour le panneau de filtres. */}
         <div className="mb-3">
-          <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('country', isEnglish)}</p>
+          <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{uiLabel('country', isEnglish)}</p>
           <select
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
@@ -1937,7 +1937,7 @@ export default function UnifiedMapView() {
           if (opts.length === 0) return null
           return (
             <div className="mb-3" key={`admin-${level}`}>
-              <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600">
+              <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-slate-300">
                 <MapPin size={12} /> {label}
               </p>
               <select
@@ -1955,7 +1955,7 @@ export default function UnifiedMapView() {
         })}
 
         <div className="mb-3">
-          <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('peopleStatus', isEnglish)}</p>
+          <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{uiLabel('peopleStatus', isEnglish)}</p>
           {/* Multi-sélection : cochez un ou plusieurs statuts (aucun coché = tous). */}
           <div className="rounded border border-neutral-200/50 p-1">
             {Object.entries(STATUS_LABELS).map(([k, v]) => (
@@ -1976,7 +1976,7 @@ export default function UnifiedMapView() {
         {activeSources.has('DMM') && (
           <>
             <div className="mb-3">
-              <p className="mb-1 text-xs font-semibold text-gray-600">{uiLabel('dmmEngagementStatus', isEnglish)}</p>
+              <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">{uiLabel('dmmEngagementStatus', isEnglish)}</p>
               {/* Multi-sélection : cochez un ou plusieurs statuts (aucun coché = tous). */}
               <div className="rounded border border-neutral-200/50 p-1">
                 {DMM_STAGE_META.map(({ key, label, color }) => (
@@ -1995,21 +1995,21 @@ export default function UnifiedMapView() {
 
             <div className="mb-3">
               <div className="mb-1 flex items-center justify-between">
-                <p className="text-xs font-semibold text-gray-600">
+                <p className="text-xs font-semibold text-gray-600 dark:text-slate-300">
                   Engagements DMM{' '}
-                  <span className="text-gray-400">({dmmVisible.length}/{dmmPeoplesFiltered.length})</span>
+                  <span className="text-gray-500 dark:text-slate-400">({dmmVisible.length}/{dmmPeoplesFiltered.length})</span>
                 </p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setAllDmm(true)}
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${inputCls(theme)}`}
+                    className={`rounded px-1.5 py-0.5 text-xs font-semibold ${inputCls(theme)}`}
                     title="Tout cocher"
                   >
                     Tout
                   </button>
                   <button
                     onClick={() => setAllDmm(false)}
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${inputCls(theme)}`}
+                    className={`rounded px-1.5 py-0.5 text-xs font-semibold ${inputCls(theme)}`}
                     title="Tout décocher"
                   >
                     Aucun
@@ -2018,7 +2018,7 @@ export default function UnifiedMapView() {
               </div>
               <div className="max-h-44 overflow-y-auto rounded border border-neutral-200/50 p-1">
                 {dmmPeoplesFiltered.length === 0 && (
-                  <p className="px-1 py-1 text-[11px] text-gray-400">Aucun engagement DMM pour ce filtre.</p>
+                  <p className="px-1 py-1 text-xs text-gray-500 dark:text-slate-400">Aucun engagement DMM pour ce filtre.</p>
                 )}
                 {dmmPeoplesFiltered.map((p) => {
                   const key = String(p.id)
@@ -2040,7 +2040,7 @@ export default function UnifiedMapView() {
                             <span className="font-normal text-gray-500">, {p.villageName}</span>
                           ) : null}
                           {!hasValidCoords(p) ? (
-                            <span className="ml-1 text-[10px] font-normal italic text-amber-500" title="Pas de géolocalisation — non affiché sur la carte">
+                            <span className="ml-1 text-xs font-normal italic text-amber-500" title="Pas de géolocalisation — non affiché sur la carte">
                               (sans position)
                             </span>
                           ) : null}
@@ -2055,7 +2055,7 @@ export default function UnifiedMapView() {
 
             {/* Stats de la sélection DMM */}
             <div className="mb-3 rounded-lg border border-neutral-200/50 p-2 text-xs">
-              <p className="mb-1 font-semibold text-gray-600">Sélection DMM</p>
+              <p className="mb-1 font-semibold text-gray-600 dark:text-slate-300">Sélection DMM</p>
               <div className="flex items-center justify-between py-0.5">
                 <span className="text-gray-500">Peuples affichés</span>
                 <b>{dmmStats.total.toLocaleString('fr-FR')}</b>
@@ -2082,16 +2082,16 @@ export default function UnifiedMapView() {
         <div className="mb-2 flex items-center justify-between">
           <button
             onClick={resetFilters}
-            className={`flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold ${inputCls(theme)}`}
+            className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold ${inputCls(theme)}`}
             title="Réinitialiser les filtres"
           >
             <RotateCcw size={12} /> Réinitialiser
           </button>
         </div>
 
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-gray-600 dark:text-slate-300">
           {isLoading && 'Chargement des marqueurs…'}
-          {error && <span className="text-red-600">Erreur de chargement des données.</span>}
+          {error && <span className="text-red-600 dark:text-red-300">Erreur de chargement des données.</span>}
           {!isLoading && !error && (
             <span>
               Peuples affichés : <b>{visibleCount.toLocaleString('fr-FR')}</b> sur{' '}
@@ -2107,14 +2107,14 @@ export default function UnifiedMapView() {
         {!isLoading && !error && <TopCountries data={topUnreachedCountries} theme={theme} />}
 
         <div className="mt-3 border-t pt-2">
-          <p className="mb-1 text-xs font-semibold text-gray-600">Légende (statut)</p>
+          <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-slate-300">Légende (statut)</p>
           {Object.entries(STATUS_LABELS).map(([k, v]) => (
             <div key={k} className="flex items-center gap-2 py-0.5 text-xs">
               <span className="h-3 w-3 rounded-full" style={{ background: STATUS_COLORS[k] }} />
               {v}
             </div>
           ))}
-          <p className="mt-2 text-[11px] text-gray-400">
+          <p className="mt-2 text-xs text-gray-500 dark:text-slate-400">
             Le double anneau indique un peuple présent dans plusieurs sources (fusionné).
           </p>
         </div>
@@ -2140,10 +2140,10 @@ export default function UnifiedMapView() {
             {(selected.sourceTypes || []).map((t) => (
               <span
                 key={t}
-                className={`rounded-full px-2 py-0.5 text-[10px] ${
+                className={`rounded-full px-2 py-0.5 text-xs ${
                   activeSources.has(t)
                     ? 'bg-indigo-100 text-indigo-700'
-                    : 'bg-gray-100 text-gray-400 line-through'
+                    : 'bg-gray-100 text-gray-500 dark:text-slate-400 line-through'
                 }`}
               >
                 {SOURCE_LABELS[t] || t}
@@ -2164,7 +2164,7 @@ export default function UnifiedMapView() {
               <button
                 key={key}
                 onClick={() => setDetailTab(key)}
-                className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition-colors ${
+                className={`whitespace-nowrap rounded-md px-2 py-1 text-xs font-semibold transition-colors ${
                   detailTab === key
                     ? 'bg-indigo-100 text-indigo-700'
                     : `${subtleText(theme)} hover:bg-black/5`
@@ -2186,7 +2186,7 @@ export default function UnifiedMapView() {
                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                   />
                 ) : (
-                  <div className="flex h-24 w-full items-center justify-center rounded-lg bg-neutral-200/40 text-[11px] text-neutral-400">
+                  <div className="flex h-24 w-full items-center justify-center rounded-lg bg-neutral-200/40 text-xs text-neutral-500 dark:text-slate-400">
                     Photo indisponible
                   </div>
                 )}
@@ -2232,7 +2232,7 @@ export default function UnifiedMapView() {
                 )}
                 {!detail && <p className={subtleText(theme)}>Chargement des sources…</p>}
                 {detail?.sources?.length ? (
-                  <p className="mt-1 text-[11px] text-indigo-500">Voir toutes les sources ({detail.sources.length})</p>
+                  <p className="mt-1 text-xs text-indigo-500">Voir toutes les sources ({detail.sources.length})</p>
                 ) : null}
               </div>
             )}
@@ -2250,7 +2250,7 @@ export default function UnifiedMapView() {
                       <span>{src.population != null ? Number(src.population).toLocaleString('fr-FR') : '—'}</span>
                     </div>
                   )) : <p className={`italic ${subtleText(theme)}`}>Non disponible.</p>}
-                  <p className={`mt-1 text-[11px] italic ${subtleText(theme)}`}>
+                  <p className={`mt-1 text-xs italic ${subtleText(theme)}`}>
                     {isEnglish
                       ? 'Populations are not summed across sources (the same population may be described by several sources).'
                       : 'Les populations ne sont pas additionnées entre sources (une même population peut être décrite par plusieurs sources).'}
@@ -2262,23 +2262,23 @@ export default function UnifiedMapView() {
                 <div className="grid grid-cols-3 gap-1.5 border-t border-neutral-200/40 pt-2">
                   {/* Carte 2 : Status (JPStage dérivé du statut atteint). */}
                   <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
-                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Status</span>
-                    <span className="text-[11px] font-bold leading-tight">{jpStageLabel || '—'}</span>
+                    <span className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Status</span>
+                    <span className="text-xs font-bold leading-tight">{jpStageLabel || '—'}</span>
                   </div>
                   {/* Carte 3 : JPScale (valeur 11px gras) + description 9px. */}
                   <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
-                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>JPScale</span>
-                    <span className="text-[11px] font-bold leading-tight">{jpScaleValue != null ? jpScaleValue : '—'}</span>
+                    <span className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${subtleText(theme)}`}>JPScale</span>
+                    <span className="text-xs font-bold leading-tight">{jpScaleValue != null ? jpScaleValue : '—'}</span>
                     {jpScaleDescription ? (
-                      <span className={`text-[9px] leading-tight ${subtleText(theme)}`}>{jpScaleDescription}</span>
+                      <span className={`text-xs leading-tight ${subtleText(theme)}`}>{jpScaleDescription}</span>
                     ) : null}
                   </div>
                   {/* Carte 4 : Bible Translation status — code 11px gras + description 9px. */}
                   <div className="flex flex-col rounded-lg border border-neutral-200/40 p-2">
-                    <span className={`mb-0.5 text-[9px] font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Bible Translation status</span>
-                    <span className="text-[11px] font-bold leading-tight">{bibleParts.code != null ? bibleParts.code : '—'}</span>
+                    <span className={`mb-0.5 text-xs font-semibold uppercase tracking-wide ${subtleText(theme)}`}>Bible Translation status</span>
+                    <span className="text-xs font-bold leading-tight">{bibleParts.code != null ? bibleParts.code : '—'}</span>
                     {bibleParts.meaning ? (
-                      <span className={`text-[9px] leading-tight ${subtleText(theme)}`}>{bibleParts.meaning}</span>
+                      <span className={`text-xs leading-tight ${subtleText(theme)}`}>{bibleParts.meaning}</span>
                     ) : null}
                   </div>
                 </div>
@@ -2322,7 +2322,7 @@ export default function UnifiedMapView() {
                     </p>
                     {coverage.territories?.length ? (
                       <div className="mt-1 max-h-40 overflow-y-auto rounded-lg border border-neutral-200/40">
-                        <table className="w-full text-[11px]">
+                        <table className="w-full text-xs">
                           <thead>
                             <tr className={subtleText(theme)}>
                               <th className="px-2 py-1 text-left font-semibold">Territoire</th>
@@ -2350,7 +2350,7 @@ export default function UnifiedMapView() {
                 )}
                 <button
                   onClick={() => { if (selected.country) setSelectedCountry(selected.country) }}
-                  className="mt-1 self-start rounded-md bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700"
+                  className="mt-1 self-start rounded-md bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
                 >
                   Voir en mode Couverture
                 </button>
@@ -2370,7 +2370,7 @@ export default function UnifiedMapView() {
                       <span className={subtleText(theme)}>{fmtDate(a.date) || '—'}</span>
                     </div>
                     <p className={subtleText(theme)}>{a.description}</p>
-                    <div className={`mt-0.5 flex items-center gap-2 text-[10px] ${subtleText(theme)}`}>
+                    <div className={`mt-0.5 flex items-center gap-2 text-xs ${subtleText(theme)}`}>
                       {a.village && <span>📍 {a.village}</span>}
                       {a.participants ? <span>👥 {a.participants}</span> : null}
                       {a.user && <span>· {a.user}</span>}
@@ -2389,7 +2389,7 @@ export default function UnifiedMapView() {
 
       {/* ── Map ───────────────────────────────────────────────────── */}
       {zooming && mapMode === 'coverage' && (
-        <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-[1001] rounded-full px-3 py-1 text-[11px] font-medium shadow-md backdrop-blur-md ${panelCls(theme)}`}>
+        <div className={`absolute bottom-20 left-1/2 -translate-x-1/2 z-[1001] rounded-full px-3 py-1 text-xs font-medium shadow-md backdrop-blur-md ${panelCls(theme)}`}>
           Affichage : {LEVEL_LABELS[levelOverride] || 'Auto (zoom)'} — Zoom {mapInstance?.getZoom?.() || 5}
         </div>
       )}

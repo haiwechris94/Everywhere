@@ -294,11 +294,11 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
   // Sort icon component
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
-      return <ChevronDown className="w-4 h-4 text-gray-300" />
+      return <ChevronDown className="w-4 h-4 text-gray-500 dark:text-slate-400" />
     }
     return sortConfig.direction === 'asc' 
-      ? <ChevronUp className="w-4 h-4 text-primary-600" />
-      : <ChevronDown className="w-4 h-4 text-primary-600" />
+      ? <ChevronUp className="w-4 h-4 text-primary-600 dark:text-primary-300" />
+      : <ChevronDown className="w-4 h-4 text-primary-600 dark:text-primary-300" />
   }
 
   const isLoading = loadingPeopleGroups || loadingVillages
@@ -307,7 +307,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
   if (error) {
     return (
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
-        <div className="flex items-center gap-3 text-red-600">
+        <div className="flex items-center gap-3 text-red-600 dark:text-red-300">
           <AlertCircle className="w-5 h-5" />
           <span>Erreur lors du chargement des données: {error.message}</span>
         </div>
@@ -322,7 +322,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary-600" />
+              <TrendingUp className="w-5 h-5 text-primary-600 dark:text-primary-300" />
               Analyse Complète des Peuples et Villages
             </h3>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
@@ -332,7 +332,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
 
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium dark:bg-primary-900/30 dark:text-primary-300"
           >
             <Download className="w-4 h-4" />
             Exporter CSV
@@ -362,7 +362,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
         {/* Filters - Minimalist */}
         <div className="flex flex-col md:flex-row gap-2 mt-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
             <input
               type="text"
               placeholder={isFrench ? 'Rechercher...' : 'Search...'}
@@ -390,7 +390,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
           {(searchTerm || statusFilter !== 'all' || countryFilter !== 'all') && (
             <button
               onClick={() => { setSearchTerm(''); setStatusFilter('all'); setCountryFilter('all'); setCurrentPage(1) }}
-              className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
+              className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors dark:hover:bg-slate-700"
             >
               Réinitialiser
             </button>
@@ -405,7 +405,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <tr>
               <th className="w-8 px-2"></th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors dark:hover:bg-slate-700"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center gap-1">
@@ -415,7 +415,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors dark:hover:bg-slate-700"
                 onClick={() => handleSort('villageName')}
               >
                 <div className="flex items-center gap-1">
@@ -425,7 +425,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors dark:hover:bg-slate-700"
                 onClick={() => handleSort('country')}
               >
                 <div className="flex items-center gap-1">
@@ -434,7 +434,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden lg:table-cell"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden lg:table-cell dark:hover:bg-slate-700"
                 onClick={() => handleSort('region')}
               >
                 <div className="flex items-center gap-1">
@@ -450,7 +450,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 Admin 3
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors dark:hover:bg-slate-700"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -459,7 +459,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors dark:hover:bg-slate-700"
                 onClick={() => handleSort('churches')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -468,7 +468,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden md:table-cell"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden md:table-cell dark:hover:bg-slate-700"
                 onClick={() => handleSort('generation')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -478,7 +478,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
             {isLoading ? (
               [...Array(5)].map((_, i) => (
                 <tr key={i} className="animate-pulse">
@@ -498,7 +498,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               <tr>
                 <td colSpan="10" className="px-4 py-12 text-center">
                   <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-slate-400">
-                    <Search className="w-8 h-8 text-gray-300" />
+                    <Search className="w-8 h-8 text-gray-500 dark:text-slate-400" />
                     <p className="font-medium">{isFrench ? 'Aucun résultat trouvé' : 'No result found'}</p>
                     <p className="text-sm">{isFrench ? 'Essayez de modifier vos filtres' : 'Try adjusting your filters'}</p>
                   </div>
@@ -508,11 +508,11 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               paginatedData.map((item) => (
                 <React.Fragment key={item.id}>
                   <tr 
-                    className="hover:bg-gray-50 dark:bg-slate-900 transition-colors cursor-pointer"
+                    className="hover:bg-gray-50 dark:bg-slate-900 transition-colors cursor-pointer dark:hover:bg-slate-700"
                     onClick={() => toggleRowExpansion(item.id)}
                   >
                     <td className="px-2 py-3 text-center">
-                      <button aria-label={expandedRows.has(item.id) ? t('common.collapseRow') : t('common.expandRow')} aria-expanded={expandedRows.has(item.id)} className="text-gray-400 hover:text-gray-600 dark:text-slate-400">
+                      <button aria-label={expandedRows.has(item.id) ? t('common.collapseRow') : t('common.expandRow')} aria-expanded={expandedRows.has(item.id)} className="text-gray-500 hover:text-gray-600 dark:text-slate-400">
                         {expandedRows.has(item.id) ? (
                           <ChevronDown className="w-4 h-4" />
                         ) : (
@@ -532,7 +532,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                       <StatusBadge status={item.status} />
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`font-semibold ${item.churches > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      <span className={`font-semibold ${item.churches > 0 ? 'text-emerald-600' : 'text-gray-500 dark:text-slate-400'}`}>
                         {item.churches}
                       </span>
                     </td>
@@ -598,7 +598,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <button aria-label={t('common.first')}
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
             >
               <ChevronLeft className="w-4 h-4" />
               <ChevronLeft className="w-4 h-4 -ml-2" />
@@ -606,7 +606,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <button aria-label={t('common.previous')}
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -643,14 +643,14 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <button aria-label={t('common.next')}
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
             <button aria-label={t('common.last')}
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
             >
               <ChevronRight className="w-4 h-4" />
               <ChevronRight className="w-4 h-4 -ml-2" />

@@ -130,13 +130,13 @@ const VoronoiMapPage: React.FC = () => {
   // Check if Voronoi feature is enabled
   if (!featureFlags.voronoi) {
     return (
-      <div className="flex items-center justify-center h-full bg-gray-50">
+      <div className="flex items-center justify-center h-full bg-gray-50 dark:bg-slate-900">
         <div className="text-center p-8">
           <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2 dark:text-slate-100">
             Fonctionnalité désactivée
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-slate-300">
             La visualisation Voronoi est actuellement désactivée.
             Contactez l'administrateur pour l'activer.
           </p>
@@ -146,14 +146,14 @@ const VoronoiMapPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-slate-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-white border-b border-gray-200 px-6 py-4 dark:bg-slate-800 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <MapPin className="w-6 h-6 text-primary-600" />
-              <h1 className="text-xl font-semibold text-gray-900">
+              <MapPin className="w-6 h-6 text-primary-600 dark:text-primary-300" />
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
                 Carte Voronoi
               </h1>
             </div>
@@ -168,7 +168,7 @@ const VoronoiMapPage: React.FC = () => {
             
             <button aria-label={isFrench ? 'Paramètres' : 'Settings'}
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors dark:hover:bg-slate-700"
               title={isFrench ? 'Paramètres' : 'Settings'}
             >
               <Settings className="w-5 h-5" />
@@ -181,17 +181,17 @@ const VoronoiMapPage: React.FC = () => {
           <div className="mt-4 flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <BarChart3 className="w-4 h-4 text-blue-500" />
-              <span className="text-gray-600">
+              <span className="text-gray-600 dark:text-slate-300">
                 Cellule: <strong>{(selectedCell.properties as any).name || selectedCell.properties.cellId}</strong>
               </span>
             </div>
             {selectedCell.properties.area && (
-              <div className="text-gray-600">
+              <div className="text-gray-600 dark:text-slate-300">
                 Surface: <strong>{selectedCell.properties.area.toFixed(2)} km²</strong>
               </div>
             )}
             {selectedCell.properties.population && (
-              <div className="text-gray-600">
+              <div className="text-gray-600 dark:text-slate-300">
                 Population: <strong>{selectedCell.properties.population.toLocaleString()}</strong>
               </div>
             )}
@@ -213,19 +213,19 @@ const VoronoiMapPage: React.FC = () => {
         {/* API Disconnected Warning */}
         {apiHealth.status === 'unhealthy' && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center space-x-3 shadow-lg">
+            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-center space-x-3 shadow-lg dark:bg-red-900/30 dark:border-red-800">
               <AlertTriangle className="w-5 h-5 text-red-500" />
               <div>
-                <p className="text-sm font-medium text-red-800">
+                <p className="text-sm font-medium text-red-800 dark:text-red-300">
                   Connexion à l'API perdue
                 </p>
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-red-600 dark:text-red-300">
                   Les données affichées peuvent être obsolètes
                 </p>
               </div>
               <button
                 onClick={handleRefreshHealth}
-                className="ml-4 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded-md transition-colors"
+                className="ml-4 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded-md transition-colors dark:bg-red-900/40 dark:text-red-300"
               >
                 Réessayer
               </button>
@@ -235,10 +235,10 @@ const VoronoiMapPage: React.FC = () => {
 
         {/* Selected Gap Info */}
         {selectedGap && (
-          <div className="absolute bottom-4 left-4 z-50 bg-white rounded-lg shadow-lg p-4 max-w-sm">
+          <div className="absolute bottom-4 left-4 z-50 bg-white rounded-lg shadow-lg p-4 max-w-sm dark:bg-slate-800">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-gray-900">{isFrench ? 'Zone non couverte' : 'Uncovered area'}</h3>
+                <h3 className="font-medium text-gray-900 dark:text-slate-100">{isFrench ? 'Zone non couverte' : 'Uncovered area'}</h3>
                 <p className="text-sm text-gray-500 mt-1">
                   {isFrench ? 'Sévérité :' : 'Severity:'} <span className={`font-medium ${
                     selectedGap.severity === 'critical' ? 'text-red-600' :
@@ -255,7 +255,7 @@ const VoronoiMapPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedGap(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-500 dark:text-slate-400 hover:text-gray-600"
               >
                 ×
               </button>
@@ -268,13 +268,13 @@ const VoronoiMapPage: React.FC = () => {
       {showSettings && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={() => setShowSettings(false)} />
-          <div ref={settingsDialogRef as React.RefObject<HTMLDivElement>} className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl">
+          <div ref={settingsDialogRef as React.RefObject<HTMLDivElement>} className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl dark:bg-slate-800">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">{isFrench ? 'Paramètres' : 'Settings'}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{isFrench ? 'Paramètres' : 'Settings'}</h2>
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-500 dark:text-slate-400 hover:text-gray-600"
                 >
                   ×
                 </button>
@@ -282,47 +282,47 @@ const VoronoiMapPage: React.FC = () => {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">{isFrench ? 'Couches' : 'Layers'}</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3 dark:text-slate-300">{isFrench ? 'Couches' : 'Layers'}</h3>
                   <div className="space-y-2">
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         defaultChecked={featureFlags.voronoi}
                         disabled
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-slate-700 dark:text-primary-300"
                       />
-                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Diagramme Voronoi' : 'Voronoi diagram'}</span>
+                      <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">{isFrench ? 'Diagramme Voronoi' : 'Voronoi diagram'}</span>
                     </label>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         defaultChecked={featureFlags.coverageGaps}
                         disabled
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-slate-700 dark:text-primary-300"
                       />
-                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Zones non couvertes' : 'Uncovered areas'}</span>
+                      <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">{isFrench ? 'Zones non couvertes' : 'Uncovered areas'}</span>
                     </label>
                     <label className="flex items-center">
                       <input
                         type="checkbox"
                         defaultChecked={featureFlags.statistics}
                         disabled
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-slate-700 dark:text-primary-300"
                       />
-                      <span className="ml-2 text-sm text-gray-600">{isFrench ? 'Panneau statistiques' : 'Statistics panel'}</span>
+                      <span className="ml-2 text-sm text-gray-600 dark:text-slate-300">{isFrench ? 'Panneau statistiques' : 'Statistics panel'}</span>
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">{isFrench ? 'Informations API' : 'API information'}</h3>
-                  <div className="bg-gray-50 rounded-lg p-3 text-sm">
-                    <p className="text-gray-600">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3 dark:text-slate-300">{isFrench ? 'Informations API' : 'API information'}</h3>
+                  <div className="bg-gray-50 rounded-lg p-3 text-sm dark:bg-slate-900">
+                    <p className="text-gray-600 dark:text-slate-300">
                       URL: <code className="text-xs bg-gray-200 px-1 rounded">
                         {import.meta.env.VITE_API_URL || 'http://localhost:5000'}
                       </code>
                     </p>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-gray-600 mt-1 dark:text-slate-300">
                       Statut: {apiHealth.status}
                     </p>
                     {apiHealth.lastChecked && (
@@ -334,8 +334,8 @@ const VoronoiMapPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Export</h3>
-                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3 dark:text-slate-300">Export</h3>
+                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-700">
                     <Download className="w-4 h-4" />
                     <span>{isFrench ? 'Exporter les données' : 'Export data'}</span>
                   </button>

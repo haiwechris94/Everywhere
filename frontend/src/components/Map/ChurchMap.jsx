@@ -252,7 +252,7 @@ const ChurchMap = ({
         
         {/* Error message */}
         {voronoiError && (
-          <div className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">
+          <div className="bg-red-100 text-red-700 text-xs px-2 py-1 rounded dark:bg-red-900/40 dark:text-red-300">
             {voronoiError}
           </div>
         )}

@@ -21,7 +21,7 @@ const QUARTER = Math.floor(now.getUTCMonth() / 3) + 1
 function Metric({ label, value, accent = '#1A1A1A' }) {
   return (
     <div className="rounded-xl border border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 p-3">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-slate-400">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-slate-400">{label}</p>
       <p className="mt-0.5 text-xl font-bold" style={{ color: accent }}>{value ?? 0}</p>
     </div>
   )
@@ -54,7 +54,7 @@ export default function DmmReportingSummary() {
         </span>
         <button
           onClick={() => toggleVisible(true)}
-          className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-1.5 text-sm font-semibold text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900"
+          className="btn-secondary btn-sm gap-1"
         >
           <Eye size={16} /> Afficher
         </button>
@@ -66,7 +66,7 @@ export default function DmmReportingSummary() {
     <div className="mb-8 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm relative z-10">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
             <BarChart3 size={18} />
           </span>
           <div>
@@ -77,14 +77,14 @@ export default function DmmReportingSummary() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/dmm-reporting')}
-            className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm gap-1"
           >
             Rapport complet <ChevronRight size={16} />
           </button>
           <button aria-label="Masquer la synthèse"
             onClick={() => toggleVisible(false)}
             title="Masquer la synthèse"
-            className="flex items-center rounded-lg border border-gray-200 dark:border-slate-700 px-2.5 py-1.5 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900"
+            className="flex items-center rounded-lg border border-gray-200 dark:border-slate-700 px-2.5 py-1.5 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900 dark:hover:bg-slate-700"
           >
             <EyeOff size={16} />
           </button>
@@ -92,7 +92,7 @@ export default function DmmReportingSummary() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-8"><Loader2 className="animate-spin text-indigo-600" /></div>
+        <div className="flex justify-center py-8"><Loader2 className="animate-spin text-indigo-600 dark:text-indigo-300" /></div>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -105,15 +105,15 @@ export default function DmmReportingSummary() {
 
           {/* Églises par génération */}
           <div className="mt-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Églises par génération</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Églises par génération</p>
             <div className="flex items-end gap-3">
               {[['1', '1G'], ['2', '2G'], ['3', '3G'], ['4plus', '4G+']].map(([k, lbl]) => (
                 <div key={k} className="flex flex-1 flex-col items-center">
-                  <span className="mb-1 text-xs font-semibold text-slate-700">{gen[k] || 0}</span>
+                  <span className="mb-1 text-xs font-semibold text-slate-700 dark:text-slate-300">{gen[k] || 0}</span>
                   <div className="flex h-20 w-full items-end rounded bg-gray-100 dark:bg-slate-800">
                     <div className="w-full rounded bg-indigo-500" style={{ height: `${((gen[k] || 0) / maxGen) * 100}%` }} />
                   </div>
-                  <span className="mt-1 text-[11px] text-gray-500 dark:text-slate-400">{lbl}</span>
+                  <span className="mt-1 text-xs text-gray-500 dark:text-slate-400">{lbl}</span>
                 </div>
               ))}
             </div>

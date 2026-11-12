@@ -109,7 +109,7 @@ const CountryMultiSelect = ({
             {selectedCountries.slice(0, 3).map(code => (
               <span
                 key={code}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs font-medium"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs font-medium dark:bg-primary-900/40 dark:text-primary-300"
               >
                 {getCountryName(code)}
                 <button aria-label={t('common.remove')}
@@ -128,7 +128,7 @@ const CountryMultiSelect = ({
             )}
           </>
         ) : (
-          <span className="text-gray-400 text-sm flex items-center gap-2">
+          <span className="text-gray-500 dark:text-slate-400 text-sm flex items-center gap-2">
             <Globe size={14} />
             {displayPlaceholder}
           </span>
@@ -139,22 +139,22 @@ const CountryMultiSelect = ({
           {selectedCountries.length > 0 && !disabled && (
             <button aria-label={t('common.reset') || 'Clear all'}
               onClick={clearAll}
-              className="p-1 hover:bg-gray-100 rounded"
+              className="p-1 hover:bg-gray-100 rounded dark:hover:bg-slate-700"
               title={t('common.reset') || 'Clear all'}
             >
-              <X size={14} className="text-gray-400" />
+              <X size={14} className="text-gray-500 dark:text-slate-400" />
             </button>
           )}
           <ChevronDown
             size={16}
-            className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`text-gray-500 dark:text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>
       </div>
 
       {/* Dropdown menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden dark:bg-slate-800 dark:border-slate-700">
           {/* Search input */}
           <div className="p-2 border-b">
             <input
@@ -169,14 +169,14 @@ const CountryMultiSelect = ({
           </div>
 
           {/* Quick actions */}
-          <div className="px-2 py-1.5 border-b bg-gray-50 flex gap-2">
+          <div className="px-2 py-1.5 border-b bg-gray-50 flex gap-2 dark:bg-slate-900">
             <button
               onClick={selectAll}
-              className="text-xs text-primary-600 hover:text-primary-800"
+              className="text-xs text-primary-600 hover:text-primary-800 dark:text-primary-300"
             >
               {t('common.all') || 'Select all'}
             </button>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-500 dark:text-slate-400">|</span>
             <button
               onClick={(e) => clearAll(e)}
               className="text-xs text-gray-500 hover:text-gray-700"
@@ -204,15 +204,15 @@ const CountryMultiSelect = ({
                     `}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
                         {country.name}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-slate-400">
                         ({country.code})
                       </span>
                     </div>
                     {isSelected && (
-                      <Check size={16} className="text-primary-600" />
+                      <Check size={16} className="text-primary-600 dark:text-primary-300" />
                     )}
                   </div>
                 );

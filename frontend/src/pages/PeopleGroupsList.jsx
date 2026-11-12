@@ -97,11 +97,11 @@ const formatCompact = (n, isFrench) => {
 
 // One small stat block (value + label) used in the card footer.
 const CardStat = ({ icon: Icon, value, label }) => (
-  <div className="flex flex-col items-center rounded-lg bg-neutral-50 px-2 py-2 text-center">
-    <span className="flex items-center gap-1 text-sm font-semibold text-neutral-900">
-      {Icon && <Icon size={13} className="text-neutral-400" />} {value}
+  <div className="flex flex-col items-center rounded-lg bg-neutral-50 px-2 py-2 text-center dark:bg-slate-900">
+    <span className="flex items-center gap-1 text-sm font-semibold text-neutral-900 dark:text-slate-100">
+      {Icon && <Icon size={13} className="text-neutral-500 dark:text-slate-400" />} {value}
     </span>
-    <span className="mt-0.5 text-[11px] leading-tight text-neutral-500">{label}</span>
+    <span className="mt-0.5 text-xs leading-tight text-neutral-500">{label}</span>
   </div>
 )
 
@@ -254,16 +254,16 @@ const ShareModal = ({ pg, shareUrl, isFrench, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div ref={dialogRef} className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" onClick={stop}>
+      <div ref={dialogRef} className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-slate-800" onClick={stop}>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-neutral-900">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-neutral-900 dark:text-slate-100">
             <Share2 size={18} /> {isFrench ? 'Partager ce peuple' : 'Share this people group'}
           </h2>
-          <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={onClose} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+          <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={onClose} className="rounded p-1 text-neutral-500 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-700">
             <X size={18} />
           </button>
         </div>
-        <p className="mb-4 text-sm text-neutral-600">
+        <p className="mb-4 text-sm text-neutral-600 dark:text-slate-300">
           {isFrench
             ? 'Envoyez une fiche à un partenaire financier, ou copiez un lien vers ce peuple.'
             : 'Send a sheet to a financial partner, or copy a link to this people group.'}
@@ -272,31 +272,31 @@ const ShareModal = ({ pg, shareUrl, isFrench, onClose }) => {
           <button
             type="button"
             onClick={openSheet}
-            className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50"
+            className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-700"
           >
-            <Download size={18} className="text-indigo-600" />
+            <Download size={18} className="text-indigo-600 dark:text-indigo-300" />
             {isFrench ? 'Générer la fiche (PDF / impression)' : 'Generate sheet (PDF / print)'}
           </button>
           <button
             type="button"
             onClick={copyLink}
-            className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50"
+            className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-700"
           >
-            <Link2 size={18} className="text-indigo-600" />
+            <Link2 size={18} className="text-indigo-600 dark:text-indigo-300" />
             {isFrench ? 'Copier le lien de la fiche' : 'Copy link to the sheet'}
           </button>
           {typeof navigator !== 'undefined' && navigator.share && (
             <button
               type="button"
               onClick={nativeShare}
-              className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-left text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-700"
             >
-              <Share2 size={18} className="text-indigo-600" />
+              <Share2 size={18} className="text-indigo-600 dark:text-indigo-300" />
               {isFrench ? 'Partager…' : 'Share…'}
             </button>
           )}
         </div>
-        <div className="mt-4 rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500 break-all">
+        <div className="mt-4 rounded-lg bg-neutral-50 px-3 py-2 text-xs text-neutral-500 break-all dark:bg-slate-900">
           {shareUrl}
         </div>
       </div>
@@ -336,7 +336,7 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
   return (
     <Link
       to={href}
-      className="group relative flex flex-col rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
+      className="group relative flex flex-col rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:bg-slate-800 dark:border-slate-700"
     >
       {/* Share button (does not trigger navigation) */}
       <button
@@ -344,7 +344,7 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
         title={isFrench ? 'Partager / fiche partenaire' : 'Share / partner sheet'}
         aria-label={isFrench ? 'Partager' : 'Share'}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onShare?.(pg) }}
-        className="absolute right-2 top-2 rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-indigo-600"
+        className="absolute right-2 top-2 rounded-md p-1.5 text-neutral-500 dark:text-slate-400 hover:bg-neutral-100 hover:text-indigo-600 dark:hover:bg-slate-700"
       >
         <Share2 size={16} />
       </button>
@@ -355,13 +355,13 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
           {getCountryFlag(pg.countryCode)}
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate font-semibold text-neutral-900 group-hover:text-indigo-700">
+          <h3 className="truncate font-semibold text-neutral-900 group-hover:text-indigo-700 dark:text-slate-100">
             {pg.name || (isFrench ? 'Sans nom' : 'Unnamed')}
           </h3>
           {location && <p className="truncate text-xs text-neutral-500">{location}</p>}
           {/* Sponsorship badge */}
           <span
-            className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${sponsored ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}
+            className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${sponsored ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}
           >
             <HeartHandshake size={11} />
             {sponsored
@@ -375,7 +375,7 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
       </div>
 
       {/* Narrative line */}
-      <p className="mt-3 text-xs leading-snug text-neutral-600">{story}</p>
+      <p className="mt-3 text-xs leading-snug text-neutral-600 dark:text-slate-300">{story}</p>
 
       {/* Labelled 4-step DMM progress bar */}
       <div className="mt-3">
@@ -392,7 +392,7 @@ const PeopleCard = ({ pg, href, isFrench, onShare }) => {
           {shortLabels.map((lbl, i) => (
             <span
               key={lbl}
-              className={`flex-1 text-center text-[10px] leading-tight ${i === stageIndex ? 'font-semibold text-neutral-700' : 'text-neutral-400'}`}
+              className={`flex-1 text-center text-xs leading-tight ${i === stageIndex ? 'font-semibold text-neutral-700' : 'text-neutral-500 dark:text-slate-400'}`}
             >
               {lbl}
             </span>
@@ -686,7 +686,7 @@ const PeopleGroupsList = () => {
       <select
         value={value}
         onChange={onChange}
-        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
       >
         <option value="">{placeholder}</option>
         {options.map((o) => {
@@ -717,45 +717,45 @@ const PeopleGroupsList = () => {
       {/* Impact banner — aggregated KPIs over the filtered set */}
       {!isLoading && !isError && (
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Users size={14} /> {isFrench ? 'Peuples' : 'People groups'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-neutral-900">{kpis.total}</div>
+            <div className="mt-1 text-2xl font-bold text-neutral-900 dark:text-slate-100">{kpis.total}</div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Flag size={14} /> {isFrench ? 'Engagés' : 'Engaged'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-indigo-600">{kpis.engaged}</div>
+            <div className="mt-1 text-2xl font-bold text-indigo-600 dark:text-indigo-300">{kpis.engaged}</div>
             <div className="text-xs text-neutral-500">{kpis.engagedPct}% {isFrench ? 'du total' : 'of total'}</div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Church size={14} /> {isFrench ? 'Églises plantées' : 'Churches planted'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-green-600">{kpis.churches.toLocaleString(isFrench ? 'fr-FR' : 'en-US')}</div>
+            <div className="mt-1 text-2xl font-bold text-green-600 dark:text-green-300">{kpis.churches.toLocaleString(isFrench ? 'fr-FR' : 'en-US')}</div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Target size={14} /> {isFrench ? 'Atteints / Non-atteints' : 'Reached / Unreached'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-neutral-900">
-              <span className="text-green-600">{kpis.reachedPct}%</span>
-              <span className="mx-1 text-neutral-300">/</span>
+            <div className="mt-1 text-2xl font-bold text-neutral-900 dark:text-slate-100">
+              <span className="text-green-600 dark:text-green-300">{kpis.reachedPct}%</span>
+              <span className="mx-1 text-neutral-500 dark:text-slate-400">/</span>
               <span className="text-red-500">{kpis.unreachedPct}%</span>
             </div>
             <div className="text-xs text-neutral-500">{kpis.reached} / {kpis.unreached}</div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-neutral-500">
               <Users size={14} /> {isFrench ? 'Sans engagement' : 'No engagement'}
             </div>
-            <div className="mt-1 text-2xl font-bold text-amber-600">{kpis.notEngaged}</div>
+            <div className="mt-1 text-2xl font-bold text-amber-600 dark:text-amber-300">{kpis.notEngaged}</div>
             <div className="text-xs text-neutral-500">{isFrench ? 'à mobiliser' : 'to mobilize'}</div>
           </div>
         </div>
@@ -767,17 +767,17 @@ const PeopleGroupsList = () => {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="btn-primary btn-sm gap-1.5"
           >
             <Plus size={16} /> {isFrench ? 'Ajouter un peuple' : 'Add people group'}
           </button>
         )}
-        <label className="inline-flex items-center gap-2 text-sm text-neutral-600">
+        <label className="inline-flex items-center gap-2 text-sm text-neutral-600 dark:text-slate-300">
           <input type="checkbox" checked={showArchived} onChange={(e) => { setShowArchived(e.target.checked); resetToFirstPage() }} />
           {isFrench ? 'Afficher les archivés' : 'Show archived'}
         </label>
         {/* View switch: table (dense) vs cards (visual) */}
-        <div className="ml-auto inline-flex overflow-hidden rounded-lg border border-neutral-200">
+        <div className="ml-auto inline-flex overflow-hidden rounded-lg border border-neutral-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setView('table')}
@@ -796,13 +796,13 @@ const PeopleGroupsList = () => {
           </button>
         </div>
         <div className="relative w-full max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => { setSearch(e.target.value); resetToFirstPage() }}
             placeholder={isFrench ? 'Rechercher…' : 'Search…'}
-            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full rounded-lg border border-neutral-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700"
           />
         </div>
       </div>
@@ -877,7 +877,7 @@ const PeopleGroupsList = () => {
           </div>
 
           {/* Pagination bar (cards view) */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
             <div>
               {isFrench
                 ? `${pageStart}–${pageEnd} sur ${totalItems} peuples`
@@ -889,7 +889,7 @@ const PeopleGroupsList = () => {
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); resetToFirstPage() }}
-                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => (
                     <option key={n} value={n}>{n}</option>
@@ -901,7 +901,7 @@ const PeopleGroupsList = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="btn-secondary btn-sm gap-1"
                 >
                   <ChevronLeft size={16} /> {isFrench ? 'Précédent' : 'Prev'}
                 </button>
@@ -910,7 +910,7 @@ const PeopleGroupsList = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={safePage >= totalPages}
-                  className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="btn-secondary btn-sm gap-1"
                 >
                   {isFrench ? 'Suivant' : 'Next'} <ChevronRight size={16} />
                 </button>
@@ -919,9 +919,9 @@ const PeopleGroupsList = () => {
           </div>
         </>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
-          <table className="min-w-full divide-y divide-neutral-200 text-sm">
-            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white dark:bg-slate-800 dark:border-slate-700">
+          <table className="min-w-full divide-y divide-neutral-200 text-sm dark:divide-slate-700">
+            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500 dark:bg-slate-900">
               <tr>
                 <th className="px-4 py-3">{isFrench ? 'Nom' : 'Name'}</th>
                 <th className="px-4 py-3">{isFrench ? 'Pays' : 'Country'}</th>
@@ -932,14 +932,14 @@ const PeopleGroupsList = () => {
                 {canManage && <th className="px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-neutral-100 dark:divide-slate-700">
               {paged.map((pg) => (
-                <tr key={pg._id} className="hover:bg-neutral-50">
+                <tr key={pg._id} className="hover:bg-neutral-50 dark:hover:bg-slate-700">
                   <td className="px-4 py-3 font-medium">
                     <div className="flex items-center gap-2">
-                      <Link to={peopleHref(pg)} className="text-blue-600 hover:underline">{pg.name}</Link>
+                      <Link to={peopleHref(pg)} className="text-blue-600 hover:underline dark:text-blue-300">{pg.name}</Link>
                       {isSponsored(pg) && (
-                        <span title={isFrench ? `Parrainé · ${pg.donor}` : `Sponsored · ${pg.donor}`} className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                        <span title={isFrench ? `Parrainé · ${pg.donor}` : `Sponsored · ${pg.donor}`} className="inline-flex items-center rounded-full bg-emerald-100 px-1.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                           <HeartHandshake size={10} />
                         </span>
                       )}
@@ -947,16 +947,16 @@ const PeopleGroupsList = () => {
                         type="button"
                         title={isFrench ? 'Partager / fiche partenaire' : 'Share / partner sheet'}
                         onClick={() => setSharing(pg)}
-                        className="text-neutral-400 hover:text-indigo-600"
+                        className="text-neutral-500 dark:text-slate-400 hover:text-indigo-600"
                       >
                         <Share2 size={14} />
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-neutral-600">{countryCodeToDisplayName(countryCodeOf(pg), isFrench) || countryOf(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin1Of(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin2Of(pg) || '—'}</td>
-                  <td className="px-4 py-3 text-neutral-600">{admin3Of(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{countryCodeToDisplayName(countryCodeOf(pg), isFrench) || countryOf(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin1Of(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin2Of(pg) || '—'}</td>
+                  <td className="px-4 py-3 text-neutral-600 dark:text-slate-300">{admin3Of(pg) || '—'}</td>
                   <td className="px-4 py-3">
                     {pg.status ? (
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass(pg.status)}`}>
@@ -972,7 +972,7 @@ const PeopleGroupsList = () => {
                         <button
                           type="button"
                           onClick={() => openEdit(pg)}
-                          className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                          className="btn-secondary btn-sm gap-1"
                         >
                           <Pencil size={14} /> {isFrench ? 'Modifier' : 'Edit'}
                         </button>
@@ -985,7 +985,7 @@ const PeopleGroupsList = () => {
                               archiveMutation.mutate({ id: pg._id, archived: isArch })
                             }
                           }}
-                          className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-100"
+                          className="btn-secondary btn-sm gap-1"
                         >
                           {pg.isArchived ? (
                             <>
@@ -1006,7 +1006,7 @@ const PeopleGroupsList = () => {
           </table>
 
           {/* Pagination bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3 text-sm text-neutral-600">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3 text-sm text-neutral-600 dark:border-slate-700 dark:text-slate-300">
             <div>
               {isFrench
                 ? `${pageStart}–${pageEnd} sur ${totalItems} peuples`
@@ -1018,7 +1018,7 @@ const PeopleGroupsList = () => {
                 <select
                   value={pageSize}
                   onChange={(e) => { setPageSize(Number(e.target.value)); resetToFirstPage() }}
-                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="rounded-lg border border-neutral-200 bg-white px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
                 >
                   {PAGE_SIZE_OPTIONS.map((n) => (
                     <option key={n} value={n}>{n}</option>
@@ -1030,7 +1030,7 @@ const PeopleGroupsList = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="btn-secondary btn-sm gap-1"
                 >
                   <ChevronLeft size={16} /> {isFrench ? 'Précédent' : 'Prev'}
                 </button>
@@ -1041,7 +1041,7 @@ const PeopleGroupsList = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={safePage >= totalPages}
-                  className="inline-flex items-center gap-1 rounded-md border border-neutral-200 px-2 py-1 text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="btn-secondary btn-sm gap-1"
                 >
                   {isFrench ? 'Suivant' : 'Next'} <ChevronRight size={16} />
                 </button>
@@ -1064,12 +1064,12 @@ const PeopleGroupsList = () => {
       {/* Create / Edit modal */}
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-slate-800">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-neutral-900">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-slate-100">
                 {editing ? (isFrench ? 'Modifier le peuple' : 'Edit people group') : isFrench ? 'Ajouter un peuple' : 'Add people group'}
               </h2>
-              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-500 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-700">
                 <X size={18} />
               </button>
             </div>
@@ -1092,8 +1092,8 @@ const PeopleGroupsList = () => {
               <Field label="Admin 2" value={form.admin2} onChange={onField('admin2')} />
               <Field label="Admin 3" value={form.admin3} onChange={onField('admin3')} />
               <div>
-                <label htmlFor="people-groups-list-status" className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Statut' : 'Status'}</label>
-                <select id="people-groups-list-status" value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
+                <label htmlFor="people-groups-list-status" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{isFrench ? 'Statut' : 'Status'}</label>
+                <select id="people-groups-list-status" value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700">
                   <option value="">—</option>
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -1108,14 +1108,14 @@ const PeopleGroupsList = () => {
               <Field label={isFrench ? 'Coordinateur national' : 'National coordinator'} value={form.nationalCoordinator} onChange={onField('nationalCoordinator')} />
               <Field label={isFrench ? 'Implanteur' : 'Church planter'} value={form.churchPlanter} onChange={onField('churchPlanter')} />
               <div className="sm:col-span-2">
-                <label htmlFor="people-groups-list-description" className="mb-1 block text-xs font-medium text-neutral-600">Description</label>
-                <textarea id="people-groups-list-description" value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+                <label htmlFor="people-groups-list-description" className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">Description</label>
+                <textarea id="people-groups-list-description" value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm dark:border-slate-700" />
               </div>
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
-                <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100">
+                <button type="button" onClick={closeForm} className="btn-secondary btn-sm">
                   {isFrench ? 'Annuler' : 'Cancel'}
                 </button>
-                <button type="submit" disabled={saveMutation.isPending} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+                <button type="submit" disabled={saveMutation.isPending} className="btn-primary btn-sm">
                   {saveMutation.isPending ? (isFrench ? 'Enregistrement…' : 'Saving…') : isFrench ? 'Enregistrer' : 'Save'}
                 </button>
               </div>
@@ -1131,8 +1131,8 @@ const Field = ({ label, value, onChange, type = 'text' }) => {
   const id = useId()
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
-      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600 dark:text-slate-300">{label}</label>
+      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-slate-700" />
     </div>
   )
 }

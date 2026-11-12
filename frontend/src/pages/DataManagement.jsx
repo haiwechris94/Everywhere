@@ -243,7 +243,7 @@ const DataManagement = () => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragging(false)
-    
+
     const files = e.dataTransfer.files
     if (files && files.length > 0) {
       handleFileProcess(files[0])
@@ -271,7 +271,7 @@ const DataManagement = () => {
         // Auto-detect separator (semicolon vs comma) based on header line
         const separator = (lines[0].match(/;/g) || []).length >= (lines[0].match(/,/g) || []).length ? ';' : ','
         const headers = lines[0].split(separator).map(h => h.trim().replace(/"/g, ''))
-        
+
         // Preview first 5 rows
         const previewData = lines.slice(1, 6).map(line => {
           const values = line.split(separator).map(v => v.trim().replace(/"/g, ''))
@@ -517,7 +517,7 @@ const DataManagement = () => {
     printWindow.document.write(printContent)
     printWindow.document.close()
     printWindow.print()
-    
+
     toast.success(t('dataManagement.export.pdfReady') || 'PDF ready for printing')
   }
 
@@ -556,22 +556,20 @@ const DataManagement = () => {
   return (
     <div className="max-w-6xl mx-auto animate-fade-in space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="page-title">
+            {t('dataManagement.title') || 'Gestion des données'}
+          </h1>
+          <p className="page-subtitle">
+            {t('dataManagement.subtitle') || 'Importez et exportez vos données de peuples'}
+          </p>
+        </div>
+        <div className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+          <Users size={24} className="text-primary-600 dark:text-primary-300" aria-hidden="true" />
           <div>
-            <h1 className="text-3xl font-bold mb-2">
-              {t('dataManagement.title') || 'Gestion des données'}
-            </h1>
-            <p className="text-indigo-100 text-lg">
-              {t('dataManagement.subtitle') || 'Importez et exportez vos données de peuples'}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 bg-white dark:bg-slate-800/15 backdrop-blur-sm px-4 py-3 rounded-xl">
-            <Users size={24} />
-            <div>
-              <p className="text-sm text-indigo-100">Total des peuples</p>
-              <p className="text-2xl font-bold">{peoplesCount}</p>
-            </div>
+            <p className="text-sm text-neutral-600 dark:text-slate-400">Total des peuples</p>
+            <p className="font-display text-2xl font-semibold text-neutral-900 dark:text-slate-100">{peoplesCount}</p>
           </div>
         </div>
       </div>
@@ -584,7 +582,7 @@ const DataManagement = () => {
               onClick={() => setActiveTab('import')}
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'import'
-                  ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
+                  ? 'text-indigo-600 border-b-2 border-primary-600 bg-primary-50'
                   : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
@@ -595,7 +593,7 @@ const DataManagement = () => {
               onClick={() => setActiveTab('export')}
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'export'
-                  ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
+                  ? 'text-indigo-600 border-b-2 border-primary-600 bg-primary-50'
                   : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
@@ -606,14 +604,14 @@ const DataManagement = () => {
               onClick={() => setActiveTab('jp-sync')}
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'jp-sync'
-                  ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
+                  ? 'text-indigo-600 border-b-2 border-primary-600 bg-primary-50'
                   : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
               <Globe size={20} />
               JP Live Sync
               {jpStatus?.isRunning && (
-                <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full animate-pulse dark:bg-blue-900/40 dark:text-blue-300">
                   <Loader2 size={10} className="animate-spin" /> En cours
                 </span>
               )}
@@ -626,9 +624,9 @@ const DataManagement = () => {
           {activeTab === 'import' && (
             <div className="space-y-6">
               {/* Country Templates Section */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+              <div className="bg-primary-50 rounded-2xl p-6 border border-blue-200 dark:bg-primary-900/30 dark:border-blue-800">
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                     <Globe className="text-white" size={28} />
                   </div>
                   <div>
@@ -640,13 +638,13 @@ const DataManagement = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {COUNTRY_TEMPLATES.map((country) => (
                     <a
                       key={country.key}
                       href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/import/people-groups/template/${country.key}`}
-                      className="group flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-blue-100 hover:border-indigo-400 hover:shadow-md transition-all"
+                      className="group flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-blue-100 hover:border-indigo-400 hover:shadow-md transition-all dark:border-blue-800"
                       download
                     >
                       <span className="text-2xl">{country.flag}</span>
@@ -655,7 +653,7 @@ const DataManagement = () => {
                           {country.name}
                         </p>
                       </div>
-                      <Download size={16} className="text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                      <Download size={16} className="text-gray-500 dark:text-slate-400 group-hover:text-indigo-500 transition-colors" />
                     </a>
                   ))}
                 </div>
@@ -686,10 +684,10 @@ const DataManagement = () => {
                   <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center transition-all ${
                     isDragging ? 'bg-indigo-500 scale-110' : 'bg-gray-100 dark:bg-slate-800'
                   }`}>
-                    <Upload size={40} className={isDragging ? 'text-white' : 'text-gray-400'} />
+                    <Upload size={40} className={isDragging ? 'text-white' : 'text-gray-500 dark:text-slate-400'} />
                   </div>
-                  <p className="text-xl font-semibold text-gray-700 mb-2">
-                    {isDragging 
+                  <p className="text-xl font-semibold text-gray-700 mb-2 dark:text-slate-300">
+                    {isDragging
                       ? 'Déposez le fichier ici...'
                       : t('dataManagement.import.dropzone') || 'Cliquez ou glissez-déposez votre fichier'}
                   </p>
@@ -697,27 +695,27 @@ const DataManagement = () => {
                     Formats acceptés: <span className="font-medium">CSV, XLS, XLSX</span> (max 10MB)
                   </p>
                 </label>
-                
+
                 {/* File type indicators */}
                 <div className="flex justify-center gap-4 mt-6">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 rounded-full">
-                    <FileText size={16} className="text-green-600" />
-                    <span className="text-sm font-medium text-green-700">CSV</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 rounded-full dark:bg-green-900/40">
+                    <FileText size={16} className="text-green-600 dark:text-green-300" />
+                    <span className="text-sm font-medium text-green-700 dark:text-green-300">CSV</span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 rounded-full">
-                    <FileSpreadsheet size={16} className="text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700">Excel</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 rounded-full dark:bg-blue-900/40">
+                    <FileSpreadsheet size={16} className="text-blue-600 dark:text-blue-300" />
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Excel</span>
                   </div>
                 </div>
               </div>
 
               {/* Import Error */}
               {importError && (
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-4 animate-fade-in">
-                  <div className="p-2 bg-red-100 rounded-lg">
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-4 animate-fade-in dark:bg-red-900/30 dark:border-red-800">
+                  <div className="p-2 bg-red-100 rounded-lg dark:bg-red-900/40">
                     <AlertCircle className="text-red-500" size={24} />
                   </div>
-                  <span className="flex-1 text-red-700 font-medium">{importError}</span>
+                  <span className="flex-1 text-red-700 font-medium dark:text-red-300">{importError}</span>
                   <button aria-label={t('common.close')} onClick={resetImport} className="p-2 hover:bg-red-100 rounded-lg transition-colors">
                     <X size={20} className="text-red-500" />
                   </button>
@@ -727,10 +725,10 @@ const DataManagement = () => {
               {/* Preview */}
               {importPreview && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="flex items-center justify-between p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+                  <div className="flex items-center justify-between p-4 bg-green-50 border-2 border-green-200 rounded-xl dark:bg-green-900/30 dark:border-green-800">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-green-100 rounded-xl">
-                        <CheckCircle className="text-green-600" size={24} />
+                      <div className="p-3 bg-green-100 rounded-xl dark:bg-green-900/40">
+                        <CheckCircle className="text-green-600 dark:text-green-300" size={24} />
                       </div>
                       <div>
                         <p className="font-semibold text-gray-800 dark:text-slate-100">{importFile?.name}</p>
@@ -751,7 +749,7 @@ const DataManagement = () => {
                   <div className="bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
                     <div className="px-4 py-3 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center gap-2">
                       <Table size={18} className="text-gray-500 dark:text-slate-400" />
-                      <span className="font-semibold text-gray-700">Aperçu des données</span>
+                      <span className="font-semibold text-gray-700 dark:text-slate-300">Aperçu des données</span>
                       <span className="text-sm text-gray-500 dark:text-slate-400">(5 premières lignes)</span>
                     </div>
                     <div className="overflow-x-auto">
@@ -765,11 +763,11 @@ const DataManagement = () => {
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                           {importPreview.data.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50 dark:bg-slate-900 transition-colors">
+                            <tr key={i} className="hover:bg-gray-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700">
                               {importPreview.headers.map((header, j) => (
-                                <td key={j} className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                                <td key={j} className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap dark:text-slate-300">
                                   {row[header] || '-'}
                                 </td>
                               ))}
@@ -784,14 +782,14 @@ const DataManagement = () => {
                   <div className="flex justify-end gap-3">
                     <button
                       onClick={resetImport}
-                      className="px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                      className="btn-secondary py-3"
                     >
                       Annuler
                     </button>
                     <button
                       onClick={handleImport}
                       disabled={isProcessing}
-                      className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all font-semibold shadow-lg disabled:opacity-50 flex items-center gap-2"
+                      className="px-8 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all font-semibold shadow-lg disabled:opacity-50 flex items-center gap-2"
                     >
                       {isProcessing ? (
                         <>
@@ -813,7 +811,7 @@ const DataManagement = () => {
               {importReport && (
                 <div className="mt-6 space-y-4">
                   {(importReport.summary?.imported ?? 0) > 0 && (
-                    <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-800">
+                    <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-800 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300">
                       <CheckCircle size={18} />
                       <span className="font-medium">
                         {importReport.summary.imported} ligne(s) importée(s)
@@ -822,16 +820,16 @@ const DataManagement = () => {
                     </div>
                   )}
                   {Array.isArray(importReport.errors) && importReport.errors.length > 0 && (
-                    <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-red-800">
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 dark:bg-red-900/30 dark:border-red-800">
+                      <div className="mb-3 flex items-center gap-2 text-red-800 dark:text-red-300">
                         <AlertCircle size={18} />
                         <span className="font-semibold">
                           Lignes en erreur — corrigez ces cases puis ré-importez ({importReport.errors.length})
                         </span>
                       </div>
-                      <div className="max-h-80 overflow-auto rounded-lg border border-red-100 bg-white dark:bg-slate-800">
+                      <div className="max-h-80 overflow-auto rounded-lg border border-red-100 bg-white dark:bg-slate-800 dark:border-red-800">
                         <table className="min-w-full text-sm">
-                          <thead className="bg-red-100/60 text-red-900">
+                          <thead className="bg-red-100/60 text-red-900 dark:text-red-300">
                             <tr>
                               <th className="px-3 py-2 text-left font-semibold">Ligne</th>
                               <th className="px-3 py-2 text-left font-semibold">Colonne</th>
@@ -844,9 +842,9 @@ const DataManagement = () => {
                             {importReport.errors.map((er, i) => (
                               <tr key={i} className="align-top">
                                 <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800 dark:text-slate-100">{er.row ?? er.line ?? '-'}</td>
-                                <td className="px-3 py-2 whitespace-nowrap text-gray-700">{er.column || er.field || '-'}</td>
+                                <td className="px-3 py-2 whitespace-nowrap text-gray-700 dark:text-slate-300">{er.column || er.field || '-'}</td>
                                 <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{er.value === '' || er.value === undefined ? '—' : String(er.value)}</td>
-                                <td className="px-3 py-2 text-red-700">{er.error || er.reason || '-'}</td>
+                                <td className="px-3 py-2 text-red-700 dark:text-red-300">{er.error || er.reason || '-'}</td>
                                 <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{er.suggestion || ''}</td>
                               </tr>
                             ))}
@@ -856,7 +854,7 @@ const DataManagement = () => {
                       <button
                         type="button"
                         onClick={() => setImportReport(null)}
-                        className="mt-3 text-sm font-medium text-red-700 hover:underline"
+                        className="mt-3 text-sm font-medium text-red-700 hover:underline dark:text-red-300"
                       >
                         Masquer le rapport
                       </button>
@@ -871,18 +869,18 @@ const DataManagement = () => {
           {activeTab === 'export' && (
             <div className="space-y-6">
               {/* Filtres d'export : pays + métriques à exporter */}
-              <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
+              <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 dark:border-indigo-800">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                  <Globe size={20} className="text-indigo-600" />
+                  <Globe size={20} className="text-indigo-600 dark:text-indigo-300" />
                   Filtres d'export
                 </h3>
                 <div className="mb-4">
-                  <label htmlFor="data-management-pays" className="block text-sm font-semibold text-gray-700 mb-1">Pays</label>
+                  <label htmlFor="data-management-pays" className="block text-sm font-semibold text-gray-700 mb-1 dark:text-slate-300">Pays</label>
                   <select
                     id="data-management-pays"
                     value={exportCountry}
                     onChange={(e) => setExportCountry(e.target.value)}
-                    className="w-full sm:w-72 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    className="w-full sm:w-72 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-slate-700"
                   >
                     <option value="all">Tous les pays</option>
                     {[...new Set((peoplesData || []).map(p => p.country).filter(Boolean))].sort().map(c => (
@@ -891,10 +889,10 @@ const DataManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Métriques à exporter</p>
+                  <p className="text-sm font-semibold text-gray-700 mb-2 dark:text-slate-300">Métriques à exporter</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {EXPORT_METRIC_FIELDS.map(f => (
-                      <label key={f.key} className="flex items-center gap-2 text-sm text-gray-700 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-2 cursor-pointer">
+                      <label key={f.key} className="flex items-center gap-2 text-sm text-gray-700 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-2 cursor-pointer dark:text-slate-300">
                         <input
                           type="checkbox"
                           checked={exportMetrics.has(f.key)}
@@ -917,7 +915,7 @@ const DataManagement = () => {
               {/* Export Format Cards */}
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                  <FileType size={20} className="text-indigo-600" />
+                  <FileType size={20} className="text-indigo-600 dark:text-indigo-300" />
                   Choisissez un format d'export
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -958,19 +956,19 @@ const DataManagement = () => {
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                       <p className="text-sm text-gray-500 dark:text-slate-400">Avec coordonnées</p>
-                      <p className="text-2xl font-bold text-green-600">
+                      <p className="text-2xl font-bold text-green-600 dark:text-green-300">
                         {peoplesData.filter(p => p.location?.coordinates).length}
                       </p>
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                       <p className="text-sm text-gray-500 dark:text-slate-400">Pays uniques</p>
-                      <p className="text-2xl font-bold text-blue-600">
+                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
                         {new Set(peoplesData.map(p => p.country).filter(Boolean)).size}
                       </p>
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
                       <p className="text-sm text-gray-500 dark:text-slate-400">Régions uniques</p>
-                      <p className="text-2xl font-bold text-purple-600">
+                      <p className="text-2xl font-bold text-purple-600 dark:text-purple-300">
                         {new Set(peoplesData.map(p => p.region).filter(Boolean)).size}
                       </p>
                     </div>
@@ -982,9 +980,9 @@ const DataManagement = () => {
               {(!peoplesData || peoplesData.length === 0) && !isLoadingPeoples && (
                 <div className="text-center py-12 bg-gray-50 dark:bg-slate-900 rounded-xl">
                   <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FolderOpen size={40} className="text-gray-400" />
+                    <FolderOpen size={40} className="text-gray-500 dark:text-slate-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune donnée à exporter</h3>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2 dark:text-slate-300">Aucune donnée à exporter</h3>
                   <p className="text-gray-500 dark:text-slate-400">Commencez par importer des données ou créer des peuples</p>
                 </div>
               )}
@@ -995,16 +993,16 @@ const DataManagement = () => {
             <div className="space-y-6">
 
               {/* Header */}
-              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200">
+              <div className="bg-primary-50 rounded-2xl p-6 border border-indigo-200 dark:bg-primary-900/30 dark:border-indigo-800">
                 <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                     <Globe className="text-white" size={28} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">Joshua Project — Sync Live</h3>
                       {jpStatus?.isRunning && (
-                        <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-200 animate-pulse">
+                        <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-200 animate-pulse dark:bg-blue-900/40 dark:border-blue-800 dark:text-blue-300">
                           <Loader2 size={11} className="animate-spin" /> En cours...
                         </span>
                       )}
@@ -1038,9 +1036,9 @@ const DataManagement = () => {
 
               {/* Progression en temps réel */}
               {jpStatus?.isRunning && jpStatus?.progress && (
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
-                  <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2">
-                    <Loader2 size={18} className="animate-spin text-blue-600" />
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 dark:bg-blue-900/30 dark:border-blue-800">
+                  <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2 dark:text-blue-300">
+                    <Loader2 size={18} className="animate-spin text-blue-600 dark:text-blue-300" />
                     Synchronisation en cours...
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1050,7 +1048,7 @@ const DataManagement = () => {
                       { label: '🔄 Mis à jour', value: jpStatus.progress.updated, color: 'text-purple-700' },
                       { label: '❌ Erreurs', value: jpStatus.progress.errors, color: 'text-red-600' },
                     ].map((s, i) => (
-                      <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-3 text-center border border-blue-100">
+                      <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-3 text-center border border-blue-100 dark:border-blue-800">
                         <p className={`text-2xl font-bold ${s.color}`}>{s.value || 0}</p>
                         <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{s.label}</p>
                       </div>
@@ -1060,7 +1058,7 @@ const DataManagement = () => {
               )}
 
               {/* Option Dry Run */}
-              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 dark:bg-amber-900/30 dark:border-amber-800">
                 <input
                   type="checkbox"
                   id="jp-dryrun"
@@ -1068,7 +1066,7 @@ const DataManagement = () => {
                   onChange={e => setJpIsDryRun(e.target.checked)}
                   className="w-4 h-4 rounded accent-amber-600"
                 />
-                <label htmlFor="jp-dryrun" className="text-sm text-amber-800 font-medium cursor-pointer">
+                <label htmlFor="jp-dryrun" className="text-sm text-amber-800 font-medium cursor-pointer dark:text-amber-300">
                   Mode test (dry run) — analyse sans sauvegarder dans la base de données
                 </label>
               </div>
@@ -1079,8 +1077,8 @@ const DataManagement = () => {
                 {/* Sync mondiale */}
                 <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 hover:border-indigo-300 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                      <Globe size={20} className="text-indigo-600" />
+                    <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center dark:bg-indigo-900/40">
+                      <Globe size={20} className="text-indigo-600 dark:text-indigo-300" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-800 dark:text-slate-100">Sync mondiale</h4>
@@ -1090,7 +1088,7 @@ const DataManagement = () => {
                   <button
                     onClick={triggerGlobalSync}
                     disabled={jpStatus?.isRunning}
-                    className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {jpStatus?.isRunning
                       ? <><Loader2 size={18} className="animate-spin" /> En cours...</>
@@ -1102,8 +1100,8 @@ const DataManagement = () => {
                 {/* Sync par pays */}
                 <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 hover:border-teal-300 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                      <Zap size={20} className="text-teal-600" />
+                    <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center dark:bg-teal-900/40">
+                      <Zap size={20} className="text-teal-600 dark:text-teal-300" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-800 dark:text-slate-100">Sync par pays</h4>
@@ -1124,7 +1122,7 @@ const DataManagement = () => {
                     <button aria-label={t('common.startSync')}
                       onClick={triggerCountrySync}
                       disabled={!jpSelectedCountry || jpStatus?.isRunning}
-                      className="px-4 py-2 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-colors disabled:opacity-40 flex items-center gap-1.5"
+                      className="btn-primary btn-sm gap-1.5"
                     >
                       <Play size={16} />
                     </button>
@@ -1190,7 +1188,7 @@ const DataManagement = () => {
                               const pct = Math.round((count / max) * 100)
                               return (
                                 <div key={country} className="flex items-center gap-2 text-xs">
-                                  <span className="w-32 text-gray-700 truncate flex-shrink-0">{country}</span>
+                                  <span className="w-32 text-gray-700 truncate flex-shrink-0 dark:text-slate-300">{country}</span>
                                   <div className="flex-1 h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-indigo-400 rounded-full" style={{ width: `${pct}%` }} />
                                   </div>
@@ -1205,7 +1203,7 @@ const DataManagement = () => {
                 )}
 
                 {jpShowStats && !jpStats?.hasData && (
-                  <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center text-gray-400 text-sm">
+                  <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center text-gray-500 dark:text-slate-400 text-sm">
                     Aucune synchronisation effectuée depuis le démarrage du serveur.
                   </div>
                 )}

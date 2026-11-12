@@ -1,13 +1,13 @@
 /**
  * AdminUsers.jsx - Admin User Management Page
- * 
+ *
  * Features:
  * - List all users with search/filter
  * - Change user roles
  * - Block/unblock users
  * - Delete users
  * - Create new users
- * 
+ *
  * Admin-only access
  */
 import { useState, useEffect, useCallback } from 'react'
@@ -66,8 +66,8 @@ const StatusBadge = ({ isActive }) => {
   const { isFrench } = useLanguage()
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-      isActive 
-        ? 'bg-green-100 text-green-800 border-green-200' 
+      isActive
+        ? 'bg-green-100 text-green-800 border-green-200'
         : 'bg-red-100 text-red-800 border-red-200'
     }`}>
       {isActive ? (isFrench ? 'Actif' : 'Active') : (isFrench ? 'Bloqué' : 'Blocked')}
@@ -80,12 +80,12 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
   const dialogRef = useDialog(isOpen, onClose)
   const { isFrench } = useLanguage()
   if (!isOpen) return null
-  
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 dark:bg-slate-800">
           <div className="flex items-start gap-4">
             <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
               isDestructive ? 'bg-red-100' : 'bg-yellow-100'
@@ -93,15 +93,15 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
               <AlertTriangle className={isDestructive ? 'text-red-600' : 'text-yellow-600'} size={20} />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-              <p className="mt-2 text-sm text-gray-600">{message}</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
+              <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">{message}</p>
             </div>
           </div>
           <div className="mt-6 flex justify-end gap-3">
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              className="btn-secondary btn-sm"
             >
               {isFrench ? 'Annuler' : 'Cancel'}
             </button>
@@ -109,8 +109,8 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
               onClick={onConfirm}
               disabled={isLoading}
               className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2 ${
-                isDestructive 
-                  ? 'bg-red-600 hover:bg-red-700' 
+                isDestructive
+                  ? 'bg-red-600 hover:bg-red-700'
                   : 'bg-primary-600 hover:bg-primary-700'
               }`}
             >
@@ -240,7 +240,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
   const InfoRow = ({ label, children }) => (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 py-1">
       <span className="text-xs font-medium text-gray-500 sm:w-40 flex-shrink-0">{label}</span>
-      <span className="text-sm text-gray-900">{children}</span>
+      <span className="text-sm text-gray-900 dark:text-slate-100">{children}</span>
     </div>
   )
 
@@ -248,25 +248,25 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
-        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto dark:bg-slate-800">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <UserCircle className="text-primary-600" size={22} />
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 dark:text-slate-100">
+              <UserCircle className="text-primary-600 dark:text-primary-300" size={22} />
               {isFrench ? "Détails de l'utilisateur" : 'User Details'}
             </h3>
-            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={handleClose} className="text-gray-500 dark:text-slate-400 hover:text-gray-600">
               <X size={20} />
             </button>
           </div>
 
           {loading && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="animate-spin text-primary-600" size={32} />
+              <Loader2 className="animate-spin text-primary-600 dark:text-primary-300" size={32} />
             </div>
           )}
 
           {!loading && loadError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm dark:bg-red-900/30 dark:border-red-800 dark:text-red-300">
               {loadError}
             </div>
           )}
@@ -275,8 +275,8 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
             <div className="space-y-6">
               {/* INFO SECTION */}
               <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2">{isFrench ? 'Informations' : 'Information'}</h4>
-                <div className="bg-gray-50 rounded-lg p-4 divide-y divide-gray-100">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 dark:text-slate-100">{isFrench ? 'Informations' : 'Information'}</h4>
+                <div className="bg-gray-50 rounded-lg p-4 divide-y divide-gray-100 dark:bg-slate-900 dark:divide-slate-700">
                   <InfoRow label={isFrench ? 'Nom' : 'Name'}>{detail.name || '—'}</InfoRow>
                   <InfoRow label="Email">{detail.email || '—'}</InfoRow>
                   <InfoRow label={isFrench ? 'Téléphone' : 'Phone'}>{detail.phone || '—'}</InfoRow>
@@ -292,31 +292,31 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
 
               {/* LOGIN HISTORY SECTION */}
               <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2 dark:text-slate-100">
                   <Clock size={16} className="text-gray-500" />
                   {isFrench ? 'Historique de connexion' : 'Login History'}
                 </h4>
                 {loginHistory.length === 0 ? (
-                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4 dark:bg-slate-900">
                     {isFrench ? 'Aucun historique de connexion' : 'No login history'}
                   </div>
                 ) : (
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden dark:border-slate-700">
                     <div className="max-h-56 overflow-y-auto">
                       <table className="w-full text-sm">
-                        <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+                        <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 dark:bg-slate-900 dark:border-slate-700">
                           <tr>
-                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Date' : 'Date'}</th>
-                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Adresse IP' : 'IP Address'}</th>
-                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">{isFrench ? 'Navigateur' : 'Browser'}</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-slate-300">{isFrench ? 'Date' : 'Date'}</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-slate-300">{isFrench ? 'Adresse IP' : 'IP Address'}</th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-slate-300">{isFrench ? 'Navigateur' : 'Browser'}</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                           {loginHistory.map((entry, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-3 py-2 whitespace-nowrap text-gray-900">{formatDateTime(entry.at)}</td>
-                              <td className="px-3 py-2 whitespace-nowrap text-gray-700">{entry.ip || '—'}</td>
-                              <td className="px-3 py-2 text-gray-700 max-w-[220px] truncate" title={entry.userAgent || ''}>
+                            <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-slate-700">
+                              <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-slate-100">{formatDateTime(entry.at)}</td>
+                              <td className="px-3 py-2 whitespace-nowrap text-gray-700 dark:text-slate-300">{entry.ip || '—'}</td>
+                              <td className="px-3 py-2 text-gray-700 max-w-[220px] truncate dark:text-slate-300" title={entry.userAgent || ''}>
                                 {entry.userAgent || '—'}
                               </td>
                             </tr>
@@ -330,24 +330,24 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
 
               {/* AUDIT LOG SECTION */}
               <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2 dark:text-slate-100">
                   <ScrollText size={16} className="text-gray-500" />
                   {isFrench ? "Journal d'audit" : 'Audit Log'}
                 </h4>
                 {audit.length === 0 ? (
-                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4 dark:bg-slate-900">
                     {isFrench ? "Aucune action d'audit" : 'No audit entries'}
                   </div>
                 ) : (
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="max-h-56 overflow-y-auto divide-y divide-gray-100">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden dark:border-slate-700">
+                    <div className="max-h-56 overflow-y-auto divide-y divide-gray-100 dark:divide-slate-700">
                       {audit.map((entry) => (
-                        <div key={entry._id} className="px-3 py-2 hover:bg-gray-50">
+                        <div key={entry._id} className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-sm font-medium text-gray-900">{auditActionLabel(entry)}</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-slate-100">{auditActionLabel(entry)}</span>
                             <span className="text-xs text-gray-500 whitespace-nowrap">{formatDateTime(entry.createdAt)}</span>
                           </div>
-                          <div className="text-xs text-gray-600 mt-0.5">
+                          <div className="text-xs text-gray-600 mt-0.5 dark:text-slate-300">
                             {isFrench ? 'Par' : 'By'}: {entry.user?.name || entry.user?.email || '—'}
                           </div>
                         </div>
@@ -359,13 +359,13 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
 
               {/* CHANGE PASSWORD SECTION */}
               <section>
-                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2 dark:text-slate-100">
                   <KeyRound size={16} className="text-gray-500" />
                   {isFrench ? 'Changer le mot de passe' : 'Change Password'}
                 </h4>
-                <form onSubmit={handleChangePassword} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <form onSubmit={handleChangePassword} className="bg-gray-50 rounded-lg p-4 space-y-3 dark:bg-slate-900">
                   <div>
-                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                       {isFrench ? 'Nouveau mot de passe' : 'New password'}
                     </label>
                     <input
@@ -374,13 +374,13 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
                       minLength={6}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                       placeholder="••••••••"
                       autoComplete="new-password"
                     />
                   </div>
                   <div>
-                    <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">
                       {isFrench ? 'Confirmer le mot de passe' : 'Confirm password'}
                     </label>
                     <input
@@ -389,7 +389,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
                       minLength={6}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                       placeholder="••••••••"
                       autoComplete="new-password"
                     />
@@ -398,7 +398,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
                     <button
                       type="submit"
                       disabled={savingPassword}
-                      className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                      className="btn-primary btn-sm gap-2"
                     >
                       {savingPassword && <Loader2 className="animate-spin" size={16} />}
                       {isFrench ? 'Changer le mot de passe' : 'Change Password'}
@@ -427,12 +427,12 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const { isFrench } = useLanguage()
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setIsLoading(true)
-    
+
     try {
       const response = await api.post('/api/admin/users', formData)
       toast.success(isFrench ? 'Utilisateur créé avec succès' : 'User created successfully')
@@ -447,56 +447,56 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
       setIsLoading(false)
     }
   }
-  
+
   if (!isOpen) return null
-  
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 dark:bg-slate-800">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">{isFrench ? 'Créer un utilisateur' : 'Create a user'}</h3>
-            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">{isFrench ? 'Créer un utilisateur' : 'Create a user'}</h3>
+            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="text-gray-500 dark:text-slate-400 hover:text-gray-600">
               <X size={20} />
             </button>
           </div>
-          
+
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm dark:bg-red-900/30 dark:border-red-800 dark:text-red-300">
               {error}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="admin-users-name" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Nom *' : 'Name *'}</label>
+              <label htmlFor="admin-users-name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">{isFrench ? 'Nom *' : 'Name *'}</label>
               <input
                 id="admin-users-name"
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                 placeholder="Jean Dupont"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="admin-users-email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <label htmlFor="admin-users-email" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">Email *</label>
               <input
                 id="admin-users-email"
                 type="email"
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                 placeholder="jean@example.com"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="admin-users-password" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Mot de passe *' : 'Password *'}</label>
+              <label htmlFor="admin-users-password" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">{isFrench ? 'Mot de passe *' : 'Password *'}</label>
               <input
                 id="admin-users-password"
                 type="password"
@@ -504,18 +504,18 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
                 minLength={6}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                 placeholder="••••••••"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="admin-users-role" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Rôle *' : 'Role *'}</label>
+              <label htmlFor="admin-users-role" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">{isFrench ? 'Rôle *' : 'Role *'}</label>
               <select
                 id="admin-users-role"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
               >
                 <option value="guest">Invité (lecture seule)</option>
                 <option value="missionary">Missionnaire (lecture/écriture)</option>
@@ -523,32 +523,32 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
                 <option value="admin">{isFrench ? 'Administrateur' : 'Administrator'}</option>
               </select>
             </div>
-            
+
             <div>
-              <label htmlFor="admin-users-organization" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Organisation' : 'Organization'}</label>
+              <label htmlFor="admin-users-organization" className="block text-sm font-medium text-gray-700 mb-1 dark:text-slate-300">{isFrench ? 'Organisation' : 'Organization'}</label>
               <input
                 id="admin-users-organization"
                 type="text"
                 value={formData.organizationName}
                 onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
                 placeholder={isFrench ? "Nom de l'organisation (optionnel)" : 'Organization name (optional)'}
               />
             </div>
-            
+
             <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="btn-secondary btn-sm"
               >
                 {isFrench ? 'Annuler' : 'Cancel'}
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2"
+                className="btn-primary btn-sm gap-2"
               >
                 {isLoading && <Loader2 className="animate-spin" size={16} />}
                 Créer
@@ -564,7 +564,7 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
 const AdminUsers = () => {
   const { t, isFrench } = useLanguage()
   const { user: currentUser } = useAuth()
-  
+
   // State
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -575,29 +575,29 @@ const AdminUsers = () => {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
-  
+
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', user: null })
   const [detailModal, setDetailModal] = useState({ isOpen: false, userId: null })
   const [actionLoading, setActionLoading] = useState(false)
-  
+
   // Check if current user is admin
   const isAdmin = currentUser?.role === 'admin'
-  
+
   // Fetch users
   const fetchUsers = useCallback(async () => {
     if (!isAdmin) return
-    
+
     setLoading(true)
     setError(null)
-    
+
     try {
       const params = { page, limit: 20 }
       if (search) params.search = search
       if (roleFilter) params.role = roleFilter
       if (statusFilter) params.isActive = statusFilter
-      
+
       const response = await api.get('/api/admin/users', { params })
       setUsers(response.data.users)
       setTotalPages(response.data.totalPages)
@@ -609,11 +609,11 @@ const AdminUsers = () => {
       setLoading(false)
     }
   }, [isAdmin, page, search, roleFilter, statusFilter])
-  
+
   useEffect(() => {
     fetchUsers()
   }, [fetchUsers])
-  
+
   // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -621,7 +621,7 @@ const AdminUsers = () => {
     }, 300)
     return () => clearTimeout(timer)
   }, [search])
-  
+
   // Handle role change
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -632,11 +632,11 @@ const AdminUsers = () => {
       toast.error(err.response?.data?.message || t('adminUsers.updateError') || 'Error updating role')
     }
   }
-  
+
   // Handle toggle active
   const handleToggleActive = async () => {
     if (!confirmModal.user) return
-    
+
     setActionLoading(true)
     try {
       await api.put(`/api/admin/users/${confirmModal.user._id}/toggle-active`)
@@ -649,11 +649,11 @@ const AdminUsers = () => {
       setActionLoading(false)
     }
   }
-  
+
   // Handle delete
   const handleDelete = async () => {
     if (!confirmModal.user) return
-    
+
     setActionLoading(true)
     try {
       await api.delete(`/api/admin/users/${confirmModal.user._id}`)
@@ -666,64 +666,64 @@ const AdminUsers = () => {
       setActionLoading(false)
     }
   }
-  
+
   // Access denied for non-admins
   if (!isAdmin) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <ShieldAlert className="mx-auto h-16 w-16 text-red-400 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('adminUsers.accessDenied') || 'Access Denied'}</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 dark:text-slate-100">{t('adminUsers.accessDenied') || 'Access Denied'}</h2>
+          <p className="text-gray-600 dark:text-slate-300">
             {t('adminUsers.adminOnly') || 'This page is reserved for administrators.'}
           </p>
         </div>
       </div>
     )
   }
-  
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Users className="text-primary-600" />
+          <h1 className="page-title flex items-center gap-2">
+            <Users className="text-primary-600 dark:text-primary-300" aria-hidden="true" />
             {t('adminUsers.title') || 'User Management'}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1 dark:text-slate-300">
             {total} {t('adminUsers.usersTotal') || 'Total Users'}
           </p>
         </div>
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="btn-primary btn-sm gap-2"
         >
           <Plus size={18} />
           {t('adminUsers.newUser') || 'Add new user'}
         </button>
       </div>
-      
+
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 dark:bg-slate-800 dark:border-slate-700">
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-slate-400" size={18} />
             <input
               type="text"
               placeholder={t('adminUsers.searchPlaceholder') || 'Search by name or email...'}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
             />
           </div>
-          
+
           {/* Role filter */}
           <select
             value={roleFilter}
             onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
           >
             <option value="">{t('adminUsers.allRoles') || 'All roles'}</option>
             <option value="admin">Admin</option>
@@ -731,84 +731,84 @@ const AdminUsers = () => {
             <option value="missionary">Missionnaire</option>
             <option value="guest">Invité</option>
           </select>
-          
+
           {/* Status filter */}
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:border-slate-700"
           >
             <option value="">{t('adminUsers.allStatuses') || 'All statuses'}</option>
             <option value="true">{t('adminUsers.active') || 'Active'}</option>
             <option value="false">{t('adminUsers.blocked') || 'Blocked'}</option>
           </select>
-          
+
           {/* Refresh */}
           <button aria-label={isFrench ? 'Actualiser' : 'Refresh'}
             onClick={fetchUsers}
             disabled={loading}
-            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors dark:text-slate-300 dark:hover:bg-slate-700"
             title={isFrench ? 'Actualiser' : 'Refresh'}
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
-      
+
       {/* Error state */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300">
           {error}
         </div>
       )}
-      
+
       {/* Loading state */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="animate-spin text-primary-600" size={32} />
+          <Loader2 className="animate-spin text-primary-600 dark:text-primary-300" size={32} />
         </div>
       )}
-      
+
       {/* Users table */}
       {!loading && !error && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden dark:bg-slate-800 dark:border-slate-700">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200 dark:bg-slate-900 dark:border-slate-700">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-slate-300">
                     {t('adminUsers.user') || 'User'}
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-slate-300">
                     {t('adminUsers.role') || 'Role'}
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-slate-300">
                     {t('adminUsers.status') || 'Status'}
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-slate-300">
                     {t('rejected.dateAdded') || 'Created'}
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider dark:text-slate-300">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                 {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50">
+                  <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                     <td className="px-4 py-4">
                       <div>
                         <button
                           type="button"
                           onClick={() => setDetailModal({ isOpen: true, userId: user._id })}
-                          className="font-medium text-primary-600 hover:underline cursor-pointer text-left"
+                          className="font-medium text-primary-600 hover:underline cursor-pointer text-left dark:text-primary-300"
                           title={isFrench ? "Voir les détails de l'utilisateur" : 'View user details'}
                         >
                           {user.name}
                         </button>
                         <div className="text-sm text-gray-500">{user.email}</div>
                         {user.organizationName && (
-                          <div className="text-xs text-gray-400">{user.organizationName}</div>
+                          <div className="text-xs text-gray-500 dark:text-slate-400">{user.organizationName}</div>
                         )}
                       </div>
                     </td>
@@ -849,7 +849,7 @@ const AdminUsers = () => {
                           disabled={user._id === currentUser?._id}
                           className={`p-2 rounded-lg transition-colors ${
                             user._id === currentUser?._id
-                              ? 'text-gray-300 cursor-not-allowed'
+                              ? 'text-gray-500 dark:text-slate-400 cursor-not-allowed'
                               : user.isActive !== false
                                 ? 'text-yellow-600 hover:bg-yellow-50'
                                 : 'text-green-600 hover:bg-green-50'
@@ -858,7 +858,7 @@ const AdminUsers = () => {
                         >
                           {user.isActive !== false ? <UserX size={18} /> : <UserCheck size={18} />}
                         </button>
-                        
+
                         {/* Delete button */}
                         <button aria-label={isFrench ? 'Supprimer' : 'Delete'}
                           onClick={() => setConfirmModal({
@@ -869,7 +869,7 @@ const AdminUsers = () => {
                           disabled={user._id === currentUser?._id}
                           className={`p-2 rounded-lg transition-colors ${
                             user._id === currentUser?._id
-                              ? 'text-gray-300 cursor-not-allowed'
+                              ? 'text-gray-500 dark:text-slate-400 cursor-not-allowed'
                               : 'text-red-600 hover:bg-red-50'
                           }`}
                           title={isFrench ? 'Supprimer' : 'Delete'}
@@ -880,7 +880,7 @@ const AdminUsers = () => {
                     </td>
                   </tr>
                 ))}
-                
+
                 {users.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
@@ -891,25 +891,25 @@ const AdminUsers = () => {
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
-              <div className="text-sm text-gray-600">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50 dark:bg-slate-900 dark:border-slate-700">
+              <div className="text-sm text-gray-600 dark:text-slate-300">
                 Page {page} sur {totalPages}
               </div>
               <div className="flex items-center gap-2">
                 <button aria-label={t('common.previous')}
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-slate-700"
                 >
                   <ChevronLeft size={18} />
                 </button>
                 <button aria-label={t('common.next')}
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-slate-700"
                 >
                   <ChevronRight size={18} />
                 </button>
@@ -918,21 +918,21 @@ const AdminUsers = () => {
           )}
         </div>
       )}
-      
+
       {/* Create User Modal */}
       <CreateUserModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSuccess={() => fetchUsers()}
       />
-      
+
       {/* User Detail Modal */}
       <UserDetailModal
         isOpen={detailModal.isOpen}
         userId={detailModal.userId}
         onClose={() => setDetailModal({ isOpen: false, userId: null })}
       />
-      
+
       {/* Confirm Modal for Toggle Active */}
       <ConfirmModal
         isOpen={confirmModal.isOpen && confirmModal.type === 'toggle'}
@@ -948,7 +948,7 @@ const AdminUsers = () => {
         isDestructive={confirmModal.user?.isActive !== false}
         isLoading={actionLoading}
       />
-      
+
       {/* Confirm Modal for Delete */}
       <ConfirmModal
         isOpen={confirmModal.isOpen && confirmModal.type === 'delete'}

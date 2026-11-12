@@ -197,7 +197,7 @@ const PeopleGroupDetail = () => {
         <div className="text-red-500 mb-4">
           <X size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900">{t('peopleMap.loadError') || 'People group not found'}</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">{t('peopleMap.loadError') || 'People group not found'}</h3>
         <p className="text-gray-500 mt-2">{t('peopleMap.loadErrorDesc') || "This people group doesn't exist or has been deleted"}</p>
         <Link to="/map" className="btn-primary mt-4 inline-block">
           {t('common.back')}
@@ -213,12 +213,12 @@ const PeopleGroupDetail = () => {
         <div className="flex items-center gap-4">
           <button aria-label={t('common.back')}
             onClick={() => navigate('/map')}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 hover:bg-gray-100 rounded-lg dark:hover:bg-slate-700"
           >
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className="page-title">
               {isEditing ? (
                 <input
                   type="text"
@@ -260,7 +260,7 @@ const PeopleGroupDetail = () => {
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="btn-secondary text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  className="btn-secondary text-red-600 hover:bg-red-50 flex items-center gap-2 dark:text-red-300"
                 >
                   <Trash2 size={18} />
                   {t('common.delete')}
@@ -288,8 +288,8 @@ const PeopleGroupDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('peopleMap.peopleName') || 'General Information'}</h3>
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 dark:text-slate-100">{t('peopleMap.peopleName') || 'General Information'}</h3>
             
             {isEditing ? (
               <div className="space-y-4">
@@ -540,8 +540,8 @@ const PeopleGroupDetail = () => {
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <TrendingUp size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <TrendingUp size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.engagementStatus')}</p>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${dmmBadgeClassFor(peopleGroup.engagementStatus)}`}>
@@ -551,8 +551,8 @@ const PeopleGroupDetail = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Users size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Users size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.population')}</p>
                       <p className="text-lg font-semibold">{peopleGroup.population?.toLocaleString() || 'N/A'}</p>
@@ -560,15 +560,15 @@ const PeopleGroupDetail = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Church size={24} className="text-green-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Church size={24} className="text-green-600 dark:text-green-300" />
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.numberOfChurches')}</p>
                       <p className="text-lg font-semibold">{peopleGroup.numberOfChurches || 0}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <TrendingUp size={24} className="text-blue-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <TrendingUp size={24} className="text-blue-600 dark:text-blue-300" />
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.churchGeneration')}</p>
                       <p className="text-lg font-semibold">{peopleGroup.churchGeneration || 0}</p>
@@ -576,22 +576,22 @@ const PeopleGroupDetail = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Activity size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Activity size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">DBS</p>
                       <p className="text-lg font-semibold">{peopleGroup.dbs || 0}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Users size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Users size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">COM</p>
                       <p className="text-lg font-semibold">{peopleGroup.com || 0}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <Church size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <Church size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">CAT</p>
                       <p className="text-lg font-semibold">{peopleGroup.cat || 0}</p>
@@ -599,8 +599,8 @@ const PeopleGroupDetail = () => {
                   </div>
                 </div>
                 {peopleGroup.location && (
-                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                    <MapPin size={24} className="text-primary-600" />
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <MapPin size={24} className="text-primary-600 dark:text-primary-300" />
                     <div>
                       <p className="text-sm text-gray-500">{t('rejected.coordinates')}</p>
                       <p className="font-medium">
@@ -610,9 +610,9 @@ const PeopleGroupDetail = () => {
                   </div>
                 )}
                 {peopleGroup.description && (
-                  <div className="p-4 bg-gray-50 rounded-lg">
+                  <div className="p-4 bg-gray-50 rounded-lg dark:bg-slate-900">
                     <p className="text-sm text-gray-500 mb-2">{t('common.description')}</p>
-                    <p className="text-gray-700">{peopleGroup.description}</p>
+                    <p className="text-gray-700 dark:text-slate-300">{peopleGroup.description}</p>
                   </div>
                 )}
               </div>
@@ -621,8 +621,8 @@ const PeopleGroupDetail = () => {
 
           {/* Photos */}
           {peopleGroup.photos && peopleGroup.photos.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
                 <Image size={20} />
                 Photos ({peopleGroup.photos.length})
               </h3>
@@ -651,16 +651,16 @@ const PeopleGroupDetail = () => {
 
           {/* Progress History */}
           {peopleGroup.progressHistory && peopleGroup.progressHistory.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
                 <Clock size={20} />
                 Progress History
               </h3>
               <div className="space-y-3">
                 {peopleGroup.progressHistory.slice().reverse().slice(0, 5).map((entry, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="p-2 bg-primary-100 rounded-lg">
-                      <TrendingUp size={16} className="text-primary-600" />
+                  <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <div className="p-2 bg-primary-100 rounded-lg dark:bg-primary-900/40">
+                      <TrendingUp size={16} className="text-primary-600 dark:text-primary-300" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -672,9 +672,9 @@ const PeopleGroupDetail = () => {
                         )}
                       </div>
                       {entry.notes && (
-                        <p className="text-sm text-gray-600 mt-1">{entry.notes}</p>
+                        <p className="text-sm text-gray-600 mt-1 dark:text-slate-300">{entry.notes}</p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                         <Calendar size={12} />
                         {format(new Date(entry.date), 'dd MMMM yyyy', { locale: fr })}
                         {entry.updatedBy?.name && ` • ${entry.updatedBy.name}`}
@@ -687,24 +687,24 @@ const PeopleGroupDetail = () => {
           )}
 
           {/* Activities */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-800">{isFrench ? 'Activités' : 'Activities'}</h3>
-              <Link to={`/activities?peopleGroup=${id}`} className="text-primary-600 text-sm hover:underline">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100">{isFrench ? 'Activités' : 'Activities'}</h3>
+              <Link to={`/activities?peopleGroup=${id}`} className="text-primary-600 text-sm hover:underline dark:text-primary-300">
                 View all
               </Link>
             </div>
             {activitiesData && activitiesData.length > 0 ? (
               <div className="space-y-3">
                 {activitiesData.map((activity) => (
-                  <div key={activity._id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="p-2 bg-primary-100 rounded-lg">
-                      <Activity size={16} className="text-primary-600" />
+                  <div key={activity._id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg dark:bg-slate-900">
+                    <div className="p-2 bg-primary-100 rounded-lg dark:bg-primary-900/40">
+                      <Activity size={16} className="text-primary-600 dark:text-primary-300" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800">{activity.type}</p>
+                      <p className="font-medium text-gray-800 dark:text-slate-100">{activity.type}</p>
                       <p className="text-sm text-gray-500">{activity.description}</p>
-                      <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                         <Calendar size={12} />
                         {format(new Date(activity.date), 'dd MMMM yyyy', { locale: fr })}
                       </p>
@@ -724,8 +724,8 @@ const PeopleGroupDetail = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick Stats */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">{isFrench ? 'Détails' : 'Details'}</h3>
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Détails' : 'Details'}</h3>
             <div className="space-y-3">
               {peopleGroup.villageName && (
                 <div className="flex items-center justify-between">
@@ -778,7 +778,7 @@ const PeopleGroupDetail = () => {
               {peopleGroup.donor && (
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">{isFrench ? 'Donateur' : 'Donor'}</span>
-                  <Link to={`/donors/${encodeURIComponent(peopleGroup.donor)}/engagements`} className="text-blue-600 hover:underline">{peopleGroup.donor}</Link>
+                  <Link to={`/donors/${encodeURIComponent(peopleGroup.donor)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">{peopleGroup.donor}</Link>
                 </div>
               )}
               {peopleGroup.nationalCoordinator && (
@@ -791,7 +791,7 @@ const PeopleGroupDetail = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500">{isFrench ? "Implanteur d'église" : 'Church Planter'}</span>
                   <span className="font-semibold text-right">
-                    <Link to={`/planters/${encodeURIComponent(peopleGroup.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
+                    <Link to={`/planters/${encodeURIComponent(peopleGroup.churchPlanter)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">
                       {peopleGroup.churchPlanter}
                     </Link>
                   </span>
@@ -815,8 +815,8 @@ const PeopleGroupDetail = () => {
           </div>
 
           {/* Approval Status */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">{isFrench ? 'Statut' : 'Status'}</h3>
+          <div className="bg-white rounded-xl shadow-sm p-6 dark:bg-slate-800">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Statut' : 'Status'}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-gray-500">{isFrench ? 'Approuvé' : 'Approved'}</span>
@@ -862,9 +862,9 @@ const PeopleGroupDetail = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le groupe de peuple' : 'Delete People Group'}</h3>
-            <p className="text-gray-600 mb-6">
+          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-soft-xl w-full max-w-md p-6 animate-fade-in dark:bg-slate-800">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 dark:text-slate-100">{isFrench ? 'Supprimer le groupe de peuple' : 'Delete People Group'}</h3>
+            <p className="text-gray-600 mb-6 dark:text-slate-300">
               {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{peopleGroup.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}
             </p>
             <div className="flex gap-3">
@@ -877,7 +877,7 @@ const PeopleGroupDetail = () => {
               <button
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                className="btn-danger btn-sm flex-1"
               >
                 {deleteMutation.isPending ? (isFrench ? 'Suppression...' : 'Deleting...') : (isFrench ? 'Supprimer' : 'Delete')}
               </button>

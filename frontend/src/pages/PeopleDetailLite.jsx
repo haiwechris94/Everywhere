@@ -165,7 +165,7 @@ function ActionsMenu({ isFrench, onAddEngagement }) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+        className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={isFrench ? 'Actions' : 'Actions'}
@@ -174,14 +174,14 @@ function ActionsMenu({ isFrench, onAddEngagement }) {
       </button>
       {open && (
         <div
-          className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:bg-slate-800 dark:border-slate-700"
           role="menu"
         >
           <button
             type="button"
             role="menuitem"
             onClick={() => { setOpen(false); onAddEngagement && onAddEngagement() }}
-            className="block w-full px-3 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+            className="block w-full px-3 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
           >
             {isFrench ? 'Ajouter un engagement' : 'Add an engagement'}
           </button>
@@ -245,7 +245,7 @@ function AddVillageForm({ peopleId, peopleName, onAdded, openSignal, onConsumeOp
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+        className="btn-primary btn-sm"
       >
         {isFrench ? '+ Ajouter un engagement' : '+ Add an engagement'}
       </button>
@@ -253,8 +253,8 @@ function AddVillageForm({ peopleId, peopleName, onAdded, openSignal, onConsumeOp
   }
 
   return (
-    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50">
-      <p className="text-sm font-semibold text-slate-700">{isFrench ? `Nouvel engagement pour « ${peopleName} »` : `New engagement for “${peopleName}”`}</p>
+    <form onSubmit={submit} className="rounded-xl border border-slate-200 p-4 space-y-3 bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
+      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{isFrench ? `Nouvel engagement pour « ${peopleName} »` : `New engagement for “${peopleName}”`}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <label className="text-xs text-slate-500">
           {isFrench ? 'Nom du village *' : 'Village name *'}
@@ -287,12 +287,12 @@ function AddVillageForm({ peopleId, peopleName, onAdded, openSignal, onConsumeOp
           <input value={form.churchGeneration} onChange={set('churchGeneration')} type="number" min="0" className="mt-1 w-full rounded border px-2 py-1 text-sm" />
         </label>
       </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-300">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+        <button type="submit" disabled={saving} className="btn-primary btn-sm">
           {saving ? (isFrench ? 'Ajout…' : 'Adding…') : (isFrench ? 'Enregistrer' : 'Save')}
         </button>
-        <button type="button" onClick={() => { setOpen(false); setError('') }} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600">
+        <button type="button" onClick={() => { setOpen(false); setError('') }} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300">
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
       </div>
@@ -343,7 +343,7 @@ function EditVillageForm({ peopleId, village, onSaved, onCancel }) {
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 rounded-lg border border-slate-200 p-3 space-y-2 bg-slate-50">
+    <form onSubmit={submit} className="mt-3 rounded-lg border border-slate-200 p-3 space-y-2 bg-slate-50 dark:bg-slate-900 dark:border-slate-700">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <label className="text-xs text-slate-500">
           {isFrench ? 'Nom du village *' : 'Village name *'}
@@ -380,12 +380,12 @@ function EditVillageForm({ peopleId, village, onSaved, onCancel }) {
           <input value={form.admin3} onChange={set('admin3')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
         </label>
       </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-300">{error}</p>}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+        <button type="submit" disabled={saving} className="btn-primary btn-sm">
           {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
         </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600">
+        <button type="button" onClick={onCancel} className="rounded-lg border px-3 py-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300">
           {isFrench ? 'Annuler' : 'Cancel'}
         </button>
       </div>
@@ -660,7 +660,7 @@ const PeopleDetailLite = () => {
               {countryCode}
             </Link>
             <span style={{ color: statusLabelColor }}>/</span>
-            <span className="font-bold text-slate-900">{name}</span>
+            <span className="font-bold text-slate-900 dark:text-slate-100">{name}</span>
           </nav>
           <ActionsMenu
             isFrench={isFrench}
@@ -678,30 +678,30 @@ const PeopleDetailLite = () => {
                 src={photoUrl}
                 alt={isFrench ? `Photo du peuple ${name}` : `Photo of the ${name} people group`}
                 onError={(e) => { e.currentTarget.style.display = 'none' }}
-                className="w-full aspect-[4/3] rounded-2xl object-cover border border-slate-200"
+                className="w-full aspect-[4/3] rounded-2xl object-cover border border-slate-200 dark:border-slate-700"
               />
             ) : (
               <div
-                className="w-full aspect-[4/3] rounded-2xl border border-slate-200 bg-white flex items-center justify-center"
+                className="w-full aspect-[4/3] rounded-2xl border border-slate-200 bg-white flex items-center justify-center dark:bg-slate-800 dark:border-slate-700"
                 role="img"
                 aria-label={isFrench ? `Aucune photo disponible pour le peuple ${name}` : `No photo available for the ${name} people group`}
               >
-                <Users className="h-10 w-10 text-slate-300" aria-hidden="true" />
+                <Users className="h-10 w-10 text-slate-500 dark:text-slate-400" aria-hidden="true" />
               </div>
             )}
 
             {/* 2. Titre = nom du peuple. */}
             {/* Titre = nom du peuple + bouton d'edition (admin). */}
-            <div className="mt-4 flex items-start justify-between gap-2">
-              <h1 className="text-[36px] leading-tight font-bold text-slate-900">{name}</h1>
+            <div className="mt-4 flex flex-wrap items-start justify-between gap-2">
+              <h1 className="page-title">{name}</h1>
               {canManage && (
-                <div className="mt-2 flex shrink-0 items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setEditingPeople(true)}
-                    className="rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                    className="btn-secondary btn-sm"
                   >
-                    {isFrench ? '✎ Modifier le peuple' : '✎ Edit people'}
+                    {isFrench ? 'Modifier le peuple' : 'Edit people'}
                   </button>
                   <button
                     type="button"
@@ -714,16 +714,16 @@ const PeopleDetailLite = () => {
                         alert(e?.response?.data?.message || (isFrench ? 'Suppression impossible' : 'Delete failed'))
                       }
                     }}
-                    className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                    className="btn-danger-outline btn-sm"
                   >
-                    {isFrench ? '🗑 Supprimer le peuple' : '🗑 Delete people'}
+                    {isFrench ? 'Supprimer le peuple' : 'Delete people'}
                   </button>
                 </div>
               )}
             </div>
             {editingPeople && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+                <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto dark:bg-slate-800">
                   <PeopleForm
                     mode="edit"
                     isFrench={isFrench}
@@ -780,21 +780,21 @@ const PeopleDetailLite = () => {
             </div>
 
             {/* 5. Description. */}
-            <p className="mt-4 text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+            <p className="mt-4 text-sm text-slate-600 leading-relaxed whitespace-pre-line dark:text-slate-300">
               {descriptionDisplay || dash}
             </p>
 
             {/* 6. Deux petites cartes : drapeau + code pays ; JP Scale. */}
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3 flex items-center gap-2">
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3 flex items-center gap-2 dark:bg-slate-800 dark:border-slate-700">
                 <span className="text-2xl leading-none" aria-hidden="true">{countryFlagEmoji}</span>
-                <span className="font-bold text-slate-900">{countryCodeDisplay}</span>
+                <span className="font-bold text-slate-900 dark:text-slate-100">{countryCodeDisplay}</span>
               </div>
-              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3">
-                <p className="text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-3 dark:bg-slate-800 dark:border-slate-700">
+                <p className="text-xs font-semibold" style={{ color: statusLabelColor }}>
                   {isFrench ? 'Échelle JP' : 'JP Scale'}
                 </p>
-                <p className="mt-0.5 font-bold text-slate-900">{jpScaleDisplay}</p>
+                <p className="mt-0.5 font-bold text-slate-900 dark:text-slate-100">{jpScaleDisplay}</p>
               </div>
             </div>
           </div>
@@ -830,22 +830,22 @@ const PeopleDetailLite = () => {
               </div>
 
               {/* Panneau blanc en bas, chevauchant le dégradé, 3 colonnes. */}
-              <div className="absolute left-6 right-6 -bottom-10 rounded-2xl bg-white border border-slate-200 shadow-md">
-                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center">
+              <div className="absolute left-6 right-6 -bottom-10 rounded-2xl bg-white border border-slate-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
+                <div className="grid grid-cols-3 divide-x divide-slate-100 text-center dark:divide-slate-700">
                   <div className="px-3 py-4">
                     <Users className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                    <p className="mt-1 font-bold text-slate-900">{evangelicalDisplay}</p>
-                    <p className="text-[11px] text-slate-500">{isFrench ? 'Évangéliques' : 'Evangelical'}</p>
+                    <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{evangelicalDisplay}</p>
+                    <p className="text-xs text-slate-500">{isFrench ? 'Évangéliques' : 'Evangelical'}</p>
                   </div>
                   <div className="px-3 py-4">
                     <Target className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                    <p className="mt-1 font-bold text-slate-900">{jpScaleDisplay}</p>
-                    <p className="text-[11px] text-slate-500">{isFrench ? 'Échelle JP' : 'JP Scale'}</p>
+                    <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{jpScaleDisplay}</p>
+                    <p className="text-xs text-slate-500">{isFrench ? 'Échelle JP' : 'JP Scale'}</p>
                   </div>
                   <div className="px-3 py-4">
                     <AlertTriangle className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                    <p className="mt-1 font-bold text-slate-900">{leastReachedDisplay}</p>
-                    <p className="text-[11px] text-slate-500">{isFrench ? 'Moins atteint' : 'Least Reached'}</p>
+                    <p className="mt-1 font-bold text-slate-900 dark:text-slate-100">{leastReachedDisplay}</p>
+                    <p className="text-xs text-slate-500">{isFrench ? 'Moins atteint' : 'Least Reached'}</p>
                   </div>
                 </div>
               </div>
@@ -856,43 +856,43 @@ const PeopleDetailLite = () => {
 
             {/* B) PANNEAU « Informations clés ». */}
             <div className="rounded-2xl p-5" style={{ backgroundColor: statusTintBg }}>
-              <h2 className="flex items-center gap-2 font-bold text-slate-900">
+              <h2 className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">
                 <AlertTriangle className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
                 {isFrench ? 'Informations clés' : 'Key Information'}
               </h2>
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 dark:bg-slate-800 dark:border-slate-700">
                   <BookOpen className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: statusLabelColor }}>
                     {isFrench ? 'Traduction de la Bible' : 'Bible Translation'}
                   </p>
-                  <p className="mt-0.5 font-bold text-slate-900">{bibleTranslationDisplay}</p>
+                  <p className="mt-0.5 font-bold text-slate-900 dark:text-slate-100">{bibleTranslationDisplay}</p>
                 </div>
-                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 dark:bg-slate-800 dark:border-slate-700">
                   <MessageSquare className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: statusLabelColor }}>
                     {isFrench ? 'Langue principale' : 'Primary Language'}
                   </p>
-                  <p className="mt-0.5 font-bold text-slate-900">{languageDisplay}</p>
+                  <p className="mt-0.5 font-bold text-slate-900 dark:text-slate-100">{languageDisplay}</p>
                 </div>
-                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+                <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 dark:bg-slate-800 dark:border-slate-700">
                   <Users className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                  <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                  <p className="mt-2 text-xs font-semibold" style={{ color: statusLabelColor }}>
                     {isFrench ? 'Religion' : 'Religion'}
                   </p>
-                  <p className="mt-0.5 font-bold text-slate-900">{religionDisplay}</p>
+                  <p className="mt-0.5 font-bold text-slate-900 dark:text-slate-100">{religionDisplay}</p>
                 </div>
               </div>
             </div>
 
             {/* C) Carte Pays. */}
             <div className="grid grid-cols-1 gap-3">
-              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
+              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4 dark:bg-slate-800 dark:border-slate-700">
                 <Globe className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
+                <p className="mt-2 text-xs font-semibold" style={{ color: statusLabelColor }}>
                   {isFrench ? 'Pays' : 'Country'}
                 </p>
-                <p className="mt-0.5 font-bold text-slate-900 flex items-center gap-1.5">
+                <p className="mt-0.5 font-bold text-slate-900 flex items-center gap-1.5 dark:text-slate-100">
                   <span className="text-lg leading-none" aria-hidden="true">{countryFlagEmoji}</span>
                   {countryCodeDisplay}
                 </p>
@@ -904,7 +904,7 @@ const PeopleDetailLite = () => {
 
 
       {dmmCards.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
           <h2 className="text-xl font-bold mb-4">DMM Rollup</h2>
           <div className="flex flex-wrap gap-3">
             {dmmCards.map((c) => (
@@ -917,13 +917,13 @@ const PeopleDetailLite = () => {
       {(aliases.length > 0 || hasPopulationBySource || hasLocalisation) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {aliases.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
               <h2 className="text-xl font-bold mb-4">Alias</h2>
               <div className="flex flex-wrap gap-2">
                 {aliases.map((a, i) => (
                   <span
                     key={i}
-                    className="rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 text-xs"
+                    className="rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 text-xs dark:bg-slate-700 dark:text-slate-300"
                   >
                     {a}
                   </span>
@@ -933,18 +933,18 @@ const PeopleDetailLite = () => {
           )}
 
           {hasPopulationBySource && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
               <h2 className="text-xl font-bold mb-4">{isFrench ? 'Population par source' : 'Population by source'}</h2>
               <div className="space-y-1">
                 {bySource.map((s, i) => (
-                  <div key={i} className="flex justify-between border-b border-slate-100 py-1.5">
+                  <div key={i} className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
                     <span className="text-slate-500 text-sm">{sourceLabel(s.sourceType)}</span>
-                    <span className="text-slate-800 text-sm font-medium">{fmtNum(s.population)}</span>
+                    <span className="text-slate-800 text-sm font-medium dark:text-slate-100">{fmtNum(s.population)}</span>
                   </div>
                 ))}
                 {/* Pas de total : les populations ne sont pas additionnées entre
                     sources (une même population peut être décrite par plusieurs sources). */}
-                <p className="mt-2 text-[11px] italic text-slate-400">
+                <p className="mt-2 text-xs italic text-slate-500 dark:text-slate-400">
                   {isFrench ? 'Les populations ne sont pas additionnées entre sources.' : 'Populations are not summed across sources.'}
                 </p>
               </div>
@@ -952,37 +952,37 @@ const PeopleDetailLite = () => {
           )}
 
           {hasLocalisation && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
               <h2 className="text-xl font-bold mb-4">{isFrench ? 'Localisation' : 'Location'}</h2>
               <div className="space-y-1">
                 {localisation?.method && (
-                  <div className="flex justify-between border-b border-slate-100 py-1.5">
+                  <div className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
                     <span className="text-slate-500 text-sm">{isFrench ? 'Méthode' : 'Method'}</span>
-                    <span className="text-slate-800 text-sm font-medium text-right">{localisation.method}</span>
+                    <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{localisation.method}</span>
                   </div>
                 )}
                 {representativePoint && (
-                  <div className="flex justify-between border-b border-slate-100 py-1.5">
+                  <div className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
                     <span className="text-slate-500 text-sm">{isFrench ? 'Point représentatif' : 'Representative point'}</span>
-                    <span className="text-slate-800 text-sm font-medium text-right">{representativePoint}</span>
+                    <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{representativePoint}</span>
                   </div>
                 )}
                 {localisation?.coverage != null && localisation.coverage !== '' && (
-                  <div className="flex justify-between border-b border-slate-100 py-1.5">
+                  <div className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
                     <span className="text-slate-500 text-sm">{isFrench ? 'Couverture' : 'Coverage'}</span>
-                    <span className="text-slate-800 text-sm font-medium text-right">{localisation.coverage}</span>
+                    <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{localisation.coverage}</span>
                   </div>
                 )}
                 {sourcePoints.length > 0 && (
                   <div className="pt-2">
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">{isFrench ? 'Points par source' : 'Points by source'}</p>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{isFrench ? 'Points par source' : 'Points by source'}</p>
                     {sourcePoints.map((sp, i) => {
                       const coord = fmtPoint(sp.coordinates)
                       if (!coord) return null
                       return (
-                        <div key={i} className="flex justify-between border-b border-slate-100 py-1.5">
+                        <div key={i} className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
                           <span className="text-slate-500 text-sm">{sourceLabel(sp.sourceType)}</span>
-                          <span className="text-slate-800 text-sm font-medium text-right">{coord}</span>
+                          <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{coord}</span>
                         </div>
                       )
                     })}
@@ -995,7 +995,7 @@ const PeopleDetailLite = () => {
       )}
 
       {dmmDetail && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
           <h2 className="text-xl font-bold mb-4">{isFrench ? 'Détails du peuple' : 'People group details'}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
             {[
@@ -1011,13 +1011,13 @@ const PeopleDetailLite = () => {
               [isFrench ? 'Année de début' : 'Start year', dmmDetail.startYear],
               ['Population', typeof dmmDetail.population === 'number' ? dmmDetail.population.toLocaleString('fr-FR') : dmmDetail.population],
               [isFrench ? 'Donateur' : 'Donor', dmmDetail.donor ? (
-                <Link to={`/donors/${encodeURIComponent(dmmDetail.donor)}/engagements`} className="text-blue-600 hover:underline">
+                <Link to={`/donors/${encodeURIComponent(dmmDetail.donor)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">
                   {dmmDetail.donor}
                 </Link>
               ) : dmmDetail.donor],
               [isFrench ? 'Coordinateur national' : 'National coordinator', dmmDetail.nationalCoordinator],
               [isFrench ? "Implanteur d'église" : 'Church planter', dmmDetail.churchPlanter ? (
-                <Link to={`/planters/${encodeURIComponent(dmmDetail.churchPlanter)}/engagements`} className="text-blue-600 hover:underline">
+                <Link to={`/planters/${encodeURIComponent(dmmDetail.churchPlanter)}/engagements`} className="text-blue-600 hover:underline dark:text-blue-300">
                   {dmmDetail.churchPlanter}
                 </Link>
               ) : dmmDetail.churchPlanter],
@@ -1027,9 +1027,9 @@ const PeopleDetailLite = () => {
             ]
               .filter(([, v]) => v !== undefined && v !== null && v !== '')
               .map(([label, value]) => (
-                <div key={label} className="flex justify-between border-b border-slate-100 py-1.5">
-                  <span className="text-slate-400 text-sm">{label}</span>
-                  <span className="text-slate-800 text-sm font-medium text-right">{value}</span>
+                <div key={label} className="flex justify-between border-b border-slate-100 py-1.5 dark:border-slate-700">
+                  <span className="text-slate-500 dark:text-slate-400 text-sm">{label}</span>
+                  <span className="text-slate-800 text-sm font-medium text-right dark:text-slate-100">{value}</span>
                 </div>
               ))}
           </div>
@@ -1044,16 +1044,16 @@ const PeopleDetailLite = () => {
       )}
 
       {!dmmDetail && overview.description ? (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
           <h2 className="text-xl font-bold mb-2">Description</h2>
-          <p className="text-slate-600 whitespace-pre-line">{overview.description}</p>
+          <p className="text-slate-600 whitespace-pre-line dark:text-slate-300">{overview.description}</p>
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 dark:bg-slate-800 dark:border-slate-700">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-xl font-bold">
-            Engagements <span className="text-slate-400 text-base">({villages.length})</span>
+            Engagements <span className="text-slate-500 dark:text-slate-400 text-base">({villages.length})</span>
           </h2>
           <AddVillageForm
             peopleId={peopleId}
@@ -1064,11 +1064,11 @@ const PeopleDetailLite = () => {
           />
         </div>
         {villages.length === 0 ? (
-          <p className="text-sm text-slate-400">{isFrench ? 'Aucun engagement enregistré pour ce peuple. Ajoutez-en un avec le bouton ci-dessus.' : 'No engagement recorded for this people group. Add one with the button above.'}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{isFrench ? 'Aucun engagement enregistré pour ce peuple. Ajoutez-en un avec le bouton ci-dessus.' : 'No engagement recorded for this people group. Add one with the button above.'}</p>
         ) : (
           <div className="space-y-3">
             {villages.map((v) => (
-              <div key={v.id} className="rounded-xl border border-slate-200 p-4">
+              <div key={v.id} className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     {/* Nom de l'engagement cliquable → fiche Engagement (funnel
@@ -1076,12 +1076,12 @@ const PeopleDetailLite = () => {
                     {v.engagementId ? (
                       <Link
                         to={`/regions/${regionId}/countries/${countryCode}/peoples/${peopleId}/engagements/${v.engagementId}`}
-                        className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                        className="font-semibold text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                       >
                         {peopleVillageLabel(name, v.villageName)}
                       </Link>
                     ) : (
-                      <p className="font-semibold text-slate-900">{peopleVillageLabel(name, v.villageName)}</p>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100">{peopleVillageLabel(name, v.villageName)}</p>
                     )}
                     <p className="text-sm text-slate-500 mt-1">
                       {[v.region, v.admin2, v.admin3].filter(Boolean).join(' · ') || '—'}
@@ -1101,7 +1101,7 @@ const PeopleDetailLite = () => {
                       <button
                         type="button"
                         onClick={() => setEditingId(editingId === v.id ? null : v.id)}
-                        className="rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        className="btn-secondary btn-sm"
                       >
                         {editingId === v.id ? (isFrench ? 'Fermer' : 'Close') : (isFrench ? 'Modifier' : 'Edit')}
                       </button>
@@ -1117,7 +1117,7 @@ const PeopleDetailLite = () => {
                             window.alert(err?.response?.data?.error || (isFrench ? 'Échec de la suppression de l’engagement.' : 'Failed to delete the engagement.'))
                           }
                         }}
-                        className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                        className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-300"
                       >
                         {isFrench ? 'Supprimer' : 'Delete'}
                       </button>
@@ -1181,18 +1181,18 @@ function PeopleCommentSection({ engagementId, description, canManage, isFrench, 
       <div className="mt-4">
         <p className="text-sm font-semibold text-slate-500 mb-1">{isFrench ? 'Commentaire' : 'Comment'}</p>
         <textarea
-          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700"
+          className="w-full rounded-lg border border-slate-300 p-2 text-sm text-slate-700 dark:border-slate-700 dark:text-slate-300"
           rows={4}
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-sm text-red-600 dark:text-red-300">{error}</p>}
         <div className="mt-2 flex gap-2">
           <button
             type="button"
             onClick={save}
             disabled={saving}
-            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="btn-primary btn-sm"
           >
             {saving ? (isFrench ? 'Enregistrement…' : 'Saving…') : (isFrench ? 'Enregistrer' : 'Save')}
           </button>
@@ -1200,7 +1200,7 @@ function PeopleCommentSection({ engagementId, description, canManage, isFrench, 
             type="button"
             onClick={() => { setEditing(false); setError('') }}
             disabled={saving}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="btn-secondary btn-sm"
           >
             {isFrench ? 'Annuler' : 'Cancel'}
           </button>
@@ -1212,17 +1212,17 @@ function PeopleCommentSection({ engagementId, description, canManage, isFrench, 
   return (
     <div className="mt-4">
       {description ? (
-        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{description}</p>
+        <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed dark:text-slate-300">{description}</p>
       ) : (
         canManage && (
-          <p className="text-sm italic text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
+          <p className="text-sm italic text-slate-500 dark:text-slate-400">{isFrench ? 'Aucun commentaire.' : 'No comment.'}</p>
         )
       )}
       {canManage && engagementId && (
         <button
           type="button"
           onClick={open}
-          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+          className="mt-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-300"
         >
           {description
             ? (isFrench ? 'Modifier' : 'Edit')

@@ -67,8 +67,12 @@ const Initiatives = () => {
       {/* En-tête : même mise en forme que les pages Regions / Pays (petit libellé
           gris en gras au-dessus, grand titre slate-900 en dessous). */}
       <div>
-        <p className="text-sm font-bold text-gray-500 dark:text-slate-400">{isFrench ? 'Initiatives' : 'Initiatives'}</p>
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">{isFrench ? 'Initiatives' : 'Initiatives'}</h1>
+        <h1 className="page-title">Initiatives</h1>
+        <p className="page-subtitle">
+          {isFrench
+            ? 'Les programmes en cours. Ouvrez une initiative pour suivre ses peuples.'
+            : 'Ongoing programmes. Open an initiative to follow its peoples.'}
+        </p>
       </div>
 
       {isLoading ? (
@@ -104,31 +108,31 @@ const Initiatives = () => {
                 {initiatives.map((initiative, index) => (
                   <tr
                     key={initiative.key || initiative.name}
-                    className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors"
+                    className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors dark:hover:bg-slate-700"
                   >
                     {/* Numéro de ligne : 1, 2, 3 … */}
-                    <td className="py-3 pr-4 text-right tabular-nums text-slate-400">{index + 1}</td>
+                    <td className="py-3 pr-4 text-right tabular-nums text-slate-500 dark:text-slate-400">{index + 1}</td>
                     <td className="py-3 px-4">
                       {initiative.key && !initiative.synthetic ? (
                         <Link
                           to={`/initiatives/${initiative.key}`}
-                          className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                          className="font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-300"
                         >
                           {initiativeDisplayName(initiative.key || initiative.name, { isFrench }, initiative.name)}
                         </Link>
                       ) : (
-                        <span className="font-medium text-slate-700">{initiativeDisplayName(initiative.key || initiative.name, { isFrench }, initiative.name)}</span>
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{initiativeDisplayName(initiative.key || initiative.name, { isFrench }, initiative.name)}</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">
+                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">
                       {fmt(initiative.countryCount ?? 0)}
                     </td>
-                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700">
+                    <td className="py-3 px-4 text-right tabular-nums font-bold text-slate-700 dark:text-slate-300">
                       {fmt(initiative.peopleCount ?? 0)}
                     </td>
                     <td className="py-3 pl-4 text-left">
                       {((initiative.countryCount ?? 0) > 0 || (initiative.peopleCount ?? 0) > 0) ? (
-                        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                        <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300">
                           {isFrench ? 'Actif' : 'Active'}
                         </span>
                       ) : (

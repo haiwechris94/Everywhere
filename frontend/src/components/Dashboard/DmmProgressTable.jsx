@@ -90,7 +90,7 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
     <section className="p-0 bg-transparent shadow-none dark:bg-transparent">
       <div className="flex items-center justify-between gap-3 mb-4">
         <h3 className="text-base font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-100">{heading}</h3>
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {engagements.length} {isFrench ? 'engagements' : 'engagements'}
         </span>
       </div>
