@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react'
+﻿import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -180,12 +180,12 @@ function GrowthCard({ label, first, last, isFrench }) {
   const pct = first === 0 ? (last > 0 ? 100 : 0) : (delta / first) * 100
   const up = delta > 0
   const flat = delta === 0
-  const color = flat ? 'text-gray-500' : up ? 'text-emerald-600' : 'text-red-600'
+  const color = flat ? 'text-gray-500 dark:text-slate-400' : up ? 'text-emerald-600' : 'text-red-600'
   const Icon = flat ? Minus : up ? ArrowUpRight : ArrowDownRight
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500 dark:text-slate-400">{label}</p>
       <div className={`mt-1 flex items-center gap-1 text-2xl font-bold ${color}`}>
         <Icon size={20} />
         {first === 0 && last > 0 ? '—' : `${pct > 0 ? '+' : ''}${pct.toFixed(0)}%`}
@@ -222,9 +222,9 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
   const data = effectiveMode === 'area' ? areaData : metricData
 
   return (
-    <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="mb-6 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600">
+        <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400">
           <TrendingUp size={15} className="text-indigo-500" />
           {isFrench ? 'Tendance par période' : 'Trend by period'}
         </h2>
@@ -232,16 +232,16 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
         <div className="flex flex-wrap items-center gap-2">
           {/* Mode switch (only when >1 area selected) */}
           {hasAreaComparison && (
-            <div className="flex overflow-hidden rounded-lg border border-gray-200 text-xs">
+            <div className="flex overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700 text-xs">
               <button
                 onClick={() => setMode('metric')}
-                className={`px-2.5 py-1 font-medium ${effectiveMode === 'metric' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                className={`px-2.5 py-1 font-medium ${effectiveMode === 'metric' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900'}`}
               >
                 {isFrench ? 'Par métrique' : 'By metric'}
               </button>
               <button
                 onClick={() => setMode('area')}
-                className={`px-2.5 py-1 font-medium ${effectiveMode === 'area' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                className={`px-2.5 py-1 font-medium ${effectiveMode === 'area' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900'}`}
               >
                 {isFrench ? 'Par zone' : 'By area'}
               </button>
@@ -253,7 +253,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
             onClick={onExport}
             disabled={exporting}
             title={isFrench ? 'Exporter en image PNG' : 'Export as PNG image'}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white dark:bg-slate-800 px-2.5 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:bg-slate-900 disabled:opacity-50"
           >
             {exporting ? <Loader2 size={14} className="animate-spin" /> : <ImageDown size={14} />}
             {isFrench ? 'Image' : 'Image'}
@@ -277,7 +277,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
             ))
           : (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">{isFrench ? 'Métrique :' : 'Metric:'}</span>
+              <span className="text-xs text-gray-500 dark:text-slate-400">{isFrench ? 'Métrique :' : 'Metric:'}</span>
               <select
                 value={areaMetric}
                 onChange={(e) => setAreaMetric(e.target.value)}
@@ -292,7 +292,7 @@ function TrendChart({ chartRef, metricData, areaData, areas, isFrench, onExport,
       </div>
 
       {/* Chart (wrapped in ref target for export) */}
-      <div ref={chartRef} className="bg-white p-2">
+      <div ref={chartRef} className="bg-white dark:bg-slate-800 p-2">
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -369,7 +369,7 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex min-w-[140px] items-center justify-between gap-1 rounded border border-gray-300 bg-white px-2 py-1.5 text-sm shadow-sm hover:border-indigo-400 focus:outline-none"
+        className="flex min-w-[140px] items-center justify-between gap-1 rounded border border-gray-300 bg-white dark:bg-slate-800 px-2 py-1.5 text-sm shadow-sm hover:border-indigo-400 focus:outline-none"
       >
         <span className="max-w-[160px] truncate">{displayLabel}</span>
         <svg className={`h-4 w-4 flex-shrink-0 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
@@ -380,13 +380,13 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full z-20 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
-            <label className="flex cursor-pointer items-center gap-2 border-b border-gray-100 px-3 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
+          <div className="absolute left-0 top-full z-20 mt-1 max-h-60 min-w-[180px] overflow-y-auto rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg">
+            <label className="flex cursor-pointer items-center gap-2 border-b border-gray-100 dark:border-slate-700 px-3 py-2 text-xs font-semibold text-indigo-600 hover:bg-indigo-50">
               <input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-indigo-600" />
               {allLabel}
             </label>
             {options.map((opt) => (
-              <label key={opt.id} className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm hover:bg-gray-50">
+              <label key={opt.id} className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-sm hover:bg-gray-50 dark:bg-slate-900">
                 <input type="checkbox" checked={selected.includes(opt.id)} onChange={() => toggle(opt.id)} className="accent-indigo-600" />
                 {opt.label}
               </label>
@@ -399,10 +399,10 @@ function MultiSelect({ label, options, selected, onChange, allLabel }) {
 }
 
 // ── Stat & Section ────────────────────────────────────────────────────────────
-function Stat({ label, value, accent = 'text-gray-900' }) {
+function Stat({ label, value, accent = 'text-gray-900 dark:text-slate-100' }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+      <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500 dark:text-slate-400">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${accent}`}>{value ?? 0}</p>
     </div>
   )
@@ -411,7 +411,7 @@ function Stat({ label, value, accent = 'text-gray-900' }) {
 function Section({ title, children }) {
   return (
     <div className="mb-6">
-      <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600">{title}</h2>
+      <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400">{title}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{children}</div>
     </div>
   )
@@ -873,7 +873,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
 
   // Formatage d'une variation QoQ en texte signé (ex. +12.5 %, −4 %, —).
   const fmtGrowth = (g) => (g === null || g === undefined ? '—' : `${g > 0 ? '+' : ''}${g}%`)
-  const growthAccent = (g) => (g === null || g === undefined ? 'text-gray-400' : g > 0 ? 'text-emerald-600' : g < 0 ? 'text-red-600' : 'text-gray-500')
+  const growthAccent = (g) => (g === null || g === undefined ? 'text-gray-400' : g > 0 ? 'text-emerald-600' : g < 0 ? 'text-red-600' : 'text-gray-500 dark:text-slate-400')
 
   const kpis = [
     { label: L("Engagements DMM", 'DMM engagements'), value: peoplesFmt(totalEng), accent: 'text-indigo-600' },
@@ -886,8 +886,8 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
     { label: L('Croissance disciples (QoQ)', 'Disciples growth (QoQ)'), value: fmtGrowth(disciplesQoQ), accent: growthAccent(disciplesQoQ) },
   ]
 
-  const card = 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'
-  const titleCls = 'mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600'
+  const card = 'rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm'
+  const titleCls = 'mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400'
 
   // ── Per-chart PNG export ──
   // One ref per chart card so a discreet, icon-only download button can capture
@@ -910,7 +910,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
     <button
       type="button"
       onClick={onClick}
-      className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+      className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400"
       title={L('Télécharger', 'Download')}
     >
       <Download size={14} />
@@ -927,7 +927,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {kpis.map((k) => (
           <div key={k.label} className={card}>
-            <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500">{k.label}</p>
+            <p className="text-[10.5px] font-bold uppercase tracking-wide text-gray-500 dark:text-slate-400">{k.label}</p>
             <p className={`mt-1 text-xl font-extrabold tabular-nums ${k.accent}`}>{k.value}</p>
           </div>
         ))}
@@ -939,9 +939,9 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
           <div className="flex items-center justify-between">
             <p className={titleCls}><TrendingUp size={16} /> {L('Tendance', 'Trend')}</p>
             <div className="flex items-center gap-2">
-              <div className="flex overflow-hidden rounded-lg border border-gray-200 text-xs">
-                <button type="button" onClick={() => setTrendGranularity('quarter')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'quarter' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>{L('Trimestre', 'Quarter')}</button>
-                <button type="button" onClick={() => setTrendGranularity('year')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'year' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>{L('Année', 'Year')}</button>
+              <div className="flex overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700 text-xs">
+                <button type="button" onClick={() => setTrendGranularity('quarter')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'quarter' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900'}`}>{L('Trimestre', 'Quarter')}</button>
+                <button type="button" onClick={() => setTrendGranularity('year')} className={`px-2.5 py-1 font-medium ${trendGranularity === 'year' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900'}`}>{L('Année', 'Year')}</button>
               </div>
               <DlBtn onClick={() => downloadCardPng(trendRef, 'tendance')} />
             </div>
@@ -982,6 +982,20 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
+          )}
+          {/* Légende textuelle avec un point coloré devant chaque libellé de statut */}
+          {statusData.length > 0 && (
+            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {statusData.map((d) => (
+                <div key={d.name} className="flex items-center justify-between text-xs">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: RA_STATUS_COLORS[d.name] || '#94a3b8' }} aria-hidden="true" />
+                    <span className="text-gray-600 dark:text-slate-300">{d.name}</span>
+                  </span>
+                  <span className="font-semibold text-gray-800 dark:text-slate-100">{d.value}</span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
@@ -1032,12 +1046,12 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
         {/* Comparaison par Zone NG — mesure pilotée par le sélecteur (une série par zone) */}
         <div className={`${card} lg:col-span-2`} ref={areaRef}>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600">
+            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400">
               <BarChart3 size={16} /> {L('Comparaison par Zone NG', 'Comparison by NG area')} — {areaMetricLabel}
             </p>
             {/* Sélecteur de mesure : églises / nouveaux disciples / baptisés / EBD actifs */}
             <select
-              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600"
+              className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400"
               value={areaMetric}
               onChange={(e) => setAreaMetric(e.target.value)}
               aria-label={L('Mesure comparée', 'Compared measure')}
@@ -1487,7 +1501,7 @@ export default function DmmReporting() {
         <div className="flex flex-col items-center gap-2 py-16">
           <Loader2 className="animate-spin text-indigo-600" />
           {pairs.length > 1 && (
-            <p className="text-sm text-gray-500">{isFrench ? `Chargement de ${pairs.length} périodes…` : `Loading ${pairs.length} periods…`}</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">{isFrench ? `Chargement de ${pairs.length} périodes…` : `Loading ${pairs.length} periods…`}</p>
           )}
         </div>
       ) : hasError ? (
@@ -1510,7 +1524,7 @@ export default function DmmReporting() {
           {/* ── Growth cards (multi-period only) ── */}
           {showTrend && growth && (
             <div className="mb-6">
-              <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600">
+              <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400">
                 {isFrench ? `Croissance (${growth.firstLabel} → ${growth.lastLabel})` : `Growth (${growth.firstLabel} → ${growth.lastLabel})`}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -1542,12 +1556,12 @@ export default function DmmReporting() {
 
           {/* Générations */}
           <div className="mb-6">
-            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600">Églises par génération</h2>
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-600 dark:text-slate-400">Églises par génération</h2>
+            <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
               {[['1','1ʳᵉ génération'],['2','2ᵉ génération'],['3','3ᵉ génération'],['4plus','4ᵉ génération +']].map(([k, lbl]) => (
                 <div key={k} className="mb-2 flex items-center gap-3">
-                  <span className="w-32 text-xs text-gray-600">{lbl}</span>
-                  <div className="h-4 flex-1 rounded bg-gray-100">
+                  <span className="w-32 text-xs text-gray-600 dark:text-slate-400">{lbl}</span>
+                  <div className="h-4 flex-1 rounded bg-gray-100 dark:bg-slate-800">
                     <div className="h-4 rounded bg-indigo-500" style={{ width: `${((gen[k] || 0) / maxGen) * 100}%` }} />
                   </div>
                   <span className="w-8 text-right text-sm font-bold">{gen[k] || 0}</span>
@@ -1594,31 +1608,31 @@ export default function DmmReporting() {
                   <option value="CPPI">CPPI / IMB</option>
                 </select>
                 {peoplesMeta?.totals?.peoples != null && (
-                  <span className="text-sm text-gray-500">{peoplesMeta.totals.peoples} {isFrench ? 'peuples' : 'people groups'}</span>
+                  <span className="text-sm text-gray-500 dark:text-slate-400">{peoplesMeta.totals.peoples} {isFrench ? 'peuples' : 'people groups'}</span>
                 )}
               </div>
             </div>
             {(areaIds.length === 0 && countryIds.length === 0) ? (
-              <div className="bg-white rounded-xl shadow-sm p-4 text-sm text-gray-500">{isFrench ? 'Sélectionnez une zone NG ou un pays pour voir les peuples.' : 'Select an NG area or a country to see the people groups.'}</div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4 text-sm text-gray-500 dark:text-slate-400">{isFrench ? 'Sélectionnez une zone NG ou un pays pour voir les peuples.' : 'Select an NG area or a country to see the people groups.'}</div>
             ) : peoplesQuery.isLoading ? (
               <div className="flex justify-center py-8"><Loader2 className="animate-spin text-gray-400" /></div>
             ) : peoplesQuery.isError ? (
               <div className="bg-red-50 text-red-600 rounded-xl p-4 text-sm">{isFrench ? 'Erreur lors du chargement des peuples.' : 'Failed to load people groups.'}</div>
             ) : peoplesRows.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-4 text-sm text-gray-500">{isFrench ? 'Aucun peuple pour cette sélection.' : 'No people groups for this selection.'}</div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4 text-sm text-gray-500 dark:text-slate-400">{isFrench ? 'Aucun peuple pour cette sélection.' : 'No people groups for this selection.'}</div>
             ) : (
               // Liste des peuples au MÊME format que la section « Peuples » des
               // fiches Pays (CountryPeoples) : tableau à plat, mêmes colonnes,
               // mêmes intitulés, mêmes badges de statut.
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm overflow-x-auto">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Peuple' : 'People group'}</th>
-                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'engagements" : '# engagements'}</th>
-                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
-                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
-                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                      <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{isFrench ? 'Peuple' : 'People group'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{isFrench ? "# d'engagements" : '# engagements'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{isFrench ? "# d'églises" : '# churches'}</th>
+                      <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Max Gen</th>
+                      <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{isFrench ? 'Statut' : 'Status'}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1629,7 +1643,7 @@ export default function DmmReporting() {
                       const src = rawSrc && rawSrc.toUpperCase() !== 'DMM' ? rawSrc : null
                       const status = p.status?.global || 'UNKNOWN'
                       return (
-                        <tr key={p.masterPeopleId} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
+                        <tr key={p.masterPeopleId} className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors">
                           <td className="py-3 pr-4">
                             <span className="font-medium text-blue-600">{p.canonicalName}</span>
                           </td>
@@ -1649,7 +1663,7 @@ export default function DmmReporting() {
             {peoplesMeta?.pagination && peoplesMeta.pagination.totalPages > 1 && (
               <div className="flex items-center justify-center gap-3 mt-3">
                 <button className="btn-secondary" disabled={peoplesPage <= 1} onClick={() => setPeoplesPage(peoplesPage - 1)}>{isFrench ? 'Précédent' : 'Previous'}</button>
-                <span className="text-sm text-gray-600">Page {peoplesMeta.pagination.page} / {peoplesMeta.pagination.totalPages}</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400">Page {peoplesMeta.pagination.page} / {peoplesMeta.pagination.totalPages}</span>
                 <button className="btn-secondary" disabled={peoplesPage >= peoplesMeta.pagination.totalPages} onClick={() => setPeoplesPage(peoplesPage + 1)}>{isFrench ? 'Suivant' : 'Next'}</button>
               </div>
             )}

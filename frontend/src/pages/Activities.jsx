@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { activitiesApi, villagesApi, churchesApi, peopleGroupsApi } from '../services/api'
@@ -93,7 +93,7 @@ const activityTypeConfig = {
   meeting: { 
     icon: UsersRound, 
     color: '#6b7280', 
-    bgColor: 'bg-gray-100', 
+    bgColor: 'bg-gray-100 dark:bg-slate-800', 
     textColor: 'text-gray-700',
     borderColor: 'border-l-gray-500'
   },
@@ -107,7 +107,7 @@ const activityTypeConfig = {
   other: { 
     icon: MoreHorizontal, 
     color: '#6b7280', 
-    bgColor: 'bg-gray-100', 
+    bgColor: 'bg-gray-100 dark:bg-slate-800', 
     textColor: 'text-gray-700',
     borderColor: 'border-l-gray-400'
   },
@@ -311,7 +311,7 @@ const Activities = () => {
         </div>
         <div className="space-y-4">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
               <div className="flex gap-4">
                 <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse"></div>
                 <div className="flex-1">
@@ -329,12 +329,12 @@ const Activities = () => {
   if (error) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center bg-white rounded-2xl shadow-lg p-12 max-w-md">
+        <div className="text-center bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-12 max-w-md">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <X size={40} className="text-red-500" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('activities.messages.loadError')}</h3>
-          <p className="text-gray-500">{t('activities.messages.loadErrorDesc')}</p>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-2">{t('activities.messages.loadError')}</h3>
+          <p className="text-gray-500 dark:text-slate-400">{t('activities.messages.loadErrorDesc')}</p>
         </div>
       </div>
     )
@@ -345,8 +345,8 @@ const Activities = () => {
       {/* Header — titre noir en haut, actions neutres à droite, sans grand cadre */}
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('activities.title')}</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-slate-100">{t('activities.title')}</h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">
             {t('activities.totalCount').replace('{count}', activities.length)}
           </p>
         </div>
@@ -357,7 +357,7 @@ const Activities = () => {
             <>
               <button
                 onClick={() => navigate('/pending-validations')}
-                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 transition-colors"
               >
                 <ClipboardCheck size={18} />
                 <span className="text-sm font-medium">{t('validation.pendingValidations')}</span>
@@ -369,7 +369,7 @@ const Activities = () => {
               </button>
               <button
                 onClick={() => navigate('/rejected-people-groups')}
-                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="relative flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-slate-900 transition-colors"
               >
                 <AlertCircle size={18} />
                 <span className="text-sm font-medium">{t('rejected.rejectedPeopleGroups')}</span>
@@ -397,7 +397,7 @@ const Activities = () => {
           href="https://goeverywhere.org"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-slate-900 transition-colors"
         >
           goeverywhere.org ↗
         </a>
@@ -405,16 +405,16 @@ const Activities = () => {
           href="https://reminiscent-acapella-740.notion.site/EVERYWHERE-2a3ec55e01df8007bfc3fc19d481d3fc"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-slate-900 transition-colors"
         >
           Calendrier détaillé (Notion) ↗
         </a>
       </div>
 
       {/* Search and Type Filter Tabs */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
         {/* Search Bar */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100 dark:border-slate-700">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 relative">
               <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -423,7 +423,7 @@ const Activities = () => {
                 placeholder={t('activities.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
               />
             </div>
             <div className="flex gap-2">
@@ -432,7 +432,7 @@ const Activities = () => {
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
                   showFilters 
                     ? 'bg-gray-900 border-gray-900 text-white' 
-                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    : 'bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:bg-slate-800'
                 }`}
               >
                 <Filter size={18} />
@@ -447,7 +447,7 @@ const Activities = () => {
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-all ${
                   showArchived 
                     ? 'bg-gray-200 border-gray-300 text-gray-700' 
-                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                    : 'bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:bg-slate-800'
                 }`}
                 title={showArchived ? t('activities.hideArchived') : t('activities.showArchived')}
               >
@@ -469,12 +469,12 @@ const Activities = () => {
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 typeFilter === '' 
                   ? 'bg-gray-900 text-white shadow-sm' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-current opacity-60"></span>
               {t('activities.filters.allTypes')}
-              <span className={`px-1.5 py-0.5 rounded-full text-xs ${typeFilter === '' ? 'bg-white/20' : 'bg-gray-200'}`}>
+              <span className={`px-1.5 py-0.5 rounded-full text-xs ${typeFilter === '' ? 'bg-white dark:bg-slate-800/20' : 'bg-gray-200'}`}>
                 {activities.length}
               </span>
             </button>
@@ -489,7 +489,7 @@ const Activities = () => {
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                     typeFilter === type.value 
                       ? `${config.bgColor} ${config.textColor} shadow-md ring-2 ring-offset-1`
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-200'
                   }`}
                   style={typeFilter === type.value ? { '--tw-ring-color': config.color } : {}}
                 >
@@ -497,7 +497,7 @@ const Activities = () => {
                   {type.label}
                   {count > 0 && (
                     <span className={`px-1.5 py-0.5 rounded-full text-xs ${
-                      typeFilter === type.value ? 'bg-white/50' : 'bg-gray-200'
+                      typeFilter === type.value ? 'bg-white dark:bg-slate-800/50' : 'bg-gray-200'
                     }`}>
                       {count}
                     </span>
@@ -510,14 +510,14 @@ const Activities = () => {
 
         {/* Advanced Filters Panel */}
         {showFilters && (
-          <div className="px-4 pb-4 pt-2 border-t border-gray-100 animate-fade-in">
+          <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-slate-700 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.village')}</label>
                 <select
                   value={villageFilter}
                   onChange={(e) => setVillageFilter(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.filters.allVillages')}</option>
                   {villages?.map((village) => (
@@ -530,7 +530,7 @@ const Activities = () => {
                 <select
                   value={churchFilter}
                   onChange={(e) => setChurchFilter(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.filters.allChurches')}</option>
                   {churches?.map((church) => (
@@ -544,7 +544,7 @@ const Activities = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 />
               </div>
               <div>
@@ -553,7 +553,7 @@ const Activities = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 />
               </div>
             </div>
@@ -579,7 +579,7 @@ const Activities = () => {
             return (
               <div
                 key={activity._id}
-                className={`group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 ${config.borderColor} ${
+                className={`group bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 ${config.borderColor} ${
                   activity.archived ? 'opacity-60' : ''
                 }`}
               >
@@ -599,20 +599,20 @@ const Activities = () => {
                           {activityTypes.find((t) => t.value === activity.type)?.label || activity.type}
                         </span>
                         {activity.archived && (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 flex items-center gap-1">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-600 dark:text-slate-400 flex items-center gap-1">
                             <Archive size={12} />
                             {t('activities.archived')}
                           </span>
                         )}
                       </div>
                       
-                      <p className="font-medium text-gray-900 mb-3">{activity.description}</p>
+                      <p className="font-medium text-gray-900 dark:text-slate-100 mb-3">{activity.description}</p>
                       
                       {/* Date - Prominent Display */}
                       {activity.date && (
                         <div className="flex items-center gap-2 mb-3">
-                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg">
-                            <Calendar size={16} className="text-gray-500" />
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg">
+                            <Calendar size={16} className="text-gray-500 dark:text-slate-400" />
                             <span className="text-sm font-medium text-gray-700">
                               {format(new Date(activity.date), 'EEEE dd MMMM yyyy', { locale: dateLocale })}
                             </span>
@@ -643,7 +643,7 @@ const Activities = () => {
                       </div>
 
                       {activity.notes && (
-                        <p className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border-l-2 border-gray-300">
+                        <p className="mt-3 text-sm text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border-l-2 border-gray-300">
                           {activity.notes}
                         </p>
                       )}
@@ -663,7 +663,7 @@ const Activities = () => {
                         className={`p-2 rounded-lg transition-all ${
                           activity.archived 
                             ? 'text-green-600 hover:bg-green-50 hover:scale-110' 
-                            : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600 hover:scale-110'
+                            : 'text-gray-400 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400 hover:scale-110'
                         }`}
                         title={activity.archived ? t('activities.unarchive') : t('activities.archive')}
                       >
@@ -679,11 +679,11 @@ const Activities = () => {
       ) : (
         /* Empty State */
         <div className="p-12 text-center">
-          <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-32 h-32 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
             <Calendar size={56} className="text-gray-400" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('activities.empty.title')}</h3>
-          <p className="text-gray-500 max-w-md mx-auto mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">{t('activities.empty.title')}</h3>
+          <p className="text-gray-500 dark:text-slate-400 max-w-md mx-auto mb-6">
             {hasActiveFilters
               ? t('activities.empty.withFilters')
               : t('activities.empty.withoutFilters')}
@@ -711,17 +711,17 @@ const Activities = () => {
       {/* Add Activity Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
             {/* Modal Header */}
-            <div className="border-b border-gray-200 px-6 py-5 rounded-t-2xl">
+            <div className="border-b border-gray-200 dark:border-slate-700 px-6 py-5 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900">{t('activities.newActivity')}</h3>
-                  <p className="text-gray-500 text-sm mt-1">{t('activities.addActivityDesc') || 'Enregistrez une nouvelle activité'}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">{t('activities.newActivity')}</h3>
+                  <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">{t('activities.addActivityDesc') || 'Enregistrez une nouvelle activité'}</p>
                 </div>
                 <button 
                   onClick={resetForm} 
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  className="p-2 hover:bg-white dark:bg-slate-800/20 rounded-lg transition-colors"
                 >
                   <X size={20} className="text-white" />
                 </button>
@@ -737,7 +737,7 @@ const Activities = () => {
                 <select
                   value={newActivity.type}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, type: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                   required
                 >
                   {activityTypes.map((type) => (
@@ -753,7 +753,7 @@ const Activities = () => {
                 <textarea
                   value={newActivity.description}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
                   rows={3}
                   required
                   placeholder={t('activities.placeholders.description') || 'Décrivez l\'activité...'}
@@ -769,7 +769,7 @@ const Activities = () => {
                     type="date"
                     value={newActivity.date}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, date: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     required
                   />
                 </div>
@@ -781,7 +781,7 @@ const Activities = () => {
                     type="number"
                     value={newActivity.participants}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, participants: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     min="0"
                     placeholder="0"
                   />
@@ -795,7 +795,7 @@ const Activities = () => {
                 <select
                   value={newActivity.village}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, village: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.placeholders.selectVillage')}</option>
                   {villages?.map((village) => (
@@ -811,7 +811,7 @@ const Activities = () => {
                 <select
                   value={newActivity.church}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, church: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">{t('activities.placeholders.selectChurch')}</option>
                   {churches?.map((church) => (
@@ -827,7 +827,7 @@ const Activities = () => {
                 <textarea
                   value={newActivity.notes}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, notes: e.target.value }))}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
                   rows={2}
                   placeholder={t('activities.placeholders.notes') || 'Notes additionnelles...'}
                 />
@@ -835,7 +835,7 @@ const Activities = () => {
 
               {/* Coaching iGROW specific fields */}
               {newActivity.type === 'coaching-igrow' && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="space-y-4 p-4 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700">
                   <h4 className="font-semibold text-teal-800 flex items-center gap-2">
                     <MessageCircle size={18} />
                     {t('activities.coaching.title') || 'Détails du coaching iGROW'}
@@ -850,7 +850,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, conversationWith: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                     >
                       <option value="">{t('common.select') || 'Sélectionner...'}</option>
                       {coachingConversationWithOptions.map((opt) => (
@@ -869,7 +869,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, conversationTheme: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                       placeholder={t('activities.coaching.themePlaceholder') || 'Ex: Leadership, Vision...'}
                     />
                   </div>
@@ -884,7 +884,7 @@ const Activities = () => {
                         ...prev,
                         coachingDetails: { ...prev.coachingDetails, duration: e.target.value }
                       }))}
-                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                      className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                       min="0"
                       placeholder="30"
                     />
@@ -896,7 +896,7 @@ const Activities = () => {
                 <button 
                   type="button" 
                   onClick={resetForm} 
-                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
                 >
                   {t('common.cancel')}
                 </button>

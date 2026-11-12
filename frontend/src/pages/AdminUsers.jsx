@@ -34,7 +34,8 @@ import {
   RefreshCw,
   UserCircle,
   Clock,
-  KeyRound
+  KeyRound,
+  ScrollText
 } from 'lucide-react'
 
 // Role badge colors
@@ -130,6 +131,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [savingPassword, setSavingPassword] = useState(false)
+  const [audit, setAudit] = useState([])
 
   const resetState = () => {
     setDetail(null)
@@ -138,12 +140,24 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
     setConfirmPassword('')
     setSavingPassword(false)
     setLoading(false)
+    setAudit([])
   }
 
   const handleClose = () => {
     resetState()
     onClose()
   }
+
+  const fetchAudit = useCallback(async () => {
+    if (!userId) return
+    try {
+      const response = await api.get(`/api/admin/users/${userId}/audit`)
+      setAudit(Array.isArray(response.data.audit) ? response.data.audit : [])
+    } catch {
+      // Audit log is non-critical; silently ignore failures
+      setAudit([])
+    }
+  }, [userId])
 
   useEffect(() => {
     if (!isOpen || !userId) return
@@ -152,7 +166,10 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
       setLoading(true)
       setLoadError('')
       try {
-        const response = await api.get(`/api/admin/users/${userId}`)
+        const [response] = await Promise.all([
+          api.get(`/api/admin/users/${userId}`),
+          fetchAudit()
+        ])
         if (!cancelled) setDetail(response.data.user)
       } catch (err) {
         if (!cancelled) {
@@ -166,7 +183,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
     }
     fetchDetail()
     return () => { cancelled = true }
-  }, [isOpen, userId, isFrench])
+  }, [isOpen, userId, isFrench, fetchAudit])
 
   const formatDateTime = (value) => {
     if (!value) return '—'
@@ -193,6 +210,8 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
       toast.success(isFrench ? 'Mot de passe mis à jour' : 'Password updated')
       setNewPassword('')
       setConfirmPassword('')
+      // Refresh the audit log so the new password-reset entry appears
+      fetchAudit()
     } catch (err) {
       toast.error(err.response?.data?.message || (isFrench ? 'Erreur lors de la mise à jour du mot de passe' : 'Error while updating password'))
     } finally {
@@ -205,6 +224,14 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
   const loginHistory = Array.isArray(detail?.loginHistory)
     ? [...detail.loginHistory].sort((a, b) => new Date(b.at) - new Date(a.at))
     : []
+
+  const auditActionLabel = (entry) => {
+    const event = entry?.metadata?.event
+    if (event === 'admin-password-reset') return isFrench ? 'Mot de passe réinitialisé' : 'Password reset'
+    if (event === 'admin-block') return isFrench ? 'Utilisateur bloqué' : 'User blocked'
+    if (event === 'admin-unblock') return isFrench ? 'Utilisateur débloqué' : 'User unblocked'
+    return entry?.description || (isFrench ? 'Action' : 'Action')
+  }
 
   const InfoRow = ({ label, children }) => (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 py-1">
@@ -292,6 +319,35 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* AUDIT LOG SECTION */}
+              <section>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <ScrollText size={16} className="text-gray-500" />
+                  {isFrench ? "Journal d'audit" : 'Audit Log'}
+                </h4>
+                {audit.length === 0 ? (
+                  <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+                    {isFrench ? "Aucune action d'audit" : 'No audit entries'}
+                  </div>
+                ) : (
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="max-h-56 overflow-y-auto divide-y divide-gray-100">
+                      {audit.map((entry) => (
+                        <div key={entry._id} className="px-3 py-2 hover:bg-gray-50">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm font-medium text-gray-900">{auditActionLabel(entry)}</span>
+                            <span className="text-xs text-gray-500 whitespace-nowrap">{formatDateTime(entry.createdAt)}</span>
+                          </div>
+                          <div className="text-xs text-gray-600 mt-0.5">
+                            {isFrench ? 'Par' : 'By'}: {entry.user?.name || entry.user?.email || '—'}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

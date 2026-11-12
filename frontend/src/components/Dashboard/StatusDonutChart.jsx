@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
   unreached:       { label: 'Non atteint',  color: '#ef4444' },  // Red
   pioneer:         { label: 'Pioneer',       color: '#f97316' },  // Orange
   midway:          { label: 'Midway',        color: '#eab308' },  // Yellow
-  'tipping-point': { label: 'Tipping Point', color: '#22c55e' },  // Light Green
+  'tipping-point': { label: 'Tipping Point', color: '#4ade80' },  // Light Green
   dmm:             { label: 'DMM',           color: '#15803d' },  // Dark Green
 }
 
@@ -119,7 +119,7 @@ const StatusDonutChart = () => {
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-4 border-t border-slate-100">
         {chartData.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} />
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill }} aria-hidden="true" />
             <span className="text-xs text-slate-600 truncate">{item.label}</span>
             <span className="text-xs font-semibold text-slate-800 ml-auto">{item.value}</span>
           </div>

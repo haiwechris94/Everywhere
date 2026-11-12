@@ -24,6 +24,16 @@ import { LanguageProvider } from './i18n'
 import 'leaflet/dist/leaflet.css'
 import './index.css'
 
+// Global theme init (belt-and-suspenders): apply the saved theme on the <html>
+// element before the app paints so dark mode persists app-wide across routes.
+try {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+} catch (e) { /* noop */ }
+
 // Configure React Query client
 const queryClient = new QueryClient({
   defaultOptions: {

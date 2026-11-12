@@ -11,17 +11,17 @@ import {
   AlertTriangle,
   Globe,
   Target,
-  Calendar,
 } from 'lucide-react'
-import { reportingApi, initiativesApi } from '../services/reportingApi'
+import { reportingApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { PeopleForm } from '../components/admin/PeopleEngagementForms'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import { jpStageFor, evangelicalRangeFor, bibleStatusLabel } from '../utils/joshuaProjectScales'
+import { jpReachedHexFor, jpReachedLabelFor } from '../utils/statusColors'
 import { getCountryFlag } from '../utils/countryUtils'
 import { DmmStatusDot } from '../components/DmmStatusBadge'
 import { useLanguage } from '../i18n'
-import { initiativeDisplayName } from '../utils/initiativeLabel'
 
 // ── Palette de statut canonique ──────────────────────────────────────────────
 // Hex alignés sur STATUS_COLORS / STATUS_COLORS_FILL de UnifiedMapView.jsx.
@@ -402,6 +402,8 @@ const PeopleDetailLite = () => {
   const [editingId, setEditingId] = useState(null)
   // Déclenche l'ouverture du formulaire d'ajout d'engagement depuis le menu kebab.
   const [actionsAddVillage, setActionsAddVillage] = useState(false)
+  // Edition (admin) des informations du peuple lui-meme.
+  const [editingPeople, setEditingPeople] = useState(false)
 
   // Primary: the master-people profile (nested under `overview`, no DMM rollup).
   const profileQuery = useQuery({
@@ -426,17 +428,6 @@ const PeopleDetailLite = () => {
     retry: false,
   })
 
-  // Appartenance aux initiatives (ESP 300, YCS) pour afficher les cases OUI/NON.
-  const membershipQuery = useQuery({
-    queryKey: ['initiative-membership', peopleId],
-    queryFn: async () => {
-      const res = await initiativesApi.membership(peopleId)
-      return res?.data?.data || { ESP300: false, YCS: false }
-    },
-    enabled: !!peopleId,
-    retry: false,
-  })
-  const membership = membershipQuery.data || { ESP300: false, YCS: false }
 
   const loading = profileQuery.isLoading && rowQuery.isLoading
   if (loading) return <div className="p-6"><StateLoading label={isFrench ? 'Chargement du peuple…' : 'Loading people group…'} /></div>
@@ -509,7 +500,11 @@ const PeopleDetailLite = () => {
     overview.jpStage ||
     (jpStage ? `${jpScaleValue ?? ''}${jpScaleValue != null ? ' — ' : ''}${jpStage}` : null)
   // Couleur de base dérivée du statut JP (palette canonique) + teintes.
-  const statusHex = statusHexFor(jpStatus)
+  // Les PEUPLES se colorent sur l'échelle Joshua Project (reached-status), JAMAIS
+  // sur le vocabulaire DMM (Pioneer/Midway/…) qui est réservé aux ENGAGEMENTS.
+  const statusHex = jpReachedHexFor(jpStatus)
+  // Libellé JP humanisé du statut principal (repli sur le stage JP déjà calculé).
+  const jpReachedLabel = jpStatus ? jpReachedLabelFor(jpStatus, isFrench) : null
   const statusTintBg = hexToRgba(statusHex, 0.06)       // fond très clair carte extérieure
   const statusBorder = hexToRgba(statusHex, 0.35)       // bordure fine couleur-statut
   const statusChipBg = hexToRgba(statusHex, 0.1)        // fond des chips pâles
@@ -558,11 +553,8 @@ const PeopleDetailLite = () => {
   const leastReachedValue = overview.leastReached ?? row?.status?.leastReached
   const leastReachedDisplay =
     leastReachedValue == null ? dash : (leastReachedValue ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
-  // ESP 300 / YCS n'ont pas de valeur « simple » exposée sur la fiche peuple :
-  // seules les cases OUI/NON (membership) existent plus bas. On affiche donc le
-  // statut d'appartenance comme valeur de la carte, avec repli « — ».
-  const esp300Display = membership.ESP300 == null ? dash : (membership.ESP300 ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
-  const ycsDisplay = membership.YCS == null ? dash : (membership.YCS ? (isFrench ? 'Oui' : 'Yes') : (isFrench ? 'Non' : 'No'))
+  // ESP 300 / YCS ne sont plus affichés comme cartes « valeur » : seules les
+  // cases OUI/NON interactives (membership, cliquables) existent plus bas.
   const countryFlagEmoji = getCountryFlag(countryCodeDisplay)
 
   // ── DMM Rollup = CUMUL des mesures d'engagement sur TOUS les engagements ─────
@@ -697,7 +689,68 @@ const PeopleDetailLite = () => {
             )}
 
             {/* 2. Titre = nom du peuple. */}
-            <h1 className="mt-4 text-[36px] leading-tight font-bold text-slate-900">{name}</h1>
+            {/* Titre = nom du peuple + bouton d'edition (admin). */}
+            <div className="mt-4 flex items-start justify-between gap-2">
+              <h1 className="text-[36px] leading-tight font-bold text-slate-900">{name}</h1>
+              {canManage && (
+                <div className="mt-2 flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPeople(true)}
+                    className="rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  >
+                    {isFrench ? '✎ Modifier le peuple' : '✎ Edit people'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!window.confirm(isFrench ? 'Supprimer définitivement ce peuple ?' : 'Permanently delete this people?')) return
+                      try {
+                        await masterPeopleApi.deletePeople(peopleId)
+                        window.history.back()
+                      } catch (e) {
+                        alert(e?.response?.data?.message || (isFrench ? 'Suppression impossible' : 'Delete failed'))
+                      }
+                    }}
+                    className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    {isFrench ? '🗑 Supprimer le peuple' : '🗑 Delete people'}
+                  </button>
+                </div>
+              )}
+            </div>
+            {editingPeople && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+                  <PeopleForm
+                    mode="edit"
+                    isFrench={isFrench}
+                    initial={{
+                      canonicalName: profile?.canonicalName || overview.name || name,
+                      primaryCountryCode: overview.country || row?.primaryCountryCode || countryCode || '',
+                      primaryLanguageName: overview.primaryLanguageName || overview.language || '',
+                      totalPopulation: overview.totalPopulation ?? overview.population ?? '',
+                      primaryLocation: profile?.primaryLocation || overview.primaryLocation,
+                      referenceData: profile?.referenceData || {
+                        population: overview.population,
+                        primaryReligion: overview.primaryReligion || overview.religion,
+                        primaryLanguage: overview.primaryLanguage || overview.language,
+                        percentEvangelical: overview.percentEvangelical,
+                        reachedStatus: overview.reachedStatus,
+                      },
+                    }}
+                    onCancel={() => setEditingPeople(false)}
+                    onSubmit={async (body) => {
+                      await masterPeopleApi.updatePeople(peopleId, body)
+                      await queryClient.invalidateQueries({ queryKey: ['ng-person-profile', peopleId] })
+                      await queryClient.invalidateQueries({ queryKey: ['ng-person-row', countryCode, peopleId] })
+                      queryClient.invalidateQueries({ queryKey: ['dmm-peoples'] })
+                      setEditingPeople(false)
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* 3-4. Chips : localisation (épingle) + peuple/langue + religion. */}
             <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -763,7 +816,7 @@ const PeopleDetailLite = () => {
                       style={{ backgroundColor: hexToRgba('#ffffff', 0.9) }}
                       aria-hidden="true"
                     />
-                    <span className="text-[40px] leading-none font-bold text-white">{jpStatus || dash}</span>
+                    <span className="text-[40px] leading-none font-bold text-white">{jpReachedLabel || jpStatus || dash}</span>
                   </div>
                   {jpScaleDescription && (
                     <p className="mt-2 text-sm font-semibold text-white/90">{jpScaleDescription}</p>
@@ -830,8 +883,8 @@ const PeopleDetailLite = () => {
               </div>
             </div>
 
-            {/* C) Rangée de 3 cartes : Pays, ESP 300, YCS. */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* C) Carte Pays. */}
+            <div className="grid grid-cols-1 gap-3">
               <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
                 <Globe className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
                 <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
@@ -842,54 +895,11 @@ const PeopleDetailLite = () => {
                   {countryCodeDisplay}
                 </p>
               </div>
-              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
-                <Target className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
-                  {initiativeDisplayName('ESP300', { isFrench }, 'ESP 300')}
-                </p>
-                <p className="mt-0.5 font-bold text-slate-900">{esp300Display}</p>
-              </div>
-              <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-4">
-                <Calendar className="h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
-                <p className="mt-2 text-[11px] font-semibold" style={{ color: statusLabelColor }}>
-                  {initiativeDisplayName('YCS', { isFrench }, 'YCS')}
-                </p>
-                <p className="mt-0.5 font-bold text-slate-900">{ycsDisplay}</p>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Cases « Projets » : ESP 300 et YCS.
-          OUI (vert) et cliquable si le peuple est engagé dans le projet → mène
-          au projet et au détail de ce peuple dans le projet.
-          NON (rouge) et NON cliquable sinon. */}
-      <div className="flex flex-wrap gap-3">
-        {[
-          { key: 'ESP300', projLabel: 'ESP 300' },
-          { key: 'YCS', projLabel: initiativeDisplayName('YCS', { isFrench }, 'YCS') },
-        ].map(({ key, projLabel }) => {
-          const engaged = !!membership[key]
-          const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
-          return (
-            <div key={key} className={base}>
-              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, projLabel)}</p>
-              {engaged ? (
-                <Link
-                  to={`/initiatives/${key}/peoples/${peopleId}`}
-                  className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
-                  title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, projLabel)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, projLabel)} detail`}
-                >
-                  {isFrench ? 'OUI' : 'YES'}
-                </Link>
-              ) : (
-                <p className="mt-0.5 text-xl font-bold text-red-600">{isFrench ? 'NON' : 'NO'}</p>
-              )}
-            </div>
-          )
-        })}
-      </div>
 
       {dmmCards.length > 0 && (
         <section className="rounded-2xl border border-slate-200 bg-white p-6">

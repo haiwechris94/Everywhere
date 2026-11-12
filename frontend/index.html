@@ -9,6 +9,14 @@
     <!-- Prevent iOS Safari from auto-zooming on input focus (font-size >= 16px handles this in CSS) -->
     <meta name="format-detection" content="telephone=no" />
     <title>Everywhere</title>
+    <!-- Apply the saved theme synchronously before React paints to avoid a flash of light mode -->
+    <script>
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    </script>
     <!-- Preconnect to tile servers for faster map loading -->
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />

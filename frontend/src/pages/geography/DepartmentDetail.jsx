@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DepartmentDetail — Admin Level 2 detail.
  * Drill-down list of subdivisions + tabs scoped to this department (admin2).
  */

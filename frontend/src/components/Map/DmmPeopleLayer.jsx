@@ -36,8 +36,8 @@ const DMM_STATUS_COLORS = {
 
 // PERF: cache one L.divIcon per status so we don't rebuild an icon per marker.
 const iconCache = {}
-function dmmIcon(status, approximate = false) {
-  const key = `${status || 'unknown'}${approximate ? '~approx' : ''}`
+function dmmIcon(status, approximate = false, pending = false) {
+  const key = `${status || 'unknown'}${approximate ? '~approx' : ''}${pending ? '~pending' : ''}`
   if (iconCache[key]) return iconCache[key]
   const cfg = DMM_STATUS_COLORS[status || 'unknown'] || DMM_STATUS_COLORS.unknown
   // A rotated square (diamond) with a white border — deliberately different from
@@ -45,7 +45,13 @@ function dmmIcon(status, approximate = false) {
   // Approximate points (snapped to an admin-unit centroid because the engagement
   // has no exact coordinates) are drawn hollow with a dashed border so users can
   // tell them apart from precisely-located ones.
-  const html = approximate
+  // Pending (not-yet-approved) engagements are drawn semi-transparent with an
+  // amber dashed border so admins can distinguish them from approved ones — the
+  // layer now shows BOTH approved and pending (consistent with the Engagements
+  // list and the Pays page); the status fill colour is preserved either way.
+  const html = pending
+    ? `<div style="width:9px;height:9px;background:${cfg.fill};border:2px dashed #d97706;box-shadow:0 1px 2px rgba(0,0,0,.35);transform:rotate(45deg);opacity:.5;"></div>`
+    : approximate
     ? `<div style="width:9px;height:9px;background:${cfg.fill}33;border:2px dashed ${cfg.fill};box-shadow:0 1px 2px rgba(0,0,0,.35);transform:rotate(45deg);"></div>`
     : `<div style="width:9px;height:9px;background:${cfg.fill};border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.5);transform:rotate(45deg);"></div>`
   const icon = L.divIcon({
@@ -97,6 +103,11 @@ function DmmPopupContent({ p }) {
       {p.approximate && (
         <div style={{ color: '#b45309', background: '#fef3c7', borderRadius: 4, padding: '2px 5px', marginBottom: 4, fontSize: 8.5 }}>
           📍 Localisation approximative (centroïde de la zone administrative)
+        </div>
+      )}
+      {p.approved !== true && (
+        <div style={{ color: '#92400e', background: '#fde68a', borderRadius: 4, padding: '2px 5px', marginBottom: 4, fontSize: 8.5, fontWeight: 600 }}>
+          ⏳ En attente d'approbation (Pending approval)
         </div>
       )}
 
@@ -167,7 +178,7 @@ function DmmPeopleLayer({ peoples = [], visible = true }) {
         // latéral. Ici on ne le montre qu'au survol (tooltip non permanent).
         const label = p.label || (p.villageName ? `${p.name}, ${p.villageName}` : p.name)
         return (
-          <Marker key={p.id} position={[lat, lng]} icon={dmmIcon(p.dmmStatus, p.approximate)}>
+          <Marker key={p.id} position={[lat, lng]} icon={dmmIcon(p.dmmStatus, p.approximate, p.approved !== true)}>
             <Tooltip
               direction="right"
               offset={[8, 0]}

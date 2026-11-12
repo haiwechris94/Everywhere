@@ -11,6 +11,57 @@ const MasterPeople = require('../models/MasterPeople');
 const Country = require('../models/Country');
 const { auth, optionalAuth } = require('../middleware/auth');
 const { COUNTRY_CONFIG } = require('./countries');
+const RegionOverlay = require('../models/RegionOverlay');
+const CountryOverlay = require('../models/CountryOverlay');
+
+// Charge toutes les surcharges (overlays) éditables par les admins, indexées
+// par identifiant. Défensif : si les collections sont vides on renvoie des maps
+// vides et le comportement d'origine (config NG_AREAS/COUNTRY_CONFIG) est intact.
+async function loadOverlays() {
+  const [regionDocs, countryDocs] = await Promise.all([
+    RegionOverlay.find().lean().catch(() => []),
+    CountryOverlay.find().lean().catch(() => []),
+  ]);
+  const regionsById = {};
+  (regionDocs || []).forEach((r) => { regionsById[String(r.regionId).toUpperCase()] = r; });
+  const countriesByCode = {};
+  (countryDocs || []).forEach((c) => { countriesByCode[String(c.code).toUpperCase()] = c; });
+  return { regionsById, countriesByCode, regionDocs: regionDocs || [], countryDocs: countryDocs || [] };
+}
+
+// Fusionne les champs éditables d'un overlay de pays (leaders / responsable /
+// nom / capitale) sur un descripteur de pays, sans écraser avec des valeurs vides.
+function mergeCountryOverlay(descriptor, overlay) {
+  if (!descriptor) return descriptor;
+  if (!overlay) return descriptor;
+  return {
+    ...descriptor,
+    name: overlay.nameFr || overlay.name || descriptor.name,
+    nameEn: overlay.nameEn || descriptor.nameEn,
+    capital: overlay.capital || descriptor.capital,
+    leaders: Array.isArray(overlay.leaders) ? overlay.leaders : (descriptor.leaders || []),
+    responsibleName: overlay.responsibleName || descriptor.responsibleName || '',
+    isCustom: !!overlay.isCustom,
+  };
+}
+
+// Construit un descripteur de pays pour un pays CUSTOM (créé par un admin et
+// absent de COUNTRY_CONFIG), à partir de son overlay.
+function customCountryDescriptor(overlay) {
+  if (!overlay) return null;
+  return {
+    code: String(overlay.code || '').toUpperCase(),
+    code3: overlay.code3 || '',
+    name: overlay.nameFr || overlay.name || overlay.code,
+    nameEn: overlay.nameEn || overlay.name || overlay.code,
+    capital: overlay.capital || '',
+    region: overlay.regionId || '',
+    center: overlay.defaultCenter ? [overlay.defaultCenter.lat, overlay.defaultCenter.lng] : undefined,
+    leaders: Array.isArray(overlay.leaders) ? overlay.leaders : [],
+    responsibleName: overlay.responsibleName || '',
+    isCustom: true,
+  };
+}
 
 const router = express.Router();
 
@@ -695,18 +746,49 @@ function ngCountryDescriptor(alpha2) {
 // List the NG regions with their countries (source of truth: NG_AREAS + COUNTRY_CONFIG).
 router.get('/regions', optionalAuth, async (req, res) => {
   try {
+    const { regionsById, countriesByCode, regionDocs } = await loadOverlays();
+
+    // 1) Régions intégrées (NG_AREAS), avec surcharges admin éventuelles.
     const data = Object.keys(NG_AREAS).map((id) => {
+      const ov = regionsById[id];
       const countries = NG_AREAS[id]
         .map(ngCountryDescriptor)
-        .filter(Boolean);
+        .filter(Boolean)
+        .map((c) => mergeCountryOverlay(c, countriesByCode[String(c.code).toUpperCase()]));
       return {
         id,
-        name: id,
-        fullName: ngAreaFullName(id),
+        name: (ov && ov.name) || id,
+        fullName: (ov && ov.fullName) || ngAreaFullName(id),
+        description: (ov && ov.description) || '',
+        leaders: ov && Array.isArray(ov.leaders) ? ov.leaders : [],
+        responsibleName: (ov && ov.responsibleName) || '',
         countryCount: countries.length,
         countries,
       };
     });
+
+    // 2) Régions CUSTOM (créées par un admin, absentes de NG_AREAS).
+    (regionDocs || [])
+      .filter((r) => r.isCustom && !NG_AREAS[String(r.regionId).toUpperCase()])
+      .forEach((r) => {
+        const codes = Array.isArray(r.countryCodes) ? r.countryCodes.map((c) => String(c).toUpperCase()) : [];
+        const countries = codes
+          .map((code) => ngCountryDescriptor(code) || customCountryDescriptor(countriesByCode[code]))
+          .filter(Boolean)
+          .map((c) => (ngCountryDescriptor(c.code) ? mergeCountryOverlay(c, countriesByCode[String(c.code).toUpperCase()]) : c));
+        data.push({
+          id: String(r.regionId).toUpperCase(),
+          name: r.name || String(r.regionId).toUpperCase(),
+          fullName: r.fullName || `${String(r.regionId).toUpperCase()} Region`,
+          description: r.description || '',
+          leaders: Array.isArray(r.leaders) ? r.leaders : [],
+          responsibleName: r.responsibleName || '',
+          countryCount: countries.length,
+          countries,
+          isCustom: true,
+        });
+      });
+
     res.json({ data });
   } catch (error) {
     console.error('Error building regions list:', error);
@@ -729,6 +811,10 @@ router.get('/regions', optionalAuth, async (req, res) => {
 // 'PeopleGroups.org' (legacy 'IMB' kept for safety). DMM/Survey rows are the
 // *engagements* and are intentionally excluded from the PG totals.
 const REFERENCE_PG_SOURCES = ['Joshua Project', 'PeopleGroups.org', 'IMB'];
+// Canonical "DMM engagement" sources — the same set used by the map's
+// /api/master-people/map/dmm-engagements layer and the Engagements list page.
+// Everything NOT in REFERENCE_PG_SOURCES that represents a real field engagement.
+const ENGAGEMENT_PG_SOURCES = ['DMM', 'Survey', 'manual'];
 
 router.get('/countries', optionalAuth, async (req, res) => {
   try {
@@ -764,8 +850,17 @@ router.get('/countries', optionalAuth, async (req, res) => {
     //    by the region fiche; the PG counts are a live count over PeopleGroup.
     const data = await Promise.all(
       countryList.map(async (country) => {
-        const [cm, totalPGs, unreachedPGs] = await Promise.all([
-          buildNumericalReport({ from, to, organization, countries: [country.code], period }),
+        const [engagements, totalPGs, unreachedPGs] = await Promise.all([
+          // Live count of real DMM engagements for this country. Canonical
+          // definition = PeopleGroup.source in {DMM, Survey, manual} — identical
+          // to the map's /api/master-people/map/dmm-engagements layer and to the
+          // Engagements list page, so all three stay consistent. NOTE: not
+          // approved-filtered, matching the Engagements list (which shows
+          // unapproved engagements too); the map additionally requires approved.
+          PeopleGroup.countDocuments({
+            countryCode: country.code,
+            source: { $in: ENGAGEMENT_PG_SOURCES },
+          }),
           PeopleGroup.countDocuments({
             countryCode: country.code,
             source: { $in: REFERENCE_PG_SOURCES },
@@ -776,7 +871,6 @@ router.get('/countries', optionalAuth, async (req, res) => {
             $or: [{ engagementStatus: 'unreached' }, { status: 'unreached' }],
           }),
         ]);
-        const engagements = cm.churches?.engagements ?? cm.dmmFieldMetrics?.engagements ?? 0;
         return {
           code: country.code,
           code3: country.code3,
@@ -809,10 +903,21 @@ router.get('/countries', optionalAuth, async (req, res) => {
 router.get('/regions/:regionId', optionalAuth, async (req, res) => {
   try {
     const regionId = String(req.params.regionId || '').toUpperCase();
-    if (!NG_AREAS[regionId]) {
+    const { regionsById, countriesByCode } = await loadOverlays();
+    const regionOverlay = regionsById[regionId];
+    const isBuiltIn = !!NG_AREAS[regionId];
+    const isCustomRegion = !isBuiltIn && regionOverlay && regionOverlay.isCustom;
+    if (!isBuiltIn && !isCustomRegion) {
       return res.status(404).json({ error: 'Region not found', message: `No NG region: ${regionId}` });
     }
-    const countries = NG_AREAS[regionId].map(ngCountryDescriptor).filter(Boolean);
+    // Codes pays : NG_AREAS pour une région intégrée, countryCodes de l'overlay
+    // pour une région custom.
+    const regionCountryCodes = isBuiltIn
+      ? NG_AREAS[regionId]
+      : (Array.isArray(regionOverlay.countryCodes) ? regionOverlay.countryCodes.map((c) => String(c).toUpperCase()) : []);
+    const countries = regionCountryCodes
+      .map((code) => ngCountryDescriptor(code) || customCountryDescriptor(countriesByCode[String(code).toUpperCase()]))
+      .filter(Boolean);
 
     // Optional time window: year+quarter takes precedence over from/to.
     let from = req.query.from;
@@ -854,8 +959,9 @@ router.get('/regions/:regionId', optionalAuth, async (req, res) => {
         // Total Believers = new believers only. The baptized are already counted
         // among the new believers, so they must NOT be added again.
         const totalBelievers = cm.disciples?.newDisciples || 0;
+        const merged = mergeCountryOverlay(country, countriesByCode[String(country.code).toUpperCase()]);
         return {
-          ...country,
+          ...merged,
           metrics: cm,
           summary: {
             engagements,
@@ -870,8 +976,12 @@ router.get('/regions/:regionId', optionalAuth, async (req, res) => {
     res.json({
       data: {
         id: regionId,
-        name: regionId,
-        fullName: ngAreaFullName(regionId),
+        name: (regionOverlay && regionOverlay.name) || regionId,
+        fullName: (regionOverlay && regionOverlay.fullName) || ngAreaFullName(regionId),
+        description: (regionOverlay && regionOverlay.description) || '',
+        leaders: regionOverlay && Array.isArray(regionOverlay.leaders) ? regionOverlay.leaders : [],
+        responsibleName: (regionOverlay && regionOverlay.responsibleName) || '',
+        isCustom: !!isCustomRegion,
         countries: countriesWithMetrics,
         metrics,
       },
@@ -888,19 +998,29 @@ router.get('/regions/:regionId/countries/:countryCode', optionalAuth, async (req
   try {
     const regionId = String(req.params.regionId || '').toUpperCase();
     const countryCode = String(req.params.countryCode || '').toUpperCase();
-    if (!NG_AREAS[regionId]) {
+    const { regionsById, countriesByCode } = await loadOverlays();
+    const regionOverlay = regionsById[regionId];
+    const isBuiltIn = !!NG_AREAS[regionId];
+    const isCustomRegion = !isBuiltIn && regionOverlay && regionOverlay.isCustom;
+    if (!isBuiltIn && !isCustomRegion) {
       return res.status(404).json({ error: 'Region not found', message: `No NG region: ${regionId}` });
     }
-    if (!NG_AREAS[regionId].includes(countryCode)) {
+    // Le pays appartient-il à la région ? NG_AREAS pour une région intégrée,
+    // countryCodes de l'overlay pour une région custom.
+    const regionCountryCodes = isBuiltIn
+      ? NG_AREAS[regionId]
+      : (Array.isArray(regionOverlay.countryCodes) ? regionOverlay.countryCodes.map((c) => String(c).toUpperCase()) : []);
+    if (!regionCountryCodes.includes(countryCode)) {
       return res.status(404).json({
         error: 'Country not in region',
         message: `${countryCode} does not belong to ${regionId}`,
       });
     }
-    const country = ngCountryDescriptor(countryCode);
-    if (!country) {
+    const baseCountry = ngCountryDescriptor(countryCode) || customCountryDescriptor(countriesByCode[countryCode]);
+    if (!baseCountry) {
       return res.status(404).json({ error: 'Country not found', message: `Unknown country config: ${countryCode}` });
     }
+    const country = mergeCountryOverlay(baseCountry, countriesByCode[countryCode]);
 
     let from = req.query.from;
     let to = req.query.to;
@@ -936,3 +1056,6 @@ router.get('/regions/:regionId/countries/:countryCode', optionalAuth, async (req
 });
 
 module.exports = router;
+// Expose la définition des régions intégrées pour les routes d'administration
+// (regionAdmin.js) afin de distinguer régions intégrées vs. custom.
+module.exports.NG_AREAS = NG_AREAS;

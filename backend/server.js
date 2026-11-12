@@ -62,10 +62,12 @@ const masterPeopleRoutes = require('./routes/masterPeople');
 const finishingTheTaskRoutes = require('./routes/finishingTheTask');
 // DMM pillars: persons of peace, discovery groups, DBS sessions, iGROW coaching, reporting
 const personsOfPeaceRoutes = require('./routes/personsOfPeace');
+const personRoutes = require('./routes/persons');
 const discoveryGroupsRoutes = require('./routes/discoveryGroups');
 const dbsSessionsRoutes = require('./routes/dbsSessions');
 const coachingSessionsRoutes = require('./routes/coachingSessions');
 const reportingRoutes = require('./routes/reporting');
+const regionAdminRoutes = require('./routes/regionAdmin');
 const dmmReviewRoutes = require('./routes/dmmReview');
 const projectRoutes = require('./routes/projects');
 const initiativesRoutes = require('./routes/initiatives');
@@ -143,7 +145,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 // 7. Query protection - Prevent unbounded queries that could return entire database
 app.use(queryProtectionMiddleware({
   protectedRoutes: ['/api/people-groups', '/api/villages'],
-  maxLimit: 500,  // Maximum records per request
+  maxLimit: 1000, // Match frontend pagination default for people groups
   requireFilter: false  // Set to true to require at least one filter
 }));
 
@@ -387,10 +389,12 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/jp-sync', jpSyncApiRoutes);
 // DMM pillars
 app.use('/api/persons-of-peace', personsOfPeaceRoutes);
+app.use('/api/persons', personRoutes);
 app.use('/api/discovery-groups', discoveryGroupsRoutes);
 app.use('/api/dbs-sessions', dbsSessionsRoutes);
 app.use('/api/coaching-sessions', coachingSessionsRoutes);
 app.use('/api/reporting', reportingRoutes);
+app.use('/api/region-admin', regionAdminRoutes);
 app.use('/api/dmm-review', dmmReviewRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/initiatives', initiativesRoutes);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AnalyticalTable Component
  * Comprehensive analytical table showing people groups, villages, and administrative data
  * with status information and DMM metrics
@@ -26,18 +26,18 @@ import {
 
 // Status configuration with colors and labels
 const STATUS_CONFIG = {
-  unreached: { color: '#EF4444', bgColor: 'bg-red-100', textColor: 'text-red-700', label: 'Non atteint' },
-  pioneer: { color: '#F59E0B', bgColor: 'bg-amber-100', textColor: 'text-amber-700', label: 'Pioneer' },
-  midway: { color: '#3B82F6', bgColor: 'bg-blue-100', textColor: 'text-blue-700', label: 'Midway' },
-  'tipping-point': { color: '#F97316', bgColor: 'bg-orange-100', textColor: 'text-orange-700', label: 'Tipping Point' },
-  dmm: { color: '#10B981', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700', label: 'DMM' }
+  unreached: { color: '#ef4444', bgColor: 'bg-red-100', textColor: 'text-red-700', label: 'Non atteint', dot: 'bg-red-500' },
+  pioneer: { color: '#f97316', bgColor: 'bg-amber-100', textColor: 'text-amber-700', label: 'Pioneer', dot: 'bg-orange-500' },
+  midway: { color: '#eab308', bgColor: 'bg-blue-100', textColor: 'text-blue-700', label: 'Midway', dot: 'bg-yellow-400' },
+  'tipping-point': { color: '#4ade80', bgColor: 'bg-orange-100', textColor: 'text-orange-700', label: 'Tipping Point', dot: 'bg-green-400' },
+  dmm: { color: '#15803d', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700', label: 'DMM', dot: 'bg-green-700' }
 }
 
 const StatusBadge = ({ status }) => {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.unreached
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${config.bgColor} ${config.textColor}`}>
-      <span className="w-1.5 h-1.5 rounded-full mr-1.5" style={{ backgroundColor: config.color }}></span>
+      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${config.dot}`}></span>
       {config.label}
     </span>
   )
@@ -306,7 +306,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
         <div className="flex items-center gap-3 text-red-600">
           <AlertCircle className="w-5 h-5" />
           <span>Erreur lors du chargement des données: {error.message}</span>
@@ -316,16 +316,16 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-slate-700">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary-600" />
               Analyse Complète des Peuples et Villages
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               {filteredData.length} enregistrements • {summaryStats.totalChurches} églises au total
             </p>
           </div>
@@ -349,7 +349,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               onClick={() => setStatusFilter(statusFilter === status ? 'all' : status)}
             >
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config.color }}></div>
+                <div className={`w-3 h-3 rounded-full ${config.dot}`}></div>
                 <span className={`text-xs font-medium ${config.textColor}`}>{config.label}</span>
               </div>
               <p className={`text-xl font-bold ${config.textColor} mt-1`}>
@@ -368,13 +368,13 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               placeholder={isFrench ? 'Rechercher...' : 'Search...'}
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 focus:bg-white rounded-t-lg text-sm outline-none transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border-0 border-b-2 border-slate-200 dark:border-slate-700 focus:border-indigo-400 focus:bg-white dark:bg-slate-800 rounded-t-lg text-sm outline-none transition-all"
             />
           </div>
           <select
             value={countryFilter}
             onChange={(e) => { setCountryFilter(e.target.value); setCurrentPage(1) }}
-            className="px-3 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600"
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border-0 border-b-2 border-slate-200 dark:border-slate-700 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600 dark:text-slate-400"
           >
             <option value="all">{isFrench ? 'Tous les pays' : 'All countries'}</option>
             {countries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -382,7 +382,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1) }}
-            className="px-3 py-2 bg-slate-50 border-0 border-b-2 border-slate-200 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600"
+            className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border-0 border-b-2 border-slate-200 dark:border-slate-700 focus:border-indigo-400 rounded-t-lg text-sm outline-none transition-all min-w-[130px] text-slate-600 dark:text-slate-400"
           >
             <option value="all">{isFrench ? 'Tous les statuts' : 'All statuses'}</option>
             {Object.entries(STATUS_CONFIG).map(([s, c]) => <option key={s} value={s}>{c.label}</option>)}
@@ -390,7 +390,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
           {(searchTerm || statusFilter !== 'all' || countryFilter !== 'all') && (
             <button
               onClick={() => { setSearchTerm(''); setStatusFilter('all'); setCountryFilter('all'); setCurrentPage(1) }}
-              className="px-3 py-2 text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:bg-slate-800 rounded-lg transition-colors"
             >
               Réinitialiser
             </button>
@@ -401,11 +401,11 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-gray-50 dark:bg-slate-900 sticky top-0">
             <tr>
               <th className="w-8 px-2"></th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
                 onClick={() => handleSort('name')}
               >
                 <div className="flex items-center gap-1">
@@ -415,7 +415,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
                 onClick={() => handleSort('villageName')}
               >
                 <div className="flex items-center gap-1">
@@ -425,7 +425,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
                 onClick={() => handleSort('country')}
               >
                 <div className="flex items-center gap-1">
@@ -434,7 +434,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors hidden lg:table-cell"
+                className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden lg:table-cell"
                 onClick={() => handleSort('region')}
               >
                 <div className="flex items-center gap-1">
@@ -443,14 +443,14 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                   <SortIcon columnKey="region" />
                 </div>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden xl:table-cell">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider hidden xl:table-cell">
                 Admin 2
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden xl:table-cell">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider hidden xl:table-cell">
                 Admin 3
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -459,7 +459,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors"
                 onClick={() => handleSort('churches')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -468,7 +468,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors hidden md:table-cell"
+                className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:bg-slate-800 transition-colors hidden md:table-cell"
                 onClick={() => handleSort('generation')}
               >
                 <div className="flex items-center justify-center gap-1">
@@ -497,7 +497,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             ) : paginatedData.length === 0 ? (
               <tr>
                 <td colSpan="10" className="px-4 py-12 text-center">
-                  <div className="flex flex-col items-center gap-2 text-gray-500">
+                  <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-slate-400">
                     <Search className="w-8 h-8 text-gray-300" />
                     <p className="font-medium">{isFrench ? 'Aucun résultat trouvé' : 'No result found'}</p>
                     <p className="text-sm">{isFrench ? 'Essayez de modifier vos filtres' : 'Try adjusting your filters'}</p>
@@ -508,11 +508,11 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               paginatedData.map((item) => (
                 <React.Fragment key={item.id}>
                   <tr 
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="hover:bg-gray-50 dark:bg-slate-900 transition-colors cursor-pointer"
                     onClick={() => toggleRowExpansion(item.id)}
                   >
                     <td className="px-2 py-3 text-center">
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button className="text-gray-400 hover:text-gray-600 dark:text-slate-400">
                         {expandedRows.has(item.id) ? (
                           <ChevronDown className="w-4 h-4" />
                         ) : (
@@ -521,13 +521,13 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                       </button>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-800">{item.name}</span>
+                      <span className="font-medium text-gray-800 dark:text-slate-100">{item.name}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{item.villageName}</td>
-                    <td className="px-4 py-3 text-gray-600">{item.country}</td>
-                    <td className="px-4 py-3 text-gray-600 hidden lg:table-cell">{item.region}</td>
-                    <td className="px-4 py-3 text-gray-500 text-sm hidden xl:table-cell">{item.department}</td>
-                    <td className="px-4 py-3 text-gray-500 text-sm hidden xl:table-cell">{item.arrondissement}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-slate-400">{item.villageName}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-slate-400">{item.country}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-slate-400 hidden lg:table-cell">{item.region}</td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-slate-400 text-sm hidden xl:table-cell">{item.department}</td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-slate-400 text-sm hidden xl:table-cell">{item.arrondissement}</td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge status={item.status} />
                     </td>
@@ -536,44 +536,44 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                         {item.churches}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-600 hidden md:table-cell">
+                    <td className="px-4 py-3 text-center text-gray-600 dark:text-slate-400 hidden md:table-cell">
                       {item.generation > 0 ? `G${item.generation}` : '-'}
                     </td>
                   </tr>
                   {/* Expanded Row Details */}
                   {expandedRows.has(item.id) && (
-                    <tr key={`${item.id}-expanded`} className="bg-gray-50">
+                    <tr key={`${item.id}-expanded`} className="bg-gray-50 dark:bg-slate-900">
                       <td colSpan="10" className="px-4 py-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-500 block">Population</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-gray-500 dark:text-slate-400 block">Population</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">
                               {item.population > 0 ? item.population.toLocaleString() : '-'}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-500 block">{isFrench ? 'Coordonnées' : 'Coordinates'}</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-gray-500 dark:text-slate-400 block">{isFrench ? 'Coordonnées' : 'Coordinates'}</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">
                               {item.latitude && item.longitude 
                                 ? `${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}`
                                 : '-'}
                             </span>
                           </div>
                           <div className="lg:hidden">
-                            <span className="text-gray-500 block">Région (Admin 1)</span>
-                            <span className="font-medium text-gray-800">{item.region}</span>
+                            <span className="text-gray-500 dark:text-slate-400 block">Région (Admin 1)</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">{item.region}</span>
                           </div>
                           <div className="xl:hidden">
-                            <span className="text-gray-500 block">Département (Admin 2)</span>
-                            <span className="font-medium text-gray-800">{item.department}</span>
+                            <span className="text-gray-500 dark:text-slate-400 block">Département (Admin 2)</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">{item.department}</span>
                           </div>
                           <div className="xl:hidden">
-                            <span className="text-gray-500 block">Arrondissement (Admin 3)</span>
-                            <span className="font-medium text-gray-800">{item.arrondissement}</span>
+                            <span className="text-gray-500 dark:text-slate-400 block">Arrondissement (Admin 3)</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">{item.arrondissement}</span>
                           </div>
                           <div className="md:hidden">
-                            <span className="text-gray-500 block">{isFrench ? 'Génération' : 'Generation'}</span>
-                            <span className="font-medium text-gray-800">
+                            <span className="text-gray-500 dark:text-slate-400 block">{isFrench ? 'Génération' : 'Generation'}</span>
+                            <span className="font-medium text-gray-800 dark:text-slate-100">
                               {item.generation > 0 ? `Génération ${item.generation}` : '-'}
                             </span>
                           </div>
@@ -590,15 +590,15 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-sm text-gray-500">
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-sm text-gray-500 dark:text-slate-400">
             Affichage {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length)} sur {filteredData.length}
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               <ChevronLeft className="w-4 h-4 -ml-2" />
@@ -606,7 +606,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -631,7 +631,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                       currentPage === pageNum
                         ? 'bg-primary-600 text-white'
-                        : 'hover:bg-gray-100 text-gray-600'
+                        : 'hover:bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400'
                     }`}
                   >
                     {pageNum}
@@ -643,14 +643,14 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+              className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
               <ChevronRight className="w-4 h-4 -ml-2" />

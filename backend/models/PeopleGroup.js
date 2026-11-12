@@ -383,6 +383,21 @@ const peopleGroupSchema = new mongoose.Schema({
     index: true,
     sparse: true,
   },
+  // Reversible archive flags (archived records are excluded from default lists)
+  isArchived: {
+    type: Boolean,
+    default: false,
+    index: true,
+  },
+  archivedAt: {
+    type: Date,
+    default: null,
+  },
+  archivedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
 }, {
   timestamps: true,
 });
@@ -413,6 +428,7 @@ peopleGroupSchema.index({ approved: 1, countryCode: 1 });  // Approved + country
 peopleGroupSchema.index({ region: 1, country: 1 });        // Regional filtering
 peopleGroupSchema.index({ admin2: 1 });                    // Department-level filtering
 peopleGroupSchema.index({ admin3: 1 });                    // Arrondissement-level filtering
+peopleGroupSchema.index({ isArchived: 1 });                // Filter archived/active records
 
 // Compound index for pagination queries (sort + filter)
 peopleGroupSchema.index({ approved: 1, createdAt: -1 });   // Approved sorted by date (default list view)

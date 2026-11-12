@@ -209,6 +209,17 @@ const toList = (v) =>
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+// ── admin/supervisor guard ───────────────────────────────────────────────────
+// Allow only authenticated admins/supervisors through. Must be mounted AFTER the
+// `auth` middleware (which populates req.user).
+function requireManager(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: 'Auth required' });
+  if (req.user.role !== 'admin' && req.user.role !== 'supervisor') {
+    return res.status(403).json({ error: 'Admins and supervisors only' });
+  }
+  next();
+}
+
 /** Build the shared master_people filter from query params. */
 function buildFilter(q) {
   const filter = {};
@@ -573,12 +584,20 @@ router.get('/map/dmm-peoples', async (req, res, next) => {
 // bbox "minLng,minLat,maxLng,maxLat".
 router.get('/map/dmm-engagements', async (req, res, next) => {
   try {
-    // Match the villages/statuses layer: approved DMM/Survey/manual engagements
-    // (everything that is NOT Joshua Project). This is the "80" population.
+    // Returns ALL DMM/Survey/manual engagements (everything that is NOT Joshua
+    // Project) — approved AND pending — so the map matches the Engagements list
+    // and the Pays page, which also do not filter by approval. Each returned
+    // point carries an `approved` flag so the UI can visually distinguish
+    // pending (not-yet-approved) engagements. An optional ?approved=true|false
+    // query param can still narrow to only approved / only pending if needed.
     const query = {
-      approved: true,
       source: { $in: ['DMM', 'Survey', 'manual'] },
     };
+    if (req.query.approved === 'true') {
+      query.approved = true;
+    } else if (req.query.approved === 'false') {
+      query.approved = { $ne: true };
+    }
 
     // Country filter accepts alpha-2 (CM) or alpha-3 (CMR). We store alpha-2 in
     // countryCode, so translate alpha-3 down to alpha-2 first.
@@ -608,7 +627,7 @@ router.get('/map/dmm-engagements', async (req, res, next) => {
     const cap = Math.min(20000, Math.max(1, parseInt(req.query.limit, 10) || 20000));
 
     const engagements = await PeopleGroup.find(query)
-      .select('name villageName masterPeopleId countryCode region admin2 admin3 engagementStatus engagementLevel numberOfChurches churchGeneration language religion population location')
+      .select('name villageName masterPeopleId countryCode region admin2 admin3 engagementStatus engagementLevel numberOfChurches churchGeneration language religion population location approved')
       .limit(cap)
       .lean();
 
@@ -652,6 +671,9 @@ router.get('/map/dmm-engagements', async (req, res, next) => {
           villageName: village || null,
           label,
           masterPeopleId: e.masterPeopleId || null,
+          // Approval status so the map can distinguish pending vs approved
+          // engagements (the layer now returns both, like the Engagements/Pays pages).
+          approved: e.approved === true,
           coordinates, // [lng,lat] — exact or admin centroid
           approximate: locationSource !== 'exact' && !!coordinates,
           locationSource,
@@ -1572,6 +1594,506 @@ router.get('/:id/activities', async (req, res, next) => {
         user: a.user ? (a.user.name || a.user.email) : null,
       })),
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── POST / — create a MasterPeople (admin/supervisor) ────────────────────────
+router.post('/', auth, requireManager, async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const canonicalName = (b.canonicalName || '').trim();
+    if (!canonicalName) return res.status(400).json({ error: 'canonicalName is required' });
+
+    const primaryCountryCode = b.primaryCountryCode
+      ? String(b.primaryCountryCode).toUpperCase()
+      : null;
+
+    // Build the representative point only when BOTH lat & lng are valid.
+    let primaryLocation = null;
+    const lng = Number(b.longitude);
+    const lat = Number(b.latitude);
+    const validLng = Number.isFinite(lng) && lng >= -180 && lng <= 180;
+    const validLat = Number.isFinite(lat) && lat >= -90 && lat <= 90;
+    if (validLng && validLat) {
+      primaryLocation = { type: 'Point', coordinates: [lng, lat] };
+    }
+
+    // Editable reference-data fields (source tagged 'manual').
+    const referenceData = { source: 'manual' };
+    if (b.population !== undefined && b.population !== '') {
+      referenceData.population = Number(b.population) || 0;
+    }
+    if (b.primaryReligion !== undefined) referenceData.primaryReligion = b.primaryReligion;
+    if (b.primaryLanguage !== undefined) referenceData.primaryLanguage = b.primaryLanguage;
+    if (b.percentEvangelical !== undefined && b.percentEvangelical !== '') {
+      referenceData.percentEvangelical = Number(b.percentEvangelical) || 0;
+    }
+    if (b.reachedStatus !== undefined) referenceData.reachedStatus = b.reachedStatus;
+
+    const doc = new MasterPeople({
+      canonicalName,
+      primaryCountryCode,
+      primaryLanguageName: b.primaryLanguageName || null,
+      totalPopulation: Number(b.totalPopulation) || 0,
+      primaryLocation,
+      sourceTypes: ['DMM'],
+      referenceData,
+    });
+    await doc.save();
+
+    res.status(201).json({ data: doc });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── PATCH /:id — edit a MasterPeople (admin/supervisor) ──────────────────────
+router.patch('/:id', auth, requireManager, async (req, res, next) => {
+  try {
+    if (!isValidId(req.params.id)) return res.status(400).json({ error: 'Invalid id' });
+    const doc = await MasterPeople.findById(req.params.id);
+    if (!doc) return res.status(404).json({ error: 'Master people not found' });
+
+    const b = req.body || {};
+    const has = (k) => Object.prototype.hasOwnProperty.call(b, k);
+
+    if (has('canonicalName')) {
+      const name = (b.canonicalName || '').trim();
+      if (!name) return res.status(400).json({ error: 'canonicalName must be non-empty' });
+      doc.canonicalName = name;
+    }
+    if (has('primaryCountryCode')) {
+      doc.primaryCountryCode = b.primaryCountryCode
+        ? String(b.primaryCountryCode).toUpperCase()
+        : null;
+    }
+    if (has('primaryLanguageName')) doc.primaryLanguageName = b.primaryLanguageName || null;
+    if (has('totalPopulation')) doc.totalPopulation = Number(b.totalPopulation) || 0;
+
+    // Coordinates: only update when BOTH latitude & longitude are valid.
+    if (has('latitude') && has('longitude')) {
+      const lng = Number(b.longitude);
+      const lat = Number(b.latitude);
+      const validLng = Number.isFinite(lng) && lng >= -180 && lng <= 180;
+      const validLat = Number.isFinite(lat) && lat >= -90 && lat <= 90;
+      if (validLng && validLat) {
+        doc.primaryLocation = { type: 'Point', coordinates: [lng, lat] };
+      }
+    }
+
+    // Merge reference-data subfields into the existing referenceData.
+    const refKeys = ['population', 'primaryReligion', 'primaryLanguage', 'percentEvangelical', 'reachedStatus'];
+    if (refKeys.some((k) => has(k))) {
+      const ref = Object.assign({}, doc.referenceData ? (doc.referenceData.toObject ? doc.referenceData.toObject() : doc.referenceData) : {});
+      if (has('population')) ref.population = b.population === '' ? ref.population : (Number(b.population) || 0);
+      if (has('primaryReligion')) ref.primaryReligion = b.primaryReligion;
+      if (has('primaryLanguage')) ref.primaryLanguage = b.primaryLanguage;
+      if (has('percentEvangelical')) ref.percentEvangelical = b.percentEvangelical === '' ? ref.percentEvangelical : (Number(b.percentEvangelical) || 0);
+      if (has('reachedStatus')) ref.reachedStatus = b.reachedStatus;
+      doc.referenceData = ref;
+      doc.markModified('referenceData');
+    }
+
+    await doc.save();
+    res.json({ data: doc });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── POST /:id/merge — unify duplicate master peoples into one ────────────────
+// Fixes "Cameroun DMM vs Cameroon JP" duplicates that were never linked because
+// they share no masterPeopleId (no common ROP3, divergent FR/EN names). The
+// master in :id is the SURVIVOR; every master listed in `loserIds` is absorbed:
+// all of its children (people_sources, people_aliases, people_locations,
+// people_statuses, and DMM people_groups) are re-pointed at the survivor, the
+// survivor's denormalized fields are back-filled, the DMM rollup is recomputed,
+// a MANUAL PeopleMatch audit row is written, and the loser master is deleted.
+//
+// Body: { loserIds: string[] | string }  (aliases accepted: sourceIds / mergeIds)
+// Runs inside a transaction when the deployment supports it (replica set), and
+// falls back to a best-effort sequential merge on standalone MongoDB.
+//
+// The core logic lives in `mergeMasterPeople()` below so both POST /:id/merge
+// and POST /merge-batch share ONE implementation.
+
+// Validation error carrying an HTTP status, thrown by mergeMasterPeople().
+class MergeError extends Error {
+  constructor(status, message, extra) {
+    super(message);
+    this.status = status;
+    this.extra = extra || {};
+  }
+}
+
+/**
+ * Unify duplicate master peoples: absorb every `loserIds` master into `survivorId`.
+ * Reassigns all children, back-fills denormalized fields, recomputes the DMM
+ * rollup, writes a MANUAL audit trail and deletes the losers.
+ * @throws {MergeError} on validation / not-found problems.
+ * @returns {Promise<object>} per-merge report.
+ */
+async function mergeMasterPeople(survivorId, rawLosers, ctx = {}) {
+  survivorId = String(survivorId || '').trim();
+  if (!isValidId(survivorId)) throw new MergeError(400, 'Invalid survivor id');
+
+  const loserIds = (Array.isArray(rawLosers) ? rawLosers : [rawLosers])
+    .map((x) => String(x || '').trim())
+    .filter(Boolean);
+
+  if (loserIds.length === 0) {
+    throw new MergeError(400, 'loserIds is required (the master peoples to absorb)');
+  }
+  if (loserIds.some((id) => !isValidId(id))) {
+    throw new MergeError(400, 'All loserIds must be valid ids');
+  }
+  if (loserIds.includes(survivorId)) {
+    throw new MergeError(400, 'A master people cannot be merged into itself');
+  }
+  // De-duplicate loserIds defensively.
+  const uniqueLoserIds = Array.from(new Set(loserIds));
+
+  const survivor = await MasterPeople.findById(survivorId);
+  if (!survivor) throw new MergeError(404, 'Survivor master people not found');
+
+  const losers = await MasterPeople.find({ _id: { $in: uniqueLoserIds } });
+  if (losers.length !== uniqueLoserIds.length) {
+    const found = new Set(losers.map((l) => String(l._id)));
+    const missing = uniqueLoserIds.filter((id) => !found.has(id));
+    throw new MergeError(404, 'Some loser master peoples were not found', { missing });
+  }
+
+  // ── DRY RUN ────────────────────────────────────────────────────────────────
+  // Compute exactly what WOULD change and return without any write. Mirrors the
+  // real merge's decisions (child reassignment counts, people_statuses conflict
+  // resolution, back-filled scalar fields, sourceTypes union) so an operator can
+  // review a batch before committing.
+  if (ctx.dryRun) {
+    const loserOids = uniqueLoserIds.map((id) => new mongoose.Types.ObjectId(id));
+    const loserFilter = { masterPeopleId: { $in: loserOids } };
+
+    const [sources, aliases, locations, matches, peopleGroups] = await Promise.all([
+      PeopleSource.countDocuments(loserFilter),
+      PeopleAlias.countDocuments(loserFilter),
+      PeopleLocation.countDocuments(loserFilter),
+      PeopleMatch.countDocuments(loserFilter),
+      PeopleGroup.countDocuments(loserFilter),
+    ]);
+
+    // people_statuses resolution preview (unique per master).
+    const survivorHasStatus = await PeopleStatus.exists({ masterPeopleId: survivor._id });
+    const loserStatusCount = await PeopleStatus.countDocuments(loserFilter);
+    let statusResolved = 'survivor-kept';
+    if (!survivorHasStatus) statusResolved = loserStatusCount > 0 ? 'promoted-from-loser' : 'none';
+
+    // Scalar back-fill preview (only fields currently empty on the survivor).
+    const fillScalars = ['rop3', 'rop2', 'rop1', 'primaryCountryCode',
+      'primaryLanguageName', 'rol3', 'affinityBloc', 'peopleCluster'];
+    const wouldFill = {};
+    const sourceTypeSet = new Set(survivor.sourceTypes || []);
+    for (const l of losers) {
+      for (const f of fillScalars) {
+        const empty = survivor[f] == null || survivor[f] === '';
+        if (empty && !(f in wouldFill) && l[f] != null && l[f] !== '') {
+          wouldFill[f] = l[f];
+        }
+      }
+      for (const st of (l.sourceTypes || [])) sourceTypeSet.add(st);
+    }
+
+    return {
+      success: true,
+      dryRun: true,
+      survivorId,
+      survivorName: survivor.canonicalName,
+      mergedCount: uniqueLoserIds.length,
+      loserIds: uniqueLoserIds,
+      loserNames: losers.map((l) => l.canonicalName),
+      wouldReassign: { sources, aliases, locations, matches, peopleGroups },
+      statusResolved,
+      wouldBackfill: wouldFill,
+      sourceTypesAfter: Array.from(sourceTypeSet),
+      wouldDeleteMasters: uniqueLoserIds.length,
+    };
+  }
+
+  // Decide whether transactions are available (replica set / mongos).
+    const supportsTxn =
+      mongoose.connection && mongoose.connection.client &&
+      (() => {
+        try {
+          const topo = mongoose.connection.client.topology;
+          const t = topo && (topo.description && topo.description.type);
+          return t && t !== 'Single';
+        } catch (_e) {
+          return false;
+        }
+      })();
+
+    // Core merge work, parameterized by an optional session.
+    const doMerge = async (session) => {
+      const opts = session ? { session } : {};
+      const survivorOid = new mongoose.Types.ObjectId(survivorId);
+      const loserOids = uniqueLoserIds.map((id) => new mongoose.Types.ObjectId(id));
+      const loserFilter = { masterPeopleId: { $in: loserOids } };
+
+      // 1) Re-point the simple child collections (many-per-master, no uniqueness).
+      const reassignMany = {};
+      for (const [key, Model] of Object.entries({
+        sources: PeopleSource,
+        aliases: PeopleAlias,
+        locations: PeopleLocation,
+        matches: PeopleMatch,
+        peopleGroups: PeopleGroup,
+      })) {
+        const r = await Model.updateMany(
+          loserFilter,
+          { $set: { masterPeopleId: survivorOid } },
+          opts
+        );
+        reassignMany[key] = r.modifiedCount ?? r.nModified ?? 0;
+      }
+
+      // Demote any inherited "primary" locations so the survivor keeps exactly one.
+      const survivorHasPrimary = await PeopleLocation.exists({
+        masterPeopleId: survivorOid,
+        isPrimary: true,
+      }).session(session || null);
+      if (survivorHasPrimary) {
+        await PeopleLocation.updateMany(
+          { masterPeopleId: survivorOid, isPrimary: true, _id: { $ne: null } },
+          [{ $set: { isPrimary: { $cond: [{ $eq: ['$_id', survivorHasPrimary._id] }, true, false] } } }],
+          opts
+        );
+      }
+
+      // 2) people_statuses is unique per master: keep the survivor's, else promote
+      //    one loser's status, then delete the leftovers.
+      let statusResolved = 'survivor-kept';
+      const survivorStatus = await PeopleStatus.findOne({ masterPeopleId: survivorOid }).session(session || null);
+      if (!survivorStatus) {
+        const promoted = await PeopleStatus.findOne(loserFilter).session(session || null);
+        if (promoted) {
+          await PeopleStatus.updateOne(
+            { _id: promoted._id },
+            { $set: { masterPeopleId: survivorOid } },
+            opts
+          );
+          statusResolved = 'promoted-from-loser';
+        } else {
+          statusResolved = 'none';
+        }
+      }
+      await PeopleStatus.deleteMany(loserFilter, opts);
+
+      // 3) Back-fill the survivor's denormalized / canonical fields from the losers,
+      //    without overwriting values the survivor already has.
+      const fillScalars = ['rop3', 'rop2', 'rop1', 'primaryCountryCode',
+        'primaryLanguageName', 'rol3', 'affinityBloc', 'peopleCluster'];
+      for (const l of losers) {
+        for (const f of fillScalars) {
+          if ((survivor[f] == null || survivor[f] === '') && l[f] != null && l[f] !== '') {
+            survivor[f] = l[f];
+          }
+        }
+        // sourceTypes = union
+        const merged = new Set([...(survivor.sourceTypes || []), ...(l.sourceTypes || [])]);
+        survivor.sourceTypes = Array.from(merged);
+        // primaryLocation: adopt a loser's if the survivor has none
+        if (!survivor.primaryLocation && l.primaryLocation) {
+          survivor.primaryLocation = l.primaryLocation;
+        }
+        // referenceData: fill only missing subfields
+        if (l.referenceData) {
+          const ref = Object.assign({},
+            survivor.referenceData
+              ? (survivor.referenceData.toObject ? survivor.referenceData.toObject() : survivor.referenceData)
+              : {});
+          const lref = l.referenceData.toObject ? l.referenceData.toObject() : l.referenceData;
+          for (const [k, v] of Object.entries(lref)) {
+            if ((ref[k] == null || ref[k] === '') && v != null && v !== '') ref[k] = v;
+          }
+          survivor.referenceData = ref;
+          survivor.markModified('referenceData');
+        }
+        // keep the longer total population estimate if survivor has none
+        if ((!survivor.totalPopulation || survivor.totalPopulation === 0) && l.totalPopulation) {
+          survivor.totalPopulation = l.totalPopulation;
+        }
+      }
+      await survivor.save(opts);
+
+      // 4) Audit trail: one MANUAL match row per absorbed master.
+      const u = ctx.user || {};
+      const decidedBy = (u.id || u._id) ? String(u.id || u._id) : 'system';
+      const auditDocs = loserOids.map((loserOid) => ({
+        masterPeopleId: survivorOid,
+        fromSourceId: null,
+        toSourceId: null,
+        matchType: 'MANUAL',
+        matchTier: 1,
+        confidence: 100,
+        confidenceBand: 'AUTO_MERGE',
+        crossReferenceType: `MERGE master:${loserOid} -> master:${survivorOid}`,
+        decidedBy,
+      }));
+      // toSourceId is required by the schema; attach the survivor's first source if any.
+      const anchorSource = await PeopleSource.findOne({ masterPeopleId: survivorOid })
+        .select('_id').session(session || null);
+      if (anchorSource) {
+        for (const d of auditDocs) d.toSourceId = anchorSource._id;
+        await PeopleMatch.insertMany(auditDocs, opts);
+      }
+
+      // 5) Delete the absorbed master documents.
+      await MasterPeople.deleteMany({ _id: { $in: loserOids } }, opts);
+
+      return { reassignMany, statusResolved };
+  };
+
+  let result;
+  let usedTransaction = false;
+  if (supportsTxn) {
+    const session = await mongoose.startSession();
+    try {
+      await session.withTransaction(async () => {
+        result = await doMerge(session);
+      });
+      usedTransaction = true;
+    } finally {
+      await session.endSession();
+    }
+  } else {
+    result = await doMerge(null);
+  }
+
+  // Recompute the DMM rollup for the survivor now that all DMM groups point at it.
+  await recomputeDmmRollup(survivorId);
+
+  return {
+    success: true,
+    survivorId,
+    mergedCount: uniqueLoserIds.length,
+    loserIds: uniqueLoserIds,
+    usedTransaction,
+    reassigned: result.reassignMany,
+    statusResolved: result.statusResolved,
+  };
+}
+
+// ── POST /:id/merge — single survivor + loserIds (thin wrapper) ──────────────
+router.post('/:id/merge', auth, requireManager, async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const rawLosers = b.loserIds ?? b.sourceIds ?? b.mergeIds ?? [];
+    const dryRun = req.query.dryRun === 'true' || b.dryRun === true;
+    const report = await mergeMasterPeople(req.params.id, rawLosers, { user: req.user, dryRun });
+    res.json(report);
+  } catch (err) {
+    if (err instanceof MergeError) {
+      return res.status(err.status).json(Object.assign({ error: err.message }, err.extra));
+    }
+    next(err);
+  }
+});
+
+// ── POST /merge-batch — run many merges in sequence, one report per pair ──────
+// Accepts the output shape of scripts/findDuplicateMasterPeople.js --json:
+//   { pairs: [ { survivorId, loserIds:[...] }, ... ] }
+// Also accepts { candidates: [...] } where each item has survivor.id / loser.id
+// (the exact JSON the detection script prints), and a bare top-level array.
+// Each pair is merged independently: a failure on one pair is reported inline
+// and does NOT abort the remaining pairs. Returns 207-style aggregate results.
+router.post('/merge-batch', auth, requireManager, async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const dryRun = req.query.dryRun === 'true' || b.dryRun === true;
+
+    // Normalize the many accepted input shapes into [{ survivorId, loserIds }].
+    let rawPairs = [];
+    if (Array.isArray(b)) rawPairs = b;
+    else if (Array.isArray(b.pairs)) rawPairs = b.pairs;
+    else if (Array.isArray(b.candidates)) rawPairs = b.candidates;
+    else if (Array.isArray(b.merges)) rawPairs = b.merges;
+
+    if (!Array.isArray(rawPairs) || rawPairs.length === 0) {
+      return res.status(400).json({
+        error: 'Provide a non-empty "pairs" (or "candidates") array of { survivorId, loserIds }',
+      });
+    }
+
+    const pairs = rawPairs.map((p) => {
+      // detection-script shape: { survivor: { id }, loser: { id } }
+      if (p && p.survivor && (p.survivor.id || p.survivor._id)) {
+        const survivorId = String(p.survivor.id || p.survivor._id);
+        const losers = [];
+        if (p.loser && (p.loser.id || p.loser._id)) losers.push(String(p.loser.id || p.loser._id));
+        if (Array.isArray(p.loserIds)) losers.push(...p.loserIds);
+        return { survivorId, loserIds: losers };
+      }
+      // canonical shape: { survivorId, loserIds | loserId | sourceIds }
+      const survivorId = p && (p.survivorId ?? p.survivor);
+      const rawLosers = p && (p.loserIds ?? p.loserId ?? p.sourceIds ?? p.losers ?? []);
+      return { survivorId, loserIds: rawLosers };
+    });
+
+    const results = [];
+    let succeeded = 0;
+    let failed = 0;
+
+    for (let i = 0; i < pairs.length; i++) {
+      const { survivorId, loserIds } = pairs[i];
+      try {
+        const report = await mergeMasterPeople(survivorId, loserIds, { user: req.user, dryRun });
+        results.push({ index: i, status: dryRun ? 'preview' : 'merged', survivorId: report.survivorId, ...report });
+        succeeded++;
+      } catch (err) {
+        failed++;
+        if (err instanceof MergeError) {
+          results.push({
+            index: i,
+            status: 'failed',
+            survivorId: survivorId || null,
+            error: err.message,
+            ...err.extra,
+          });
+        } else {
+          // Unexpected DB/runtime error: capture it per-pair, keep going.
+          results.push({
+            index: i,
+            status: 'error',
+            survivorId: survivorId || null,
+            error: err.message || 'Unknown error',
+          });
+        }
+      }
+    }
+
+    // 200 when everything merged, 207 (Multi-Status) when some pairs failed.
+    const httpStatus = failed === 0 ? 200 : 207;
+    res.status(httpStatus).json({
+      success: failed === 0,
+      dryRun,
+      total: pairs.length,
+      succeeded,
+      failed,
+      results,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── DELETE /:id — delete a MasterPeople (admin/supervisor) ───────────────────
+router.delete('/:id', auth, requireManager, async (req, res, next) => {
+  try {
+    const doc = await MasterPeople.findByIdAndDelete(req.params.id);
+    if (!doc) {
+      return res.status(404).json({ success: false, message: 'People not found' });
+    }
+    res.json({ success: true, message: 'People deleted', id: req.params.id });
   } catch (err) {
     next(err);
   }

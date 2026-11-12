@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GeographyHome — entry of the Geography section.
  * Lists the regions (Admin Level 1) of the current country as drill-down cards.
  */

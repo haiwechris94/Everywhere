@@ -1,5 +1,5 @@
-/**
- * DashboardEnhanced.jsx — Slim wrapper for AnalyticsDashboard
+﻿/**
+ * DashboardEnhanced.jsx â€” Slim wrapper for AnalyticsDashboard
  * Preserves Socket.IO real-time invalidation and DataSourceContext
  */
 import { useEffect, createContext, useContext, useState } from 'react'

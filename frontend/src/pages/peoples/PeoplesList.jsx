@@ -6,8 +6,10 @@
  */
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { peopleGroupsApi } from '../../services/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { peopleGroupsApi, masterPeopleApi } from '../../services/api'
+import { useAuth } from '../../context/AuthContext'
+import { PeopleForm } from '../../components/admin/PeopleEngagementForms'
 import { useLanguage } from '../../i18n'
 import { Search, ChevronRight, Users } from 'lucide-react'
 import {
@@ -29,7 +31,11 @@ const statusBadge = (status) => {
 
 const PeoplesList = () => {
   const { t, isFrench } = useLanguage()
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+  const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [search, setSearch] = useState('')
+  const [creating, setCreating] = useState(false)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['peoples-list'],
@@ -60,6 +66,32 @@ const PeoplesList = () => {
         }
         stats={[{ label: t('nav.peoples') || 'Peuples', value: list.length }]}
       />
+
+      {canManage && (
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => setCreating((v) => !v)}
+            className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
+          >
+            {creating ? (isFrench ? 'Fermer' : 'Close') : (isFrench ? '\uFF0B Créer un peuple' : '\uFF0B New people')}
+          </button>
+          {creating && (
+            <div className="mt-3 max-w-3xl">
+              <PeopleForm
+                mode="create"
+                isFrench={isFrench}
+                onCancel={() => setCreating(false)}
+                onSubmit={async (body) => {
+                  await masterPeopleApi.createPeople(body)
+                  queryClient.invalidateQueries({ queryKey: ['peoples-list'] })
+                  setCreating(false)
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="relative mb-4 max-w-md">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />

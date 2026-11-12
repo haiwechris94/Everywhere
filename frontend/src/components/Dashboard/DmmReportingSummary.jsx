@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+﻿import React, { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { BarChart3, ChevronRight, Loader2, EyeOff, Eye } from 'lucide-react'
@@ -20,8 +20,8 @@ const QUARTER = Math.floor(now.getUTCMonth() / 3) + 1
 
 function Metric({ label, value, accent = '#1A1A1A' }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="rounded-xl border border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/60 p-3">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500 dark:text-slate-400">{label}</p>
       <p className="mt-0.5 text-xl font-bold" style={{ color: accent }}>{value ?? 0}</p>
     </div>
   )
@@ -48,13 +48,13 @@ export default function DmmReportingSummary() {
   // Vue repliée : bouton discret pour réafficher la synthèse.
   if (!visible) {
     return (
-      <div className="mb-8 flex items-center justify-between rounded-2xl border border-dashed border-gray-200 bg-white/60 px-6 py-3 relative z-10">
-        <span className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="mb-8 flex items-center justify-between rounded-2xl border border-dashed border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800/60 px-6 py-3 relative z-10">
+        <span className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
           <BarChart3 size={16} className="text-indigo-500" /> Synthèse DMM masquée
         </span>
         <button
           onClick={() => toggleVisible(true)}
-          className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+          className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-1.5 text-sm font-semibold text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900"
         >
           <Eye size={16} /> Afficher
         </button>
@@ -63,15 +63,15 @@ export default function DmmReportingSummary() {
   }
 
   return (
-    <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm relative z-10">
+    <div className="mb-8 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm relative z-10">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
             <BarChart3 size={18} />
           </span>
           <div>
-            <h3 className="text-base font-bold text-slate-900">Synthèse DMM — T{QUARTER} {YEAR}</h3>
-            <p className="text-xs text-gray-500">Format numérique Cityteam (trimestre en cours)</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Synthèse DMM — T{QUARTER} {YEAR}</h3>
+            <p className="text-xs text-gray-500 dark:text-slate-400">Format numérique Cityteam (trimestre en cours)</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default function DmmReportingSummary() {
           <button
             onClick={() => toggleVisible(false)}
             title="Masquer la synthèse"
-            className="flex items-center rounded-lg border border-gray-200 px-2.5 py-1.5 text-gray-500 hover:bg-gray-50"
+            className="flex items-center rounded-lg border border-gray-200 dark:border-slate-700 px-2.5 py-1.5 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900"
           >
             <EyeOff size={16} />
           </button>
@@ -105,15 +105,15 @@ export default function DmmReportingSummary() {
 
           {/* Églises par génération */}
           <div className="mt-4">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Églises par génération</p>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">Églises par génération</p>
             <div className="flex items-end gap-3">
               {[['1', '1G'], ['2', '2G'], ['3', '3G'], ['4plus', '4G+']].map(([k, lbl]) => (
                 <div key={k} className="flex flex-1 flex-col items-center">
                   <span className="mb-1 text-xs font-semibold text-slate-700">{gen[k] || 0}</span>
-                  <div className="flex h-20 w-full items-end rounded bg-gray-100">
+                  <div className="flex h-20 w-full items-end rounded bg-gray-100 dark:bg-slate-800">
                     <div className="w-full rounded bg-indigo-500" style={{ height: `${((gen[k] || 0) / maxGen) * 100}%` }} />
                   </div>
-                  <span className="mt-1 text-[11px] text-gray-500">{lbl}</span>
+                  <span className="mt-1 text-[11px] text-gray-500 dark:text-slate-400">{lbl}</span>
                 </div>
               ))}
             </div>

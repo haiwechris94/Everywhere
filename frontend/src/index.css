@@ -22,6 +22,36 @@ body {
 }
 
 /* ============================================================================
+ * DARK MODE BASE
+ * Tailwind uses the class strategy (darkMode: 'class'), so the `dark` class is
+ * toggled on <html>. These rules make the global page/body background and the
+ * default text color dark app-wide, so backgrounds are dark on every page/route
+ * even before inner surfaces opt in with their own dark: variants.
+ * ============================================================================ */
+html.dark,
+html.dark body {
+  background: #0f172a; /* slate-900 */
+  color: #e2e8f0; /* slate-200 */
+}
+
+html.dark #root {
+  background-color: #0f172a; /* slate-900 */
+}
+
+/* Dark scrollbar to match the dark surfaces */
+html.dark ::-webkit-scrollbar-track {
+  background: #1e293b; /* slate-800 */
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #475569; /* slate-600 */
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b; /* slate-500 */
+}
+
+/* ============================================================================
  * FONT WEIGHT
  * Tailwind's font-* weight utilities (font-medium/semibold/bold/…) and native
  * bold tags are left to behave normally so that intentional emphasis (bold nav

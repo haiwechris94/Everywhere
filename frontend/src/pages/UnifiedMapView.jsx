@@ -21,6 +21,16 @@ import { getCountryConfig, SUPPORTED_COUNTRIES } from '../config/supportedCountr
 import { VORONOI_ZOOM_CONFIG, getVoronoiLevelForZoom } from '../config/countryConfig'
 import { useLanguage } from '../i18n'
 import { jpStageFor, bibleStatusParts } from '../utils/joshuaProjectScales'
+import { DMM_STAGE, dmmStageLabel, dmmStageColors } from '../utils/dmmEngagement'
+
+// Étapes DMM pour la légende « Engagements » (ordre croissant Pionnier → Mouvement),
+// avec les couleurs de la palette canonique unique (utils/dmmEngagement.js).
+const LEGEND_DMM_STAGES = [
+  DMM_STAGE.PIONEER,
+  DMM_STAGE.MIDWAY,
+  DMM_STAGE.TIPPING_POINT,
+  DMM_STAGE.MOVEMENT,
+].map((key) => ({ key, hex: dmmStageColors(key).hex }))
 
 // ── i18n local labels (FR/EN) for the Unified Map UI ─────────────────────────
 // Small helper object: pick FR or EN label by current language flag.
@@ -1784,13 +1794,30 @@ export default function UnifiedMapView() {
           </button>
           {legendOpen && (
             <div className="mt-2 flex flex-col gap-1">
+              {/* ÉCHELLE 1 — PEUPLES : statut d'avancement Joshua Project. */}
+              <span className={`text-[9px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+                {isFrench ? 'Peuples · Joshua Project' : 'Peoples · Joshua Project'}
+              </span>
               {Object.entries(STATUS_LABELS).map(([k, v]) => (
                 <span key={k} className="flex items-center gap-1.5 text-[11px]">
                   <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: STATUS_COLORS[k] }} />
                   {v}
                 </span>
               ))}
-              <span className="mt-1 flex items-center gap-1.5 border-t border-black/10 pt-1.5 text-[11px]">
+
+              {/* ÉCHELLE 2 — ENGAGEMENTS : étapes DMM (palette canonique). */}
+              <span className={`mt-1.5 border-t border-black/10 pt-1.5 text-[9px] font-bold uppercase tracking-wide ${subtleText(theme)}`}>
+                {isFrench ? 'Engagements · DMM' : 'Engagements · DMM'}
+              </span>
+              {LEGEND_DMM_STAGES.map(({ key, hex }) => (
+                <span key={key} className="flex items-center gap-1.5 text-[11px]">
+                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: hex }} />
+                  {dmmStageLabel(key, isFrench)}
+                </span>
+              ))}
+
+              {/* Formes des marqueurs (indépendantes des deux échelles ci-dessus). */}
+              <span className="mt-1.5 flex items-center gap-1.5 border-t border-black/10 pt-1.5 text-[11px]">
                 <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: '#6b7280' }} />
                 master people
               </span>

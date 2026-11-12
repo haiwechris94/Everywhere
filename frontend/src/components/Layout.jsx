@@ -7,7 +7,7 @@ const Layout = () => {
   const location = useLocation()
   const isFullscreen = FULLSCREEN_ROUTES.some(r => location.pathname.startsWith(r))
   return (
-    <div className="relative min-h-screen bg-neutral-50 flex flex-col lg:flex-row">
+    <div className="relative min-h-screen bg-neutral-50 dark:bg-slate-900 flex flex-col lg:flex-row">
       {!isFullscreen && (
         <div
           aria-hidden="true"
@@ -25,8 +25,8 @@ const Layout = () => {
       <div className="relative z-10 contents">
         <TopNavbar />
         <main className={isFullscreen
-          ? 'flex-1 min-w-0 overflow-hidden h-[calc(100vh-3.5rem)] lg:h-screen'
-          : 'relative z-10 flex-1 min-w-0 w-full px-4 sm:px-6 lg:px-8 py-6'
+          ? 'flex-1 min-w-0 overflow-hidden h-[calc(100vh-3.5rem)] lg:h-screen dark:bg-slate-900 dark:text-slate-100'
+          : 'relative z-10 flex-1 min-w-0 w-full px-4 sm:px-6 lg:px-8 py-6 dark:bg-slate-900 dark:text-slate-100'
         }>
           {isFullscreen ? <Outlet /> : <div className="max-w-7xl mx-auto w-full"><Outlet /></div>}
         </main>

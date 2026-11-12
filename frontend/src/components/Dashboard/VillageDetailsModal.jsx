@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Village Details Modal Component
  * Shows detailed village information when clicking on a polygon
  */
@@ -49,14 +49,14 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
       />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
+      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div 
-          className="px-6 py-4 border-b border-gray-200 flex items-center justify-between"
+          className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between"
           style={{ backgroundColor: data ? STATUS_COLORS[data.status] + '20' : '#f3f4f6' }}
         >
           <div>
-            <h2 className="text-xl font-bold text-gray-800">{villageName}</h2>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-slate-100">{villageName}</h2>
             {data && (
               <div className="flex items-center gap-2 mt-1">
                 <div 
@@ -71,9 +71,9 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           </button>
         </div>
 
@@ -91,37 +91,37 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
             <div className="space-y-6">
               {/* Key Stats */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 text-center">
                   <Users className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">
+                  <p className="text-2xl font-bold text-gray-800 dark:text-slate-100">
                     {data.population?.toLocaleString() || 0}
                   </p>
-                  <p className="text-xs text-gray-500">Population</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">Population</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 text-center">
                   <Users className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">
+                  <p className="text-2xl font-bold text-gray-800 dark:text-slate-100">
                     {data.totalPeopleGroups}
                   </p>
-                  <p className="text-xs text-gray-500">{isFrench ? 'Groupes de peuples' : 'People groups'}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">{isFrench ? 'Groupes de peuples' : 'People groups'}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 text-center">
                   <Church className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-800">
+                  <p className="text-2xl font-bold text-gray-800 dark:text-slate-100">
                     {data.totalChurches}
                   </p>
-                  <p className="text-xs text-gray-500">{isFrench ? 'Églises' : 'Churches'}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400">{isFrench ? 'Églises' : 'Churches'}</p>
                 </div>
               </div>
 
               {/* Location Info */}
               {(data.region || data.departement || data.arrondissement) && (
-                <div className="bg-gray-50 rounded-lg p-4">
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <MapPin className="w-4 h-4 text-gray-500" />
+                    <MapPin className="w-4 h-4 text-gray-500 dark:text-slate-400" />
                     <span className="text-sm font-medium text-gray-700">{isFrench ? 'Localisation' : 'Location'}</span>
                   </div>
-                  <div className="text-sm text-gray-600 space-y-1">
+                  <div className="text-sm text-gray-600 dark:text-slate-400 space-y-1">
                     {data.region && <p>Région: <span className="font-medium">{data.region}</span></p>}
                     {data.departement && <p>Département: <span className="font-medium">{data.departement}</span></p>}
                     {data.arrondissement && <p>Arrondissement: <span className="font-medium">{data.arrondissement}</span></p>}
@@ -144,7 +144,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                           className="w-3 h-3 rounded-full flex-shrink-0"
                           style={{ backgroundColor: STATUS_COLORS[status] }}
                         />
-                        <span className="text-sm text-gray-600 w-24">
+                        <span className="text-sm text-gray-600 dark:text-slate-400 w-24">
                           {STATUS_LABELS[status]}
                         </span>
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -156,7 +156,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                             }}
                           />
                         </div>
-                        <span className="text-sm font-medium text-gray-800 w-16 text-right">
+                        <span className="text-sm font-medium text-gray-800 dark:text-slate-100 w-16 text-right">
                           {count} ({percentage}%)
                         </span>
                       </div>
@@ -175,16 +175,16 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
                     {data.peopleGroups.map((pg, index) => (
                       <div 
                         key={pg._id || index}
-                        className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-slate-900 rounded-lg"
                       >
                         <div className="flex items-center gap-2">
                           <div 
                             className="w-2 h-2 rounded-full"
                             style={{ backgroundColor: STATUS_COLORS[pg.status] || STATUS_COLORS.unreached }}
                           />
-                          <span className="text-sm font-medium text-gray-800">{pg.name}</span>
+                          <span className="text-sm font-medium text-gray-800 dark:text-slate-100">{pg.name}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-slate-400">
                           {pg.population > 0 && (
                             <span>{pg.population.toLocaleString()} hab.</span>
                           )}

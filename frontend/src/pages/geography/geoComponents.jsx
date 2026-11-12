@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Shared building blocks for the Geography section.
  * Constant visual language across every level (region / department / subdivision):
  *  - PageHeader : title + breadcrumb + stat cards row
@@ -76,7 +76,7 @@ export const StatCard = ({ label, value, accent = 'neutral' }) => {
   // are always black regardless of the accent colour.
   return (
     <div
-      className={`bg-white rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3.5 py-2.5 w-[9.75rem]`}
+      className={`bg-white dark:bg-slate-800 rounded-lg border border-neutral-200 ${topBorder[accent] || topBorder.neutral} px-3.5 py-2.5 w-[9.75rem]`}
     >
       <p className={`text-[15px] font-normal leading-tight font-[Arial] ${labelColor[accent] || labelColor.neutral}`}>
         {label}
@@ -110,21 +110,37 @@ export const StatusBadge = ({ status }) => {
 
   // Ordered so more specific keys win (e.g. "tippingpoint" before "point").
   const palette = {
-    pioneer: 'bg-amber-100 text-amber-700',
-    midway: 'bg-blue-100 text-blue-700',
-    tippingpoint: 'bg-purple-100 text-purple-700',
-    movement: 'bg-green-100 text-green-700',
-    dmm: 'bg-green-100 text-green-700',
-    engaged: 'bg-blue-100 text-blue-700',
-    unreached: 'bg-red-100 text-red-700',
-    reached: 'bg-green-100 text-green-700',
-    unknown: 'bg-slate-100 text-slate-600',
+    pioneer: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+    midway: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+    tippingpoint: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+    movement: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    dmm: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    engaged: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+    unreached: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+    reached: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+    unknown: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400',
   }
-  const cls = palette[norm] || 'bg-slate-100 text-slate-600'
+  // Couleur du petit point devant le libellé (Pionnier=orange, Mi-parcours=jaune,
+  // Point de bascule=vert clair, Mouvement/DMM/Reached=vert foncé, Unreached=rouge,
+  // le reste=gris). Uniforme avec la carte / le dashboard.
+  const dotPalette = {
+    pioneer: 'bg-orange-500',
+    midway: 'bg-yellow-400',
+    tippingpoint: 'bg-green-400',
+    movement: 'bg-green-700',
+    dmm: 'bg-green-700',
+    engaged: 'bg-blue-500',
+    unreached: 'bg-red-500',
+    reached: 'bg-green-700',
+    unknown: 'bg-slate-400',
+  }
+  const cls = palette[norm] || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+  const dotCls = dotPalette[norm] || 'bg-slate-400'
 
   return (
     <span className="inline-flex items-center gap-1">
-      <span className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
+      <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
+        <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${dotCls}`} aria-hidden="true" />
         {main}
       </span>
       {source && <span className="text-xs text-slate-400">({source})</span>}
@@ -179,7 +195,7 @@ export const ChildrenGrid = ({ title, items, toPath, emptyLabel }) => {
             const name = nameOf(item)
             const to = toPath(name)
             const card = (
-              <div className="flex items-center justify-between bg-white border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-400 hover:bg-neutral-50 transition-colors">
+              <div className="flex items-center justify-between bg-white dark:bg-slate-800 border border-neutral-200 rounded-lg px-4 py-3 hover:border-neutral-400 hover:bg-neutral-50 dark:bg-slate-900 transition-colors">
                 <span className="text-sm font-bold text-neutral-800 truncate">
                   {name || '—'}
                 </span>
@@ -229,7 +245,7 @@ function PeoplesTab({ filter }) {
         </thead>
         <tbody>
           {list.map((pg, i) => (
-            <tr key={pg._id || i} className="border-b border-neutral-100 hover:bg-neutral-50">
+            <tr key={pg._id || i} className="border-b border-neutral-100 hover:bg-neutral-50 dark:bg-slate-900">
               <td className="py-2 pr-4 font-medium text-neutral-800">
                 {pg.name || pg.peopleName || pg.NAME || '—'}
               </td>
@@ -376,7 +392,7 @@ export const GeoTabs = ({ filter = {} }) => {
   ]
 
   return (
-    <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-neutral-200 overflow-hidden">
       <div className="flex border-b border-neutral-200">
         {tabs.map((tb) => {
           const Icon = tb.icon

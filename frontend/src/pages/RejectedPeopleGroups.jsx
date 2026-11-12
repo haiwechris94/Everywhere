@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { peopleGroupsApi } from '../services/api'
@@ -34,7 +34,7 @@ const statusColors = {
 const resubmissionStatusColors = {
   rejected: 'bg-red-100 text-red-800',
   resubmitted: 'bg-blue-100 text-blue-800',
-  archived: 'bg-gray-100 text-gray-800',
+  archived: 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-100',
 }
 
 const RejectedPeopleGroups = () => {
@@ -92,8 +92,8 @@ const RejectedPeopleGroups = () => {
         <div className="text-red-500 mb-4">
           <AlertTriangle size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">{t('rejected.loadError')}</h3>
-        <p className="text-gray-500 mt-2">{error.response?.data?.message || t('rejected.loadErrorDesc')}</p>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('rejected.loadError')}</h3>
+        <p className="text-gray-500 dark:text-slate-400 mt-2">{error.response?.data?.message || t('rejected.loadErrorDesc')}</p>
         <button
           onClick={() => navigate('/activities')}
           className="btn-secondary mt-4"
@@ -112,25 +112,25 @@ const RejectedPeopleGroups = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/activities')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-lg transition-colors"
           >
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{t('rejected.title')}</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">{t('rejected.title')}</h1>
+            <p className="text-gray-500 dark:text-slate-400 mt-1">
               {t('rejected.totalRejected').replace('{count}', total)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
           <XCircle size={16} className="text-red-500" />
           <span>{t('rejected.rejectedSubmissions')}</span>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -161,7 +161,7 @@ const RejectedPeopleGroups = () => {
           {rejectedItems.map((item) => (
             <div
               key={item._id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden"
             >
               {/* Main Content */}
               <div className="p-6">
@@ -169,7 +169,7 @@ const RejectedPeopleGroups = () => {
                   {/* Main Info */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{item.name}</h3>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[item.engagementStatus] || statusColors.unreached}`}>
                         {t(`peopleMap.status.${item.engagementStatus}`) || item.engagementStatus}
                       </span>
@@ -178,7 +178,7 @@ const RejectedPeopleGroups = () => {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-gray-600">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm text-gray-600 dark:text-slate-400">
                       {/* Village */}
                       <div className="flex items-center gap-2">
                         <MapPin size={16} className="text-gray-400" />
@@ -278,7 +278,7 @@ const RejectedPeopleGroups = () => {
                         <button
                           onClick={() => handleArchive(item._id)}
                           disabled={archiveMutation.isPending}
-                          className="btn-secondary flex items-center justify-center gap-2 text-sm text-gray-600 hover:bg-gray-100"
+                          className="btn-secondary flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:bg-slate-800"
                         >
                           {archiveMutation.isPending ? (
                             <Loader2 size={16} className="animate-spin" />
@@ -295,54 +295,54 @@ const RejectedPeopleGroups = () => {
 
               {/* Expanded Details */}
               {expandedId === item._id && (
-                <div className="border-t bg-gray-50 p-6 animate-fade-in">
-                  <h4 className="font-medium text-gray-800 mb-3">{t('rejected.fullDetails')}</h4>
+                <div className="border-t bg-gray-50 dark:bg-slate-900 p-6 animate-fade-in">
+                  <h4 className="font-medium text-gray-800 dark:text-slate-100 mb-3">{t('rejected.fullDetails')}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                     {item.description && (
                       <div className="col-span-full">
-                        <span className="text-gray-500">{t('rejected.description')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.description')}:</span>
                         <p className="mt-1 text-gray-700">{item.description}</p>
                       </div>
                     )}
                     {item.population > 0 && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.population')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.population')}:</span>
                         <p className="text-gray-700">{item.population.toLocaleString()}</p>
                       </div>
                     )}
                     {item.language && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.language')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.language')}:</span>
                         <p className="text-gray-700">{item.language}</p>
                       </div>
                     )}
                     {item.religion && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.religion')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.religion')}:</span>
                         <p className="text-gray-700">{item.religion}</p>
                       </div>
                     )}
                     {item.churchGeneration > 0 && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.generations')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.generations')}:</span>
                         <p className="text-gray-700">{item.churchGeneration}</p>
                       </div>
                     )}
                     {item.region && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.region')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.region')}:</span>
                         <p className="text-gray-700">{item.region}</p>
                       </div>
                     )}
                     {item.country && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.country')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.country')}:</span>
                         <p className="text-gray-700">{item.country}</p>
                       </div>
                     )}
                     {item.location?.coordinates && (
                       <div>
-                        <span className="text-gray-500">{t('rejected.coordinates')}:</span>
+                        <span className="text-gray-500 dark:text-slate-400">{t('rejected.coordinates')}:</span>
                         <p className="text-gray-700">
                           {item.location.coordinates[1].toFixed(6)}, {item.location.coordinates[0].toFixed(6)}
                         </p>
@@ -355,10 +355,10 @@ const RejectedPeopleGroups = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-12 text-center">
           <XCircle size={48} className="mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">{t('rejected.empty.title')}</h3>
-          <p className="text-gray-500 mt-2">{t('rejected.empty.description')}</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('rejected.empty.title')}</h3>
+          <p className="text-gray-500 dark:text-slate-400 mt-2">{t('rejected.empty.description')}</p>
           <button
             onClick={() => navigate('/activities')}
             className="btn-primary mt-4"

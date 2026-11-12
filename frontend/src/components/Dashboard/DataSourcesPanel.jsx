@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DataSourcesPanel — Shows import status + CSV upload button for each data source:
  * Joshua Project (API sync), IMB/PeopleGroups.org (CSV), Finishing the Task (CSV)
  */
@@ -89,7 +89,7 @@ const SourceCard = ({
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className={`p-2.5 rounded-xl bg-white shadow-sm`}>
+          <div className={`p-2.5 rounded-xl bg-white dark:bg-slate-800 shadow-sm`}>
             <Icon className={`w-5 h-5 ${c.icon}`} />
           </div>
           <div>
@@ -107,7 +107,7 @@ const SourceCard = ({
       {/* Count + last sync */}
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-3xl font-bold text-gray-800 leading-none">
+          <p className="text-3xl font-bold text-gray-800 dark:text-slate-100 leading-none">
             {isLoading ? (
               <span className="inline-block w-12 h-7 bg-gray-200 animate-pulse rounded" />
             ) : (
@@ -120,7 +120,7 @@ const SourceCard = ({
         </div>
         <div className="text-right">
           {syncDate ? (
-            <p className="text-xs text-gray-500 flex items-center gap-1 justify-end">
+            <p className="text-xs text-gray-500 dark:text-slate-400 flex items-center gap-1 justify-end">
               <Clock className="w-3 h-3" />
               {syncDate}
             </p>
@@ -132,7 +132,7 @@ const SourceCard = ({
 
       {/* Progress bar when uploading */}
       {isBusy && uploadProgress != null && (
-        <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden">
+        <div className="h-1.5 w-full bg-white dark:bg-slate-800/60 rounded-full overflow-hidden">
           <div
             className={`h-1.5 rounded-full ${c.bar} transition-all duration-300`}
             style={{ width: `${uploadProgress}%` }}
@@ -346,11 +346,11 @@ const DataSourcesPanel = () => {
   const fttDate   = fttStatus?.lastSync ?? fttStatus?.data?.lastSync ?? null
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 relative z-10">
+    <div className="bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 relative z-10">
       {/* Panel header */}
       <div className="flex items-center gap-2 mb-5">
         <Globe className="w-5 h-5 text-primary-600" />
-        <h3 className="text-lg font-semibold text-gray-800">{isFrench ? 'Sources de données' : 'Data sources'}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{isFrench ? 'Sources de données' : 'Data sources'}</h3>
         <span className="ml-auto text-xs text-gray-400">3 sources actives</span>
       </div>
 

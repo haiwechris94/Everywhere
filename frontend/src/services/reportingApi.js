@@ -49,4 +49,31 @@ export const initiativesApi = {
   removePeople: (key, peopleId) => api.delete(`/api/initiatives/${key}/peoples/${peopleId}`),
 }
 
+/**
+ * Region / Country ADMIN overlay API — editable regions & countries.
+ * Backed by backend/routes/regionAdmin.js (mounted at /api/region-admin).
+ * Admin/supervisor only for writes. Overlays augment the built-in NG regions
+ * (FCA/AWA/FWA) and ISO countries, and allow brand-new custom regions/countries
+ * with editable leader/responsible names.
+ *
+ *  - listRegions()               -> { data: [ RegionOverlay ] }
+ *  - createRegion(body)          -> { data: RegionOverlay }   (body: { regionId, name, fullName, description, leaders, responsibleName, countryCodes })
+ *  - updateRegion(regionId, body)-> { data: RegionOverlay }   (upsert)
+ *  - deleteRegion(regionId)      -> { data: ... }             (custom only)
+ *  - listCountries()             -> { data: [ CountryOverlay ] }
+ *  - createCountry(body)         -> { data: CountryOverlay }  (body: { code, code3, nameFr, nameEn, capital, regionId, leaders, responsibleName, defaultCenter, description })
+ *  - updateCountry(code, body)   -> { data: CountryOverlay }  (upsert)
+ *  - deleteCountry(code)         -> { data: ... }             (custom only)
+ */
+export const regionAdminApi = {
+  listRegions: () => api.get('/api/region-admin/regions'),
+  createRegion: (body) => api.post('/api/region-admin/regions', body),
+  updateRegion: (regionId, body) => api.put(`/api/region-admin/regions/${regionId}`, body),
+  deleteRegion: (regionId) => api.delete(`/api/region-admin/regions/${regionId}`),
+  listCountries: () => api.get('/api/region-admin/countries'),
+  createCountry: (body) => api.post('/api/region-admin/countries', body),
+  updateCountry: (code, body) => api.put(`/api/region-admin/countries/${code}`, body),
+  deleteCountry: (code) => api.delete(`/api/region-admin/countries/${code}`),
+}
+
 export default reportingApi

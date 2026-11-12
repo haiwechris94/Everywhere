@@ -198,3 +198,31 @@ export function dmmEngagementDisplay(engagement = {}, isFrench = true) {
     colors: dmmStageColors(stage),
   }
 }
+
+// Les sources considérées comme de vrais engagements DMM. Elles correspondent
+// EXACTEMENT au filtre canonique de la carte
+// (GET /api/master-people/map/dmm-engagements → source ∈ {DMM, Survey, manual}).
+// Les enregistrements « Joshua Project » / « PeopleGroups.org » sont des peuples
+// de RÉFÉRENCE et ne doivent jamais être comptés comme engagements.
+export const DMM_ENGAGEMENT_SOURCES = ['DMM', 'Survey', 'manual']
+
+/**
+ * Un people group est-il un véritable engagement DMM ?
+ *
+ * Aligné sur le signal canonique de la carte : on se base UNIQUEMENT sur la
+ * source et sur des marqueurs d'engagement explicites (drapeau NG/DMM, planteur
+ * d'église, coordinateur national). On n'utilise VOLONTAIREMENT aucun critère
+ * de statut / métrique (nombre d'églises, etc.), car cela inclurait à tort des
+ * peuples de référence Joshua Project.
+ *
+ * @param {object} pg - people group
+ * @returns {boolean}
+ */
+export function isDmmEngagement(pg = {}) {
+  return (
+    pg.isNGEngaged === true ||
+    (typeof pg.source === 'string' && DMM_ENGAGEMENT_SOURCES.includes(pg.source)) ||
+    !!(pg.churchPlanter && String(pg.churchPlanter).trim()) ||
+    !!(pg.nationalCoordinator && String(pg.nationalCoordinator).trim())
+  )
+}

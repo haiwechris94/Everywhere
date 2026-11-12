@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+﻿import { useState, useRef, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api, { peopleGroupsApi, masterPeopleApi } from '../services/api'
 import { useLanguage } from '../i18n'
@@ -566,7 +566,7 @@ const DataManagement = () => {
               {t('dataManagement.subtitle') || 'Importez et exportez vos données de peuples'}
             </p>
           </div>
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm px-4 py-3 rounded-xl">
+          <div className="flex items-center gap-3 bg-white dark:bg-slate-800/15 backdrop-blur-sm px-4 py-3 rounded-xl">
             <Users size={24} />
             <div>
               <p className="text-sm text-indigo-100">Total des peuples</p>
@@ -577,15 +577,15 @@ const DataManagement = () => {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="border-b border-gray-100">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+        <div className="border-b border-gray-100 dark:border-slate-700">
           <div className="flex">
             <button
               onClick={() => setActiveTab('import')}
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'import'
                   ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
               <Upload size={20} />
@@ -596,7 +596,7 @@ const DataManagement = () => {
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'export'
                   ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
               <Download size={20} />
@@ -607,7 +607,7 @@ const DataManagement = () => {
               className={`flex-1 px-6 py-4 text-sm font-semibold flex items-center justify-center gap-3 transition-all ${
                 activeTab === 'jp-sync'
                   ? 'text-indigo-600 border-b-3 border-indigo-600 bg-indigo-50'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 hover:bg-gray-50 dark:bg-slate-900'
               }`}
             >
               <Globe size={20} />
@@ -632,10 +632,10 @@ const DataManagement = () => {
                     <Globe className="text-white" size={28} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-1">
                       {t('dataManagement.import.downloadTemplate') || 'Télécharger un modèle CSV'}
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-slate-400">
                       {t('dataManagement.import.templateDescription') || 'Sélectionnez votre pays pour télécharger un modèle CSV pré-formaté'}
                     </p>
                   </div>
@@ -646,12 +646,12 @@ const DataManagement = () => {
                     <a
                       key={country.key}
                       href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/import/people-groups/template/${country.key}`}
-                      className="group flex items-center gap-3 px-4 py-3 bg-white rounded-xl border-2 border-blue-100 hover:border-indigo-400 hover:shadow-md transition-all"
+                      className="group flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-blue-100 hover:border-indigo-400 hover:shadow-md transition-all"
                       download
                     >
                       <span className="text-2xl">{country.flag}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 group-hover:text-indigo-600 truncate transition-colors">
+                        <p className="font-medium text-gray-800 dark:text-slate-100 group-hover:text-indigo-600 truncate transition-colors">
                           {country.name}
                         </p>
                       </div>
@@ -671,7 +671,7 @@ const DataManagement = () => {
                 className={`relative border-3 border-dashed rounded-2xl p-12 text-center transition-all ${
                   isDragging
                     ? 'border-indigo-500 bg-indigo-50 scale-[1.02]'
-                    : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50'
+                    : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50 dark:bg-slate-900'
                 }`}
               >
                 <input
@@ -684,7 +684,7 @@ const DataManagement = () => {
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center transition-all ${
-                    isDragging ? 'bg-indigo-500 scale-110' : 'bg-gray-100'
+                    isDragging ? 'bg-indigo-500 scale-110' : 'bg-gray-100 dark:bg-slate-800'
                   }`}>
                     <Upload size={40} className={isDragging ? 'text-white' : 'text-gray-400'} />
                   </div>
@@ -693,7 +693,7 @@ const DataManagement = () => {
                       ? 'Déposez le fichier ici...'
                       : t('dataManagement.import.dropzone') || 'Cliquez ou glissez-déposez votre fichier'}
                   </p>
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-slate-400">
                     Formats acceptés: <span className="font-medium">CSV, XLS, XLSX</span> (max 10MB)
                   </p>
                 </label>
@@ -733,8 +733,8 @@ const DataManagement = () => {
                         <CheckCircle className="text-green-600" size={24} />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-800">{importFile?.name}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-semibold text-gray-800 dark:text-slate-100">{importFile?.name}</p>
+                        <p className="text-sm text-gray-600 dark:text-slate-400">
                           {importPreview.totalRows} {t('dataManagement.import.rows') || 'lignes'} détectées
                         </p>
                       </div>
@@ -743,23 +743,23 @@ const DataManagement = () => {
                       onClick={resetImport}
                       className="p-2 hover:bg-green-100 rounded-lg transition-colors"
                     >
-                      <X size={20} className="text-gray-500" />
+                      <X size={20} className="text-gray-500 dark:text-slate-400" />
                     </button>
                   </div>
 
                   {/* Preview Table */}
-                  <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
-                    <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-                      <Table size={18} className="text-gray-500" />
+                  <div className="bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
+                    <div className="px-4 py-3 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 flex items-center gap-2">
+                      <Table size={18} className="text-gray-500 dark:text-slate-400" />
                       <span className="font-semibold text-gray-700">Aperçu des données</span>
-                      <span className="text-sm text-gray-500">(5 premières lignes)</span>
+                      <span className="text-sm text-gray-500 dark:text-slate-400">(5 premières lignes)</span>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="min-w-full">
-                        <thead className="bg-gray-100">
+                        <thead className="bg-gray-100 dark:bg-slate-800">
                           <tr>
                             {importPreview.headers.map((header, i) => (
-                              <th key={i} className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                              <th key={i} className="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-wider">
                                 {header}
                               </th>
                             ))}
@@ -767,7 +767,7 @@ const DataManagement = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                           {importPreview.data.map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50 transition-colors">
+                            <tr key={i} className="hover:bg-gray-50 dark:bg-slate-900 transition-colors">
                               {importPreview.headers.map((header, j) => (
                                 <td key={j} className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
                                   {row[header] || '-'}
@@ -784,7 +784,7 @@ const DataManagement = () => {
                   <div className="flex justify-end gap-3">
                     <button
                       onClick={resetImport}
-                      className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
+                      className="px-6 py-3 bg-gray-100 dark:bg-slate-800 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium"
                     >
                       Annuler
                     </button>
@@ -829,7 +829,7 @@ const DataManagement = () => {
                           Lignes en erreur — corrigez ces cases puis ré-importez ({importReport.errors.length})
                         </span>
                       </div>
-                      <div className="max-h-80 overflow-auto rounded-lg border border-red-100 bg-white">
+                      <div className="max-h-80 overflow-auto rounded-lg border border-red-100 bg-white dark:bg-slate-800">
                         <table className="min-w-full text-sm">
                           <thead className="bg-red-100/60 text-red-900">
                             <tr>
@@ -843,11 +843,11 @@ const DataManagement = () => {
                           <tbody className="divide-y divide-red-100">
                             {importReport.errors.map((er, i) => (
                               <tr key={i} className="align-top">
-                                <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800">{er.row ?? er.line ?? '-'}</td>
+                                <td className="px-3 py-2 whitespace-nowrap font-medium text-gray-800 dark:text-slate-100">{er.row ?? er.line ?? '-'}</td>
                                 <td className="px-3 py-2 whitespace-nowrap text-gray-700">{er.column || er.field || '-'}</td>
-                                <td className="px-3 py-2 text-gray-600">{er.value === '' || er.value === undefined ? '—' : String(er.value)}</td>
+                                <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{er.value === '' || er.value === undefined ? '—' : String(er.value)}</td>
                                 <td className="px-3 py-2 text-red-700">{er.error || er.reason || '-'}</td>
-                                <td className="px-3 py-2 text-gray-600">{er.suggestion || ''}</td>
+                                <td className="px-3 py-2 text-gray-600 dark:text-slate-400">{er.suggestion || ''}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -872,7 +872,7 @@ const DataManagement = () => {
             <div className="space-y-6">
               {/* Filtres d'export : pays + métriques à exporter */}
               <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                   <Globe size={20} className="text-indigo-600" />
                   Filtres d'export
                 </h3>
@@ -893,7 +893,7 @@ const DataManagement = () => {
                   <p className="text-sm font-semibold text-gray-700 mb-2">Métriques à exporter</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {EXPORT_METRIC_FIELDS.map(f => (
-                      <label key={f.key} className="flex items-center gap-2 text-sm text-gray-700 bg-white rounded-lg border border-gray-200 px-3 py-2 cursor-pointer">
+                      <label key={f.key} className="flex items-center gap-2 text-sm text-gray-700 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-2 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={exportMetrics.has(f.key)}
@@ -907,7 +907,7 @@ const DataManagement = () => {
                       </label>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
                     {exportCountry === 'all' ? 'Tous les pays' : exportCountry} · {getExportRows().length} ligne(s) · {getSelectedFields().length} colonne(s)
                   </p>
                 </div>
@@ -915,7 +915,7 @@ const DataManagement = () => {
 
               {/* Export Format Cards */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4 flex items-center gap-2">
                   <FileType size={20} className="text-indigo-600" />
                   Choisissez un format d'export
                 </h3>
@@ -933,7 +933,7 @@ const DataManagement = () => {
                           <Icon size={28} className="text-white" />
                         </div>
                         <h4 className={`text-xl font-bold ${format.textColor} mb-2`}>{format.name}</h4>
-                        <p className="text-gray-600 text-sm">{format.description}</p>
+                        <p className="text-gray-600 dark:text-slate-400 text-sm">{format.description}</p>
                         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Download size={20} className={format.textColor} />
                         </div>
@@ -945,30 +945,30 @@ const DataManagement = () => {
 
               {/* Data Summary */}
               {peoplesData && peoplesData.length > 0 && (
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <Info size={18} className="text-gray-500" />
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                  <h4 className="font-semibold text-gray-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                    <Info size={18} className="text-gray-500 dark:text-slate-400" />
                     Résumé des données à exporter
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                      <p className="text-sm text-gray-500">Total des peuples</p>
-                      <p className="text-2xl font-bold text-gray-900">{peoplesData.length}</p>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">Total des peuples</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{peoplesData.length}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                      <p className="text-sm text-gray-500">Avec coordonnées</p>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">Avec coordonnées</p>
                       <p className="text-2xl font-bold text-green-600">
                         {peoplesData.filter(p => p.location?.coordinates).length}
                       </p>
                     </div>
-                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                      <p className="text-sm text-gray-500">Pays uniques</p>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">Pays uniques</p>
                       <p className="text-2xl font-bold text-blue-600">
                         {new Set(peoplesData.map(p => p.country).filter(Boolean)).size}
                       </p>
                     </div>
-                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                      <p className="text-sm text-gray-500">Régions uniques</p>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">Régions uniques</p>
                       <p className="text-2xl font-bold text-purple-600">
                         {new Set(peoplesData.map(p => p.region).filter(Boolean)).size}
                       </p>
@@ -979,12 +979,12 @@ const DataManagement = () => {
 
               {/* No Data Message */}
               {(!peoplesData || peoplesData.length === 0) && !isLoadingPeoples && (
-                <div className="text-center py-12 bg-gray-50 rounded-xl">
+                <div className="text-center py-12 bg-gray-50 dark:bg-slate-900 rounded-xl">
                   <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <FolderOpen size={40} className="text-gray-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucune donnée à exporter</h3>
-                  <p className="text-gray-500">Commencez par importer des données ou créer des peuples</p>
+                  <p className="text-gray-500 dark:text-slate-400">Commencez par importer des données ou créer des peuples</p>
                 </div>
               )}
             </div>
@@ -1001,21 +1001,21 @@ const DataManagement = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-gray-900">Joshua Project — Sync Live</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">Joshua Project — Sync Live</h3>
                       {jpStatus?.isRunning && (
                         <span className="flex items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-200 animate-pulse">
                           <Loader2 size={11} className="animate-spin" /> En cours...
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-slate-400 text-sm">
                       Synchronise automatiquement les données de tous les peuples non-atteints du monde
                       depuis l'API Joshua Project. Mise à jour hebdomadaire + déclenchement manuel.
                     </p>
                   </div>
                 </div>
                 {/* Infos CRON */}
-                <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-500">
+                <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-500 dark:text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <Clock size={12} />
                     Dernière sync : {jpStatus?.lastSync
@@ -1049,9 +1049,9 @@ const DataManagement = () => {
                       { label: '🔄 Mis à jour', value: jpStatus.progress.updated, color: 'text-purple-700' },
                       { label: '❌ Erreurs', value: jpStatus.progress.errors, color: 'text-red-600' },
                     ].map((s, i) => (
-                      <div key={i} className="bg-white rounded-xl p-3 text-center border border-blue-100">
+                      <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-3 text-center border border-blue-100">
                         <p className={`text-2xl font-bold ${s.color}`}>{s.value || 0}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{s.label}</p>
                       </div>
                     ))}
                   </div>
@@ -1076,14 +1076,14 @@ const DataManagement = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* Sync mondiale */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-indigo-300 transition-colors">
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 hover:border-indigo-300 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
                       <Globe size={20} className="text-indigo-600" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800">Sync mondiale</h4>
-                      <p className="text-xs text-gray-500">Tous les pays — 10 à 30 min</p>
+                      <h4 className="font-bold text-gray-800 dark:text-slate-100">Sync mondiale</h4>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">Tous les pays — 10 à 30 min</p>
                     </div>
                   </div>
                   <button
@@ -1099,21 +1099,21 @@ const DataManagement = () => {
                 </div>
 
                 {/* Sync par pays */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-teal-300 transition-colors">
+                <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 hover:border-teal-300 transition-colors">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
                       <Zap size={20} className="text-teal-600" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-800">Sync par pays</h4>
-                      <p className="text-xs text-gray-500">Rapide — 1 à 2 minutes</p>
+                      <h4 className="font-bold text-gray-800 dark:text-slate-100">Sync par pays</h4>
+                      <p className="text-xs text-gray-500 dark:text-slate-400">Rapide — 1 à 2 minutes</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <select
                       value={jpSelectedCountry}
                       onChange={e => setJpSelectedCountry(e.target.value)}
-                      className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"
+                      className="flex-1 text-sm border border-gray-200 dark:border-slate-700 rounded-xl px-3 py-2 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
                     >
                       <option value="">Choisir un pays...</option>
                       {JP_COUNTRIES.map(c => (
@@ -1135,14 +1135,14 @@ const DataManagement = () => {
               <div>
                 <button
                   onClick={() => setJpShowStats(!jpShowStats)}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-800 mb-3"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-gray-800 dark:text-slate-100 mb-3"
                 >
                   {jpShowStats ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   Statistiques de la dernière synchronisation
                 </button>
 
                 {jpShowStats && jpStats?.hasData && (
-                  <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
+                  <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 space-y-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
                         { label: 'Total récupérés', value: jpStats.totalFetched },
@@ -1150,25 +1150,25 @@ const DataManagement = () => {
                         { label: '🔄 Mis à jour', value: jpStats.updated },
                         { label: '❌ Erreurs', value: jpStats.errors },
                       ].map((s, i) => (
-                        <div key={i} className="bg-gray-50 rounded-xl p-3 text-center">
-                          <p className="text-xl font-bold text-gray-800">{s.value || 0}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+                        <div key={i} className="bg-gray-50 dark:bg-slate-900 rounded-xl p-3 text-center">
+                          <p className="text-xl font-bold text-gray-800 dark:text-slate-100">{s.value || 0}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{s.label}</p>
                         </div>
                       ))}
                     </div>
-                    <div className="text-xs text-gray-500 flex gap-4">
+                    <div className="text-xs text-gray-500 dark:text-slate-400 flex gap-4">
                       {jpStats.duration && <span>⏱ Durée : {jpStats.duration}</span>}
                       {jpStats.startedAt && <span>📅 {new Date(jpStats.startedAt).toLocaleString('fr-FR')}</span>}
                     </div>
                     {/* Répartition par statut */}
                     {jpStats.byStatus && (
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Répartition par statut DMM</p>
+                        <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Répartition par statut DMM</p>
                         <div className="flex flex-wrap gap-2">
                           {Object.entries(jpStats.byStatus).map(([status, count]) => {
-                            const s = STATUS_LABELS_JP[status] || { label: status, color: 'text-gray-600', bg: 'bg-gray-50' }
+                            const s = STATUS_LABELS_JP[status] || { label: status, color: 'text-gray-600 dark:text-slate-400', bg: 'bg-gray-50 dark:bg-slate-900' }
                             return (
-                              <span key={status} className={`px-3 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.color} border border-gray-200`}>
+                              <span key={status} className={`px-3 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.color} border border-gray-200 dark:border-slate-700`}>
                                 {s.label} : {count}
                               </span>
                             )
@@ -1179,7 +1179,7 @@ const DataManagement = () => {
                     {/* Top pays */}
                     {jpStats.byCountry && (
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Top pays</p>
+                        <p className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase mb-2">Top pays</p>
                         <div className="space-y-1.5">
                           {Object.entries(jpStats.byCountry)
                             .sort((a, b) => b[1] - a[1])
@@ -1190,10 +1190,10 @@ const DataManagement = () => {
                               return (
                                 <div key={country} className="flex items-center gap-2 text-xs">
                                   <span className="w-32 text-gray-700 truncate flex-shrink-0">{country}</span>
-                                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                  <div className="flex-1 h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div className="h-full bg-indigo-400 rounded-full" style={{ width: `${pct}%` }} />
                                   </div>
-                                  <span className="text-gray-500 w-8 text-right flex-shrink-0">{count}</span>
+                                  <span className="text-gray-500 dark:text-slate-400 w-8 text-right flex-shrink-0">{count}</span>
                                 </div>
                               )
                             })}
@@ -1204,7 +1204,7 @@ const DataManagement = () => {
                 )}
 
                 {jpShowStats && !jpStats?.hasData && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center text-gray-400 text-sm">
+                  <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl p-4 text-center text-gray-400 text-sm">
                     Aucune synchronisation effectuée depuis le démarrage du serveur.
                   </div>
                 )}

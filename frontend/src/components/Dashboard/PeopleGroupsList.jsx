@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+﻿import React, { useState, useMemo } from 'react'
 import {
   Search,
   Filter,
@@ -48,11 +48,11 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
 
   // Data sources configuration - extensible for future organisations
   const DATA_SOURCES = useMemo(() => [
-    { value: 'all', label: t('common.all') || 'All data', color: 'bg-gray-100 text-gray-700' },
+    { value: 'all', label: t('common.all') || 'All data', color: 'bg-gray-100 dark:bg-slate-800 text-gray-700' },
     { value: 'Survey', label: t('peopleMap.surveyData') || 'Survey', color: 'bg-purple-100 text-purple-700' },
     { value: 'DMM', label: 'DMM', color: 'bg-blue-100 text-blue-700' },
     { value: 'Joshua Project', label: 'Joshua Project', color: 'bg-amber-100 text-amber-700' },
-    { value: 'Manual', label: t('common.import') || 'Manual', color: 'bg-gray-100 text-gray-600' },
+    { value: 'Manual', label: t('common.import') || 'Manual', color: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400' },
     { value: 'PeopleGroups.org', label: 'IMB / PeopleGroups.org', color: 'bg-emerald-100 text-emerald-700' },
     { value: 'Finishing the Task', label: 'Finishing the Task', color: 'bg-violet-100 text-violet-700' },
     // Add new organisations here in the future
@@ -253,9 +253,10 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
   }
 
   const StatusBadge = ({ status }) => {
-    const colors = STATUS_COLORS[status] || { bg: 'bg-gray-100', text: 'text-gray-700', label: status || (t('common.unknown') || 'Unknown') }
+    const colors = STATUS_COLORS[status] || { bg: 'bg-gray-100 dark:bg-slate-800', text: 'text-gray-700', hex: '#6b7280', label: status || (t('common.unknown') || 'Unknown') }
     return (
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
+      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
+        <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: colors.hex || '#6b7280' }} aria-hidden="true" />
         {colors.label}
       </span>
     )
@@ -275,33 +276,33 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
   ], [t])
 
   const renderTable = (items) => (
-    <div className="overflow-x-auto mt-2 rounded-lg border border-gray-100">
-      <table className="min-w-full divide-y divide-gray-200 text-sm">
-        <thead className="bg-gray-50">
+    <div className="overflow-x-auto mt-2 rounded-lg border border-gray-100 dark:border-slate-700">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 text-sm">
+        <thead className="bg-gray-50 dark:bg-slate-900">
           <tr>
             {tableHeaders.map(h => (
-              <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+              <th key={h} className="px-4 py-2 text-left text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-100">
+        <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-100">
           {items.map((pg, idx) => {
             const hasCoords = pg.location?.coordinates?.length >= 2
             return (
-              <tr key={pg._id || idx} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{formatPeopleVillageName(pg.name, pg.villageName)}</td>
+              <tr key={pg._id || idx} className="hover:bg-gray-50 dark:bg-slate-900 transition-colors">
+                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900 dark:text-slate-100">{formatPeopleVillageName(pg.name, pg.villageName)}</td>
                 <td className="px-4 py-2 whitespace-nowrap"><StatusBadge status={pg.engagementStatus} /></td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.population ? pg.population.toLocaleString() : '-'}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.numberOfChurches || 0}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.churchGeneration || '-'}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.language || '-'}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.religion || '-'}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-600">{pg.region || '-'}</td>
-                <td className="px-4 py-2 whitespace-nowrap text-gray-500 font-mono text-xs">
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.population ? pg.population.toLocaleString() : '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.numberOfChurches || 0}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.churchGeneration || '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.language || '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.religion || '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-600 dark:text-slate-400">{pg.region || '-'}</td>
+                <td className="px-4 py-2 whitespace-nowrap text-gray-500 dark:text-slate-400 font-mono text-xs">
                   {hasCoords ? `${pg.location.coordinates[1]?.toFixed(3)}, ${pg.location.coordinates[0]?.toFixed(3)}` : '-'}
                 </td>
                 <td className="px-4 py-2 whitespace-nowrap">
-                  <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">
+                  <span className="px-2 py-0.5 rounded text-xs bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-400">
                     {pg.source || pg.dataSource || (t('common.import') || 'Manual')}
                   </span>
                 </td>
@@ -317,13 +318,13 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
     <div className="space-y-4">
       <KPICards />
 
-      <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 relative z-10">
+      <div className="bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 relative z-10">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100 flex items-center gap-2">
           <Users size={20} className="text-primary-600" />
           {t('dashboard.peopleGroups') || 'People Groups'}
-          <span className="text-sm font-normal text-gray-500 ml-1">
+          <span className="text-sm font-normal text-gray-500 dark:text-slate-400 ml-1">
             ({peopleGroups.length} total)
           </span>
         </h3>
@@ -337,7 +338,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
       </div>
 
       {/* Toolbar */}
-      <div className="px-6 py-3 border-b border-gray-200 bg-gray-50/50">
+      <div className="px-6 py-3 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 min-w-[220px]">
@@ -347,10 +348,10 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
               placeholder={t('peopleMap.searchPlaceholder') || 'Search a people group...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+              className="w-full pl-9 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-slate-800"
             />
             {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-slate-400">
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -360,19 +361,19 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
           <div className="relative">
             <button
               onClick={() => { setSourceDropdownOpen(!sourceDropdownOpen); setSortDropdownOpen(false) }}
-              className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white bg-white shadow-sm"
+              className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white dark:bg-slate-800 bg-white dark:bg-slate-800 shadow-sm"
             >
-              <Database className="h-4 w-4 text-gray-500" />
+              <Database className="h-4 w-4 text-gray-500 dark:text-slate-400" />
               <span className="font-medium">{DATA_SOURCES.find(s => s.value === sourceFilter)?.label || 'Source'}</span>
               <ChevronDown className="h-4 w-4 text-gray-400" />
             </button>
             {sourceDropdownOpen && (
-              <div className="absolute z-20 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+              <div className="absolute z-20 mt-1 w-52 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
                 {DATA_SOURCES.map(source => (
                   <button
                     key={source.value}
                     onClick={() => { setSourceFilter(source.value); setSourceDropdownOpen(false) }}
-                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center justify-between transition-colors ${sourceFilter === source.value ? 'bg-blue-50' : ''}`}
+                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 dark:bg-slate-900 flex items-center justify-between transition-colors ${sourceFilter === source.value ? 'bg-blue-50' : ''}`}
                   >
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${source.color}`}>{source.label}</span>
                     {sourceFilter === source.value && <Check className="h-4 w-4 text-blue-600" />}
@@ -386,19 +387,19 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
           <div className="relative">
             <button
               onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setSourceDropdownOpen(false) }}
-              className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white bg-white shadow-sm"
+              className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white dark:bg-slate-800 bg-white dark:bg-slate-800 shadow-sm"
             >
-              <LayoutList className="h-4 w-4 text-gray-500" />
+              <LayoutList className="h-4 w-4 text-gray-500 dark:text-slate-400" />
               <span className="font-medium">{SORT_OPTIONS.find(s => s.value === sortBy)?.label || (t('common.sort') || 'Sort')}</span>
               <ChevronDown className="h-4 w-4 text-gray-400" />
             </button>
             {sortDropdownOpen && (
-              <div className="absolute z-20 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+              <div className="absolute z-20 mt-1 w-44 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
                 {SORT_OPTIONS.map(option => (
                   <button
                     key={option.value}
                     onClick={() => { setSortBy(option.value); setSortDropdownOpen(false) }}
-                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center justify-between transition-colors ${sortBy === option.value ? 'bg-blue-50' : ''}`}
+                    className={`w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 dark:bg-slate-900 flex items-center justify-between transition-colors ${sortBy === option.value ? 'bg-blue-50' : ''}`}
                   >
                     <span>{option.label}</span>
                     {sortBy === option.value && <Check className="h-4 w-4 text-blue-600" />}
@@ -412,14 +413,14 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             <button
               onClick={() => setViewMode('hierarchy')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'hierarchy' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'hierarchy' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-700 hover:bg-gray-50 dark:bg-slate-900'}`}
             >
               <Globe className="h-4 w-4" />
               Hiérarchie
             </button>
             <button
               onClick={() => setViewMode('status')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'status' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors ${viewMode === 'status' ? 'bg-primary-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-700 hover:bg-gray-50 dark:bg-slate-900'}`}
             >
               <LayoutGrid className="h-4 w-4" />
               {t('common.status') || 'Status'}
@@ -428,12 +429,12 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
         </div>
       </div>
 
-      <div className="px-6 py-3 border-b border-gray-200 bg-slate-50/60 flex items-center gap-2 flex-wrap">
+      <div className="px-6 py-3 border-b border-gray-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex items-center gap-2 flex-wrap">
         {HIERARCHY_ORDER.map(level => (
           <button
             key={level}
             onClick={() => setHierarchyLevel(level)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${hierarchyLevel === level ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${hierarchyLevel === level ? 'bg-slate-900 text-white border-slate-900' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300'}`}
           >
             {HIERARCHY_CONFIG[level].label}
           </button>
@@ -441,11 +442,11 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
       </div>
 
       {/* Status filter pills */}
-      <div className="px-6 py-3 border-b border-gray-200 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">{t('common.status') || 'Status'} :</span>
+      <div className="px-6 py-3 border-b border-gray-200 dark:border-slate-700 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wide mr-1">{t('common.status') || 'Status'} :</span>
         <button
           onClick={() => setActiveStatuses([])}
-          className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors border ${activeStatuses.length === 0 ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'}`}
+          className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors border ${activeStatuses.length === 0 ? 'bg-gray-800 text-white border-gray-800' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-300 hover:border-gray-400'}`}
         >
           {t('common.all') || 'All'}
         </button>
@@ -457,8 +458,9 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
             <button
               key={status}
               onClick={() => toggleStatus(status)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all border ${isActive ? `${colors.bg} ${colors.text} ${colors.border} shadow-sm` : `bg-white ${colors.text} ${colors.border} hover:${colors.bg}`}`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all border ${isActive ? `${colors.bg} ${colors.text} ${colors.border} shadow-sm` : `bg-white dark:bg-slate-800 ${colors.text} ${colors.border} hover:${colors.bg}`}`}
             >
+              <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: colors.hex }} aria-hidden="true" />
               {colors.label}
               {count > 0 && <span className="ml-1 opacity-75">({count})</span>}
             </button>
@@ -467,10 +469,10 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
       </div>
 
       {/* Stats summary bar */}
-      <div className="px-6 py-2.5 border-b border-gray-100 bg-gray-50/30 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="px-6 py-2.5 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/30 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
           <Users className="h-4 w-4 text-gray-400" />
-          <span className="font-semibold text-gray-800">{filteredGroups.length}</span>
+          <span className="font-semibold text-gray-800 dark:text-slate-100">{filteredGroups.length}</span>
           <span>{t('dashboard.peopleGroups') || 'people groups'}</span>
           {filteredGroups.length !== peopleGroups.length && (
             <span className="text-gray-400">/ {peopleGroups.length}</span>
@@ -511,11 +513,11 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
                 <div key={name}>
                   <button
                     onClick={() => toggleGroup(name)}
-                    className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+                    className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-slate-50 dark:bg-slate-900 transition-colors text-left"
                   >
                     <div className="flex items-center gap-3">
                       {isExpanded ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
-                      <span className="font-semibold text-gray-800">{name}</span>
+                      <span className="font-semibold text-gray-800 dark:text-slate-100">{name}</span>
                       <span className="text-sm text-gray-400">({items.length})</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -551,7 +553,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
                 <div key={country}>
                   <button
                     onClick={() => toggleGroup(country)}
-                    className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+                    className="w-full px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 dark:bg-slate-900 transition-colors text-left"
                   >
                     <div className="flex items-center gap-3">
                       {isExpanded
@@ -559,7 +561,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
                         : <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
                       }
                       <Globe className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                      <span className="font-semibold text-gray-800">{country}</span>
+                      <span className="font-semibold text-gray-800 dark:text-slate-100">{country}</span>
                       <span className="text-sm text-gray-400">({items.length})</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -593,7 +595,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
           ) : (
             groupedByStatus.map(([status, items]) => {
               const isExpanded = expandedGroups.has(status)
-              const colors = STATUS_COLORS[status] || { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200', hex: '#6b7280', label: t('common.unknown') || 'Unknown' }
+              const colors = STATUS_COLORS[status] || { bg: 'bg-gray-100 dark:bg-slate-800', text: 'text-gray-700', border: 'border-gray-200 dark:border-slate-700', hex: '#6b7280', label: t('common.unknown') || 'Unknown' }
               return (
                 <div key={status}>
                   <button
@@ -611,7 +613,7 @@ const PeopleGroupsList = ({ peopleGroups = [] }) => {
                     </div>
                   </button>
                   {isExpanded && (
-                    <div className="px-6 pb-4 bg-white">
+                    <div className="px-6 pb-4 bg-white dark:bg-slate-800">
                       {renderTable(items)}
                     </div>
                   )}

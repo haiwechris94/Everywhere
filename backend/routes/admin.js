@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const ActivityLog = require('../models/ActivityLog');
 const { auth } = require('../middleware/auth');
 const { isAdmin } = require('../middleware/roles');
 
@@ -99,6 +100,34 @@ router.get('/users/:userId', async (req, res) => {
     res.status(500).json({
       error: 'Server error',
       message: 'Failed to fetch user'
+    });
+  }
+});
+
+/**
+ * GET /admin/users/:userId/audit
+ * Recent admin audit entries where this user is the target
+ * (password resets, blocks/unblocks performed by an admin)
+ */
+router.get('/users/:userId/audit', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const audit = await ActivityLog.find({
+      entityType: 'User',
+      entityId: userId,
+      'metadata.event': { $in: ['admin-password-reset', 'admin-block', 'admin-unblock'] }
+    })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('user', 'name email');
+
+    res.json({ audit });
+  } catch (error) {
+    console.error('Error fetching user audit log:', error);
+    res.status(500).json({
+      error: 'Server error',
+      message: 'Failed to fetch audit log'
     });
   }
 });
@@ -311,6 +340,28 @@ router.put('/users/:userId/password', async (req, res) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    // Audit: record that an admin reset this user's password (never block the request on audit failure)
+    try {
+      await ActivityLog.log({
+        user: req.user._id,
+        action: 'password-reset',
+        entityType: 'User',
+        entityId: user._id,
+        entityName: user.name,
+        description: `Admin ${req.user.name || req.user.email} reset the password of ${user.name}`,
+        ipAddress: (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || null,
+        userAgent: req.headers['user-agent'] || null,
+        metadata: {
+          adminId: String(req.user._id),
+          adminName: req.user.name,
+          targetUserId: String(user._id),
+          event: 'admin-password-reset'
+        }
+      });
+    } catch (e) {
+      console.error('audit log failed', e);
+    }
+
     res.json({
       message: 'Password updated successfully'
     });
@@ -357,6 +408,29 @@ router.put('/users/:userId/toggle-active', async (req, res) => {
     
     user.isActive = !user.isActive;
     await user.save();
+
+    // Audit: record the block/unblock (isActive now reflects the NEW state); never block the request on audit failure
+    try {
+      await ActivityLog.log({
+        user: req.user._id,
+        action: 'update',
+        entityType: 'User',
+        entityId: user._id,
+        entityName: user.name,
+        description: `Admin ${req.user.name || req.user.email} ${user.isActive ? 'unblocked' : 'blocked'} ${user.name}`,
+        ipAddress: (req.headers['x-forwarded-for']?.split(',')[0]?.trim()) || req.ip || null,
+        userAgent: req.headers['user-agent'] || null,
+        metadata: {
+          event: user.isActive ? 'admin-unblock' : 'admin-block',
+          adminId: String(req.user._id),
+          adminName: req.user.name,
+          targetUserId: String(user._id),
+          isActive: user.isActive
+        }
+      });
+    } catch (e) {
+      console.error('audit log failed', e);
+    }
     
     res.json({
       message: user.isActive ? 'User unblocked successfully' : 'User blocked successfully',

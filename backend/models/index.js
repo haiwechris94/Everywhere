@@ -14,6 +14,7 @@ const PersonOfPeace = require('./PersonOfPeace');
 const DiscoveryGroup = require('./DiscoveryGroup');
 const DBSSession = require('./DBSSession');
 const CoachingSession = require('./CoachingSession');
+const Person = require('./Person');
 
 module.exports = {
   User,
@@ -29,4 +30,5 @@ module.exports = {
   DiscoveryGroup,
   DBSSession,
   CoachingSession,
+  Person,
 };

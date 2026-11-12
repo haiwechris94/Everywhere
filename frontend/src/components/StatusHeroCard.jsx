@@ -1,6 +1,6 @@
 import { Target, Users, AlertTriangle } from 'lucide-react'
 import { jpStageFor, evangelicalRangeFor } from '../utils/joshuaProjectScales'
-import { statusHexFor, hexToRgba } from '../utils/statusColors'
+import { statusHexFor, jpReachedHexFor, hexToRgba } from '../utils/statusColors'
 
 // ── Jauge circulaire (SVG) de la carte « Statut » ───────────────────────────
 // Piste blanche translucide + arc de progression (jpScale / 5) plus clair, avec
@@ -85,21 +85,34 @@ export default function StatusHeroCard({
   description = null,
   evangelical = null,
   leastReached = null,
+  evangelicalLabel = null,
+  jpScaleLabel = null,
+  leastReachedLabel = null,
+  evangelicalValue = null,
+  jpScaleValue = null,
+  leastReachedValue = null,
+  statusOverride = null,
+  statusHexOverride = null,
+  gaugeProgressOverride = null,
+  descriptionOverride = null,
   isFrench = false,
   className = '',
 }) {
   const dash = '—'
   const jpStageResolved = jpStage || jpStageFor(jpScale)
   // Statut du peuple = statut Joshua Project ; repli sur `status` fourni.
-  const displayStatus = jpStageResolved || status || null
-  const statusHex = statusHexFor(displayStatus)
+  const displayStatus = statusOverride || jpStageResolved || status || null
+  // Carte Joshua Project : on colore sur l'échelle JP (reached-status), pas sur
+  // le vocabulaire DMM. Un appelant « engagement » peut forcer via statusHexOverride.
+  const statusHex = statusHexOverride || jpReachedHexFor(displayStatus)
   const statusGradient = `linear-gradient(90deg, ${statusHex} 0%, ${hexToRgba(statusHex, 0.82)} 100%)`
 
   // Progression de la jauge (jpScale / 5), bornée [0,1].
-  const gaugeProgress = jpScale != null ? Math.min(1, Math.max(0, Number(jpScale) / 5)) : 0
+  const gaugeProgress = gaugeProgressOverride != null ? Math.min(1, Math.max(0, Number(gaugeProgressOverride))) : (jpScale != null ? Math.min(1, Math.max(0, Number(jpScale) / 5)) : 0)
 
   // Description lisible du JPScale (« 5 — Significantly reached »), repli dérivé.
   const descriptionResolved =
+    descriptionOverride != null ? descriptionOverride :
     description ||
     (jpStageResolved
       ? `${jpScale ?? ''}${jpScale != null ? ' — ' : ''}${jpStageResolved}`
@@ -107,12 +120,14 @@ export default function StatusHeroCard({
 
   // % évangéliques : valeur précise sinon fourchette officielle liée au JPScale.
   const evangelicalDisplay =
+    evangelicalValue != null ? evangelicalValue :
     evangelical != null
       ? (typeof evangelical === 'number' ? `${evangelical}%` : String(evangelical))
       : evangelicalRangeFor(jpScale) || dash
 
-  const jpScaleDisplay = jpScale != null ? String(jpScale) : dash
+  const jpScaleDisplay = jpScaleValue != null ? jpScaleValue : (jpScale != null ? String(jpScale) : dash)
   const leastReachedDisplay =
+    leastReachedValue != null ? leastReachedValue :
     leastReached == null
       ? dash
       : leastReached
@@ -153,17 +168,17 @@ export default function StatusHeroCard({
           <div className="px-3 py-4">
             <Users className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
             <p className="mt-1 font-bold text-slate-900">{evangelicalDisplay}</p>
-            <p className="text-[11px] text-slate-500">{isFrench ? 'Évangéliques' : 'Evangelical'}</p>
+            <p className="text-[11px] text-slate-500">{evangelicalLabel || (isFrench ? 'Évangéliques' : 'Evangelical')}</p>
           </div>
           <div className="px-3 py-4">
             <Target className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
             <p className="mt-1 font-bold text-slate-900">{jpScaleDisplay}</p>
-            <p className="text-[11px] text-slate-500">{isFrench ? 'Échelle JP' : 'JP Scale'}</p>
+            <p className="text-[11px] text-slate-500">{jpScaleLabel || (isFrench ? 'Échelle JP' : 'JP Scale')}</p>
           </div>
           <div className="px-3 py-4">
             <AlertTriangle className="mx-auto h-5 w-5" style={{ color: statusHex }} aria-hidden="true" />
             <p className="mt-1 font-bold text-slate-900">{leastReachedDisplay}</p>
-            <p className="text-[11px] text-slate-500">{isFrench ? 'Moins atteint' : 'Least Reached'}</p>
+            <p className="text-[11px] text-slate-500">{leastReachedLabel || (isFrench ? 'Moins atteint' : 'Least Reached')}</p>
           </div>
         </div>
       </div>

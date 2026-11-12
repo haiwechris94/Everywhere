@@ -52,6 +52,40 @@ export const countryCodeToDbName = (code) => {
 }
 
 /**
+ * Localized display name for a country code (alpha-2 or alpha-3).
+ * One country = one label. The label follows the UI language so that the
+ * same country (e.g. CM) never shows twice as "Cameroun" + "Cameroon".
+ * @param {string} code - ISO country code (e.g., 'CM', 'CMR')
+ * @param {boolean} isFrench - true for the French label, false for English
+ * @returns {string|null} Localized country name, or null if unknown
+ */
+export const countryCodeToDisplayName = (code, isFrench = true) => {
+  const fr = {
+    CM: 'Cameroun', CMR: 'Cameroun',
+    TD: 'Tchad', TCD: 'Tchad',
+    CF: 'République centrafricaine', CAF: 'République centrafricaine',
+    CG: 'Congo', COG: 'Congo',
+    CD: 'RD Congo', COD: 'RD Congo',
+    GA: 'Gabon', GAB: 'Gabon',
+    GQ: 'Guinée équatoriale', GNQ: 'Guinée équatoriale',
+    ST: 'Sao Tomé-et-Príncipe', STP: 'Sao Tomé-et-Príncipe',
+  }
+  const en = {
+    CM: 'Cameroon', CMR: 'Cameroon',
+    TD: 'Chad', TCD: 'Chad',
+    CF: 'Central African Republic', CAF: 'Central African Republic',
+    CG: 'Congo', COG: 'Congo',
+    CD: 'DR Congo', COD: 'DR Congo',
+    GA: 'Gabon', GAB: 'Gabon',
+    GQ: 'Equatorial Guinea', GNQ: 'Equatorial Guinea',
+    ST: 'São Tomé and Príncipe', STP: 'São Tomé and Príncipe',
+  }
+  const key = code?.toUpperCase()
+  if (!key) return null
+  return (isFrench ? fr : en)[key] || null
+}
+
+/**
  * Convert database country name to ISO code
  * @param {string} name - Country name in database
  * @returns {string|null} ISO country code

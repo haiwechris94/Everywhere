@@ -1,0 +1,61 @@
+$kind: http-request
+name: Merge Master People
+method: POST
+url: '{{baseUrl}}/api/master-people/{{survivorId}}/merge?dryRun=true'
+order: 1000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+  - key: Content-Type
+    value: application/json
+queryParams:
+  - key: dryRun
+    value: 'true'
+    description: 'Set to "true" to preview the merge without writing anything. Remove/disable to actually merge.'
+body:
+  type: json
+  content: |-
+    {
+      "loserIds": ["{{loserId}}"]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      // Unifies a duplicate master people (e.g. "Cameroun" DMM) into the survivor
+      // ("Cameroon" JP). With ?dryRun=true the body is a preview; otherwise it is
+      // the applied-merge report.
+      const isDryRun = pm.request.url.query.has('dryRun')
+        && pm.request.url.query.get('dryRun') === 'true';
+
+      pm.test('Status is 200', function () {
+        pm.response.to.have.status(200);
+      });
+
+      const json = pm.response.json();
+
+      pm.test('success is true', function () {
+        pm.expect(json.success).to.eql(true);
+      });
+
+      pm.test('survivorId echoes the request', function () {
+        pm.expect(json.survivorId).to.eql(pm.variables.get('survivorId'));
+      });
+
+      pm.test('report lists the merged losers', function () {
+        pm.expect(json.loserIds).to.be.an('array').that.is.not.empty;
+        pm.expect(json.mergedCount).to.eql(json.loserIds.length);
+      });
+
+      if (isDryRun) {
+        pm.test('dryRun report previews the changes (nothing written)', function () {
+          pm.expect(json.dryRun).to.eql(true);
+          pm.expect(json.wouldReassign).to.be.an('object');
+          pm.expect(json.sourceTypesAfter).to.be.an('array');
+        });
+      } else {
+        pm.test('applied merge reports reassignment counts', function () {
+          pm.expect(json.reassigned).to.be.an('object');
+          pm.expect(json).to.have.property('statusResolved');
+        });
+      }

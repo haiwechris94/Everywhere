@@ -845,6 +845,17 @@ router.get('/', optionalAuth, async (req, res) => {
     // 3. SECURE QUERY CONSTRUCTION
     // ============================================
     const query = {};
+
+    // ============================================
+    // ARCHIVE FILTER (reversible archive)
+    // ============================================
+    // Exclude archived records by default. Pass onlyArchived=true to list only
+    // archived ones, or includeArchived=true to return both archived and active.
+    if (req.query.onlyArchived === 'true') {
+      query.isArchived = true;
+    } else if (req.query.includeArchived !== 'true') {
+      query.isArchived = { $ne: true };
+    }
     
     // Status filter (can be comma-separated for multiple)
     // SECURITY: Only add if status is a non-empty string
@@ -910,8 +921,21 @@ router.get('/', optionalAuth, async (req, res) => {
     // Allow filtering by data source (e.g. 'Joshua Project', 'PeopleGroups.org',
     // 'Finishing the Task', 'Survey', 'DMM'). Values are case-sensitive and must
     // match the stored `source` field exactly. 'all' (or empty) means no filter.
+    //
+    // A comma-separated list (e.g. 'DMM,Survey,manual') matches ANY of the given
+    // sources via $in. This lets callers (e.g. the Engagements page) request the
+    // exact engagement set the map uses — { source: { $in: [...] } } — in one
+    // query. Single values keep the original equality behaviour unchanged.
     if (source && typeof source === 'string' && source.trim() && source !== 'all') {
-      query.source = source.trim();
+      const sources = source
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (sources.length > 1) {
+        query.source = { $in: sources };
+      } else if (sources.length === 1) {
+        query.source = sources[0];
+      }
     }
     
     // ============================================
@@ -2381,6 +2405,51 @@ router.post('/:id/reject', auth, canApprove, async (req, res) => {
 /**
  * DELETE /people-groups/:id - Delete a people group
  */
+/**
+ * PATCH /people-groups/:id/archive - Archive (reversible) a people group / engagement.
+ * Archived records are hidden from the default listing; nothing is deleted.
+ */
+router.patch('/:id/archive', auth, canApprove, async (req, res) => {
+  try {
+    const peopleGroup = await PeopleGroup.findByIdAndUpdate(
+      req.params.id,
+      { isArchived: true, archivedAt: new Date(), archivedBy: req.user ? req.user._id : null },
+      { new: true }
+    );
+    if (!peopleGroup) {
+      return res.status(404).json({ error: 'Not found', message: 'People group not found' });
+    }
+    res.json({ message: 'People group archived', data: peopleGroup });
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid ID', message: 'The people group ID is invalid' });
+    }
+    res.status(500).json({ error: 'Server error', message: error.message });
+  }
+});
+
+/**
+ * PATCH /people-groups/:id/unarchive - Restore a previously archived people group / engagement.
+ */
+router.patch('/:id/unarchive', auth, canApprove, async (req, res) => {
+  try {
+    const peopleGroup = await PeopleGroup.findByIdAndUpdate(
+      req.params.id,
+      { isArchived: false, archivedAt: null, archivedBy: null },
+      { new: true }
+    );
+    if (!peopleGroup) {
+      return res.status(404).json({ error: 'Not found', message: 'People group not found' });
+    }
+    res.json({ message: 'People group unarchived', data: peopleGroup });
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ error: 'Invalid ID', message: 'The people group ID is invalid' });
+    }
+    res.status(500).json({ error: 'Server error', message: error.message });
+  }
+});
+
 router.delete('/:id', auth, isMissionary,
   logActivity('delete', 'PeopleGroup', (req) => ({ entityId: req.params.id })),
   async (req, res) => {

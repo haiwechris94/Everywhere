@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RegionDetail — Admin Level 1 detail.
  * Header + stats, drill-down list of departments, and the constant
  * [Peuples | Reporting | Couverture] tabs scoped to this region.

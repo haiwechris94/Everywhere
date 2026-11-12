@@ -2,16 +2,18 @@ import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine,
+  ComposedChart, Bar, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts'
 import { peopleGroupsApi, masterPeopleApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { StateLoading, StateError, StatCard } from './geography/geoComponents'
 import {
-  dmmEngagementDisplay, dmmLevelForEngagement, dmmLevelLabel,
+  dmmEngagementDisplay, dmmLevelForEngagement, dmmLevelLabel, dmmLevelFromGeneration,
   dmmStageFromChurches, normalizeDmmStage, dmmStageColors, dmmStageLabel, DMM_STAGE,
 } from '../utils/dmmEngagement'
 import { useLanguage } from '../i18n'
+import { initiativesApi } from '../services/reportingApi'
+import { initiativeDisplayName } from '../utils/initiativeLabel'
 import StatusHeroCard from '../components/StatusHeroCard'
 
 // Rang numérique d'un stade DMM (Pionnier=1 … Mouvement=4) pour tracer la
@@ -213,6 +215,10 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
     engagementStatus: engagement.engagementStatus || 'pioneer',
     numberOfChurches: engagement.numberOfChurches ?? 0,
     churchGeneration: engagement.churchGeneration ?? 0,
+    region: engagement.region || '',
+    admin2: engagement.admin2 || engagement.departement || '',
+    admin3: engagement.admin3 || engagement.arrondissement || '',
+    description: engagement.description || '',
     latitude: coords[1] != null ? String(coords[1]) : '',
     longitude: coords[0] != null ? String(coords[0]) : '',
   })
@@ -238,6 +244,13 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
     if (nextVillage !== (engagement.villageName || '')) {
       payload.villageName = nextVillage
     }
+
+    // Localisation administrative + commentaire : on envoie uniquement les
+    // champs renseignés / modifiés.
+    if (form.region.trim() !== (engagement.region || '')) payload.region = form.region.trim()
+    if (form.admin2.trim() !== (engagement.admin2 || engagement.departement || '')) payload.admin2 = form.admin2.trim()
+    if (form.admin3.trim() !== (engagement.admin3 || engagement.arrondissement || '')) payload.admin3 = form.admin3.trim()
+    if (form.description !== (engagement.description || '')) payload.description = form.description
 
     // Latitude / longitude → GeoJSON Point [lng, lat]. Only include when both
     // are provided and valid; validate ranges.
@@ -295,7 +308,23 @@ function EditEngagementForm({ engagement, onSaved, onCancel }) {
           {isFrench ? 'Longitude' : 'Longitude'}
           <input type="number" step="any" min="-180" max="180" value={form.longitude} onChange={set('longitude')} placeholder={isFrench ? 'ex. 9.7679' : 'e.g. 9.7679'} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
         </label>
+        <label className="text-xs text-slate-500">
+          {isFrench ? 'Région' : 'Region'}
+          <input value={form.region} onChange={set('region')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+        </label>
+        <label className="text-xs text-slate-500">
+          Admin 2
+          <input value={form.admin2} onChange={set('admin2')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+        </label>
+        <label className="text-xs text-slate-500">
+          Admin 3
+          <input value={form.admin3} onChange={set('admin3')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+        </label>
       </div>
+      <label className="block text-xs text-slate-500">
+        {isFrench ? 'Commentaire' : 'Comment'}
+        <textarea rows={3} value={form.description} onChange={set('description')} className="mt-1 w-full rounded border px-2 py-1 text-sm" />
+      </label>
       {error && <p className="text-xs text-red-600">{error}</p>}
       <div className="flex gap-2">
         <button type="submit" disabled={saving} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
@@ -334,6 +363,8 @@ export default function EngagementDetail() {
   const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  // Vue du graphe de progression : « quarter » (trimestre) ou « year » (année).
+  const [progView, setProgView] = useState('quarter')
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['engagement', engagementId],
@@ -357,6 +388,18 @@ export default function EngagementDetail() {
     retry: false,
   })
   const parentName = master?.canonicalName || master?.name || null
+
+  // Appartenance aux initiatives (ESP 300, YCS) du peuple parent — affichée ici
+  // (déplacée depuis la fiche du peuple) sous forme de cases OUI/NON.
+  const { data: membership = { ESP300: false, YCS: false } } = useQuery({
+    queryKey: ['initiative-membership', masterId],
+    queryFn: async () => {
+      const res = await initiativesApi.membership(masterId)
+      return res?.data?.data || { ESP300: false, YCS: false }
+    },
+    enabled: !!masterId,
+    retry: false,
+  })
 
   const refresh = () => {
     // Refresh this page…
@@ -385,11 +428,13 @@ export default function EngagementDetail() {
   // stocké du peuple (eng.name) puis le nom du village.
   const peopleName = parentName || eng.name || ''
   const engagementName = engagementDisplayName(peopleName, eng.villageName, eng.name || (isFrench ? 'Engagement' : 'Engagement'))
-  const { label: stageLabel, colors } = dmmEngagementDisplay(eng, isFrench)
+  const { stage: dmmStage, label: stageLabel, colors } = dmmEngagementDisplay(eng, isFrench)
 
   // Niveau DMM (I–IV) d'après la génération max, selon le tableau DMM.
   const level = dmmLevelForEngagement(eng)
   const levelText = level ? dmmLevelLabel(level, isFrench) : '—'
+  // Jauge + grand libelle de la carte Statut = stade DMM de l'engagement (rang/4).
+  const dmmGaugeProgress = (dmmStage ? (STAGE_RANK[dmmStage] || 0) : 0) / 4
 
   const handleDelete = async () => {
     if (!window.confirm(isFrench ? 'Supprimer cet engagement ?' : 'Delete this engagement?')) return
@@ -427,22 +472,60 @@ export default function EngagementDetail() {
   const cumNewBaptisms = sumQ('newBaptisms', eng.newBaptisms)
   const cumTrainings = sumQ('trainingsHeld', eng.trainingsHeld)
 
-  // Progression du stade DMM (Pionnier → Mouvement) trimestre par trimestre.
-  // Chaque point : rang de stade (1–4) + nombre d'églises, trié par trimestre.
-  const progression = [...quarters]
-    .filter((q) => q && q.reportPeriod)
-    .sort((a, b) => quarterOrder(a.reportPeriod) - quarterOrder(b.reportPeriod))
-    .map((q) => {
-      const churches = Number(q.numberOfChurches) || 0
-      const stage = dmmStageFromChurches(churches) // null si 0 église
-      return {
-        label: q.reportPeriod,
-        churches,
-        generation: Number(q.churchGeneration) || 0,
-        stageRank: stage ? STAGE_RANK[stage] : 0,
-        stageLabel: stage ? dmmStageLabel(stage, isFrench) : (isFrench ? 'Non engagé' : 'Not engaged'),
+  // Transforme un rapport trimestriel (churches/generation) en un point de
+  // progression enrichi : rang de stade (0–4), niveau DMM (1–4) et libellés.
+  const buildPoint = (label, churches, generation) => {
+    const stage = dmmStageFromChurches(churches) // null si 0 église
+    const level = stage ? dmmLevelFromGeneration(generation, stage) : null
+    return {
+      label,
+      churches,
+      generation,
+      stage,
+      stageRank: stage ? STAGE_RANK[stage] : 0,
+      stageLabel: stage ? dmmStageLabel(stage, isFrench) : (isFrench ? 'Non engagé' : 'Not engaged'),
+      level: level || 0,
+      levelLabel: level ? dmmLevelLabel(level, isFrench) : '—',
+    }
+  }
+
+  // Vue TRIMESTRE : un point par rapport trimestriel, trié chronologiquement.
+  // NB : simple dérivation (pas un hook) pour que le nombre de hooks reste
+  // constant même après les retours anticipés de chargement/erreur ci-dessus.
+  const quarterPoints = (
+    [...quarters]
+      .filter((q) => q && q.reportPeriod)
+      .sort((a, b) => quarterOrder(a.reportPeriod) - quarterOrder(b.reportPeriod))
+      .map((q) => buildPoint(q.reportPeriod, Number(q.numberOfChurches) || 0, Number(q.churchGeneration) || 0))
+  )
+
+  // Vue ANNÉE : on agrège par année en gardant la valeur du trimestre LE PLUS
+  // RÉCENT de l'année (églises & génération sont des mesures d'ÉTAT, pas des
+  // flux → on ne somme pas). Chaque point est libellé « 2026 ».
+  const yearPoints = (() => {
+    const byYear = new Map()
+    for (const q of quarters) {
+      if (!q || !q.reportPeriod) continue
+      const ord = quarterOrder(q.reportPeriod)
+      if (ord < 0) continue
+      const year = Math.floor(ord / 4) // année*4+trimestre → année
+      const prev = byYear.get(year)
+      if (!prev || ord > prev.ord) {
+        byYear.set(year, {
+          ord,
+          churches: Number(q.numberOfChurches) || 0,
+          generation: Number(q.churchGeneration) || 0,
+        })
       }
-    })
+    }
+    return [...byYear.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([year, v]) => buildPoint(String(year), v.churches, v.generation))
+  })()
+
+  // Jeu de données courant selon la vue sélectionnée (trimestre par défaut).
+  const progression = progView === 'year' ? yearPoints : quarterPoints
+
   // Libellés d'axe Y pour les stades (0 = non engagé).
   const stageTick = (v) => {
     const map = {
@@ -454,6 +537,8 @@ export default function EngagementDetail() {
     }
     return map[v] ?? ''
   }
+  // Libellés d'axe Y pour les niveaux DMM (1–4 → I–IV).
+  const levelTick = (v) => (v >= 1 && v <= 4 ? dmmLevelLabel(v, isFrench).replace(/^.*\s/, '') : '')
 
   const stats = [
     { label: isFrench ? "# d'églises" : '# churches', value: fmt(eng.numberOfChurches ?? 0), accent: 'blue' },
@@ -537,15 +622,57 @@ export default function EngagementDetail() {
       {/* Carte HERO « Statut » (Joshua Project) alimentée par le peuple parent
           (overview.*). Repli gracieux sur « — » / le stade DMM si masterId est
           absent ou que le peuple parent n'a pas de données JP. */}
+      {/* mb-12 pour laisser la place au panneau de stats absolu (-bottom-10, pb-24)
+          sans qu'il soit rogné par la section suivante. */}
       <StatusHeroCard
+        className="mb-12"
         status={master?.overview?.status || stageLabel || eng.engagementStatus || null}
         jpScale={master?.overview?.jpScale ?? null}
         jpStage={master?.overview?.jpStage}
         description={master?.overview?.jpScaleDescription}
         evangelical={master?.overview?.percentEvangelical ?? null}
         leastReached={master?.overview?.leastReached ?? null}
+        evangelicalLabel="# churches"
+        jpScaleLabel="Max Gen"
+        leastReachedLabel="# New disciples"
+        evangelicalValue={fmt(eng.numberOfChurches ?? 0)}
+        jpScaleValue={fmt(eng.churchGeneration ?? 0)}
+        leastReachedValue={fmt(cumNewDisciples)}
+        statusOverride={stageLabel}
+        statusHexOverride={colors.hex}
+        gaugeProgressOverride={dmmGaugeProgress}
+        descriptionOverride={level ? levelText : ''}
         isFrench={isFrench}
       />
+
+      {/* Cases « Projets » : ESP 300 et YCS (déplacées depuis la fiche du peuple).
+          OUI (vert) et cliquable si le peuple parent est engagé dans le projet →
+          mène au projet et au détail de ce peuple dans le projet ; NON (rouge) sinon. */}
+      <div className="flex flex-wrap gap-3">
+        {[
+          { key: 'ESP300', projLabel: 'ESP 300' },
+          { key: 'YCS', projLabel: initiativeDisplayName('YCS', { isFrench }, 'YCS') },
+        ].map(({ key, projLabel }) => {
+          const engaged = !!membership[key]
+          const base = 'bg-white rounded-lg border border-neutral-200 px-3 py-2 w-36'
+          return (
+            <div key={key} className={base}>
+              <p className="text-[10.5px] font-bold leading-tight text-neutral-400">{initiativeDisplayName(key, { isFrench }, projLabel)}</p>
+              {engaged && masterId ? (
+                <Link
+                  to={`/initiatives/${key}/peoples/${masterId}`}
+                  className="mt-0.5 inline-flex items-center text-xl font-bold text-emerald-600 hover:text-emerald-700 hover:underline"
+                  title={isFrench ? `Voir le détail ${initiativeDisplayName(key, { isFrench }, projLabel)} de ce peuple` : `View this people's ${initiativeDisplayName(key, { isFrench }, projLabel)} detail`}
+                >
+                  {isFrench ? 'OUI' : 'YES'}
+                </Link>
+              ) : (
+                <p className="mt-0.5 text-xl font-bold text-red-600">{isFrench ? 'NON' : 'NO'}</p>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       {/* Carte Statut DMM : point + libellé colorés selon la règle du tableau,
           suivi du NIVEAU DMM (I–IV) déduit de la génération max. */}
@@ -582,20 +709,42 @@ export default function EngagementDetail() {
         </div>
       </section>
 
-      {/* ── Progression DMM (Pionnier → Mouvement) par trimestre ─────────────
+      {/* ── Progression DMM (Pionnier → Mouvement) — trimestre ou année ──────
           Trace, à partir de l'historique trimestriel accumulé, l'évolution du
-          stade DMM (axe gauche, Pionnier→Mouvement) et du nombre d'églises
-          (axe droit). Visualise le passage d'un peuple de Pionnier à Mouvement
-          au fil des trimestres. */}
+          stade DMM (axe gauche, Pionnier→Mouvement), du niveau DMM (I→IV) et du
+          nombre d'églises (axe droit). Une bascule permet d'agréger par année
+          (dernier trimestre connu de chaque année). Le tableau en-dessous
+          indique le passage d'un niveau/stade à l'autre (▲ / ▼). */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="mb-1 text-xl font-bold">
-          {isFrench ? "Progression de l'engagement" : 'Engagement progression'}
-        </h2>
-        <p className="mb-4 text-sm text-slate-400">
-          {isFrench
-            ? 'Évolution du stade DMM et du nombre d’églises, trimestre par trimestre.'
-            : 'DMM stage and number of churches, quarter by quarter.'}
-        </p>
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="mb-1 text-xl font-bold">
+              {isFrench ? "Progression de l'engagement" : 'Engagement progression'}
+            </h2>
+            <p className="text-sm text-slate-400">
+              {isFrench
+                ? 'Passage d’un stade (Pionnier → Mouvement) et d’un niveau (I → IV) au fil du temps, avec le nombre d’églises.'
+                : 'Stage (Pioneer → Movement) and level (I → IV) transitions over time, alongside the number of churches.'}
+            </p>
+          </div>
+          {/* Bascule Trimestre / Année (segmented control). */}
+          <div className="inline-flex shrink-0 rounded-lg border border-slate-200 p-0.5">
+            <button
+              type="button"
+              onClick={() => setProgView('quarter')}
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${progView === 'quarter' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              {isFrench ? 'Par trimestre' : 'By quarter'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setProgView('year')}
+              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${progView === 'year' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              {isFrench ? 'Par année' : 'By year'}
+            </button>
+          </div>
+        </div>
         {progression.length === 0 ? (
           <p className="py-8 text-center text-sm text-slate-400">
             {isFrench
@@ -603,63 +752,140 @@ export default function EngagementDetail() {
               : 'No quarterly history yet. Import quarterly data (the "Report period" column, e.g. 1Q26, 2Q26) to see progression.'}
           </p>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={progression} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+          <ResponsiveContainer width="100%" height={340}>
+            <ComposedChart data={progression} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              {/* Axe gauche : stade DMM (0–4). */}
+              {/* Axe gauche : stade DMM (0–4), libellés = noms des stades. */}
               <YAxis
                 yAxisId="stage"
                 domain={[0, 4]}
                 ticks={[0, 1, 2, 3, 4]}
                 tickFormatter={stageTick}
                 tick={{ fontSize: 10 }}
-                width={90}
+                width={95}
               />
               {/* Axe droit : nombre d'églises. */}
-              <YAxis yAxisId="churches" orientation="right" tick={{ fontSize: 11 }} />
+              <YAxis
+                yAxisId="churches"
+                orientation="right"
+                allowDecimals={false}
+                tick={{ fontSize: 11, fill: '#0ea5e9' }}
+                label={{ value: isFrench ? "Nombre d'églises" : 'Number of churches', angle: 90, position: 'insideRight', style: { fontSize: 11, fill: '#0ea5e9' } }}
+              />
+              {/* Axe droit secondaire : niveau DMM (I–IV), caché mais utilisé par la ligne Niveau. */}
+              <YAxis
+                yAxisId="level"
+                orientation="right"
+                domain={[0, 4]}
+                ticks={[1, 2, 3, 4]}
+                tickFormatter={levelTick}
+                tick={{ fontSize: 10, fill: '#db2777' }}
+                width={28}
+                axisLine={false}
+                tickLine={false}
+              />
               <Tooltip
-                formatter={(value, name, props) => {
-                  if (props?.dataKey === 'stageRank') return [props.payload.stageLabel, isFrench ? 'Stade DMM' : 'DMM stage']
-                  return [fmt(value), name]
+                content={({ active, payload }) => {
+                  if (!active || !payload || !payload.length) return null
+                  const p = payload[0].payload
+                  const col = dmmStageColors(p.stage)
+                  return (
+                    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow">
+                      <p className="mb-1 font-semibold text-slate-700">{p.label}</p>
+                      <p className="text-slate-600">{isFrench ? "# d'églises" : '# churches'} : <span className="font-semibold tabular-nums">{fmt(p.churches)}</span></p>
+                      <p className="text-slate-600">{isFrench ? 'Génération' : 'Generation'} : <span className="font-semibold tabular-nums">{fmt(p.generation)}</span></p>
+                      <p className="flex items-center gap-1.5 text-slate-600">
+                        {isFrench ? 'Stade' : 'Stage'} :
+                        <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: col.hex }} />
+                        <span className="font-semibold" style={{ color: col.hex }}>{p.stageLabel}</span>
+                      </p>
+                      <p className="text-slate-600">{isFrench ? 'Niveau' : 'Level'} : <span className="font-semibold">{p.levelLabel}</span></p>
+                    </div>
+                  )
                 }}
               />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              {/* Seuils de stade (34 / 67 / 100 églises) en repères légers. */}
+              {/* Seuils de stade (34 / 67 / 100 églises) sur l'axe des églises uniquement. */}
               <ReferenceLine yAxisId="churches" y={34} stroke="#eab308" strokeDasharray="2 4" />
               <ReferenceLine yAxisId="churches" y={67} stroke="#22c55e" strokeDasharray="2 4" />
               <ReferenceLine yAxisId="churches" y={100} stroke="#15803d" strokeDasharray="2 4" />
-              <Line yAxisId="stage" type="stepAfter" dataKey="stageRank" name={isFrench ? 'Stade DMM' : 'DMM stage'} stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} />
-              <Line yAxisId="churches" type="monotone" dataKey="churches" name={isFrench ? "# d'églises" : '# churches'} stroke="#0ea5e9" strokeWidth={2} dot={{ r: 3 }} />
-            </LineChart>
+              {/* Églises : aire remplie douce (axe droit). */}
+              <Area yAxisId="churches" type="monotone" dataKey="churches" name={isFrench ? "# d'églises" : '# churches'} stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.12} strokeWidth={2} />
+              {/* Stade DMM : ligne en escalier (passage Pionnier → Mouvement). */}
+              <Line
+                yAxisId="stage"
+                type="stepAfter"
+                dataKey="stageRank"
+                name={isFrench ? 'Stade DMM' : 'DMM stage'}
+                stroke="#6366f1"
+                strokeWidth={3}
+                dot={(props) => {
+                  const { cx, cy, payload } = props
+                  const col = dmmStageColors(payload.stage)
+                  return <circle key={`s-${payload.label}`} cx={cx} cy={cy} r={5} fill={col.hex} stroke="#fff" strokeWidth={1.5} />
+                }}
+              />
+              {/* Niveau DMM (I–IV) : ligne pointillée, propre échelle 1–4 (réutilise l'axe stade). */}
+              <Line
+                yAxisId="level"
+                type="stepAfter"
+                dataKey="level"
+                name={isFrench ? 'Niveau (I–IV)' : 'Level (I–IV)'}
+                stroke="#db2777"
+                strokeWidth={2}
+                strokeDasharray="5 4"
+                dot={{ r: 3, fill: '#db2777' }}
+              />
+            </ComposedChart>
           </ResponsiveContainer>
         )}
 
-        {/* Tableau d'historique trimestriel (chiffres par trimestre). */}
+        {/* Tableau d'évolution (par trimestre ou par année), avec indicateur de
+            changement de stade/niveau (▲ hausse / ▼ baisse) vs la période précédente. */}
         {progression.length > 0 && (
           <div className="mt-5 overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Trimestre' : 'Quarter'}</th>
-                  <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
+                  <th className="py-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{progView === 'year' ? (isFrench ? 'Année' : 'Year') : (isFrench ? 'Trimestre' : 'Quarter')}</th>
+                  <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# églises" : '# churches'}</th>
                   <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Génération' : 'Generation'}</th>
+                  <th className="py-2 px-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Niveau' : 'Level'}</th>
                   <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Stade' : 'Stage'}</th>
                 </tr>
               </thead>
               <tbody>
-                {progression.map((p) => {
-                  const stage = dmmStageFromChurches(p.churches)
-                  const col = dmmStageColors(stage)
+                {progression.map((p, i) => {
+                  const prev = i > 0 ? progression[i - 1] : null
+                  const col = dmmStageColors(p.stage)
+                  const levelBadge = dmmStageColors(p.stage).badge
+                  // Flèche de changement : compare au point précédent.
+                  const stageDelta = prev ? p.stageRank - prev.stageRank : 0
+                  const levelDelta = prev ? p.level - prev.level : 0
+                  const arrow = (delta) => {
+                    if (delta > 0) return <span className="font-bold text-green-600" title={isFrench ? 'En hausse' : 'Increased'}>▲</span>
+                    if (delta < 0) return <span className="font-bold text-red-600" title={isFrench ? 'En baisse' : 'Decreased'}>▼</span>
+                    return null
+                  }
                   return (
                     <tr key={p.label} className="border-b border-slate-100 last:border-0">
                       <td className="py-2 pr-4 font-medium text-slate-700">{p.label}</td>
                       <td className="py-2 px-4 text-right tabular-nums font-bold text-slate-700">{fmt(p.churches)}</td>
                       <td className="py-2 px-4 text-right tabular-nums text-slate-600">{fmt(p.generation)}</td>
+                      <td className="py-2 px-4">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-xs font-bold ${p.level ? levelBadge : 'bg-slate-100 text-slate-500'}`}>
+                            {p.level ? dmmLevelLabel(p.level, isFrench).replace(/^.*\s/, '') : '—'}
+                          </span>
+                          {arrow(levelDelta)}
+                        </span>
+                      </td>
                       <td className="py-2 pl-4">
                         <span className="inline-flex items-center gap-2">
                           <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: col.hex }} />
                           <span className="font-medium" style={{ color: col.hex }}>{p.stageLabel}</span>
+                          {arrow(stageDelta)}
                         </span>
                       </td>
                     </tr>

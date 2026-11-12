@@ -4,10 +4,13 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { reportingApi } from '../services/reportingApi'
 import { masterPeopleApi } from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import { PeopleForm } from '../components/admin/PeopleEngagementForms'
 import { StateLoading, StateError, StateEmpty, StatCard, StatusBadge } from './geography/geoComponents'
 import { metricCards } from './regions/ngMetrics'
 import { DmmStatusBadge } from '../components/DmmStatusBadge'
 import DmmProgressTable from '../components/Dashboard/DmmProgressTable'
+import DmmStageGauge from '../components/Dashboard/DmmStageGauge'
 import { dmmLevelForEngagement, dmmLevelLabel } from '../utils/dmmEngagement'
 import { jpStageFor } from '../utils/joshuaProjectScales'
 import { useLanguage } from '../i18n'
@@ -25,6 +28,9 @@ const CountryPeoples = () => {
   const { isFrench } = useLanguage()
   const { regionId, countryCode } = useParams()
   const [peoplesOpen, setPeoplesOpen] = useState(true)
+  const { user } = useAuth()
+  const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
+  const [editingPerson, setEditingPerson] = useState(null)
   const [engagementsOpen, setEngagementsOpen] = useState(true)
   const [showAllMetrics, setShowAllMetrics] = useState(false)
 
@@ -122,11 +128,40 @@ const CountryPeoples = () => {
       {/* Tableau DMM coloré (étape × niveau) — mêmes couleurs/structure que le
           Global Dashboard, mais avec les chiffres des engagements DE CE PAYS. */}
       <div className="border-t border-slate-200 mb-4" />
-      <DmmProgressTable
-        engagements={dmmEngagementsQuery.data || []}
-        isFrench={isFrench}
-        title={isFrench ? '#Peuples par Statut & Niveau' : '#people groups by stages & levels'}
-      />
+      {editingPerson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+            <PeopleForm
+              mode="edit"
+              isFrench={isFrench}
+              initial={{
+                canonicalName: editingPerson.canonicalName || '',
+                primaryCountryCode: editingPerson.primaryCountryCode || countryCode || '',
+              }}
+              onCancel={() => setEditingPerson(null)}
+              onSubmit={async (body) => {
+                await masterPeopleApi.updatePeople(editingPerson.masterPeopleId, body)
+                setEditingPerson(null)
+                peoplesQuery.refetch()
+              }}
+            />
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <DmmProgressTable
+            engagements={dmmEngagementsQuery.data || []}
+            isFrench={isFrench}
+            title={isFrench ? '#Peuples par Statut & Niveau' : '#people groups by stages & levels'}
+          />
+        </section>
+        <DmmStageGauge
+          engagements={dmmEngagementsQuery.data || []}
+          isFrench={isFrench}
+          title={isFrench ? 'Progression DMM' : 'DMM progression'}
+        />
+      </div>
 
       {/* Peuple en haut, Engagements en bas — deux sections repliables, même
           structure visuelle que le tableau Countries de la page Regions. */}
@@ -167,6 +202,7 @@ const CountryPeoples = () => {
                       <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? "# d'églises" : '# churches'}</th>
                       <th className="py-2 px-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Max Gen</th>
                       <th className="py-2 pl-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{isFrench ? 'Statut' : 'Status'}</th>
+                      {canManage && <th className="py-2 pl-4 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -193,6 +229,32 @@ const CountryPeoples = () => {
                           <td className="py-3 pl-4 text-left text-slate-700">
                             <StatusBadge status={`${jpStatus} (JP)`} />
                           </td>
+                          {canManage && (
+                            <td className="py-3 pl-4 text-right whitespace-nowrap">
+                              <button
+                                type="button"
+                                onClick={() => setEditingPerson(p)}
+                                className="mr-2 rounded border px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                              >
+                                {isFrench ? 'Modifier' : 'Edit'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (!window.confirm(isFrench ? 'Supprimer ce peuple ?' : 'Delete this people?')) return
+                                  try {
+                                    await masterPeopleApi.deletePeople(p.masterPeopleId)
+                                    peoplesQuery.refetch()
+                                  } catch (e) {
+                                    alert(e?.response?.data?.message || (isFrench ? 'Suppression impossible' : 'Delete failed'))
+                                  }
+                                }}
+                                className="rounded border border-red-200 px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                              >
+                                {isFrench ? 'Supprimer' : 'Delete'}
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       )
                     })}

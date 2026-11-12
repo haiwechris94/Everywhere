@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DmmProgressTable.jsx
  *
  * Petit tableau DMM coloré (ÉTAPES × NIVEAUX) reproduisant « TABLEAU DMM.docx ».
@@ -99,15 +99,15 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              <th className="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200">
+              <th className="py-2 px-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                 {isFrench ? 'Étapes' : 'Stages'}
               </th>
               {LEVELS.map((lvl) => (
-                <th key={lvl} className="py-2 px-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200">
+                <th key={lvl} className="py-2 px-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                   {isFrench ? 'Niveau' : 'Level'} {ROMAN[lvl]}
                 </th>
               ))}
-              <th className="py-2 px-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 border-b border-slate-200">
+              <th className="py-2 px-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                 Total
               </th>
             </tr>
@@ -117,9 +117,12 @@ const DmmProgressTable = ({ engagements = [], isFrench = true, title }) => {
               const color = STAGE_COLORS[stage]
               return (
                 <tr key={stage}>
-                  {/* Cellule d'étape : pas de fond, seul le mot est coloré. */}
+                  {/* Cellule d'étape : pas de fond, seul le mot est coloré, précédé d'un point. */}
                   <td className="py-1.5 px-2.5 text-xs font-semibold" style={{ color }}>
-                    <div>{stageLabels[stage]}</div>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />
+                      {stageLabels[stage]}
+                    </span>
                   </td>
                   {LEVELS.map((lvl) => {
                     const value = counts[stage][lvl]

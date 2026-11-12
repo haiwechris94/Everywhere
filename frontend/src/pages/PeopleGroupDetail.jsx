@@ -24,29 +24,26 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
 import StatusHeroCard from '../components/StatusHeroCard'
+import {
+  normalizeDmmStage,
+  dmmStageLabel,
+  dmmStageColors,
+} from '../utils/dmmEngagement'
 
-// Status labels
-const statusLabels = {
-  pioneer: 'Pioneer',
-  midway: 'Midway',
-  'tipping-point': 'Tipping Point',
-  dmm: 'DMM',
-}
-
-// Status colors - Updated to new color scheme
-const statusColors = {
-  pioneer: 'bg-yellow-500',
-  midway: 'bg-blue-500',
-  'tipping-point': 'bg-orange-500',
-  dmm: 'bg-green-500',
-}
-
-const statusBgColors = {
-  pioneer: 'bg-yellow-100 text-yellow-800',
-  midway: 'bg-blue-100 text-blue-800',
-  'tipping-point': 'bg-orange-100 text-orange-800',
-  dmm: 'bg-green-100 text-green-800',
-}
+// ── Statut d'ENGAGEMENT (vocabulaire DMM) ────────────────────────────────────
+// Un engagement DMM se mesure sur l'échelle DMM (Pionnier / Mi-parcours / Point
+// de Basculement / Mouvement) — à NE PAS confondre avec l'échelle Joshua Project
+// des PEUPLES. Les couleurs proviennent de la palette canonique unique
+// (utils/dmmEngagement.js) : Pionnier=orange, Mi-parcours=jaune,
+// Basculement=vert clair, Mouvement=vert foncé.
+//
+// Helpers de compatibilité : les enregistrements portent engagementStatus avec
+// les clés 'pioneer' | 'midway' | 'tipping-point' | 'dmm'. normalizeDmmStage()
+// convertit vers les clés canoniques ('pioneer'|'midway'|'tippingpoint'|'movement').
+const dmmLabelFor = (status, isFrench) => dmmStageLabel(normalizeDmmStage(status), isFrench)
+const dmmDotClassFor = (status) => dmmStageColors(normalizeDmmStage(status)).dot
+const dmmBadgeClassFor = (status) => dmmStageColors(normalizeDmmStage(status)).badge
+const dmmHexFor = (status) => dmmStageColors(normalizeDmmStage(status)).hex
 
 // Engagement level options
 const engagementLevelOptions = ['I', 'II', 'III', 'IV']
@@ -275,7 +272,8 @@ const PeopleGroupDetail = () => {
       {!isEditing && (
         <div className="mb-10">
           <StatusHeroCard
-            status={statusLabels[peopleGroup.engagementStatus] || peopleGroup.engagementStatus || null}
+            status={dmmLabelFor(peopleGroup.engagementStatus, isFrench) || peopleGroup.engagementStatus || null}
+            statusHexOverride={dmmHexFor(peopleGroup.engagementStatus)}
             jpScale={peopleGroup.jpScale ?? null}
             evangelical={peopleGroup.percentEvangelical ?? null}
             leastReached={peopleGroup.leastReached ?? null}
@@ -522,9 +520,9 @@ const PeopleGroupDetail = () => {
                     <TrendingUp size={24} className="text-primary-600" />
                     <div>
                       <p className="text-sm text-gray-500">{t('peopleMap.engagementStatus')}</p>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusBgColors[peopleGroup.engagementStatus]}`}>
-                        <span className={`w-2 h-2 rounded-full ${statusColors[peopleGroup.engagementStatus]}`}></span>
-                        {statusLabels[peopleGroup.engagementStatus]}
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${dmmBadgeClassFor(peopleGroup.engagementStatus)}`}>
+                        <span className={`w-2 h-2 rounded-full ${dmmDotClassFor(peopleGroup.engagementStatus)}`}></span>
+                        {dmmLabelFor(peopleGroup.engagementStatus, isFrench)}
                         {peopleGroup.engagementLevel && ` - Level ${peopleGroup.engagementLevel}`}
                       </span>
                     </div>
@@ -642,8 +640,8 @@ const PeopleGroupDetail = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusBgColors[entry.status] || 'bg-gray-100 text-gray-800'}`}>
-                          {statusLabels[entry.status] || entry.status}
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${dmmBadgeClassFor(entry.status) || 'bg-gray-100 text-gray-800'}`}>
+                          {dmmLabelFor(entry.status, isFrench) || entry.status}
                         </span>
                         {entry.percentage !== undefined && (
                           <span className="text-sm text-gray-500">{entry.percentage}%</span>

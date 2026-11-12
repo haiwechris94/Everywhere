@@ -19,6 +19,7 @@ import axios from 'axios'
 import { statsApi, villagesApi, activitiesApi, peopleGroupsApi, dashboardApi, masterPeopleApi } from '../../services/api'
 import SourceDonutChart from './SourceDonutChart'
 import DmmProgressTable from './DmmProgressTable'
+import DmmStageGauge from './DmmStageGauge'
 import { useLanguage } from '../../i18n'
 
 // Couleurs des statuts JP/IMB, identiques à Unified Map (STATUS_COLORS).
@@ -55,10 +56,10 @@ const C = {
 
 // ─── Engagement status constants ────────────────────────────────────────────
 const engagementStatusLabels = {
-  unreached: 'Not Started',
-  pioneer: 'Starting',
-  midway: 'Growing',
-  'tipping-point': 'Expanding',
+  unreached: 'Unreached',
+  pioneer: 'Pioneer',
+  midway: 'Midway',
+  'tipping-point': 'Tipping Point',
   dmm: 'Movement',
 }
 
@@ -66,7 +67,7 @@ const engagementStatusColors = {
   unreached: '#ef4444',
   pioneer: '#f97316',
   midway: '#eab308',
-  'tipping-point': '#22c55e',
+  'tipping-point': '#4ade80',
   dmm: '#15803d',
 }
 
@@ -516,18 +517,18 @@ const TopRegions = () => {
 // ════════════════════════════════════════════════════════════════════════════
 
 const STATUS_COLORS = {
-  unreached: '#EF4444',
-  pioneer: '#F59E0B',
-  midway: '#3B82F6',
-  'tipping-point': '#8B5CF6',
-  dmm: '#10B981',
+  unreached: '#ef4444',
+  pioneer: '#f97316',
+  midway: '#eab308',
+  'tipping-point': '#4ade80',
+  dmm: '#15803d',
 }
 
 const STATUS_LABELS_FR = {
   unreached: 'Non atteint',
   pioneer: 'Pionnier',
-  midway: 'En chemin',
-  'tipping-point': 'Point critique',
+  midway: 'Mi-parcours',
+  'tipping-point': 'Point de bascule',
   dmm: 'Mouvement DMM',
 }
 
@@ -536,9 +537,10 @@ const EngagementStatusPill = ({ status }) => {
   const label = STATUS_LABELS_FR[status] || status
   return (
     <span
-      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+      className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full"
       style={{ background: `${color}18`, color }}
     >
+      <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />
       {label}
     </span>
   )
@@ -1685,11 +1687,18 @@ const AnalyticsDashboard = () => {
         {/* ── Global DMM Engagements — tableau DMM coloré (étape × niveau) ──
             Source : couche carte /map/dmm-engagements (un point par engagement).
             Chiffres GLOBAUX réels. Couleurs = statuts DMM d'Unified Map. */}
-        <div className="mb-6 relative z-10">
-          <DmmProgressTable
+        <div className="mb-6 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <DmmProgressTable
+              engagements={dmmEngagements}
+              isFrench={isFrench}
+              title={isFrench ? 'Global DMM Engagements' : 'Global DMM Engagements'}
+            />
+          </section>
+          <DmmStageGauge
             engagements={dmmEngagements}
             isFrench={isFrench}
-            title={isFrench ? 'Global DMM Engagements' : 'Global DMM Engagements'}
+            title={isFrench ? 'Progression DMM' : 'DMM progression'}
           />
         </div>
 
@@ -1841,14 +1850,14 @@ const AnalyticsDashboard = () => {
                 unreached: '#ef4444',
                 pioneer: '#f97316',
                 midway: '#eab308',
-                'tipping-point': '#22c55e',
+                'tipping-point': '#4ade80',
                 dmm: '#15803d',
               }
               const donutLabels = {
                 unreached: 'Non-atteint',
                 pioneer: 'Pionnier',
                 midway: 'Mi-parcours',
-                'tipping-point': 'Basculement',
+                'tipping-point': 'Point de bascule',
                 dmm: 'Mouvement',
               }
               const total = raw?.reduce((s, d) => s + (d.count || 0), 0) || 0

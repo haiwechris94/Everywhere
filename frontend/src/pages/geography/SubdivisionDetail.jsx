@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SubdivisionDetail — Admin Level 3 detail.
  * Lists villages (Admin Level 4, leaf) + tabs scoped to this subdivision (admin3).
  */

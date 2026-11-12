@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+﻿import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { initiativesApi } from '../services/reportingApi'
@@ -67,8 +67,8 @@ const Initiatives = () => {
       {/* En-tête : même mise en forme que les pages Regions / Pays (petit libellé
           gris en gras au-dessus, grand titre slate-900 en dessous). */}
       <div>
-        <p className="text-sm font-bold text-gray-500">{isFrench ? 'Initiatives' : 'Initiatives'}</p>
-        <h1 className="text-4xl font-bold text-slate-900">{isFrench ? 'Initiatives' : 'Initiatives'}</h1>
+        <p className="text-sm font-bold text-gray-500 dark:text-slate-400">{isFrench ? 'Initiatives' : 'Initiatives'}</p>
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">{isFrench ? 'Initiatives' : 'Initiatives'}</h1>
       </div>
 
       {isLoading ? (
@@ -78,24 +78,24 @@ const Initiatives = () => {
       ) : initiatives.length === 0 ? (
         <StateEmpty label={isFrench ? 'Aucune initiative disponible.' : 'No initiative available.'} />
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="py-2 pr-4 text-right text-xs font-semibold tracking-wide text-slate-500 w-12">
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="py-2 pr-4 text-right text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400 w-12">
                     #
                   </th>
-                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500">
+                  <th className="py-2 px-4 text-left text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
                     {isFrench ? 'Nom' : 'Name'}
                   </th>
-                  <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500">
+                  <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
                     {isFrench ? 'Pays' : 'Countries'}
                   </th>
-                  <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500">
+                  <th className="py-2 px-4 text-right text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
                     {isFrench ? 'Peuples' : 'People groups'}
                   </th>
-                  <th className="py-2 pl-4 text-left text-xs font-semibold tracking-wide text-slate-500">
+                  <th className="py-2 pl-4 text-left text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
                     {isFrench ? 'Statut du projet' : 'Project Status'}
                   </th>
                 </tr>
@@ -104,7 +104,7 @@ const Initiatives = () => {
                 {initiatives.map((initiative, index) => (
                   <tr
                     key={initiative.key || initiative.name}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
+                    className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:bg-slate-900 transition-colors"
                   >
                     {/* Numéro de ligne : 1, 2, 3 … */}
                     <td className="py-3 pr-4 text-right tabular-nums text-slate-400">{index + 1}</td>
@@ -132,7 +132,7 @@ const Initiatives = () => {
                           {isFrench ? 'Actif' : 'Active'}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+                        <span className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                           {isFrench ? 'Inactif' : 'Inactive'}
                         </span>
                       )}

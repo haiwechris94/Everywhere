@@ -61,6 +61,9 @@ const EngagementDetail = lazy(() => import('./pages/EngagementDetail'))
 const PlanterEngagements = lazy(() => import('./pages/PlanterEngagements'))
 const DonorEngagements = lazy(() => import('./pages/DonorEngagements'))
 const Activities = lazy(() => import('./pages/Activities'))
+const PeopleGroupsList = lazy(() => import('./pages/PeopleGroupsList'))
+const EngagementsList = lazy(() => import('./pages/EngagementsList'))
+const PersonsList = lazy(() => import('./pages/PersonsList'))
 
 const NOTION_ACTIVITE_URL = 'https://reminiscent-acapella-740.notion.site/EVERYWHERE-2a3ec55e01df8007bfc3fc19d481d3fc'
 
@@ -348,6 +351,24 @@ function App() {
             </ErrorBoundary>
           } />
           
+          {/* People Groups / Engagements / Persons - global list pages */}
+          <Route path="people-groups" element={
+            <Suspense fallback={<CompactLoader />}>
+              <PeopleGroupsList />
+            </Suspense>
+          } />
+          <Route path="engagements" element={
+            <Suspense fallback={<CompactLoader />}>
+              <EngagementsList />
+            </Suspense>
+          } />
+          <Route path="persons" element={
+            <Suspense fallback={<CompactLoader />}>
+              <PersonsList />
+            </Suspense>
+          } />
+          <Route path="peoples" element={<Navigate to="/people-groups" replace />} />
+
           {/* Admin Routes - Admin-only access */}
           <Route path="admin/users" element={
             <AdminRoute>

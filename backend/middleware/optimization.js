@@ -204,7 +204,7 @@ function rateLimitMiddleware(options = {}) {
 function queryProtectionMiddleware(options = {}) {
   const {
     protectedRoutes = ['/api/people-groups', '/api/villages', '/api/churches'],
-    maxLimit = 500,
+    maxLimit = 1000,
     requireFilter = false
   } = options;
   

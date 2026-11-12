@@ -1,0 +1,66 @@
+$kind: http-request
+name: Merge Master People (Batch)
+method: POST
+url: '{{baseUrl}}/api/master-people/merge-batch?dryRun=true'
+order: 2000
+headers:
+  - key: Authorization
+    value: 'Bearer {{token}}'
+  - key: Content-Type
+    value: application/json
+queryParams:
+  - key: dryRun
+    value: 'true'
+    description: 'Set to "true" to preview all merges without writing. Remove/disable to actually merge.'
+body:
+  type: json
+  content: |-
+    {
+      "pairs": [
+        { "survivorId": "{{survivorId}}", "loserIds": ["{{loserId}}"] }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      // Runs many merges in sequence. Accepts { pairs: [...] } (shown here) or the
+      // exact JSON printed by scripts/findDuplicateMasterPeople.js --json
+      // ({ candidates: [...] }). Each pair is isolated: one failure does not abort
+      // the rest. HTTP 200 when all succeed, 207 (Multi-Status) on partial failure.
+      const isDryRun = pm.request.url.query.has('dryRun')
+        && pm.request.url.query.get('dryRun') === 'true';
+
+      pm.test('Status is 200 or 207', function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 207]);
+      });
+
+      const json = pm.response.json();
+
+      pm.test('aggregate counts are consistent', function () {
+        pm.expect(json.total).to.be.a('number');
+        pm.expect(json.results).to.be.an('array').with.lengthOf(json.total);
+        pm.expect(json.succeeded + json.failed).to.eql(json.total);
+      });
+
+      pm.test('success flag matches failed count', function () {
+        pm.expect(json.success).to.eql(json.failed === 0);
+      });
+
+      pm.test('HTTP 207 iff at least one pair failed', function () {
+        if (json.failed > 0) pm.expect(pm.response.code).to.eql(207);
+        else pm.expect(pm.response.code).to.eql(200);
+      });
+
+      pm.test('each result row has an index and a status', function () {
+        json.results.forEach(function (r, i) {
+          pm.expect(r.index).to.eql(i);
+          pm.expect(r.status).to.be.oneOf(['merged', 'preview', 'failed', 'error']);
+        });
+      });
+
+      if (isDryRun) {
+        pm.test('dryRun flagged on the aggregate', function () {
+          pm.expect(json.dryRun).to.eql(true);
+        });
+      }

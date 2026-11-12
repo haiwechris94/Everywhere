@@ -357,6 +357,21 @@ export const peopleGroupsApi = {
   create: (data) => api.post('/api/people-groups', data),
   update: (id, data) => api.put(`/api/people-groups/${id}`, data),
   delete: (id) => api.delete(`/api/people-groups/${id}`),
+
+  /**
+   * Archive a people group (soft-delete). Admin/supervisor only.
+   * @param {string} id - People group ID
+   * @returns {Promise} Archived people group
+   */
+  archive: (id) => api.patch(`/api/people-groups/${id}/archive`),
+
+  /**
+   * Unarchive a previously archived people group. Admin/supervisor only.
+   * @param {string} id - People group ID
+   * @returns {Promise} Unarchived people group
+   */
+  unarchive: (id) => api.patch(`/api/people-groups/${id}/unarchive`),
+
   getNearby: (lng, lat, maxDistance) =>
     api.get(`/api/people-groups/nearby/${lng}/${lat}?maxDistance=${maxDistance}`),
   getStats: () => api.get('/api/people-groups/stats/summary'),
@@ -901,6 +916,10 @@ export const masterPeopleApi = {
   addVillage: (id, data) => api.post(`/api/master-people/${id}/villages`, data),
   updateVillage: (id, villageId, data) => api.put(`/api/master-people/${id}/villages/${villageId}`, data),
   deleteVillage: (id, villageId) => api.delete(`/api/master-people/${id}/villages/${villageId}`),
+  // Création / modification d'un peuple (MasterPeople) — réservé admin/superviseur.
+  createPeople: (data) => api.post('/api/master-people', data),
+  updatePeople: (id, data) => api.patch(`/api/master-people/${id}`, data),
+  deletePeople: (id) => api.delete(`/api/master-people/${id}`),
   recomputeRollups: () => api.post('/api/master-people/recompute-rollups'),
   getAll: (params) => api.get('/api/master-people', { params }),
   getById: (id) => api.get(`/api/master-people/${id}`),
@@ -914,10 +933,10 @@ export const masterPeopleApi = {
 }
 
 // ============================================
-// DMM Pillars API â€” Persons of Peace, Discovery Groups, DBS, iGROW Coaching, Reporting
+// DMM Pillars API — Persons of Peace, Discovery Groups, DBS, iGROW Coaching, Reporting
 // ============================================
 
-// Pilier â‘  / carte â€” Personnes de paix
+// Pilier ① / carte — Personnes de paix
 export const personsOfPeaceApi = {
   list: (params) => api.get('/api/persons-of-peace', { params }),
   get: (id) => api.get(`/api/persons-of-peace/${id}`),
@@ -926,7 +945,7 @@ export const personsOfPeaceApi = {
   remove: (id) => api.delete(`/api/persons-of-peace/${id}`),
 }
 
-// Pilier â‘¢ â€” Groupes de dÃ©couverte (DBS)
+// Pilier ③ — Groupes de découverte (DBS)
 export const discoveryGroupsApi = {
   list: (params) => api.get('/api/discovery-groups', { params }),
   get: (id) => api.get(`/api/discovery-groups/${id}`),
@@ -936,7 +955,7 @@ export const discoveryGroupsApi = {
   remove: (id) => api.delete(`/api/discovery-groups/${id}`),
 }
 
-// Pilier â‘¢ â€” Sessions DBS (Ã©tude 3 colonnes)
+// Pilier ③ — Sessions DBS (étude 3 colonnes)
 export const dbsSessionsApi = {
   list: (params) => api.get('/api/dbs-sessions', { params }),
   get: (id) => api.get(`/api/dbs-sessions/${id}`),
@@ -945,7 +964,7 @@ export const dbsSessionsApi = {
   remove: (id) => api.delete(`/api/dbs-sessions/${id}`),
 }
 
-// Pilier â‘¡ â€” Coaching iGROW
+// Pilier ② — Coaching iGROW
 export const coachingSessionsApi = {
   list: (params) => api.get('/api/coaching-sessions', { params }),
   get: (id) => api.get(`/api/coaching-sessions/${id}`),
@@ -955,7 +974,7 @@ export const coachingSessionsApi = {
   remove: (id) => api.delete(`/api/coaching-sessions/${id}`),
 }
 
-// Pilier â‘£ â€” Reporting (format numÃ©rique Cityteam)
+// Pilier ④ — Reporting (format numérique Cityteam)
 export const reportingApi = {
   numerical: (params) => api.get('/api/reporting/numerical', { params }),
   quarterly: (params) => api.get('/api/reporting/quarterly', { params }),

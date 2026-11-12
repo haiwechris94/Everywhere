@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { peopleGroupsApi } from '../services/api'
@@ -108,8 +108,8 @@ const PendingValidations = () => {
         <div className="text-red-500 mb-4">
           <AlertTriangle size={48} className="mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">{t('validation.loadError')}</h3>
-        <p className="text-gray-500 mt-2">{error.response?.data?.message || t('validation.loadErrorDesc')}</p>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('validation.loadError')}</h3>
+        <p className="text-gray-500 dark:text-slate-400 mt-2">{error.response?.data?.message || t('validation.loadErrorDesc')}</p>
         <button
           onClick={() => navigate('/activities')}
           className="btn-secondary mt-4"
@@ -128,18 +128,18 @@ const PendingValidations = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/activities')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-lg transition-colors"
           >
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">{t('validation.title')}</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-100">{t('validation.title')}</h1>
+            <p className="text-gray-500 dark:text-slate-400 mt-1">
               {t('validation.totalPending').replace('{count}', total)}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
           <Clock size={16} />
           <span>{t('validation.awaitingReview')}</span>
         </div>
@@ -151,19 +151,19 @@ const PendingValidations = () => {
           {pendingItems.map((item) => (
             <div
               key={item._id}
-              className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700"
             >
               <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                 {/* Main Info */}
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-100">{item.name}</h3>
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[item.engagementStatus] || statusColors.unreached}`}>
                       {t(`peopleMap.status.${item.engagementStatus}`) || item.engagementStatus}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600 dark:text-slate-400">
                     {/* Village */}
                     <div className="flex items-center gap-2">
                       <MapPin size={16} className="text-gray-400" />
@@ -207,7 +207,7 @@ const PendingValidations = () => {
 
                   {/* Description */}
                   {item.description && (
-                    <p className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg line-clamp-2">
+                    <p className="mt-3 text-sm text-gray-600 dark:text-slate-400 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg line-clamp-2">
                       {item.description}
                     </p>
                   )}
@@ -283,10 +283,10 @@ const PendingValidations = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-12 text-center">
           <CheckCircle size={48} className="mx-auto text-green-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">{t('validation.empty.title')}</h3>
-          <p className="text-gray-500 mt-2">{t('validation.empty.description')}</p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{t('validation.empty.title')}</h3>
+          <p className="text-gray-500 dark:text-slate-400 mt-2">{t('validation.empty.description')}</p>
           <button
             onClick={() => navigate('/activities')}
             className="btn-primary mt-4"
