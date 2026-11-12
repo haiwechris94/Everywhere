@@ -301,14 +301,14 @@ const HierarchicalTable = () => {
             Page {data.pagination.page} sur {data.pagination.totalPages} ({data.pagination.total} éléments)
           </div>
           <div className="flex gap-2">
-            <button
+            <button aria-label={isFrench ? "Précédent" : "Previous"}
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
               className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button
+            <button aria-label={isFrench ? "Suivant" : "Next"}
               onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
               disabled={page >= data.pagination.totalPages}
               className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900"

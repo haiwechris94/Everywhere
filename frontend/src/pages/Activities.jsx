@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { activitiesApi, villagesApi, churchesApi, peopleGroupsApi } from '../services/api'
@@ -144,6 +145,7 @@ const Activities = () => {
   const [dateTo, setDateTo] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const addDialogRef = useDialog(showAddModal, () => setShowAddModal(false))
   const [showArchived, setShowArchived] = useState(false)
   const [newActivity, setNewActivity] = useState({
     type: 'evangelism',
@@ -513,8 +515,9 @@ const Activities = () => {
           <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-slate-700 animate-fade-in">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.village')}</label>
+                <label htmlFor="activities-village" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.village')}</label>
                 <select
+                  id="activities-village"
                   value={villageFilter}
                   onChange={(e) => setVillageFilter(e.target.value)}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
@@ -526,8 +529,9 @@ const Activities = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.church')}</label>
+                <label htmlFor="activities-church" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.labels.church')}</label>
                 <select
+                  id="activities-church"
                   value={churchFilter}
                   onChange={(e) => setChurchFilter(e.target.value)}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
@@ -539,8 +543,9 @@ const Activities = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateFrom')}</label>
+                <label htmlFor="activities-datefrom" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateFrom')}</label>
                 <input
+                  id="activities-datefrom"
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
@@ -548,8 +553,9 @@ const Activities = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateTo')}</label>
+                <label htmlFor="activities-dateto" className="block text-sm font-medium text-gray-700 mb-2">{t('activities.filters.dateTo')}</label>
                 <input
+                  id="activities-dateto"
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
@@ -657,7 +663,7 @@ const Activities = () => {
                           {format(new Date(activity.createdAt), 'HH:mm')}
                         </span>
                       )}
-                      <button
+                      <button aria-label={activity.archived ? t('activities.unarchive') : t('activities.archive')}
                         onClick={() => handleArchive(activity._id, activity.archived)}
                         disabled={archiveMutation.isLoading}
                         className={`p-2 rounded-lg transition-all ${
@@ -701,7 +707,7 @@ const Activities = () => {
       )}
 
       {/* Floating Add Button (Mobile) */}
-      <button
+      <button aria-label={t('activities.newActivity')}
         onClick={() => setShowAddModal(true)}
         className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-gray-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:scale-110 transition-all"
       >
@@ -711,7 +717,7 @@ const Activities = () => {
       {/* Add Activity Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
+          <div ref={addDialogRef} className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in">
             {/* Modal Header */}
             <div className="border-b border-gray-200 dark:border-slate-700 px-6 py-5 rounded-t-2xl">
               <div className="flex items-center justify-between">
@@ -719,7 +725,7 @@ const Activities = () => {
                   <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">{t('activities.newActivity')}</h3>
                   <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">{t('activities.addActivityDesc') || 'Enregistrez une nouvelle activité'}</p>
                 </div>
-                <button 
+                <button aria-label={t('common.close')} 
                   onClick={resetForm} 
                   className="p-2 hover:bg-white dark:bg-slate-800/20 rounded-lg transition-colors"
                 >
@@ -731,10 +737,11 @@ const Activities = () => {
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-activitytype" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('activities.labels.activityType')} <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="activities-activitytype"
                   value={newActivity.type}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, type: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
@@ -747,10 +754,11 @@ const Activities = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-description" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('activities.labels.description')} <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  id="activities-description"
                   value={newActivity.description}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, description: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
@@ -762,10 +770,11 @@ const Activities = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="activities-date" className="block text-sm font-semibold text-gray-700 mb-2">
                     {t('activities.labels.date')} <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="activities-date"
                     type="date"
                     value={newActivity.date}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, date: e.target.value }))}
@@ -774,10 +783,11 @@ const Activities = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label htmlFor="activities-participants" className="block text-sm font-semibold text-gray-700 mb-2">
                     {t('activities.labels.participants')}
                   </label>
                   <input
+                    id="activities-participants"
                     type="number"
                     value={newActivity.participants}
                     onChange={(e) => setNewActivity((prev) => ({ ...prev, participants: e.target.value }))}
@@ -789,10 +799,11 @@ const Activities = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-village-2" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('activities.labels.village')}
                 </label>
                 <select
+                  id="activities-village-2"
                   value={newActivity.village}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, village: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
@@ -805,10 +816,11 @@ const Activities = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-church-2" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('activities.labels.church')}
                 </label>
                 <select
+                  id="activities-church-2"
                   value={newActivity.church}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, church: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
@@ -821,10 +833,11 @@ const Activities = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="activities-notes" className="block text-sm font-semibold text-gray-700 mb-2">
                   {t('activities.labels.notes')}
                 </label>
                 <textarea
+                  id="activities-notes"
                   value={newActivity.notes}
                   onChange={(e) => setNewActivity((prev) => ({ ...prev, notes: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none"
@@ -841,10 +854,11 @@ const Activities = () => {
                     {t('activities.coaching.title') || 'Détails du coaching iGROW'}
                   </h4>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-conversationwith" className="block text-sm font-medium text-gray-700 mb-2">
                       {t('activities.coaching.conversationWith') || 'Conversation avec'}
                     </label>
                     <select
+                      id="activities-conversationwith"
                       value={newActivity.coachingDetails.conversationWith}
                       onChange={(e) => setNewActivity((prev) => ({
                         ...prev,
@@ -859,10 +873,11 @@ const Activities = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-theme" className="block text-sm font-medium text-gray-700 mb-2">
                       {t('activities.coaching.theme') || 'Thème de la conversation'}
                     </label>
                     <input
+                      id="activities-theme"
                       type="text"
                       value={newActivity.coachingDetails.conversationTheme}
                       onChange={(e) => setNewActivity((prev) => ({
@@ -874,10 +889,11 @@ const Activities = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="activities-duration" className="block text-sm font-medium text-gray-700 mb-2">
                       {t('activities.coaching.duration') || 'Durée (minutes)'}
                     </label>
                     <input
+                      id="activities-duration"
                       type="number"
                       value={newActivity.coachingDetails.duration}
                       onChange={(e) => setNewActivity((prev) => ({

@@ -176,10 +176,10 @@ const DataExport = () => {
       </h2>
 
       {/* Export Type Selection */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="mb-6" role="radiogroup" aria-labelledby="data-export-type-label">
+        <span id="data-export-type-label" className="block text-sm font-medium text-gray-700 mb-2">
           Export Type
-        </label>
+        </span>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -208,11 +208,13 @@ const DataExport = () => {
 
       {/* Format Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <span id="data-export-format-label" className="block text-sm font-medium text-gray-700 mb-2">
           Format
-        </label>
-        <div className="flex gap-4">
+        </span>
+        <div className="flex gap-4" role="group" aria-labelledby="data-export-format-label">
           <button
+            type="button"
+            aria-pressed={format === 'json'}
             onClick={() => setFormat('json')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
               format === 'json'
@@ -224,6 +226,8 @@ const DataExport = () => {
             JSON
           </button>
           <button
+            type="button"
+            aria-pressed={format === 'csv'}
             onClick={() => setFormat('csv')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
               format === 'csv'
@@ -241,9 +245,9 @@ const DataExport = () => {
       {exportType === 'selected' && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <span id="data-export-villages-label" className="block text-sm font-medium text-gray-700">
               Select Villages ({selectedVillages.length} selected)
-            </label>
+            </span>
             <button
               onClick={handleSelectAll}
               className="text-sm text-primary-600 hover:underline"
@@ -265,6 +269,10 @@ const DataExport = () => {
                     className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
                   >
                     <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={selectedVillages.includes(village._id)}
+                      aria-label={village.name}
                       onClick={() => handleVillageToggle(village._id)}
                       className="text-gray-500 hover:text-primary-600"
                     >
@@ -290,14 +298,15 @@ const DataExport = () => {
 
       {/* Source Filter (applies to "Export People Groups Only") */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <span id="data-export-source-label" className="block text-sm font-medium text-gray-700 mb-2">
           Filter People Groups by Source <span className="text-gray-400 font-normal">(optional — empty = all sources)</span>
-        </label>
-        <div className="flex flex-wrap gap-2">
+        </span>
+        <div className="flex flex-wrap gap-2" role="group" aria-labelledby="data-export-source-label">
           {SOURCE_OPTIONS.map((src) => (
             <button
               key={src.value}
               type="button"
+              aria-pressed={selectedSources.includes(src.value)}
               onClick={() => handleSourceToggle(src.value)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 text-sm transition-colors ${
                 selectedSources.includes(src.value)

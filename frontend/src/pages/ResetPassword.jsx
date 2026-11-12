@@ -204,7 +204,7 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* New Password */}
           <div>
-            <label className="form-label">
+            <label htmlFor="reset-password-newpassword" className="form-label">
               {t('resetPassword.newPassword') || 'New Password'}
             </label>
             <div className="relative">
@@ -213,6 +213,7 @@ const ResetPassword = () => {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="reset-password-newpassword"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password', {
                   required: t('validation.passwordRequired') || 'Password is required',
@@ -224,7 +225,7 @@ const ResetPassword = () => {
                 className="form-input pl-10 pr-10"
                 placeholder="••••••••"
               />
-              <button
+              <button aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -239,7 +240,7 @@ const ResetPassword = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="form-label">
+            <label htmlFor="reset-password-confirmpassword" className="form-label">
               {t('resetPassword.confirmPassword') || 'Confirm Password'}
             </label>
             <div className="relative">
@@ -248,6 +249,7 @@ const ResetPassword = () => {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="reset-password-confirmpassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 {...register('confirmPassword', {
                   required: t('validation.confirmRequired') || 'Please confirm your password',
@@ -259,7 +261,7 @@ const ResetPassword = () => {
                 className="form-input pl-10 pr-10"
                 placeholder="••••••••"
               />
-              <button
+              <button aria-label={showConfirmPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"

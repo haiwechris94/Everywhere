@@ -11,6 +11,7 @@
  * Admin-only access
  */
 import { useState, useEffect, useCallback } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import toast from 'react-hot-toast'
@@ -76,6 +77,7 @@ const StatusBadge = ({ isActive }) => {
 
 // Confirmation Modal Component
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText, isDestructive = false, isLoading = false }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const { isFrench } = useLanguage()
   if (!isOpen) return null
   
@@ -83,7 +85,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
           <div className="flex items-start gap-4">
             <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
               isDestructive ? 'bg-red-100' : 'bg-yellow-100'
@@ -124,6 +126,8 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText,
 
 // User Detail Modal Component (info + login history + change password)
 const UserDetailModal = ({ isOpen, userId, onClose }) => {
+  // handleClose is declared below; the callback only runs after render
+  const dialogRef = useDialog(isOpen, () => handleClose())
   const { isFrench } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
@@ -244,13 +248,13 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
-        <div className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <UserCircle className="text-primary-600" size={22} />
               {isFrench ? "Détails de l'utilisateur" : 'User Details'}
             </h3>
-            <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={handleClose} className="text-gray-400 hover:text-gray-600">
               <X size={20} />
             </button>
           </div>
@@ -412,6 +416,7 @@ const UserDetailModal = ({ isOpen, userId, onClose }) => {
 
 // Create User Modal Component
 const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -449,10 +454,10 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+        <div ref={dialogRef} className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">{isFrench ? 'Créer un utilisateur' : 'Create a user'}</h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X size={20} />
             </button>
           </div>
@@ -465,8 +470,9 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Nom *' : 'Name *'}</label>
+              <label htmlFor="admin-users-name" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Nom *' : 'Name *'}</label>
               <input
+                id="admin-users-name"
                 type="text"
                 required
                 value={formData.name}
@@ -477,8 +483,9 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <label htmlFor="admin-users-email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
               <input
+                id="admin-users-email"
                 type="email"
                 required
                 value={formData.email}
@@ -489,8 +496,9 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Mot de passe *' : 'Password *'}</label>
+              <label htmlFor="admin-users-password" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Mot de passe *' : 'Password *'}</label>
               <input
+                id="admin-users-password"
                 type="password"
                 required
                 minLength={6}
@@ -502,8 +510,9 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Rôle *' : 'Role *'}</label>
+              <label htmlFor="admin-users-role" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Rôle *' : 'Role *'}</label>
               <select
+                id="admin-users-role"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
@@ -516,8 +525,9 @@ const CreateUserModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Organisation' : 'Organization'}</label>
+              <label htmlFor="admin-users-organization" className="block text-sm font-medium text-gray-700 mb-1">{isFrench ? 'Organisation' : 'Organization'}</label>
               <input
+                id="admin-users-organization"
                 type="text"
                 value={formData.organizationName}
                 onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
@@ -734,7 +744,7 @@ const AdminUsers = () => {
           </select>
           
           {/* Refresh */}
-          <button
+          <button aria-label={isFrench ? 'Actualiser' : 'Refresh'}
             onClick={fetchUsers}
             disabled={loading}
             className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -830,7 +840,7 @@ const AdminUsers = () => {
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-end gap-2">
                         {/* Toggle active button */}
-                        <button
+                        <button aria-label={user.isActive !== false ? (isFrench ? 'Bloquer' : 'Block') : (isFrench ? 'Débloquer' : 'Unblock')}
                           onClick={() => setConfirmModal({
                             isOpen: true,
                             type: 'toggle',
@@ -850,7 +860,7 @@ const AdminUsers = () => {
                         </button>
                         
                         {/* Delete button */}
-                        <button
+                        <button aria-label={isFrench ? 'Supprimer' : 'Delete'}
                           onClick={() => setConfirmModal({
                             isOpen: true,
                             type: 'delete',
@@ -889,14 +899,14 @@ const AdminUsers = () => {
                 Page {page} sur {totalPages}
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <button aria-label={t('common.previous')}
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft size={18} />
                 </button>
-                <button
+                <button aria-label={t('common.next')}
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="p-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"

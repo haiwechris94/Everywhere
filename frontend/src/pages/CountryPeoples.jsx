@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronRight } from 'lucide-react'
@@ -31,6 +32,7 @@ const CountryPeoples = () => {
   const { user } = useAuth()
   const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [editingPerson, setEditingPerson] = useState(null)
+  const editDialogRef = useDialog(!!editingPerson, () => setEditingPerson(null))
   const [engagementsOpen, setEngagementsOpen] = useState(true)
   const [showAllMetrics, setShowAllMetrics] = useState(false)
 
@@ -130,7 +132,7 @@ const CountryPeoples = () => {
       <div className="border-t border-slate-200 mb-4" />
       {editingPerson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
             <PeopleForm
               mode="edit"
               isFrench={isFrench}

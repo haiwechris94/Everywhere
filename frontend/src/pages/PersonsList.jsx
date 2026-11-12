@@ -6,7 +6,8 @@
  * Filterable by role, country and administrative levels. Admin/supervisor
  * users can add, edit and (reversibly) archive persons.
  */
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { Search, Plus, Pencil, Archive, ArchiveRestore, X } from 'lucide-react'
@@ -74,6 +75,7 @@ const PersonsList = () => {
   const [fAdmin2, setFAdmin2] = useState('')
   const [fAdmin3, setFAdmin3] = useState('')
   const [formOpen, setFormOpen] = useState(false)
+  const formDialogRef = useDialog(formOpen, () => setFormOpen(false))
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyForm)
 
@@ -393,12 +395,12 @@ const PersonsList = () => {
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-neutral-900">
                 {editing ? (isFrench ? 'Modifier la personne' : 'Edit person') : isFrench ? 'Ajouter une personne' : 'Add person'}
               </h2>
-              <button type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
                 <X size={18} />
               </button>
             </div>
@@ -415,8 +417,8 @@ const PersonsList = () => {
             >
               <Field label={isFrench ? 'Nom *' : 'Name *'} value={form.name} onChange={onField('name')} />
               <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Rôle *' : 'Role *'}</label>
-                <select value={form.role} onChange={onField('role')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
+                <label htmlFor="persons-list-role" className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Rôle *' : 'Role *'}</label>
+                <select id="persons-list-role" value={form.role} onChange={onField('role')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
                   {ROLE_VALUES.map((r) => (
                     <option key={r} value={r}>
                       {roleLabel(r, isFrench)}
@@ -433,8 +435,8 @@ const PersonsList = () => {
               <Field label="Admin 2" value={form.admin2} onChange={onField('admin2')} />
               <Field label="Admin 3" value={form.admin3} onChange={onField('admin3')} />
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs font-medium text-neutral-600">Notes</label>
-                <textarea value={form.notes} onChange={onField('notes')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+                <label htmlFor="persons-list-notes" className="mb-1 block text-xs font-medium text-neutral-600">Notes</label>
+                <textarea id="persons-list-notes" value={form.notes} onChange={onField('notes')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
               </div>
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
                 <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100">
@@ -452,11 +454,14 @@ const PersonsList = () => {
   )
 }
 
-const Field = ({ label, value, onChange, type = 'text' }) => (
-  <div>
-    <label className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
-    <input type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-  </div>
-)
+const Field = ({ label, value, onChange, type = 'text' }) => {
+  const id = useId()
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
+      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+  )
+}
 
 export default PersonsList

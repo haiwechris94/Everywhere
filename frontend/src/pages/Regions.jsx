@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { reportingApi, regionAdminApi } from '../services/reportingApi'
@@ -14,6 +15,7 @@ const Regions = () => {
   const canManage = !!user && (user.role === 'admin' || user.role === 'supervisor')
   const [creating, setCreating] = useState(false)
   const [editRegion, setEditRegion] = useState(null)
+  const editDialogRef = useDialog(!!editRegion, () => setEditRegion(null))
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['ng-regions'],
@@ -96,7 +98,7 @@ const Regions = () => {
 
       {editRegion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
             <RegionForm
               mode="edit"
               initial={editRegion}

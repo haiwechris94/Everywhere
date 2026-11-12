@@ -199,11 +199,12 @@ const PeopleGroupImport = ({ onSuccess }) => {
 
       {/* File Upload */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="people-group-import-select-csv-file" className="block text-sm font-medium text-gray-700 mb-2">
           {isFrench ? 'Sélectionner un fichier CSV' : 'Select CSV File'}
         </label>
         <div className="flex items-center gap-4">
           <input
+            id="people-group-import-select-csv-file"
             ref={fileInputRef}
             type="file"
             accept=".csv,text/csv,application/csv"
@@ -211,7 +212,7 @@ const PeopleGroupImport = ({ onSuccess }) => {
             className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
           />
           {file && (
-            <button
+            <button aria-label={isFrench ? 'Effacer la sélection' : 'Clear selection'}
               onClick={resetForm}
               className="text-gray-500 hover:text-gray-700"
               title={isFrench ? 'Effacer la sélection' : 'Clear selection'}

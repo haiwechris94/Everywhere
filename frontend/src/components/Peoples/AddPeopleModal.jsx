@@ -3,6 +3,7 @@
  * Modal form for adding new peoples/population data
  */
 import { useState, useEffect, useCallback } from 'react'
+import { useDialog } from '../ui/useDialog'
 import { useAuth } from '../../context/AuthContext'
 import { peoplesApi } from '../../services/peoplesApi'
 import { villagesApi } from '../../services/api'
@@ -79,6 +80,7 @@ const COUNTRY_OPTIONS = Object.values(SUPPORTED_COUNTRIES).map(c => ({
 }))
 
 const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const { t, isFrench } = useLanguage()
   const { user } = useAuth()
   const [formData, setFormData] = useState(INITIAL_FORM_STATE)
@@ -321,13 +323,13 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div ref={dialogRef} className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-800">
               Add Population Data
             </h2>
-            <button
+            <button aria-label={t('common.close')}
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 p-1"
             >
@@ -412,10 +414,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="add-people-modal-name"
                     type="text"
                     name="name"
                     value={formData.name}
@@ -432,7 +435,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Village Name - Dropdown filtered by country */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-village-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Village Name
                     {loadingVillages && (
                       <span className="ml-2 text-xs text-gray-400">(Loading...)</span>
@@ -440,6 +443,7 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                   </label>
                   <div className="relative">
                     <input
+                      id="add-people-modal-village-name"
                       type="text"
                       placeholder={villages.length > 0 ? "Search or type village name..." : "Type village name..."}
                       value={villageSearchTerm || formData.villageName}
@@ -493,10 +497,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Status */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-status" className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
                   <select
+                    id="add-people-modal-status"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
@@ -512,10 +517,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
                 {/* Polygon ID */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-polygon-id" className="block text-sm font-medium text-gray-700 mb-1">
                     Polygon ID
                   </label>
                   <input
+                    id="add-people-modal-polygon-id"
                     type="text"
                     name="polygonId"
                     value={formData.polygonId}
@@ -535,10 +541,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-population" className="block text-sm font-medium text-gray-700 mb-1">
                     Population
                   </label>
                   <input
+                    id="add-people-modal-population"
                     type="number"
                     name="population"
                     value={formData.population}
@@ -555,10 +562,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-households" className="block text-sm font-medium text-gray-700 mb-1">
                     Households
                   </label>
                   <input
+                    id="add-people-modal-households"
                     type="number"
                     name="households"
                     value={formData.households}
@@ -570,10 +578,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-believers" className="block text-sm font-medium text-gray-700 mb-1">
                     Believers
                   </label>
                   <input
+                    id="add-people-modal-believers"
                     type="number"
                     name="believersCount"
                     value={formData.believersCount}
@@ -585,10 +594,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-churches" className="block text-sm font-medium text-gray-700 mb-1">
                     Churches
                   </label>
                   <input
+                    id="add-people-modal-churches"
                     type="number"
                     name="churchesCount"
                     value={formData.churchesCount}
@@ -623,10 +633,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               {showDemographics && (
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-male" className="block text-xs font-medium text-gray-600 mb-1">
                       Male
                     </label>
                     <input
+                      id="add-people-modal-male"
                       type="number"
                       name="demographics.maleCount"
                       value={formData.demographics.maleCount}
@@ -637,10 +648,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-female" className="block text-xs font-medium text-gray-600 mb-1">
                       Female
                     </label>
                     <input
+                      id="add-people-modal-female"
                       type="number"
                       name="demographics.femaleCount"
                       value={formData.demographics.femaleCount}
@@ -651,10 +663,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-children" className="block text-xs font-medium text-gray-600 mb-1">
                       Children
                     </label>
                     <input
+                      id="add-people-modal-children"
                       type="number"
                       name="demographics.childrenCount"
                       value={formData.demographics.childrenCount}
@@ -665,10 +678,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-adults" className="block text-xs font-medium text-gray-600 mb-1">
                       Adults
                     </label>
                     <input
+                      id="add-people-modal-adults"
                       type="number"
                       name="demographics.adultsCount"
                       value={formData.demographics.adultsCount}
@@ -679,10 +693,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label htmlFor="add-people-modal-elderly" className="block text-xs font-medium text-gray-600 mb-1">
                       Elderly
                     </label>
                     <input
+                      id="add-people-modal-elderly"
                       type="number"
                       name="demographics.elderlyCount"
                       value={formData.demographics.elderlyCount}
@@ -704,10 +719,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-language" className="block text-sm font-medium text-gray-700 mb-1">
                     Language
                   </label>
                   <input
+                    id="add-people-modal-language"
                     type="text"
                     name="language"
                     value={formData.language}
@@ -718,10 +734,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-religion" className="block text-sm font-medium text-gray-700 mb-1">
                     Religion
                   </label>
                   <input
+                    id="add-people-modal-religion"
                     type="text"
                     name="religion"
                     value={formData.religion}
@@ -732,10 +749,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-ethnicity" className="block text-sm font-medium text-gray-700 mb-1">
                     Ethnicity
                   </label>
                   <input
+                    id="add-people-modal-ethnicity"
                     type="text"
                     name="ethnicity"
                     value={formData.ethnicity}
@@ -755,10 +773,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-country" className="block text-sm font-medium text-gray-700 mb-1">
                     Country
                   </label>
                   <select
+                    id="add-people-modal-country"
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
@@ -774,10 +793,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-region" className="block text-sm font-medium text-gray-700 mb-1">
                     Region
                   </label>
                   <input
+                    id="add-people-modal-region"
                     type="text"
                     name="region"
                     value={formData.region}
@@ -788,10 +808,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-departement" className="block text-sm font-medium text-gray-700 mb-1">
                     Departement
                   </label>
                   <input
+                    id="add-people-modal-departement"
                     type="text"
                     name="departement"
                     value={formData.departement}
@@ -802,10 +823,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-arrondissement" className="block text-sm font-medium text-gray-700 mb-1">
                     Arrondissement
                   </label>
                   <input
+                    id="add-people-modal-arrondissement"
                     type="text"
                     name="arrondissement"
                     value={formData.arrondissement}
@@ -819,10 +841,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               {/* Coordinates */}
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-latitude" className="block text-sm font-medium text-gray-700 mb-1">
                     Latitude
                   </label>
                   <input
+                    id="add-people-modal-latitude"
                     type="number"
                     step="any"
                     value={latitude}
@@ -836,10 +859,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-longitude" className="block text-sm font-medium text-gray-700 mb-1">
                     Longitude
                   </label>
                   <input
+                    id="add-people-modal-longitude"
                     type="number"
                     step="any"
                     value={longitude}
@@ -872,10 +896,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-source" className="block text-sm font-medium text-gray-700 mb-1">
                     Source
                   </label>
                   <input
+                    id="add-people-modal-source"
                     type="text"
                     name="dataSource"
                     value={formData.dataSource}
@@ -886,10 +911,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="add-people-modal-year" className="block text-sm font-medium text-gray-700 mb-1">
                     Year
                   </label>
                   <input
+                    id="add-people-modal-year"
                     type="number"
                     name="dataYear"
                     value={formData.dataYear}
@@ -905,10 +931,11 @@ const AddPeopleModal = ({ isOpen, onClose, onSuccess, initialData = {} }) => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="add-people-modal-description-notes" className="block text-sm font-medium text-gray-700 mb-1">
                 Description / Notes
               </label>
               <textarea
+                id="add-people-modal-description-notes"
                 name="description"
                 value={formData.description}
                 onChange={handleChange}

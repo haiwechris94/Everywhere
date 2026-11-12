@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 /**
  * Shared admin forms for editable Region / Country overlays.
@@ -11,6 +11,7 @@ const errMsg = (err, isFrench) =>
   (isFrench ? 'Une erreur est survenue. Veuillez réessayer.' : 'Something went wrong. Please try again.')
 
 export function LeadersEditor({ leaders = [], onChange, isFrench }) {
+  const groupId = useId()
   const update = (idx, field, value) => {
     const next = leaders.map((l, i) => (i === idx ? { ...l, [field]: value } : l))
     onChange(next)
@@ -23,8 +24,8 @@ export function LeadersEditor({ leaders = [], onChange, isFrench }) {
   }
 
   return (
-    <div className="space-y-2">
-      <label className="text-xs text-slate-500">{isFrench ? 'Responsables' : 'Leaders'}</label>
+    <div className="space-y-2" role="group" aria-labelledby={groupId}>
+      <span id={groupId} className="text-xs text-slate-500">{isFrench ? 'Responsables' : 'Leaders'}</span>
       {leaders.map((leader, idx) => (
         <div key={idx} className="flex flex-wrap items-center gap-2">
           <input
@@ -132,8 +133,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
       </h3>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Identifiant (sigle)' : 'Region ID (code)'}</label>
+        <label htmlFor="region-country-forms-region-id-code" className="text-xs text-slate-500">{isFrench ? 'Identifiant (sigle)' : 'Region ID (code)'}</label>
         <input
+          id="region-country-forms-region-id-code"
           className="mt-1 w-full rounded border px-2 py-1 text-sm disabled:bg-slate-100"
           value={regionId}
           disabled={mode === 'edit'}
@@ -143,8 +145,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Nom' : 'Name'}</label>
+        <label htmlFor="region-country-forms-name" className="text-xs text-slate-500">{isFrench ? 'Nom' : 'Name'}</label>
         <input
+          id="region-country-forms-name"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -152,8 +155,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Nom complet' : 'Full name'}</label>
+        <label htmlFor="region-country-forms-full-name" className="text-xs text-slate-500">{isFrench ? 'Nom complet' : 'Full name'}</label>
         <input
+          id="region-country-forms-full-name"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
@@ -161,8 +165,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Description' : 'Description'}</label>
+        <label htmlFor="region-country-forms-description" className="text-xs text-slate-500">{isFrench ? 'Description' : 'Description'}</label>
         <textarea
+          id="region-country-forms-description"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           rows={3}
           value={description}
@@ -171,8 +176,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Responsable' : 'Responsible'}</label>
+        <label htmlFor="region-country-forms-responsible" className="text-xs text-slate-500">{isFrench ? 'Responsable' : 'Responsible'}</label>
         <input
+          id="region-country-forms-responsible"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           value={responsibleName}
           onChange={(e) => setResponsibleName(e.target.value)}
@@ -183,8 +189,9 @@ export function RegionForm({ mode = 'create', initial = {}, onSubmit, onCancel, 
 
       {mode === 'create' && (
         <div>
-          <label className="text-xs text-slate-500">{isFrench ? 'Codes pays' : 'Country codes'}</label>
+          <label htmlFor="region-country-forms-country-codes" className="text-xs text-slate-500">{isFrench ? 'Codes pays' : 'Country codes'}</label>
           <input
+            id="region-country-forms-country-codes"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
             value={countryCodesText}
             onChange={(e) => setCountryCodesText(e.target.value)}
@@ -284,8 +291,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
 
       <div className="flex gap-2">
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Code (2 lettres)' : 'Code (2 letters)'}</label>
+          <label htmlFor="region-country-forms-code-2-letters" className="text-xs text-slate-500">{isFrench ? 'Code (2 lettres)' : 'Code (2 letters)'}</label>
           <input
+            id="region-country-forms-code-2-letters"
             className="mt-1 w-full rounded border px-2 py-1 text-sm disabled:bg-slate-100"
             value={code}
             disabled={mode === 'edit'}
@@ -294,8 +302,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
           />
         </div>
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Code (3 lettres)' : 'Code (3 letters)'}</label>
+          <label htmlFor="region-country-forms-code-3-letters" className="text-xs text-slate-500">{isFrench ? 'Code (3 lettres)' : 'Code (3 letters)'}</label>
           <input
+            id="region-country-forms-code-3-letters"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
             value={code3}
             onChange={(e) => setCode3(e.target.value.toUpperCase())}
@@ -306,16 +315,18 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
 
       <div className="flex gap-2">
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Nom (FR)' : 'Name (FR)'}</label>
+          <label htmlFor="region-country-forms-name-fr" className="text-xs text-slate-500">{isFrench ? 'Nom (FR)' : 'Name (FR)'}</label>
           <input
+            id="region-country-forms-name-fr"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
             value={nameFr}
             onChange={(e) => setNameFr(e.target.value)}
           />
         </div>
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Nom (EN)' : 'Name (EN)'}</label>
+          <label htmlFor="region-country-forms-name-en" className="text-xs text-slate-500">{isFrench ? 'Nom (EN)' : 'Name (EN)'}</label>
           <input
+            id="region-country-forms-name-en"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
             value={nameEn}
             onChange={(e) => setNameEn(e.target.value)}
@@ -324,8 +335,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Capitale' : 'Capital'}</label>
+        <label htmlFor="region-country-forms-capital" className="text-xs text-slate-500">{isFrench ? 'Capitale' : 'Capital'}</label>
         <input
+          id="region-country-forms-capital"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           value={capital}
           onChange={(e) => setCapital(e.target.value)}
@@ -334,8 +346,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
 
       <div className="flex gap-2">
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Latitude' : 'Latitude'}</label>
+          <label htmlFor="region-country-forms-latitude" className="text-xs text-slate-500">{isFrench ? 'Latitude' : 'Latitude'}</label>
           <input
+            id="region-country-forms-latitude"
             type="number"
             step="any"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
@@ -344,8 +357,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
           />
         </div>
         <div className="flex-1">
-          <label className="text-xs text-slate-500">{isFrench ? 'Longitude' : 'Longitude'}</label>
+          <label htmlFor="region-country-forms-longitude" className="text-xs text-slate-500">{isFrench ? 'Longitude' : 'Longitude'}</label>
           <input
+            id="region-country-forms-longitude"
             type="number"
             step="any"
             className="mt-1 w-full rounded border px-2 py-1 text-sm"
@@ -356,8 +370,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Description' : 'Description'}</label>
+        <label htmlFor="region-country-forms-description-2" className="text-xs text-slate-500">{isFrench ? 'Description' : 'Description'}</label>
         <textarea
+          id="region-country-forms-description-2"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           rows={3}
           value={description}
@@ -366,8 +381,9 @@ export function CountryForm({ mode = 'create', initial = {}, regionId, onSubmit,
       </div>
 
       <div>
-        <label className="text-xs text-slate-500">{isFrench ? 'Responsable' : 'Responsible'}</label>
+        <label htmlFor="region-country-forms-responsible-2" className="text-xs text-slate-500">{isFrench ? 'Responsable' : 'Responsible'}</label>
         <input
+          id="region-country-forms-responsible-2"
           className="mt-1 w-full rounded border px-2 py-1 text-sm"
           value={responsibleName}
           onChange={(e) => setResponsibleName(e.target.value)}

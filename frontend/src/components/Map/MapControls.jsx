@@ -34,7 +34,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
     >
       {/* Zoom group */}
       <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-neutral-200 overflow-hidden flex flex-col">
-        <button
+        <button aria-label={tx('map.controls.zoomIn', 'Zoom in')}
           type="button"
           onClick={() => map.zoomIn()}
           title={tx('map.controls.zoomIn', 'Zoom in')}
@@ -42,7 +42,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
         >
           <Plus size={16} />
         </button>
-        <button
+        <button aria-label={tx('map.controls.zoomOut', 'Zoom out')}
           type="button"
           onClick={() => map.zoomOut()}
           title={tx('map.controls.zoomOut', 'Zoom out')}
@@ -54,7 +54,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
 
       {/* Fit-to-data */}
       {onFitData && (
-        <button
+        <button aria-label={tx('map.modernControls.fitToData', 'Fit to data')}
           type="button"
           onClick={onFitData}
           title={tx('map.modernControls.fitToData', 'Fit to data')}
@@ -66,7 +66,7 @@ const MapControls = ({ onFitData, onLocateMe, className = '' }) => {
 
       {/* Locate me */}
       {onLocateMe && (
-        <button
+        <button aria-label={tx('map.modernControls.locateMe', 'Locate me')}
           type="button"
           onClick={onLocateMe}
           title={tx('map.modernControls.locateMe', 'Locate me')}

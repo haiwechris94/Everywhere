@@ -104,7 +104,7 @@ const FilterPanel = ({
               className="w-full pl-7 pr-7 py-1.5 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100 focus:outline-none transition-all"
             />
             {search && (
-              <button
+              <button aria-label={t('common.clearSearch')}
                 onClick={() => onSearchChange?.('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
               >

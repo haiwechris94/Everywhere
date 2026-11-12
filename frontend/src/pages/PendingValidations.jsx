@@ -126,7 +126,7 @@ const PendingValidations = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button
+          <button aria-label={t('common.back')}
             onClick={() => navigate('/activities')}
             className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-lg transition-colors"
           >

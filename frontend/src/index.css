@@ -78,6 +78,12 @@ th.text-right,
   font-weight: 700;
 }
 
+/* Dialog panels receive programmatic focus (tabindex="-1") on open so screen
+ * readers announce their title; the panel itself needs no focus ring. */
+[role="dialog"][tabindex="-1"]:focus {
+  outline: none;
+}
+
 /* ============================================================================
  * MOBILE ZOOM PREVENTION
  * Prevents iOS Safari from auto-zooming on input focus

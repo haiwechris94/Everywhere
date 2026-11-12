@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronRight, ChevronDown, Plus, Search, Users2, BookOpenText, Loader2, X } from 'lucide-react'
@@ -69,6 +70,7 @@ const SetCard = ({ set }) => {
 
 // Modal to engage a people group in the initiative (managers only).
 const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
+  const dialogRef = useDialog(true, onClose)
   const { isFrench } = useLanguage()
   const [term, setTerm] = useState('')
   const [language, setLanguage] = useState('')
@@ -99,12 +101,12 @@ const AddPeopleModal = ({ initiativeKey, onClose, onAdded }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-slate-900">
             {isFrench ? 'Ajouter un peuple' : 'Add a people group'}
           </h3>
-          <button onClick={onClose} className="rounded p-1 text-slate-400 hover:text-slate-600"><X size={18} /></button>
+          <button aria-label={isFrench ? "Fermer" : "Close"} onClick={onClose} className="rounded p-1 text-slate-400 hover:text-slate-600"><X size={18} /></button>
         </div>
 
         <div className="relative mb-3">

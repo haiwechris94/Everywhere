@@ -37,6 +37,22 @@ import { initSocket, getSocket, subscribeToPeopleGroupUpdates, subscribeToVillag
 import { format } from 'date-fns'
 import { fr, enUS } from 'date-fns/locale'
 
+/**
+ * Tracks the app theme (the 'dark' class on <html>) so charts re-render with
+ * the right palette when the user switches theme.
+ */
+const useIsDark = () => {
+  const [isDark, setIsDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
+  useEffect(() => {
+    const el = document.documentElement
+    const obs = new MutationObserver(() => setIsDark(el.classList.contains('dark')))
+    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
+    setIsDark(el.classList.contains('dark'))
+    return () => obs.disconnect()
+  }, [])
+  return isDark
+}
+
 // ─── API helpers ────────────────────────────────────────────────────────────
 const api = (url) => axios.get(url, {
   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -220,7 +236,7 @@ const AIAssistantCard = () => {
 // WIDGET 2 — Monthly Activity Chart
 // ════════════════════════════════════════════════════════════════════════════
 const MonthlyActivityChart = () => {
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const isDark = useIsDark()
   const { data, isLoading } = useQuery({
     queryKey: ['analytics-monthly-activity'],
     queryFn: () => api('/api/analytics/monthly-activity').then(r => r.data),
@@ -390,7 +406,7 @@ const RecentActivity = () => {
 // WIDGET 5 — DMM Movement Growth (Radial / Donut)
 // ════════════════════════════════════════════════════════════════════════════
 const MovementGrowth = () => {
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const isDark = useIsDark()
   const { data, isLoading } = useQuery({
     queryKey: ['analytics-dmm-growth'],
     queryFn: () => api('/api/analytics/dmm-growth').then(r => r.data),
@@ -558,7 +574,7 @@ const APP_COUNTRIES = [
 ]
 
 const PeopleGroupsWidget = () => {
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  const isDark = useIsDark()
   const navigate = useNavigate()
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedRegion, setSelectedRegion] = useState('')
@@ -1585,14 +1601,7 @@ const AnalyticsDashboard = () => {
     { name: 'DMM (Reached)', peopleGroups: peopleStats.dmm, villages: villageStats.byStatus.dmm },
   ], [peopleStats, villageStats])
 
-  const [isDark, setIsDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'))
-  useEffect(() => {
-    const el = document.documentElement
-    const obs = new MutationObserver(() => setIsDark(el.classList.contains('dark')))
-    obs.observe(el, { attributes: true, attributeFilter: ['class'] })
-    setIsDark(el.classList.contains('dark'))
-    return () => obs.disconnect()
-  }, [])
+  const isDark = useIsDark()
   const T = isDark ? { primary: '#818cf8', secondary: '#fb7185', bg: '#0b1020', card: 'rgba(17,24,39,0.75)', text: '#e5e7eb', muted: '#94a3b8', success: '#34d399', danger: '#f87171' } : C
 
   return (

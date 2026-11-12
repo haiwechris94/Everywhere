@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -404,6 +405,7 @@ const PeopleDetailLite = () => {
   const [actionsAddVillage, setActionsAddVillage] = useState(false)
   // Edition (admin) des informations du peuple lui-meme.
   const [editingPeople, setEditingPeople] = useState(false)
+  const editDialogRef = useDialog(!!editingPeople, () => setEditingPeople(false))
 
   // Primary: the master-people profile (nested under `overview`, no DMM rollup).
   const profileQuery = useQuery({
@@ -721,7 +723,7 @@ const PeopleDetailLite = () => {
             </div>
             {editingPeople && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+                <div ref={editDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
                   <PeopleForm
                     mode="edit"
                     isFrench={isFrench}

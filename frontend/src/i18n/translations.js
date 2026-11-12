@@ -179,6 +179,16 @@ const translations = {
       results: 'results',
       selected: 'selected',
       items: 'items',
+      // Accessible names for icon-only buttons
+      clearSearch: 'Clear search',
+      startSync: 'Start sync',
+      showPanel: 'Show panel',
+      hidePanel: 'Hide panel',
+      showPassword: 'Show password',
+      hidePassword: 'Hide password',
+      darkMode: 'Dark mode',
+      expandRow: 'Expand row',
+      collapseRow: 'Collapse row',
     },
 
     // Authentication
@@ -1117,6 +1127,16 @@ const translations = {
       results: 'résultats',
       selected: 'sélectionné(s)',
       items: 'éléments',
+      // Accessible names for icon-only buttons
+      clearSearch: 'Effacer la recherche',
+      startSync: 'Lancer la synchronisation',
+      showPanel: 'Afficher le panneau',
+      hidePanel: 'Masquer le panneau',
+      showPassword: 'Afficher le mot de passe',
+      hidePassword: 'Masquer le mot de passe',
+      darkMode: 'Mode sombre',
+      expandRow: 'Développer la ligne',
+      collapseRow: 'Réduire la ligne',
     },
 
     // Authentication

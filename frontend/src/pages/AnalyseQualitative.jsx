@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { peopleGroupsApi, qualitativeAnalysisApi } from '../services/api'
 import { reportingApi } from '../services/reportingApi'
@@ -83,6 +84,7 @@ const ANALYSIS_CRITERIA = {
 
 // Analysis Detail Modal Component - REDESIGNED with prominent AI section
 const AnalysisDetailModal = ({ analysis, onClose, language }) => {
+  const dialogRef = useDialog(true, onClose)
   if (!analysis) return null
 
   const getScoreColor = (score) => {
@@ -103,7 +105,7 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
+      <div ref={dialogRef} className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in">
         {/* Modal Header */}
         <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5 rounded-t-2xl">
           <div className="flex items-center justify-between">
@@ -113,7 +115,7 @@ const AnalysisDetailModal = ({ analysis, onClose, language }) => {
               </h3>
               <p className="text-indigo-100 text-sm mt-1">{analysis.peopleGroupName}</p>
             </div>
-            <button 
+            <button aria-label={language === 'fr' ? "Fermer" : "Close"} 
               onClick={onClose} 
               className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             >
@@ -692,14 +694,18 @@ const AnalyseQualitative = () => {
                             {category.criteria.map(criterion => (
                               <div key={criterion.id} className="flex flex-col sm:flex-row sm:items-center gap-3">
                                 <div className="flex-1">
-                                  <label className="text-sm font-medium text-gray-700">
+                                  <span id={`criterion-${criterion.id}-label`} className="text-sm font-medium text-gray-700">
                                     {language === 'fr' ? criterion.label : criterion.labelEn}
-                                  </label>
+                                  </span>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2" role="radiogroup" aria-labelledby={`criterion-${criterion.id}-label`}>
                                   {RATING_OPTIONS.map(option => (
                                     <button
                                       key={option.value}
+                                      type="button"
+                                      role="radio"
+                                      aria-checked={analysisData[criterion.id] === option.value}
+                                      aria-label={`${option.value} – ${language === 'fr' ? option.label : option.labelEn}`}
                                       onClick={() => handleRatingChange(criterion.id, option.value)}
                                       className={`w-11 h-11 rounded-xl text-sm font-bold transition-all border border-blue-300 bg-blue-50 text-blue-700 ${
                                         analysisData[criterion.id] === option.value
@@ -722,10 +728,11 @@ const AnalyseQualitative = () => {
                     {/* Remarks and Recommendations */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="analyse-qualitative-remarks" className="block text-sm font-semibold text-gray-700 mb-2">
                           {language === 'fr' ? 'Remarques' : 'Remarks'}
                         </label>
                         <textarea
+                          id="analyse-qualitative-remarks"
                           value={remarks}
                           onChange={(e) => setRemarks(e.target.value)}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"
@@ -733,10 +740,11 @@ const AnalyseQualitative = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <label htmlFor="analyse-qualitative-recommendations" className="block text-sm font-semibold text-gray-700 mb-2">
                           {language === 'fr' ? 'Recommandations' : 'Recommendations'}
                         </label>
                         <textarea
+                          id="analyse-qualitative-recommendations"
                           value={recommendations}
                           onChange={(e) => setRecommendations(e.target.value)}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent resize-none h-32"

@@ -6,7 +6,8 @@
  * Admin/supervisor users can add, edit and (reversibly) archive people groups.
  * Archived records are hidden by default and can be shown / restored via the toggle.
  */
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { Search, Plus, Pencil, Archive, ArchiveRestore, X, ChevronLeft, ChevronRight, LayoutGrid, List, Church, Users, Target, Flag, Share2, Download, Link2, HeartHandshake } from 'lucide-react'
@@ -227,6 +228,7 @@ const openPeopleSheet = (pg, { isFrench, shareUrl }) => {
  * donor: open/print the PDF sheet, or copy a read-only link to the people page.
  */
 const ShareModal = ({ pg, shareUrl, isFrench, onClose }) => {
+  const dialogRef = useDialog(true, onClose)
   const stop = (e) => e.stopPropagation()
   const copyLink = async () => {
     try {
@@ -252,12 +254,12 @@ const ShareModal = ({ pg, shareUrl, isFrench, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" onClick={stop}>
+      <div ref={dialogRef} className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" onClick={stop}>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-neutral-900">
             <Share2 size={18} /> {isFrench ? 'Partager ce peuple' : 'Share this people group'}
           </h2>
-          <button type="button" onClick={onClose} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+          <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={onClose} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
             <X size={18} />
           </button>
         </div>
@@ -435,6 +437,7 @@ const PeopleGroupsList = () => {
   const [fStatus, setFStatus] = useState('')
   const [fSource, setFSource] = useState('')
   const [formOpen, setFormOpen] = useState(false)
+  const formDialogRef = useDialog(formOpen, () => setFormOpen(false))
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyForm)
 
@@ -940,7 +943,7 @@ const PeopleGroupsList = () => {
                           <HeartHandshake size={10} />
                         </span>
                       )}
-                      <button
+                      <button aria-label={isFrench ? 'Partager / fiche partenaire' : 'Share / partner sheet'}
                         type="button"
                         title={isFrench ? 'Partager / fiche partenaire' : 'Share / partner sheet'}
                         onClick={() => setSharing(pg)}
@@ -1061,12 +1064,12 @@ const PeopleGroupsList = () => {
       {/* Create / Edit modal */}
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div ref={formDialogRef} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-neutral-900">
                 {editing ? (isFrench ? 'Modifier le peuple' : 'Edit people group') : isFrench ? 'Ajouter un peuple' : 'Add people group'}
               </h2>
-              <button type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
+              <button aria-label={isFrench ? "Fermer" : "Close"} type="button" onClick={closeForm} className="rounded p-1 text-neutral-400 hover:bg-neutral-100">
                 <X size={18} />
               </button>
             </div>
@@ -1089,8 +1092,8 @@ const PeopleGroupsList = () => {
               <Field label="Admin 2" value={form.admin2} onChange={onField('admin2')} />
               <Field label="Admin 3" value={form.admin3} onChange={onField('admin3')} />
               <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Statut' : 'Status'}</label>
-                <select value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
+                <label htmlFor="people-groups-list-status" className="mb-1 block text-xs font-medium text-neutral-600">{isFrench ? 'Statut' : 'Status'}</label>
+                <select id="people-groups-list-status" value={form.status} onChange={onField('status')} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm">
                   <option value="">—</option>
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
@@ -1105,8 +1108,8 @@ const PeopleGroupsList = () => {
               <Field label={isFrench ? 'Coordinateur national' : 'National coordinator'} value={form.nationalCoordinator} onChange={onField('nationalCoordinator')} />
               <Field label={isFrench ? 'Implanteur' : 'Church planter'} value={form.churchPlanter} onChange={onField('churchPlanter')} />
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs font-medium text-neutral-600">Description</label>
-                <textarea value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
+                <label htmlFor="people-groups-list-description" className="mb-1 block text-xs font-medium text-neutral-600">Description</label>
+                <textarea id="people-groups-list-description" value={form.description} onChange={onField('description')} rows={3} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm" />
               </div>
               <div className="sm:col-span-2 flex justify-end gap-2 pt-2">
                 <button type="button" onClick={closeForm} className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100">
@@ -1124,11 +1127,14 @@ const PeopleGroupsList = () => {
   )
 }
 
-const Field = ({ label, value, onChange, type = 'text' }) => (
-  <div>
-    <label className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
-    <input type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-  </div>
-)
+const Field = ({ label, value, onChange, type = 'text' }) => {
+  const id = useId()
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-xs font-medium text-neutral-600">{label}</label>
+      <input id={id} type={type} value={value} onChange={onChange} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+  )
+}
 
 export default PeopleGroupsList

@@ -712,7 +712,7 @@ const SearchBox = ({ markers, onPick, onClear, theme }) => {
           className="min-w-0 w-24 bg-transparent text-sm outline-none placeholder:text-neutral-400 sm:w-40"
         />
         {q && (
-          <button onMouseDown={() => { setQ(''); setOpen(false); onClear && onClear() }} className={subtleText(theme)}>
+          <button aria-label="Effacer la recherche" onMouseDown={() => { setQ(''); setOpen(false); onClear && onClear() }} className={subtleText(theme)}>
             <X size={14} />
           </button>
         )}
@@ -871,7 +871,7 @@ const MiniViewport = ({ mainMap }) => {
 const OverviewMiniMap = ({ mainMap, theme, collapsed, onToggle }) => {
   if (collapsed) {
     return (
-      <button
+      <button aria-label="Afficher la mini-carte"
         onClick={onToggle}
         title="Afficher la mini-carte"
         className={`absolute bottom-6 right-4 z-[1000] flex h-9 w-9 items-center justify-center rounded-lg shadow-lg ${panelCls(theme)}`}
@@ -887,7 +887,7 @@ const OverviewMiniMap = ({ mainMap, theme, collapsed, onToggle }) => {
     >
       <div className="flex items-center justify-between px-2 py-1 text-[11px] font-semibold">
         <span>Vue d'ensemble</span>
-        <button onClick={onToggle} title="Réduire"><Minimize2 size={13} /></button>
+        <button aria-label="Réduire" onClick={onToggle} title="Réduire"><Minimize2 size={13} /></button>
       </div>
       <div style={{ width: 200, height: 140 }}>
         <MapContainer
@@ -973,7 +973,7 @@ const ExportMenu = ({ markers, mapInstance, theme }) => {
   }
   return (
     <div className="relative">
-      <button
+      <button aria-label="Exporter"
         onClick={() => setOpen((o) => !o)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         title="Exporter"
@@ -1704,7 +1704,7 @@ export default function UnifiedMapView() {
       <div className="absolute top-3 right-4 z-[1001] flex items-center gap-2">
         <SearchBox markers={sourceVisibleMarkers} onPick={handleSearchPick} onClear={clearFocus} theme={theme} />
         <ExportMenu markers={sourceVisibleMarkers} mapInstance={mapInstance} theme={theme} />
-        <button
+        <button aria-label={showKpis ? 'Masquer les indicateurs' : 'Afficher les indicateurs'}
           onClick={() => setShowKpis((v) => !v)}
           title={showKpis ? 'Masquer les indicateurs' : 'Afficher les indicateurs'}
           aria-pressed={showKpis}
@@ -1718,7 +1718,7 @@ export default function UnifiedMapView() {
         >
           <BarChart3 size={16} />
         </button>
-        <button
+        <button aria-label={showDmmIndicators ? 'Masquer les indicateurs DMM' : 'Afficher les indicateurs DMM'}
           onClick={() => setShowDmmIndicators((v) => !v)}
           title={showDmmIndicators ? 'Masquer les indicateurs DMM' : 'Afficher les indicateurs DMM'}
           aria-pressed={showDmmIndicators}
@@ -1850,7 +1850,7 @@ export default function UnifiedMapView() {
           {/* Titre « Carte unifiée des peuples » retiré à la demande. On garde un
               span vide pour conserver l'alignement (justify-between) du bouton. */}
           <span />
-          <button onClick={() => setSidebarOpen(false)} className={subtleText(theme)} title="Réduire le panneau">
+          <button aria-label="Réduire le panneau" onClick={() => setSidebarOpen(false)} className={subtleText(theme)} title="Réduire le panneau">
             <ChevronLeft size={18} />
           </button>
         </div>

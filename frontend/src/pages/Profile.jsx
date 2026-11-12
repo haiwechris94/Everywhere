@@ -235,10 +235,11 @@ const Profile = () => {
           {isEditing ? (
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.fullName')}</label>
+                <label htmlFor="profile-fullname" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.fullName')}</label>
                 <div className="relative">
                   <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-fullname"
                     type="text"
                     value={editData.name}
                     onChange={(e) => setEditData((prev) => ({ ...prev, name: e.target.value }))}
@@ -248,10 +249,11 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.email')}</label>
+                <label htmlFor="profile-email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.email')}</label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-email"
                     type="email"
                     value={editData.email}
                     onChange={(e) => setEditData((prev) => ({ ...prev, email: e.target.value }))}
@@ -261,10 +263,11 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.organization')}</label>
+                <label htmlFor="profile-organization" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.organization')}</label>
                 <div className="relative">
                   <Building size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-organization"
                     type="text"
                     value={editData.organization}
                     onChange={(e) => setEditData((prev) => ({ ...prev, organization: e.target.value }))}
@@ -365,17 +368,18 @@ const Profile = () => {
           ) : (
             <form onSubmit={handlePasswordChange} className="space-y-5 animate-fade-in">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.currentPassword')}</label>
+                <label htmlFor="profile-currentpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.currentPassword')}</label>
                 <div className="relative">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-currentpassword"
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData((prev) => ({ ...prev, currentPassword: e.target.value }))}
                     className="w-full pl-12 pr-12 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900 dark:text-white"
                     required
                   />
-                  <button
+                  <button aria-label={showCurrentPassword ? t('common.hidePassword') : t('common.showPassword')}
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -386,10 +390,11 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.newPassword')}</label>
+                <label htmlFor="profile-newpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.newPassword')}</label>
                 <div className="relative">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-newpassword"
                     type={showNewPassword ? 'text' : 'password'}
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData((prev) => ({ ...prev, newPassword: e.target.value }))}
@@ -397,7 +402,7 @@ const Profile = () => {
                     required
                     minLength={6}
                   />
-                  <button
+                  <button aria-label={showNewPassword ? t('common.hidePassword') : t('common.showPassword')}
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -409,10 +414,11 @@ const Profile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.confirmPassword')}</label>
+                <label htmlFor="profile-confirmpassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('profile.confirmPassword')}</label>
                 <div className="relative">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="profile-confirmpassword"
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
@@ -481,7 +487,7 @@ const Profile = () => {
             </div>
             
             {/* iOS-style Toggle Switch */}
-            <button
+            <button aria-label={t('common.darkMode')} role="switch" aria-checked={isDarkMode}
               onClick={toggleDarkMode}
               className={`relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                 isDarkMode ? 'bg-indigo-600' : 'bg-gray-300'

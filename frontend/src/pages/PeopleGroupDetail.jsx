@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { peopleGroupsApi, activitiesApi } from '../services/api'
@@ -58,6 +59,8 @@ const PeopleGroupDetail = () => {
   const [editData, setEditData] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
+  const deleteDialogRef = useDialog(showDeleteModal, () => setShowDeleteModal(false))
+  const photoDialogRef = useDialog(!!selectedPhoto, () => setSelectedPhoto(null))
 
   // Fetch people group details
   const { data: peopleGroup, isLoading, error } = useQuery({
@@ -208,7 +211,7 @@ const PeopleGroupDetail = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button
+          <button aria-label={t('common.back')}
             onClick={() => navigate('/map')}
             className="p-2 hover:bg-gray-100 rounded-lg"
           >
@@ -292,8 +295,9 @@ const PeopleGroupDetail = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{t('peopleMap.engagementStatus')}</label>
+                    <label htmlFor="people-group-detail-engagementstatus" className="form-label">{t('peopleMap.engagementStatus')}</label>
                     <select
+                      id="people-group-detail-engagementstatus"
                       value={editData.engagementStatus}
                       onChange={(e) => setEditData((prev) => ({ ...prev, engagementStatus: e.target.value }))}
                       className="form-input"
@@ -304,8 +308,9 @@ const PeopleGroupDetail = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="form-label">{t('peopleMap.engagementLevel')}</label>
+                    <label htmlFor="people-group-detail-engagementlevel" className="form-label">{t('peopleMap.engagementLevel')}</label>
                     <select
+                      id="people-group-detail-engagementlevel"
                       value={editData.engagementLevel}
                       onChange={(e) => setEditData((prev) => ({ ...prev, engagementLevel: e.target.value }))}
                       className="form-input"
@@ -319,8 +324,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{t('peopleMap.population')}</label>
+                    <label htmlFor="people-group-detail-population" className="form-label">{t('peopleMap.population')}</label>
                     <input
+                      id="people-group-detail-population"
                       type="number"
                       value={editData.population}
                       onChange={(e) => setEditData((prev) => ({ ...prev, population: e.target.value }))}
@@ -328,8 +334,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{t('peopleMap.numberOfChurches')}</label>
+                    <label htmlFor="people-group-detail-numberofchurches" className="form-label">{t('peopleMap.numberOfChurches')}</label>
                     <input
+                      id="people-group-detail-numberofchurches"
                       type="number"
                       value={editData.numberOfChurches}
                       onChange={(e) => setEditData((prev) => ({ ...prev, numberOfChurches: e.target.value }))}
@@ -339,8 +346,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{t('peopleMap.churchGeneration')}</label>
+                    <label htmlFor="people-group-detail-churchgeneration" className="form-label">{t('peopleMap.churchGeneration')}</label>
                     <input
+                      id="people-group-detail-churchgeneration"
                       type="number"
                       value={editData.churchGeneration}
                       onChange={(e) => setEditData((prev) => ({ ...prev, churchGeneration: e.target.value }))}
@@ -348,8 +356,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{t('peopleMap.village')}</label>
+                    <label htmlFor="people-group-detail-village" className="form-label">{t('peopleMap.village')}</label>
                     <input
+                      id="people-group-detail-village"
                       type="text"
                       value={editData.villageName}
                       onChange={(e) => setEditData((prev) => ({ ...prev, villageName: e.target.value }))}
@@ -359,8 +368,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="form-label">DBS</label>
+                    <label htmlFor="people-group-detail-dbs" className="form-label">DBS</label>
                     <input
+                      id="people-group-detail-dbs"
                       type="number"
                       min="0"
                       value={editData.dbs}
@@ -369,8 +379,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">COM</label>
+                    <label htmlFor="people-group-detail-com" className="form-label">COM</label>
                     <input
+                      id="people-group-detail-com"
                       type="number"
                       min="0"
                       value={editData.com}
@@ -379,8 +390,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">CAT</label>
+                    <label htmlFor="people-group-detail-cat" className="form-label">CAT</label>
                     <input
+                      id="people-group-detail-cat"
                       type="number"
                       min="0"
                       value={editData.cat}
@@ -391,8 +403,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Trimestre (reportPeriod)</label>
+                    <label htmlFor="people-group-detail-trimestre-reportperiod" className="form-label">Trimestre (reportPeriod)</label>
                     <input
+                      id="people-group-detail-trimestre-reportperiod"
                       type="text"
                       placeholder="ex. 2Q26"
                       value={editData.reportPeriod}
@@ -403,8 +416,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{t('peopleMap.region')}</label>
+                    <label htmlFor="people-group-detail-region" className="form-label">{t('peopleMap.region')}</label>
                     <input
+                      id="people-group-detail-region"
                       type="text"
                       value={editData.region}
                       onChange={(e) => setEditData((prev) => ({ ...prev, region: e.target.value }))}
@@ -412,8 +426,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{t('peopleMap.country')}</label>
+                    <label htmlFor="people-group-detail-country" className="form-label">{t('peopleMap.country')}</label>
                     <input
+                      id="people-group-detail-country"
                       type="text"
                       value={editData.country}
                       onChange={(e) => setEditData((prev) => ({ ...prev, country: e.target.value }))}
@@ -423,8 +438,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Latitude</label>
+                    <label htmlFor="people-group-detail-latitude" className="form-label">Latitude</label>
                     <input
+                      id="people-group-detail-latitude"
                       type="number"
                       step="any"
                       value={editData.latitude}
@@ -433,8 +449,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Longitude</label>
+                    <label htmlFor="people-group-detail-longitude" className="form-label">Longitude</label>
                     <input
+                      id="people-group-detail-longitude"
                       type="number"
                       step="any"
                       value={editData.longitude}
@@ -445,8 +462,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{isFrench ? "Groupe d'affinité" : 'Affinity Group'}</label>
+                    <label htmlFor="people-group-detail-affinity-group" className="form-label">{isFrench ? "Groupe d'affinité" : 'Affinity Group'}</label>
                     <input
+                      id="people-group-detail-affinity-group"
                       type="text"
                       value={editData.affinityGroup}
                       onChange={(e) => setEditData((prev) => ({ ...prev, affinityGroup: e.target.value }))}
@@ -454,8 +472,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Urban / Rural</label>
+                    <label htmlFor="people-group-detail-urban-rural" className="form-label">Urban / Rural</label>
                     <input
+                      id="people-group-detail-urban-rural"
                       type="text"
                       value={editData.urbanRural}
                       onChange={(e) => setEditData((prev) => ({ ...prev, urbanRural: e.target.value }))}
@@ -465,8 +484,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{isFrench ? 'Année de début' : 'Start Year'}</label>
+                    <label htmlFor="people-group-detail-start-year" className="form-label">{isFrench ? 'Année de début' : 'Start Year'}</label>
                     <input
+                      id="people-group-detail-start-year"
                       type="number"
                       value={editData.startYear}
                       onChange={(e) => setEditData((prev) => ({ ...prev, startYear: e.target.value }))}
@@ -474,8 +494,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{isFrench ? 'Donateur' : 'Donor'}</label>
+                    <label htmlFor="people-group-detail-donor" className="form-label">{isFrench ? 'Donateur' : 'Donor'}</label>
                     <input
+                      id="people-group-detail-donor"
                       type="text"
                       value={editData.donor}
                       onChange={(e) => setEditData((prev) => ({ ...prev, donor: e.target.value }))}
@@ -485,8 +506,9 @@ const PeopleGroupDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{isFrench ? 'Coordinateur national' : 'National Coordinator'}</label>
+                    <label htmlFor="people-group-detail-national-coordinator" className="form-label">{isFrench ? 'Coordinateur national' : 'National Coordinator'}</label>
                     <input
+                      id="people-group-detail-national-coordinator"
                       type="text"
                       value={editData.nationalCoordinator}
                       onChange={(e) => setEditData((prev) => ({ ...prev, nationalCoordinator: e.target.value }))}
@@ -494,8 +516,9 @@ const PeopleGroupDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{isFrench ? "Implanteur d'église" : 'Church Planter'}</label>
+                    <label htmlFor="people-group-detail-church-planter" className="form-label">{isFrench ? "Implanteur d'église" : 'Church Planter'}</label>
                     <input
+                      id="people-group-detail-church-planter"
                       type="text"
                       value={editData.churchPlanter}
                       onChange={(e) => setEditData((prev) => ({ ...prev, churchPlanter: e.target.value }))}
@@ -504,8 +527,9 @@ const PeopleGroupDetail = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="form-label">{t('common.description')}</label>
+                  <label htmlFor="people-group-detail-description" className="form-label">{t('common.description')}</label>
                   <textarea
+                    id="people-group-detail-description"
                     value={editData.description}
                     onChange={(e) => setEditData((prev) => ({ ...prev, description: e.target.value }))}
                     className="form-input"
@@ -838,7 +862,7 @@ const PeopleGroupDetail = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
+          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
             <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le groupe de peuple' : 'Delete People Group'}</h3>
             <p className="text-gray-600 mb-6">
               {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{peopleGroup.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}
@@ -868,8 +892,8 @@ const PeopleGroupDetail = () => {
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedPhoto(null)}
         >
-          <div className="max-w-4xl max-h-[90vh] relative">
-            <button
+          <div ref={photoDialogRef} aria-label="Photo" className="max-w-4xl max-h-[90vh] relative">
+            <button aria-label={t('common.close')}
               onClick={() => setSelectedPhoto(null)}
               className="absolute -top-10 right-0 text-white hover:text-gray-300"
             >

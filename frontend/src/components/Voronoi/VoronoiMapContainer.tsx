@@ -458,8 +458,9 @@ export const VoronoiMapContainer: React.FC<VoronoiMapContainerProps> = ({
             <h3 style={styles.modalTitle}>Générer un nouveau diagramme</h3>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>Nom du diagramme</label>
+              <label htmlFor="voronoi-map-container-nom-du-diagramme" style={styles.formLabel}>Nom du diagramme</label>
               <input
+                id="voronoi-map-container-nom-du-diagramme"
                 type="text"
                 style={styles.formInput}
                 value={generateForm.name}
@@ -472,8 +473,9 @@ export const VoronoiMapContainer: React.FC<VoronoiMapContainerProps> = ({
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>Source des points</label>
+              <label htmlFor="voronoi-map-container-source-des-points" style={styles.formLabel}>Source des points</label>
               <select
+                id="voronoi-map-container-source-des-points"
                 style={styles.formSelect}
                 value={generateForm.sourceType}
                 onChange={(e) => setGenerateForm((prev) => ({
@@ -488,8 +490,9 @@ export const VoronoiMapContainer: React.FC<VoronoiMapContainerProps> = ({
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.formLabel}>Description (optionnel)</label>
+              <label htmlFor="voronoi-map-container-description-optionnel" style={styles.formLabel}>Description (optionnel)</label>
               <input
+                id="voronoi-map-container-description-optionnel"
                 type="text"
                 style={styles.formInput}
                 value={generateForm.description || ''}

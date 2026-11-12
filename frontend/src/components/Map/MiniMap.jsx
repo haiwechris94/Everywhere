@@ -176,7 +176,7 @@ const MiniMap = ({
   if (isCollapsed) {
     return (
       <div className={positionStyles}>
-        <button
+        <button aria-label="Show mini-map"
           onClick={() => setIsCollapsed(false)}
           className="bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors border border-gray-200"
           title="Show mini-map"
@@ -198,7 +198,7 @@ const MiniMap = ({
           {selectedCountry} Overview
         </span>
         {collapsible && (
-          <button
+          <button aria-label="Collapse mini-map"
             onClick={() => setIsCollapsed(true)}
             className="p-1 hover:bg-gray-200 rounded transition-colors"
             title="Collapse mini-map"

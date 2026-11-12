@@ -512,7 +512,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
                     onClick={() => toggleRowExpansion(item.id)}
                   >
                     <td className="px-2 py-3 text-center">
-                      <button className="text-gray-400 hover:text-gray-600 dark:text-slate-400">
+                      <button aria-label={expandedRows.has(item.id) ? t('common.collapseRow') : t('common.expandRow')} aria-expanded={expandedRows.has(item.id)} className="text-gray-400 hover:text-gray-600 dark:text-slate-400">
                         {expandedRows.has(item.id) ? (
                           <ChevronDown className="w-4 h-4" />
                         ) : (
@@ -595,7 +595,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
             Affichage {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredData.length)} sur {filteredData.length}
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <button aria-label={t('common.first')}
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
               className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
@@ -603,7 +603,7 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               <ChevronLeft className="w-4 h-4" />
               <ChevronLeft className="w-4 h-4 -ml-2" />
             </button>
-            <button
+            <button aria-label={t('common.previous')}
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
@@ -640,14 +640,14 @@ const AnalyticalTable = ({ showDMM = true, showJoshuaProject = true }) => {
               })}
             </div>
 
-            <button
+            <button aria-label={t('common.next')}
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-            <button
+            <button aria-label={t('common.last')}
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
               className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:bg-slate-900 transition-colors"

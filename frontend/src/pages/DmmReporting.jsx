@@ -907,7 +907,7 @@ function RichAnalytics({ report = {}, periodReports = [], areaReports = [], sele
   }
   // Small icon-only download button rendered in each chart card header.
   const DlBtn = ({ onClick }) => (
-    <button
+    <button aria-label={L('Télécharger', 'Download')}
       type="button"
       onClick={onClick}
       className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:bg-slate-800 hover:text-gray-600 dark:text-slate-400"

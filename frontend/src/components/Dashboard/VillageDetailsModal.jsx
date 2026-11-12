@@ -3,6 +3,7 @@
  * Shows detailed village information when clicking on a polygon
  */
 import { useState, useEffect } from 'react'
+import { useDialog } from '../ui/useDialog'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from '../../services/api'
 import { X, Users, Church, MapPin, TrendingUp, Loader2 } from 'lucide-react'
@@ -28,6 +29,7 @@ const STATUS_LABELS = {
 }
 
 const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const { isFrench } = useLanguage()
   const { data, isLoading, error } = useQuery({
     queryKey: ['village-details', villageName],
@@ -49,7 +51,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
+      <div ref={dialogRef} className="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div 
           className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between"
@@ -69,7 +71,7 @@ const VillageDetailsModal = ({ villageName, isOpen, onClose }) => {
               </div>
             )}
           </div>
-          <button
+          <button aria-label={isFrench ? "Fermer" : "Close"}
             onClick={onClose}
             className="p-2 hover:bg-gray-100 dark:bg-slate-800 rounded-full transition-colors"
           >

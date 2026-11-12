@@ -73,13 +73,14 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email */}
           <div>
-            <label className="form-label text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.email')}</label>
+            <label htmlFor="login-email" className="form-label text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.email')}</label>
             <div className="relative">
               <Mail
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="login-email"
                 type="email"
                 {...register('email', {
                   required: t('validation.emailRequired'),
@@ -100,7 +101,7 @@ const Login = () => {
           {/* Password */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="form-label mb-0 text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.password')}</label>
+              <label htmlFor="login-password" className="form-label mb-0 text-gray-900 font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">{t('auth.password')}</label>
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
@@ -115,6 +116,7 @@ const Login = () => {
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password', {
                   required: t('validation.passwordRequired'),
@@ -126,7 +128,7 @@ const Login = () => {
                 className="form-input pl-10 pr-10 bg-white/80 backdrop-blur-sm shadow-lg"
                 placeholder="••••••••"
               />
-              <button
+              <button aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"

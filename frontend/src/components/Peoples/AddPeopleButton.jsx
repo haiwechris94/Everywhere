@@ -48,7 +48,7 @@ const AddPeopleButton = ({
   // Icon-only variant
   if (variant === 'icon') {
     return (
-      <button
+      <button aria-label={label}
         onClick={onClick}
         disabled={disabled}
         className={`

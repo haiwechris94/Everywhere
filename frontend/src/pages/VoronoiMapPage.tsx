@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useDialog } from '../components/ui/useDialog'
 import { MapPin, Layers, BarChart3, AlertTriangle, RefreshCw, Download, Settings } from 'lucide-react';
 import { useLanguage } from '../i18n';
 import { VoronoiMapContainer } from '../components/Voronoi';
@@ -32,6 +33,7 @@ const VoronoiMapPage: React.FC = () => {
   const [selectedCell, setSelectedCell] = useState<VoronoiCell | null>(null);
   const [selectedGap, setSelectedGap] = useState<CoverageGap | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const settingsDialogRef = useDialog(showSettings, () => setShowSettings(false));
   const [apiHealth, setApiHealth] = useState<ApiHealthStatus>({
     status: 'checking',
     lastChecked: null,
@@ -114,7 +116,7 @@ const VoronoiMapPage: React.FC = () => {
           'bg-gray-500 animate-pulse'
         }`} />
         {statusLabels[apiHealth.status]}
-        <button
+        <button aria-label={isFrench ? 'Rafraîchir le statut' : 'Refresh status'}
           onClick={handleRefreshHealth}
           className="ml-2 p-1 hover:bg-white/50 rounded-full transition-colors"
           title={isFrench ? 'Rafraîchir le statut' : 'Refresh status'}
@@ -164,7 +166,7 @@ const VoronoiMapPage: React.FC = () => {
           <div className="flex items-center space-x-4">
             {renderHealthBadge()}
             
-            <button
+            <button aria-label={isFrench ? 'Paramètres' : 'Settings'}
               onClick={() => setShowSettings(!showSettings)}
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               title={isFrench ? 'Paramètres' : 'Settings'}
@@ -266,7 +268,7 @@ const VoronoiMapPage: React.FC = () => {
       {showSettings && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="absolute inset-0 bg-black/30" onClick={() => setShowSettings(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl">
+          <div ref={settingsDialogRef as React.RefObject<HTMLDivElement>} className="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-xl">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">{isFrench ? 'Paramètres' : 'Settings'}</h2>

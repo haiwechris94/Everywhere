@@ -112,7 +112,7 @@ const CountryMultiSelect = ({
                 className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs font-medium"
               >
                 {getCountryName(code)}
-                <button
+                <button aria-label={t('common.remove')}
                   onClick={(e) => removeCountry(code, e)}
                   className="hover:text-primary-900"
                   disabled={disabled}
@@ -137,7 +137,7 @@ const CountryMultiSelect = ({
         {/* Clear and dropdown icons */}
         <div className="ml-auto flex items-center gap-1">
           {selectedCountries.length > 0 && !disabled && (
-            <button
+            <button aria-label={t('common.reset') || 'Clear all'}
               onClick={clearAll}
               className="p-1 hover:bg-gray-100 rounded"
               title={t('common.reset') || 'Clear all'}

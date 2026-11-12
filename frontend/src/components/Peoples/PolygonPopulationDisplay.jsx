@@ -103,7 +103,7 @@ const PolygonPopulationDisplay = ({
             {villageName || polygonId || 'Population Data'}
           </h3>
           {onClose && (
-            <button
+            <button aria-label={t('common.close')}
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
             >
@@ -137,7 +137,7 @@ const PolygonPopulationDisplay = ({
           {villageName || polygonId || 'Population Data'}
         </h3>
         {onClose && (
-          <button
+          <button aria-label={t('common.close')}
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 p-1"
           >

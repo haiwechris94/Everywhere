@@ -718,7 +718,7 @@ const DataManagement = () => {
                     <AlertCircle className="text-red-500" size={24} />
                   </div>
                   <span className="flex-1 text-red-700 font-medium">{importError}</span>
-                  <button onClick={resetImport} className="p-2 hover:bg-red-100 rounded-lg transition-colors">
+                  <button aria-label={t('common.close')} onClick={resetImport} className="p-2 hover:bg-red-100 rounded-lg transition-colors">
                     <X size={20} className="text-red-500" />
                   </button>
                 </div>
@@ -739,7 +739,7 @@ const DataManagement = () => {
                         </p>
                       </div>
                     </div>
-                    <button
+                    <button aria-label={t('common.close')}
                       onClick={resetImport}
                       className="p-2 hover:bg-green-100 rounded-lg transition-colors"
                     >
@@ -877,8 +877,9 @@ const DataManagement = () => {
                   Filtres d'export
                 </h3>
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Pays</label>
+                  <label htmlFor="data-management-pays" className="block text-sm font-semibold text-gray-700 mb-1">Pays</label>
                   <select
+                    id="data-management-pays"
                     value={exportCountry}
                     onChange={(e) => setExportCountry(e.target.value)}
                     className="w-full sm:w-72 rounded-lg border border-gray-300 px-3 py-2 text-sm"
@@ -1120,7 +1121,7 @@ const DataManagement = () => {
                         <option key={c.code} value={c.code}>{c.name}</option>
                       ))}
                     </select>
-                    <button
+                    <button aria-label={t('common.startSync')}
                       onClick={triggerCountrySync}
                       disabled={!jpSelectedCountry || jpStatus?.isRunning}
                       className="px-4 py-2 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-colors disabled:opacity-40 flex items-center gap-1.5"

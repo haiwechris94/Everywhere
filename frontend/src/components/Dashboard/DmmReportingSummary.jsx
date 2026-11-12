@@ -81,7 +81,7 @@ export default function DmmReportingSummary() {
           >
             Rapport complet <ChevronRight size={16} />
           </button>
-          <button
+          <button aria-label="Masquer la synthèse"
             onClick={() => toggleVisible(false)}
             title="Masquer la synthèse"
             className="flex items-center rounded-lg border border-gray-200 dark:border-slate-700 px-2.5 py-1.5 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:bg-slate-900"

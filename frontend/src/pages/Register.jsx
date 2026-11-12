@@ -58,13 +58,14 @@ const Register = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Name */}
           <div>
-            <label className="form-label">{t('auth.fullName')}</label>
+            <label htmlFor="register-fullname" className="form-label">{t('auth.fullName')}</label>
             <div className="relative">
               <User
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="register-fullname"
                 type="text"
                 {...register('name', {
                   required: t('validation.nameRequired'),
@@ -84,13 +85,14 @@ const Register = () => {
 
           {/* Email */}
           <div>
-            <label className="form-label">{t('auth.email')}</label>
+            <label htmlFor="register-email" className="form-label">{t('auth.email')}</label>
             <div className="relative">
               <Mail
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="register-email"
                 type="email"
                 {...register('email', {
                   required: t('validation.emailRequired'),
@@ -110,13 +112,14 @@ const Register = () => {
 
           {/* Organization */}
           <div>
-            <label className="form-label">{t('auth.organizationOptional')}</label>
+            <label htmlFor="register-organizationoptional" className="form-label">{t('auth.organizationOptional')}</label>
             <div className="relative">
               <Building
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="register-organizationoptional"
                 type="text"
                 {...register('organization')}
                 className="form-input pl-10"
@@ -126,8 +129,8 @@ const Register = () => {
           </div>
 
           {/* Role Selection */}
-          <div>
-            <label className="form-label">Statut du compte *</label>
+          <div role="radiogroup" aria-labelledby="register-role-label">
+            <span id="register-role-label" className="form-label">Statut du compte *</span>
             <div className="mt-2 space-y-2">
               <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                 <input
@@ -159,13 +162,14 @@ const Register = () => {
 
           {/* Password */}
           <div>
-            <label className="form-label">{t('auth.password')}</label>
+            <label htmlFor="register-password" className="form-label">{t('auth.password')}</label>
             <div className="relative">
               <Lock
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="register-password"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password', {
                   required: t('validation.passwordRequired'),
@@ -177,7 +181,7 @@ const Register = () => {
                 className="form-input pl-10 pr-10"
                 placeholder="••••••••"
               />
-              <button
+              <button aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -192,13 +196,14 @@ const Register = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="form-label">{t('auth.confirmPassword')}</label>
+            <label htmlFor="register-confirmpassword" className="form-label">{t('auth.confirmPassword')}</label>
             <div className="relative">
               <Lock
                 size={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
+                id="register-confirmpassword"
                 type={showPassword ? 'text' : 'password'}
                 {...register('confirmPassword', {
                   required: t('validation.confirmRequired'),

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { villagesApi, churchesApi, activitiesApi } from '../services/api'
@@ -69,6 +70,7 @@ const VillageDetail = () => {
   const [isEditing, setIsEditing] = useState(false)
   const [editData, setEditData] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const deleteDialogRef = useDialog(showDeleteModal, () => setShowDeleteModal(false))
 
   const { data: village, isLoading, error } = useQuery({
     queryKey: ['village', id],
@@ -184,7 +186,7 @@ const VillageDetail = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button
+          <button aria-label={t('common.back')}
             onClick={() => navigate('/villages')}
             className="p-2 hover:bg-gray-100 rounded-lg"
           >
@@ -252,8 +254,9 @@ const VillageDetail = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Population</label>
+                    <label htmlFor="village-detail-population" className="form-label">Population</label>
                     <input
+                      id="village-detail-population"
                       type="number"
                       value={editData.population}
                       onChange={(e) => setEditData((prev) => ({ ...prev, population: e.target.value }))}
@@ -261,8 +264,9 @@ const VillageDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{isFrench ? 'Statut' : 'Status'}</label>
+                    <label htmlFor="village-detail-status" className="form-label">{isFrench ? 'Statut' : 'Status'}</label>
                     <select
+                      id="village-detail-status"
                       value={editData.status}
                       onChange={(e) => setEditData((prev) => ({ ...prev, status: e.target.value }))}
                       className="form-input"
@@ -275,8 +279,9 @@ const VillageDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">{isFrench ? 'Région' : 'Region'}</label>
+                    <label htmlFor="village-detail-region" className="form-label">{isFrench ? 'Région' : 'Region'}</label>
                     <input
+                      id="village-detail-region"
                       type="text"
                       value={editData.region}
                       onChange={(e) => setEditData((prev) => ({ ...prev, region: e.target.value }))}
@@ -284,8 +289,9 @@ const VillageDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">{isFrench ? 'Pays' : 'Country'}</label>
+                    <label htmlFor="village-detail-country" className="form-label">{isFrench ? 'Pays' : 'Country'}</label>
                     <input
+                      id="village-detail-country"
                       type="text"
                       value={editData.country}
                       onChange={(e) => setEditData((prev) => ({ ...prev, country: e.target.value }))}
@@ -295,8 +301,9 @@ const VillageDetail = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="form-label">Latitude</label>
+                    <label htmlFor="village-detail-latitude" className="form-label">Latitude</label>
                     <input
+                      id="village-detail-latitude"
                       type="number"
                       step="any"
                       value={editData.latitude}
@@ -305,8 +312,9 @@ const VillageDetail = () => {
                     />
                   </div>
                   <div>
-                    <label className="form-label">Longitude</label>
+                    <label htmlFor="village-detail-longitude" className="form-label">Longitude</label>
                     <input
+                      id="village-detail-longitude"
                       type="number"
                       step="any"
                       value={editData.longitude}
@@ -316,8 +324,9 @@ const VillageDetail = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="form-label">Description</label>
+                  <label htmlFor="village-detail-description" className="form-label">Description</label>
                   <textarea
+                    id="village-detail-description"
                     value={editData.description}
                     onChange={(e) => setEditData((prev) => ({ ...prev, description: e.target.value }))}
                     className="form-input"
@@ -466,7 +475,7 @@ const VillageDetail = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
+          <div ref={deleteDialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 animate-fade-in">
             <h3 className="text-xl font-bold text-gray-800 mb-4">{isFrench ? 'Supprimer le village' : 'Delete village'}</h3>
             <p className="text-gray-600 mb-6">
               {isFrench ? 'Êtes-vous sûr de vouloir supprimer' : 'Are you sure you want to delete'} <strong>{village.name}</strong>{isFrench ? ' ? Cette action est irréversible.' : '? This action cannot be undone.'}

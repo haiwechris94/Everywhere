@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from './ui/useDialog'
 import { useForm } from 'react-hook-form'
 import { X, Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react'
 import { useLanguage } from '../i18n'
@@ -47,6 +48,8 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
     reset()
   }
 
+  const dialogRef = useDialog(isOpen, handleClose)
+
   if (!isOpen) return null
 
   return (
@@ -58,9 +61,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 animate-fade-in">
+      <div ref={dialogRef} className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 animate-fade-in">
         {/* Close button */}
-        <button
+        <button aria-label={t('common.close')}
           onClick={handleClose}
           className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
@@ -121,13 +124,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label className="form-label">{t('auth.email')}</label>
+                <label htmlFor="forgot-password-modal-email" className="form-label">{t('auth.email')}</label>
                 <div className="relative">
                   <Mail
                     size={18}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                   />
                   <input
+                    id="forgot-password-modal-email"
                     type="email"
                     {...register('email', {
                       required: t('validation.emailRequired'),

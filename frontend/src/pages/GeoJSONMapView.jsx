@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { MapContainer, TileLayer, useMap, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -39,6 +40,7 @@ const ENGAGEMENT_STATUS_LABELS = {
 // Village People Groups Modal Component
 // Now supports both villages (Admin 3) and admin areas (Admin 1/2 - regions/departments)
 const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, adminLevel, isAdminArea }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const navigate = useNavigate()
   const [peopleGroups, setPeopleGroups] = useState([])
   const [loading, setLoading] = useState(false)
@@ -103,7 +105,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
   
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000]">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col animate-fade-in">
+      <div ref={dialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col animate-fade-in">
         {/* Header */}
         <div className="p-4 border-b flex items-center justify-between bg-gradient-to-r from-primary-50 to-blue-50 rounded-t-xl">
           <div>
@@ -115,7 +117,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
               {loading ? 'Chargement...' : `${peopleGroups.length} groupe(s) de peuples trouvé(s)`}
             </p>
           </div>
-          <button 
+          <button aria-label="Fermer" 
             onClick={onClose}
             className="p-2 hover:bg-white/50 rounded-lg transition-colors"
           >
@@ -185,7 +187,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
                         <p className="mt-2 text-sm text-gray-500 line-clamp-2">{pg.description}</p>
                       )}
                     </div>
-                    <button
+                    <button aria-label={isFrench ? 'Voir les détails' : 'View details'}
                       onClick={() => navigate(`/people-groups/${pg._id}`)}
                       className="ml-4 p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                       title={isFrench ? 'Voir les détails' : 'View details'}
@@ -215,6 +217,7 @@ const VillagePeopleGroupsModal = ({ isOpen, onClose, villageName, polygon, admin
 
 // Add People Group Modal Component
 const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess }) => {
+  const dialogRef = useDialog(isOpen, onClose)
   const queryClient = useQueryClient()
   const [formData, setFormData] = useState({
     name: '',
@@ -316,7 +319,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
   
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000]">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-fade-in">
+      <div ref={dialogRef} className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-fade-in">
         {/* Header */}
         <div className="p-4 border-b flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-xl">
           <div>
@@ -328,7 +331,7 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
               Village: {villageName}
             </p>
           </div>
-          <button 
+          <button aria-label="Fermer" 
             onClick={onClose}
             className="p-2 hover:bg-white/50 rounded-lg transition-colors"
           >
@@ -339,10 +342,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="geo-jsonmap-view-nom-du-groupe-de-peuples" className="block text-sm font-medium text-gray-700 mb-1">
               Nom du groupe de peuples *
             </label>
             <input
+              id="geo-jsonmap-view-nom-du-groupe-de-peuples"
               type="text"
               name="name"
               value={formData.name}
@@ -354,10 +358,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="geo-jsonmap-view-village" className="block text-sm font-medium text-gray-700 mb-1">
               Village
             </label>
             <input
+              id="geo-jsonmap-view-village"
               type="text"
               name="villageName"
               value={formData.villageName}
@@ -368,10 +373,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="geo-jsonmap-view-population" className="block text-sm font-medium text-gray-700 mb-1">
               Population
             </label>
             <input
+              id="geo-jsonmap-view-population"
               type="number"
               name="population"
               min="0"
@@ -384,10 +390,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="geo-jsonmap-view-nombre-d-eglises" className="block text-sm font-medium text-gray-700 mb-1">
                 Nombre d'églises
               </label>
               <input
+                id="geo-jsonmap-view-nombre-d-eglises"
                 type="number"
                 name="numberOfChurches"
                 min="0"
@@ -397,10 +404,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="geo-jsonmap-view-generation-d-eglise" className="block text-sm font-medium text-gray-700 mb-1">
                 Génération d'église
               </label>
               <input
+                id="geo-jsonmap-view-generation-d-eglise"
                 type="number"
                 name="churchGeneration"
                 min="0"
@@ -427,10 +435,11 @@ const AddPeopleGroupModal = ({ isOpen, onClose, villageName, polygon, onSuccess 
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="geo-jsonmap-view-description" className="block text-sm font-medium text-gray-700 mb-1">
               Description
             </label>
             <textarea
+              id="geo-jsonmap-view-description"
               name="description"
               value={formData.description}
               onChange={handleChange}
@@ -1462,7 +1471,7 @@ const GeoJSONMapView = () => {
             <div className="px-3 py-2 border-b">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-sm font-semibold text-gray-700">Villages</h2>
-                <button
+                <button aria-label={showFilters ? t('villagesMap.hideFilters') : t('villagesMap.showFilters')}
                   onClick={() => setShowFilters(!showFilters)}
                   className="p-1 rounded hover:bg-gray-100 transition-colors"
                   title={showFilters ? t('villagesMap.hideFilters') : t('villagesMap.showFilters')}
@@ -1482,7 +1491,7 @@ const GeoJSONMapView = () => {
                   className="w-full pl-8 pr-8 py-1.5 text-xs border-0 border-b border-gray-200 bg-transparent focus:ring-0 focus:border-gray-400 placeholder-gray-400"
                 />
                 {searchQuery && (
-                  <button 
+                  <button aria-label={t('common.clearSearch')} 
                     onClick={() => setSearchQuery('')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500"
                   >
@@ -1584,7 +1593,7 @@ const GeoJSONMapView = () => {
                       <span>{t('villagesMap.dmmStatus')} (auto)</span>
                       <Eye size={12} />
                     </div>
-                    <button
+                    <button aria-label={isFrench ? 'Actualiser' : 'Refresh'}
                       onClick={refreshVillageStatuses}
                       className="p-1.5 rounded text-indigo-500 hover:bg-indigo-50 transition-colors"
                       title={isFrench ? 'Actualiser' : 'Refresh'}
@@ -1674,7 +1683,7 @@ const GeoJSONMapView = () => {
       </div>
       
       {/* Sidebar Toggle Button */}
-      <button
+      <button aria-label={sidebarOpen ? t('common.hidePanel') : t('common.showPanel')} aria-expanded={sidebarOpen}
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="absolute left-0 top-1/2 -translate-y-1/2 z-[1002] bg-white shadow-lg rounded-r-lg p-2 hover:bg-gray-50 transition-all"
         style={{ left: sidebarOpen ? '384px' : '0' }}
@@ -1694,14 +1703,14 @@ const GeoJSONMapView = () => {
         
         {/* Top Right Controls */}
         <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
-          <button 
+          <button aria-label={isFrench ? 'Ma position' : 'My location'} 
             onClick={handleLocateMe} 
             className="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50" 
             title={isFrench ? 'Ma position' : 'My location'}
           >
             <Navigation size={20} />
           </button>
-          <button 
+          <button aria-label={isFrench ? 'Voir tout le Cameroun' : 'View all Cameroon'} 
             onClick={handleFitAll} 
             className="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50" 
             title={isFrench ? 'Voir tout le Cameroun' : 'View all Cameroon'}

@@ -74,6 +74,11 @@ export const LanguageProvider = ({ children }) => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
   }, [language])
 
+  // Keep <html lang> in sync so screen readers pronounce the UI in the right language
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
   const value = {
     language,
     setLanguage,

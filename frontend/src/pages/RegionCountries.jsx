@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../components/ui/useDialog'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronRight } from 'lucide-react'
@@ -26,6 +27,8 @@ const RegionCountries = () => {
   const [editingRegion, setEditingRegion] = useState(false)
   const [creatingCountry, setCreatingCountry] = useState(false)
   const [editCountry, setEditCountry] = useState(null)
+  const regionDialogRef = useDialog(!!editingRegion, () => setEditingRegion(false))
+  const countryDialogRef = useDialog(!!editCountry, () => setEditCountry(null))
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['ng-region', regionId],
@@ -107,7 +110,7 @@ const RegionCountries = () => {
 
       {editingRegion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={regionDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
             <RegionForm
               mode="edit"
               initial={{
@@ -299,7 +302,7 @@ const RegionCountries = () => {
 
       {editCountry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
+          <div ref={countryDialogRef} className="max-w-lg w-full bg-white rounded-xl p-4 max-h-[85vh] overflow-y-auto">
             <CountryForm
               mode="edit"
               regionId={regionId}

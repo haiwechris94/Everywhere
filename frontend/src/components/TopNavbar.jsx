@@ -94,6 +94,18 @@ const TopNavbar = () => {
     setMobileOpen(false)
   }, [location.pathname])
 
+  // Escape closes the mobile drawer and the user menu
+  useEffect(() => {
+    if (!mobileOpen && !userMenuOpen) return undefined
+    const onKeyDown = (e) => {
+      if (e.key !== 'Escape') return
+      setMobileOpen(false)
+      setUserMenuOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mobileOpen, userMenuOpen])
+
   useEffect(() => {
     try { localStorage.setItem(COLLAPSE_KEY, String(collapsed)) } catch { /* noop */ }
   }, [collapsed])
